@@ -1,0 +1,85 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ROS2 : BUILD : framework : PKG : head_unit : mrs_voice_recognition",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                "mrs_voice_recognition"
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : PKG : head_unit : mrs_hu_hitomi",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                "mrs_hu_hitomi"
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : PKG : head_unit : mrs_hu_mimi",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                "mrs_hu_mimi"
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : PKG : mrs_mikumikumoving_interfaces",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                "mrs_mikumikumoving_interfaces"
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : PKG : mrs_interfaces",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                "mrs_interfaces",
+                "--allow-overriding mrs_interfaces"
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : ALL",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "bulid",
+                "release",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : framework : REBUILD",
+            "type": "shell",
+            "command": "${workspaceFolder}/src/PlanetaryModule/build.sh",
+            "args": [
+                "${workspaceFolder}/src/PlanetaryModule",
+                "REBUILD",
+                "",
+                ""
+            ]
+        }
+    ]
+}

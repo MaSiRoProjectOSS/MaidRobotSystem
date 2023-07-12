@@ -1,0 +1,53 @@
+{
+	"folders": [
+		{
+			"name": "Maid Robot System",
+			"path": "."
+		}
+	],
+	"settings": {
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"doxdocgen.file.versionTag": "@version 0.23.4",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/*.code-search": true,
+			"**/.pio/build": true,
+			"**/.git/**": true,
+			"**/__*": true,
+			"**/Doxyfile": true,
+			"**/Doxygen": true
+		},
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/node_modules/*/**": true,
+			"**/.hg/store/**": true,
+			"**/.pio": true,
+			"**/*.map": true,
+			"**/doxygen": true,
+			"**/Doxyfile": true,
+			"**/build": true
+		},
+		"cSpell.words": [
+			"chgrp",
+			"doxygen",
+			"endgantt",
+			"gantt",
+			"shacklebone",
+			"startgantt",
+			"unstarted",
+			"usermod"
+		],
+		"forbeslindesay-taskrunner.source": "Workspace",
+		"markdown-preview-enhanced.configPath": "${workspaceFolder}/.mume",
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.autopep8"
+		},
+		"python.formatting.provider": "none"
+	}
+}

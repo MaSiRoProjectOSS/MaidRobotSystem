@@ -1,0 +1,271 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ROS2 : COMMANDS : help : run",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "run",
+                "--help",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : help : launch",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "launch",
+                "--help",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : help : security",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "security",
+                "--help",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : multicast : receive",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "multicast",
+                "receive",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : multicast : send",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "multicast",
+                "send",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : topic",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "topic",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : service",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "service",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : pkg",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "pkg",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : param",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "param",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : node",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "node",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : lifecycle : nodes",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "lifecycle",
+                "nodes",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : interface",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "interface",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : docto(wtf)",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "doctor",
+                "-r",
+                "hello",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : start",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "daemon",
+                "start",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : stop",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "daemon",
+                "stop",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : status",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "daemon",
+                "status",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : component",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "component",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : action",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "action",
+                "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : bag : storage",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "bag",
+                "list",
+                "storage",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : bag : converter",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "bag",
+                "list",
+                "converter",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : bag : compressor",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "bag",
+                "list",
+                "compressor",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : bag : decompressor",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../PlanetaryModule/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../PlanetaryModule",
+                "bag",
+                "list",
+                "decompressor",
+                ""
+            ]
+        }
+    ]
+}
