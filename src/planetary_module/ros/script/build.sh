@@ -21,7 +21,10 @@ COLOR_ON_YELLOW="\e[33m"
 COLOR_OFF="\e[m"
 ## ================================
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
-source ${SCRIPT_FOLDER}/env.sh ${SCRIPT_FOLDER}/../..
+#SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
+TARGET_FOLDER=${SCRIPT_FOLDER}/../../../..
+#TARGET_FOLDER=`readlink -f ${SCRIPT_FOLDER}/../../../..`
+source ${SCRIPT_FOLDER}/env.sh ${TARGET_FOLDER}
 
 if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================

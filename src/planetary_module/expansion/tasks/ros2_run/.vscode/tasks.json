@@ -6,11 +6,11 @@
         {
             "label": "ROS2 : RUN : head_unit : node_hitomi",
             "type": "shell",
-            "command": "${workspaceFolder}/src/PlanetaryModule/commands.sh",
+            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/src/PlanetaryModule",
+                "${workspaceFolder}/../../../../planetary_module",
                 "launch",
-                "/opt/MaidRobotSystem/source/ros/mrs_hu_hitomi/launch/node_hitomi.py",
+                "/opt/MaidRobotSystem/src/planetary_module/ros/package/mrs_hu_hitomi/launch/node_hitomi.py",
                 "",
                 ""
             ]

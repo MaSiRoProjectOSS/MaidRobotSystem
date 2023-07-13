@@ -2,7 +2,7 @@
 MY_NODE_NAME=$1
 MY_PACKAGE_NAME=$2
 
-source $(cd $(dirname $0)/../../source/ros/ && pwd)/env.sh
+echo source $(readlink -f $(dirname $0))/env.sh
 
 
 if [ -z "${MY_NODE_NAME}" ]; then

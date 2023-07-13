@@ -1,0 +1,15 @@
+[Unit]
+Description=start MaidRobotSystem program
+Requisite=NetworkManager.service
+After=NetworkManager.service
+Wants=network.target
+Before=network.target network-online.target
+
+
+[Service]
+Type=forking
+ExecStart=/opt/MaidRobotSystem/src/planetary_module/ros/script/service_HeadUnit.sh
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

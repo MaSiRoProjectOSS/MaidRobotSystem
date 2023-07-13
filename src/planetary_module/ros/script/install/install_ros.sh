@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source env.sh
+source ../env.sh
 
 ## =======================================
 ## Settings
@@ -9,7 +9,7 @@ ROS_DISTRO=humble
 INSTALL_ROS_DESKTOP=false
 INSTALL_ROS_DEVELOPMENT_TOOLS=false
 INSTALL_ROS_DDS=true
-INSTALL_ROS_UROS=true
+INSTALL_ROS_UROS=false
 
 ## ================================
 ## Escape sequence
@@ -31,8 +31,8 @@ if [ 0 -ne $ret ]; then
     sudo groupadd MaSiRoProject
     sudo usermod -aG MaSiRoProject $USER
     echo -e "${COLOR_ON_BLUE}* Join group : MaSiRoProject${COLOR_OFF}"
+    groups $USER
 fi
-
 
 ## =======================================
 ## install ROS2
@@ -88,8 +88,8 @@ else
 
     source /opt/ros/${ROS_DISTRO}/setup.bash
     cd
-    sudo rosdep init
-    rosdep update
+    #sudo rosdep init
+    #rosdep update
 fi
 
 if [ ! -d "/opt/ros/${ROS_DISTRO}" ];
