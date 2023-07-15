@@ -61,6 +61,9 @@ if [ -n "${ROS_DISTRO}" ] ;then
         then
             if [ "clean" = "${WORK_COMMANDS}" ]; then
                 rm -rf ${MRS_WORKSPACE}/.colcon/*
+                echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
+                echo -e "${COLOR_ON_GREEN}    rm -rf ${MRS_WORKSPACE}/.colcon${COLOR_OFF}"
+                echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
             else
                 if [ "REBUILD" = "${WORK_COMMANDS}" ]; then
                     #echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"

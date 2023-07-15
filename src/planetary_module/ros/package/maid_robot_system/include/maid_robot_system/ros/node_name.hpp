@@ -19,6 +19,7 @@
 /* ------------------------------------------------------------------------ */
 // unit : fms
 /* ------------------------------------------------------------------------ */
+#define MRS_NODE_CONDITION_MONITORING         "condition_monitoring_node"
 #define MRS_NODE_FMS_REPORTER                 "reporter_node"
 #define MRS_NODE_FMS_DISPATCHER               "dispatcher_node"
 #define MRS_NODE_FMS_RECEPTIONIST             "receptionist_node"

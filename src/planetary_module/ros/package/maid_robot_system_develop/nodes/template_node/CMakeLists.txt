@@ -1,9 +1,11 @@
-# [node] mrs_cloud_node
+# [node] template_node
 
-set(NODE_NAME mrs_cloud_node)
+set(NODE_NAME template_node)
 
 add_executable(${NODE_NAME}
-  src/mrs_cloud_node.cpp
+  src/main.cpp
+  src/ros/node_implement.cpp
+  src/models/model_implement.cpp
 )
 
 target_include_directories(${NODE_NAME}

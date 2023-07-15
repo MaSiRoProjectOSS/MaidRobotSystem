@@ -7,11 +7,10 @@ WORK_FOLDER=`readlink -f ${WORK_FOLDER}`
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
 SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
 
-PARAM_01=$2
-PARAM_02=$3
-PARAM_03=$4
-PARAM_04=$5
-PARAM_05=$6
+CMD_TOPIC_NAME=$2
+CMD_MESSAGE_TYPE=$3
+CMD_YAML_FILE=`cat $4`
+CMD_OPTIONS=$5
 ## ================================
 ## Escape sequence
 COLOR_ON_GREEN="\e[32m"
@@ -38,9 +37,9 @@ then
         echo -e "${COLOR_ON_GREEN}  CAST          :${COLOR_OFF} ${MRS_MY_NAME_IS} [ID:${MRS_CAST_ID}]"
         echo -e "${COLOR_ON_GREEN}  Target Fodler :${COLOR_OFF} ${MRS_WORKSPACE}"
         echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
-        echo -e "${COLOR_ON_GREEN}[command]${COLOR_OFF} ros2 ${PARAM_01} ${PARAM_02} ${PARAM_03} ${PARAM_04} ${PARAM_05}"
+        echo -e "${COLOR_ON_GREEN}[command]${COLOR_OFF} ros2 topic pub ${CMD_OPTIONS} ${CMD_TOPIC_NAME} ${CMD_MESSAGE_TYPE} \"${CMD_YAML_FILE}\""
         echo -e ""
-        ros2 ${PARAM_01} ${PARAM_02} ${PARAM_03} ${PARAM_04} ${PARAM_05}
+        ros2 topic pub ${CMD_OPTIONS} ${CMD_TOPIC_NAME} ${CMD_MESSAGE_TYPE} "${CMD_YAML_FILE}"
         echo -e "${COLOR_ON_GREEN}-------------------------------------------------------------------------------${COLOR_OFF}"
     else
         echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"

@@ -12,6 +12,7 @@
                 "run",
                 "--help",
                 "",
+                "",
                 ""
             ]
         },
@@ -23,6 +24,7 @@
                 "${workspaceFolder}/../../../../../",
                 "launch",
                 "--help",
+                "",
                 "",
                 ""
             ]
@@ -36,6 +38,7 @@
                 "security",
                 "--help",
                 "",
+                "",
                 ""
             ]
         },
@@ -47,6 +50,7 @@
                 "${workspaceFolder}/../../../../../",
                 "multicast",
                 "receive",
+                "",
                 "",
                 ""
             ]
@@ -60,6 +64,7 @@
                 "multicast",
                 "send",
                 "",
+                "",
                 ""
             ]
         },
@@ -71,6 +76,7 @@
                 "${workspaceFolder}/../../../../../",
                 "topic",
                 "list",
+                "",
                 "",
                 ""
             ]
@@ -84,6 +90,7 @@
                 "service",
                 "list",
                 "",
+                "",
                 ""
             ]
         },
@@ -95,6 +102,7 @@
                 "${workspaceFolder}/../../../../../",
                 "pkg",
                 "list",
+                "",
                 "",
                 ""
             ]
@@ -108,6 +116,7 @@
                 "pkg",
                 "executables",
                 "",
+                "",
                 ""
             ]
         },
@@ -119,6 +128,7 @@
                 "${workspaceFolder}/../../../../../",
                 "param",
                 "list",
+                "",
                 "",
                 ""
             ]
@@ -132,6 +142,7 @@
                 "node",
                 "list",
                 "",
+                "",
                 ""
             ]
         },
@@ -143,6 +154,7 @@
                 "${workspaceFolder}/../../../../../",
                 "lifecycle",
                 "nodes",
+                "",
                 "",
                 ""
             ]
@@ -156,6 +168,7 @@
                 "interface",
                 "list",
                 "-a",
+                "",
                 ""
             ]
         },
@@ -168,6 +181,7 @@
                 "interface",
                 "list",
                 "-s",
+                "",
                 ""
             ]
         },
@@ -180,6 +194,7 @@
                 "interface",
                 "list",
                 "-m",
+                "",
                 ""
             ]
         },
@@ -192,6 +207,7 @@
                 "doctor",
                 "-r",
                 "hello",
+                "",
                 ""
             ]
         },
@@ -203,6 +219,7 @@
                 "${workspaceFolder}/../../../../../",
                 "daemon",
                 "start",
+                "",
                 "",
                 ""
             ]
@@ -216,6 +233,7 @@
                 "daemon",
                 "stop",
                 "",
+                "",
                 ""
             ]
         },
@@ -227,6 +245,7 @@
                 "${workspaceFolder}/../../../../../",
                 "daemon",
                 "status",
+                "",
                 "",
                 ""
             ]
@@ -240,6 +259,7 @@
                 "component",
                 "list",
                 "",
+                "",
                 ""
             ]
         },
@@ -251,6 +271,7 @@
                 "${workspaceFolder}/../../../../../",
                 "action",
                 "list",
+                "",
                 "",
                 ""
             ]
@@ -264,6 +285,7 @@
                 "bag",
                 "list",
                 "storage",
+                "",
                 ""
             ]
         },
@@ -276,6 +298,7 @@
                 "bag",
                 "list",
                 "converter",
+                "",
                 ""
             ]
         },
@@ -288,6 +311,7 @@
                 "bag",
                 "list",
                 "compressor",
+                "",
                 ""
             ]
         },
@@ -300,6 +324,7 @@
                 "bag",
                 "list",
                 "decompressor",
+                "",
                 ""
             ]
         }

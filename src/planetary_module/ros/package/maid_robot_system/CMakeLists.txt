@@ -31,7 +31,7 @@ write_file(${CMAKE_CURRENT_SOURCE_DIR}/include/maid_robot_system/config/__genera
   "#ifndef MAID_ROBOT_SYSTEM_CONFIG_GENERATE_CONFIG_HPP\n"
   "#define MAID_ROBOT_SYSTEM_CONFIG_GENERATE_CONFIG_HPP\n"
   "\n"
-  "#define CONFIG_PATH_HOME \"${CMAKE_CURRENT_SOURCE_DIR}\"\n"
+  "#define CONFIG_PATH_HOME \"${MRS_WORKSPACE}\"\n"
   "#define CONFIG_SKIN_NAME \"$ENV{MRS_MY_NAME_IS}\"\n"
   "#define CONFIG_CAST_ID    $ENV{MRS_CAST_ID}\n"
   "\n"

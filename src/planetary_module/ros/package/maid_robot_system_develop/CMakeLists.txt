@@ -46,6 +46,7 @@ find_package(maid_robot_system REQUIRED)
 # /////////////////////////////////////////////
 
 add_subdirectory(nodes/mrs_cloud_node)
+add_subdirectory(nodes/template_node)
 
 # /////////////////////////////////////////////
 

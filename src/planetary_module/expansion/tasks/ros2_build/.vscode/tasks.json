@@ -12,6 +12,7 @@
                 "bulid",
                 "debug",
                 "maid_robot_system",
+                "",
                 ""
             ]
         },
@@ -24,8 +25,13 @@
                 "bulid",
                 "debug",
                 "maid_robot_system_develop",
+                "",
                 ""
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         },
         {
             "label": "ROS2 : BUILD : ALL-BUILD",
@@ -35,8 +41,14 @@
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "bulid",
                 "release",
+                "",
+                "",
                 ""
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "label": "ROS2 : BUILD : CLEAN",
@@ -45,6 +57,8 @@
             "args": [
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "clean",
+                "",
+                "",
                 "",
                 ""
             ]
@@ -57,7 +71,12 @@
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "REBUILD",
                 "",
+                "",
+                "",
                 ""
+            ],
+            "dependsOn": [
+                "ROS2 : BUILD : CLEAN"
             ]
         }
     ]
