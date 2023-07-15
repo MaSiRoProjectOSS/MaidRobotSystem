@@ -24,7 +24,8 @@
 			"**/.git/**": true,
 			"**/__*": true,
 			"**/Doxyfile": true,
-			"**/Doxygen": true
+			"**/Doxygen": true,
+			"**/.colcon": true
 		},
 		"files.watcherExclude": {
 			"**/.git/objects/**": true,

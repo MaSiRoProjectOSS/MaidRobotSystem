@@ -4,59 +4,27 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "ROS2 : BUILD : PKG : head_unit : mrs_voice_recognition",
+            "label": "ROS2 : BUILD : DEBUG : maid_robot_system",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "bulid",
-                "release",
-                "mrs_voice_recognition"
+                "debug",
+                "maid_robot_system",
+                ""
             ]
         },
         {
-            "label": "ROS2 : BUILD : PKG : head_unit : mrs_hu_hitomi",
+            "label": "ROS2 : BUILD : DEBUG : maid_robot_system_develop",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "bulid",
-                "release",
-                "mrs_hu_hitomi"
-            ]
-        },
-        {
-            "label": "ROS2 : BUILD : PKG : head_unit : mrs_hu_mimi",
-            "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
-            "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
-                "release",
-                "mrs_hu_mimi"
-            ]
-        },
-        {
-            "label": "ROS2 : BUILD : PKG : mrs_mikumikumoving_interfaces",
-            "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
-            "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
-                "release",
-                "mrs_mikumikumoving_interfaces"
-            ]
-        },
-        {
-            "label": "ROS2 : BUILD : PKG : mrs_interfaces",
-            "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
-            "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
-                "release",
-                "mrs_interfaces",
-                "--allow-overriding mrs_interfaces"
+                "debug",
+                "maid_robot_system_develop",
+                ""
             ]
         },
         {
@@ -67,6 +35,17 @@
                 "${workspaceFolder}/../../../../planetary_module/ros/package",
                 "bulid",
                 "release",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : BUILD : CLEAN",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../planetary_module/ros/package",
+                "clean",
+                "",
                 ""
             ]
         },

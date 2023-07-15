@@ -1,11 +1,17 @@
 #!/bin/bash
 # ///////////////////////////////////////////////////////////////////
+# source /opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh
+# ///////////////////////////////////////////////////////////////////
 
 ## =======================================
 ## Settings
 ## =======================================
 ROS_DISTRO=humble
 export MRS_WORKSPACE=`cd ${1:-/opt/MaidRobotSystem} && pwd`
+
+# Maid robot system
+export MRS_MY_NAME_IS=${MRS_MY_NAME_IS:-`hostname`}
+export MRS_CAST_ID=${MRS_CAST_ID:-1000}
 
 ## =======================================
 ## Configuring environment
@@ -51,12 +57,8 @@ export RCUTILS_COLORIZED_OUTPUT=1
 export LANG=en_US.UTF-8
 
 ## =======================================
-## Settings : SYSTEM
+## Settings : ROS
 ## =======================================
-# Maid robot system
-export MRS_MY_NAME_IS=`hostname`
-export MRS_CAST_ID=1
-
 # ROS 1
 if [ -z "${ROS_IP}" ]; then
     export ROS_IP=`hostname -I  | cut -d " " -f 1`

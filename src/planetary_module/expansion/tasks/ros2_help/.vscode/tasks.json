@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "run",
                 "--help",
                 "",
@@ -20,7 +20,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "launch",
                 "--help",
                 "",
@@ -32,7 +32,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "security",
                 "--help",
                 "",
@@ -44,7 +44,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "multicast",
                 "receive",
                 "",
@@ -56,7 +56,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "multicast",
                 "send",
                 "",
@@ -68,7 +68,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "topic",
                 "list",
                 "",
@@ -80,7 +80,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "service",
                 "list",
                 "",
@@ -88,13 +88,25 @@
             ]
         },
         {
-            "label": "ROS2 : COMMANDS : list : pkg",
+            "label": "ROS2 : COMMANDS : list : pkg : list",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "pkg",
                 "list",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : pkg : executables",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "pkg",
+                "executables",
                 "",
                 ""
             ]
@@ -104,7 +116,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "param",
                 "list",
                 "",
@@ -116,7 +128,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "node",
                 "list",
                 "",
@@ -128,7 +140,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "lifecycle",
                 "nodes",
                 "",
@@ -136,14 +148,38 @@
             ]
         },
         {
-            "label": "ROS2 : COMMANDS : list : interface",
+            "label": "ROS2 : COMMANDS : list : interface : action",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "interface",
                 "list",
-                "",
+                "-a",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : interface : service",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "interface",
+                "list",
+                "-s",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : list : interface : message",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "interface",
+                "list",
+                "-m",
                 ""
             ]
         },
@@ -152,7 +188,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "doctor",
                 "-r",
                 "hello",
@@ -164,7 +200,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "start",
                 "",
@@ -176,7 +212,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "stop",
                 "",
@@ -188,7 +224,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "status",
                 "",
@@ -200,7 +236,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "component",
                 "list",
                 "",
@@ -212,7 +248,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "action",
                 "list",
                 "",
@@ -224,7 +260,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "storage",
@@ -236,7 +272,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "converter",
@@ -248,7 +284,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "compressor",
@@ -260,7 +296,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../planetary_module/ros/script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module",
+                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "decompressor",

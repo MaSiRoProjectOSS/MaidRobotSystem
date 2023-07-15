@@ -59,41 +59,51 @@ if [ -n "${ROS_DISTRO}" ] ;then
     then
         if [ -d "${WORK_FOLDER}" ]
         then
-            if [ "REBUILD" = "${WORK_COMMANDS}" ]; then
-                #echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                #echo "REBUILD (delete install folder)"
-                #rm -rf ${WORK_FOLDER}/install
-                #rm -rf ${WORK_FOLDER}/log
-                #rm -rf ${WORK_FOLDER}/build
-                WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
-            fi
-            if [ "debug" = "${WORK_BUILD_TYPE}" ]; then
-                WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" -DCMAKE_BUILD_TYPE=Debug"
-                COLCON_LOG_LEVEL=DEBUG
-            fi
+            if [ "clean" = "${WORK_COMMANDS}" ]; then
+                rm -rf ${MRS_WORKSPACE}/.colcon/*
+            else
+                if [ "REBUILD" = "${WORK_COMMANDS}" ]; then
+                    #echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                    #echo "REBUILD (delete install folder)"
+                    #rm -rf ${WORK_FOLDER}/install
+                    #rm -rf ${WORK_FOLDER}/log
+                    #rm -rf ${WORK_FOLDER}/build
+                    WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
+                fi
+                if [ "debug" = "${WORK_BUILD_TYPE}" ]; then
+                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" -DCMAKE_BUILD_TYPE=Debug"
+                    COLCON_LOG_LEVEL=DEBUG
+                fi
 
-            source /usr/share/colcon_cd/function/colcon_cd.sh
-            export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
-            source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-            if [ -e ${WORK_FOLDER}/install/ ]; then
-                source ${WORK_FOLDER}/install/local_setup.bash
-            fi
-            if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
-                source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
-            fi
+                source /usr/share/colcon_cd/function/colcon_cd.sh
+                export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
+                source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
+                if [ -e ${WORK_FOLDER}/install/ ]; then
+                    source ${WORK_FOLDER}/install/local_setup.bash
+                fi
+                if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
+                    source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
+                fi
 
-            MAKEFLAGS=-j4
+                MAKEFLAGS=-j4
 
-            echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-            if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
-                WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}
-            fi
-            echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
-            echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-            colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
-
-            if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
-                source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
+                echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
+                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}
+                fi
+                echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
+                echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
+                ret=$?
+                if [ 0 -eq ${ret} ]; then
+                    if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
+                        source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
+                    fi
+                else
+                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+                    echo -e "${COLOR_ON_RED}  Build failed(${ret}).${COLOR_OFF}"
+                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+                fi
             fi
         else
             echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
