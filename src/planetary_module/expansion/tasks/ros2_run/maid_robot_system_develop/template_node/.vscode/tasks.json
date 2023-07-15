@@ -4,14 +4,27 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "ROS2 : RUN : template_node : launch",
+            "label": "ROS2 : RUN : template_node : launch : file",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
-                "/opt/MaidRobotSystem/src/planetary_module/ros/package/mrs_hu_hitomi/launch/node_hitomi.py",
+                "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system_develop/launch/node_template.launch.py",
                 "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : RUN : template_node : launch : name",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system_develop",
+                "node_template.launch.py",
                 "",
                 ""
             ]
@@ -37,7 +50,7 @@
                 "/opt/MaidRobotSystem",
                 "param",
                 "get",
-                "/template_node",
+                "/maid_robot_system/template_node",
                 "template/param/times",
                 ""
             ]
@@ -50,61 +63,61 @@
                 "/opt/MaidRobotSystem",
                 "param",
                 "get",
-                "/template_node",
+                "/maid_robot_system/template_node",
                 "template/param/offset",
                 ""
             ]
         },
         {
-            "label": "ROS2 : RUN : template_node : param : set : times : 1",
+            "label": "ROS2 : RUN : template_node : param : set : times : 1.0",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
-                "get",
-                "/template_node",
+                "set",
+                "/maid_robot_system/template_node",
                 "template/param/times",
-                "1"
+                "1.0"
             ]
         },
         {
-            "label": "ROS2 : RUN : template_node : param : set : times : 10",
+            "label": "ROS2 : RUN : template_node : param : set : times : 10.0",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
-                "get",
-                "/template_node",
+                "set",
+                "/maid_robot_system/template_node",
                 "template/param/times",
-                "10"
+                "10.0"
             ]
         },
         {
-            "label": "ROS2 : RUN : template_node : param : set : offset : 0",
+            "label": "ROS2 : RUN : template_node : param : set : offset : 0.0",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
-                "get",
-                "/template_node",
+                "set",
+                "/maid_robot_system/template_node",
                 "template/param/offset",
-                "0"
+                "0.0"
             ]
         },
         {
-            "label": "ROS2 : RUN : template_node : param : set : offset : 5",
+            "label": "ROS2 : RUN : template_node : param : set : offset : 5.0",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
-                "get",
-                "/template_node",
+                "set",
+                "/maid_robot_system/template_node",
                 "template/param/offset",
-                "5"
+                "5.0"
             ]
         },
         {
@@ -115,7 +128,7 @@
                 "/opt/MaidRobotSystem",
                 "topic",
                 "info",
-                "/template/output",
+                "/maid_robot_system/template/output",
                 "",
                 ""
             ]
@@ -128,7 +141,7 @@
                 "/opt/MaidRobotSystem",
                 "topic",
                 "info",
-                "/template/input",
+                "/maid_robot_system/template/input",
                 "",
                 ""
             ]
@@ -141,7 +154,7 @@
                 "/opt/MaidRobotSystem",
                 "topic",
                 "echo",
-                "/template/output",
+                "/maid_robot_system/template/output",
                 "",
                 ""
             ]
@@ -154,7 +167,7 @@
                 "/opt/MaidRobotSystem",
                 "topic",
                 "echo",
-                "/template/input",
+                "/maid_robot_system/template/input",
                 "",
                 ""
             ]
@@ -165,10 +178,10 @@
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/command_topic_pub.sh",
             "args": [
                 "/opt/MaidRobotSystem",
-                "/template/input",
+                "/maid_robot_system/template/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_0.yaml",
-                "--once"
+                "-r 0.5"
             ]
         },
         {
@@ -177,10 +190,10 @@
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/command_topic_pub.sh",
             "args": [
                 "/opt/MaidRobotSystem",
-                "/template/input",
+                "/maid_robot_system/template/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_1.yaml",
-                "--once"
+                "-r 0.5"
             ]
         }
     ]

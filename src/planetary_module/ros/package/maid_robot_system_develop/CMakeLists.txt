@@ -45,8 +45,8 @@ find_package(maid_robot_system REQUIRED)
 # add node
 # /////////////////////////////////////////////
 
-add_subdirectory(nodes/mrs_cloud_node)
-add_subdirectory(nodes/template_node)
+add_subdirectory(nodes/unit/mrs_cloud_node)
+add_subdirectory(nodes/unit/template_node)
 
 # /////////////////////////////////////////////
 
@@ -54,6 +54,8 @@ include_directories(include)
 install(DIRECTORY include/
   DESTINATION include
 )
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME})
 
 ament_export_include_directories(include)
 ament_package()

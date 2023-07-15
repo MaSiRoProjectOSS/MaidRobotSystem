@@ -17,12 +17,12 @@ namespace maid_robot_system
 
 void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
 {
-    RCLCPP_DEBUG(this->_node_ptr->get_logger(), "callback_message()");
-    RCLCPP_INFO(this->_node_ptr->get_logger(), "callback_message()");
-    RCLCPP_WARN(this->_node_ptr->get_logger(), "callback_message()");
-    RCLCPP_ERROR(this->_node_ptr->get_logger(), "callback_message()");
-    RCLCPP_FATAL(this->_node_ptr->get_logger(), "callback_message()");
     this->_convert_msg.data = this->_model.calculate(msg.data);
+    // RCLCPP_DEBUG(this->_node_ptr->get_logger(), "callback_message() : %f", this->_convert_msg.data);
+    RCLCPP_INFO(this->_node_ptr->get_logger(), "callback_message() : %f", this->_convert_msg.data);
+    // RCLCPP_WARN(this->_node_ptr->get_logger(), "callback_message() : %f", this->_convert_msg.data);
+    // RCLCPP_ERROR(this->_node_ptr->get_logger(), "callback_message() : %f", this->_convert_msg.data);
+    // RCLCPP_FATAL(this->_node_ptr->get_logger(), "callback_message() : %f", this->_convert_msg.data);
 }
 
 void NodeImplement::callback_param()
@@ -35,15 +35,16 @@ void NodeImplement::callback_param()
     this->_sub_parameter = std::make_shared<rclcpp::ParameterEventHandler>(this);
     auto cb              = [this](const rclcpp::Parameter &param) {
         std::string p_name = param.get_name().c_str();
+        RCLCPP_INFO(this->_node_ptr->get_logger(), "GET param - %s", p_name.c_str());
         switch (param.get_type()) {
             case rclcpp::PARAMETER_DOUBLE:
                 if (0 == p_name.compare(MRS_PARAMETER_TEMPLATE_TIMES)) {
                     this->_model.set_times(param.as_double());
-                    RCLCPP_INFO(this->_node_ptr->get_logger(), "set param : %s[%f]", MRS_PARAMETER_TEMPLATE_TIMES, this->_model.get_times());
+                    RCLCPP_INFO(this->_node_ptr->get_logger(), "  set param : %s[%f]", MRS_PARAMETER_TEMPLATE_TIMES, this->_model.get_times());
                 }
                 if (0 == p_name.compare(MRS_PARAMETER_TEMPLATE_OFFSET)) {
                     this->_model.set_offset(param.as_double());
-                    RCLCPP_INFO(this->_node_ptr->get_logger(), "set param : %s[%f]", MRS_PARAMETER_TEMPLATE_OFFSET, this->_model.get_offset());
+                    RCLCPP_INFO(this->_node_ptr->get_logger(), "  set param : %s[%f]", MRS_PARAMETER_TEMPLATE_OFFSET, this->_model.get_offset());
                 }
                 break;
             case rclcpp::PARAMETER_INTEGER:
@@ -59,12 +60,26 @@ void NodeImplement::callback_param()
                 break;
         }
     };
-    this->_handle_param = this->_sub_parameter->add_parameter_callback("param_" NODE_IMPLEMENT_NODE, cb);
+
+    this->_handle_param1 = this->_sub_parameter->add_parameter_callback(MRS_PARAMETER_TEMPLATE_OFFSET, cb);
+    this->_handle_param2 = this->_sub_parameter->add_parameter_callback(MRS_PARAMETER_TEMPLATE_TIMES, cb);
 }
 
 void NodeImplement::callback_timer()
 {
     this->_pub_value->publish(this->_convert_msg);
+
+#if 1
+    static double __times  = 0;
+    static double __offset = 0;
+    static double __data   = 0;
+    if ((__times != this->_model.get_times()) || (__offset != this->_model.get_offset()) || (__data != this->_convert_msg.data)) {
+        RCLCPP_INFO(this->_node_ptr->get_logger(), "callback_timer : %f = %f * n + %f", this->_convert_msg.data, this->_model.get_times(), this->_model.get_offset());
+        __times  = this->_model.get_times();
+        __offset = this->_model.get_offset();
+        __data   = this->_convert_msg.data;
+    }
+#endif
 }
 
 NodeImplement::NodeImplement(int argc, char **argv) : Node(NODE_IMPLEMENT_NODE)
@@ -91,6 +106,7 @@ NodeImplement::NodeImplement(int argc, char **argv) : Node(NODE_IMPLEMENT_NODE)
 
 NodeImplement::~NodeImplement()
 {
+    RCLCPP_DEBUG(this->_node_ptr->get_logger(), "[%s] : %s", NODE_IMPLEMENT_NODE, "");
 }
 
 } // namespace maid_robot_system

@@ -82,7 +82,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 # /////////////////////////////////////////////
 
 add_subdirectory(nodes/condition_monitoring_node)
-#add_subdirectory(nodes/hitomi_node)
+#add_subdirectory(nodes/head_unit/mitumeru_node)
+#add_subdirectory(nodes/head_unit/hitomi_node)
+#add_subdirectory(nodes/head_unit/kubi_node)
 
 
 # /////////////////////////////////////////////
@@ -91,6 +93,9 @@ include_directories(include)
 install(DIRECTORY include/
   DESTINATION include
 )
+install(DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME})
+
 ament_export_dependencies(rosidl_default_runtime)
 ament_export_include_directories(include)
 ament_package()

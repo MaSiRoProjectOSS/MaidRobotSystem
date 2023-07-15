@@ -10,7 +10,7 @@ add_executable(${NODE_NAME}
 
 target_include_directories(${NODE_NAME}
 PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../include>
   $<INSTALL_INTERFACE:include>
   ${maid_robot_system_INCLUDE_DIRS}
 PRIVATE

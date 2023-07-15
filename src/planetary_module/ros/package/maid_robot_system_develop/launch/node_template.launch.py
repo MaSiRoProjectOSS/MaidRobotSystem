@@ -12,8 +12,12 @@ def generate_launch_description():
         package='maid_robot_system_develop',
         executable='template_node',
         parameters=[{
-            "template/param/times"  :10,
-            "template/param/offset":  1,
+            "template": {
+                "param":{
+                    "times" : 20.0,
+                    "offset" : 3.0
+                }
+            }
         }],
         respawn=True,
         respawn_delay=2.0
