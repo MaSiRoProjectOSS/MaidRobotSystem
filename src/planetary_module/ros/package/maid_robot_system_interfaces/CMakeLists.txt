@@ -43,9 +43,8 @@ find_package(rosidl_default_generators REQUIRED)
 ###############################################
 #   MSG_EULER_FILE
 set(MSG_EULER_FILE
-  msg/EulerFloat.msg
-  msg/EulerInt16.msg
-  msg/EventValue.msg
+  msg/euler/EulerFloat.msg
+  msg/euler/EulerInt16.msg
 )
 ###############################################
 #   BUILD_DEVELOP
@@ -53,33 +52,12 @@ if(BUILD_DEVELOP)
   set(MSG_DEVELOP_FILE
     msg/sample/MrsSample.msg
   )
-else(BUILD_DEVELOP)
-  set(MSG_DEVELOP_FILE "")
 endif()
 ###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_DEVELOP_FILE}
   ${MSG_EULER_FILE}
-  msg/BodyMessage.msg
-  msg/CastResume.msg
-  msg/ClusterArm.msg
-  msg/ClusterLeg.msg
-  msg/ClusterLocation.msg
-  msg/DancingMessage.msg
-  msg/FramesNo.msg
-  msg/GazingAhead.msg
-  msg/MotionDataEulerInt16.msg
-  msg/Instructions.msg
-
-  msg/Collected.msg
-  msg/OrderReceptionist.msg
-  msg/BellInfo.msg
-  msg/HtmlPage.msg
-
-  msg/BoundingBox.msg
-  msg/BoundingBoxes.msg
-  msg/StateBehavior.msg
 
   DEPENDENCIES std_msgs geometry_msgs
 )

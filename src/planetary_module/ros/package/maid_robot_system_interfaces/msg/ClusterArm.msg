@@ -1,9 +1,0 @@
-std_msgs/Float32    shoulder_mae
-std_msgs/Float32    shoulder_yoko
-std_msgs/Float32    elbow_roll
-std_msgs/Float32    elbow_mage
-std_msgs/Float32    shacklebone_roll
-std_msgs/Float32    shacklebone_bye
-std_msgs/Float32    shacklebone_oide
-std_msgs/Float32    finger
-std_msgs/Float32    thumb

@@ -23,6 +23,7 @@ SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
 #SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
 source ${SCRIPT_FOLDER}/env.sh
 
+ret=0
 if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================
     ## command exsample:
@@ -99,10 +100,6 @@ if [ -n "${ROS_DISTRO}" ] ;then
                     if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
                         source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
                     fi
-                else
-                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-                    echo -e "${COLOR_ON_RED}  Build failed(${ret}).${COLOR_OFF}"
-                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
                 fi
             fi
         else
@@ -141,4 +138,10 @@ if [ -n "${ROS_DISTRO}" ] ;then
     echo -e "${COLOR_ON_BLUE}    BUILD_CLOUD_UNIT       : ${BUILD_CLOUD_UNIT}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    BUILD_MANAGEMENT_UNIT  : ${BUILD_MANAGEMENT_UNIT}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+fi
+
+if [ 0 -ne ${ret} ]; then
+    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+    echo -e "${COLOR_ON_RED}  Build failed(${ret}).${COLOR_OFF}"
+    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
 fi

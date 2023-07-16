@@ -63,7 +63,7 @@
                 ""
             ],
             "dependsOn": [
-                "ROS2 : BUILD : CLEAN"
+                "ROS2 : head_unit : BUILD : CLEAN"
             ]
         },
         {
