@@ -13,7 +13,6 @@
 ##      ./build.sh ${MRS_WORKSPACE} BUILD release
 ##
 
-
 COLOR_ON_RED="\e[31m"
 COLOR_ON_BLUE="\e[34m"
 COLOR_ON_GREEN="\e[32m"
@@ -22,9 +21,7 @@ COLOR_OFF="\e[m"
 ## ================================
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
 #SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
-TARGET_FOLDER=${SCRIPT_FOLDER}/../../../..
-#TARGET_FOLDER=`readlink -f ${SCRIPT_FOLDER}/../../../..`
-source ${SCRIPT_FOLDER}/env.sh ${TARGET_FOLDER}
+source ${SCRIPT_FOLDER}/env.sh
 
 if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================
@@ -92,7 +89,7 @@ if [ -n "${ROS_DISTRO}" ] ;then
 
                 echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
                 if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
-                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}
+                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}" --allow-overriding "${WORK_PACKAGES_SELECT}
                 fi
                 echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
                 echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
@@ -120,9 +117,28 @@ if [ -n "${ROS_DISTRO}" ] ;then
     fi
 
     echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}ROS           : ${ROS_DISTRO}${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}Workspace     : ${MRS_WORKSPACE}${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}Target folder : ${WORK_FOLDER}${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}Date          : ${COMPLILEDATE_TEXT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}Date : ${COMPLILEDATE_TEXT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}ROS                        : ${ROS_DISTRO}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}Workspace                  : ${MRS_WORKSPACE}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}Target folder              : ${WORK_FOLDER}${COLOR_OFF}"
+
+    echo -e "${COLOR_ON_BLUE}ENV${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}  ROS${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    ROS_DOMAIN_ID          : ${ROS_DOMAIN_ID}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    ROS_IP                 : ${ROS_IP}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    ROS_MASTER_URI         : ${ROS_MASTER_URI}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}  MRS${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    MRS_CAST_ID            : ${MRS_CAST_ID}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    MRS_MY_NAME_IS         : ${MRS_MY_NAME_IS}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    MRS_SKIN_HOME          : ${MRS_SKIN_HOME}${COLOR_OFF}"
+
+    echo -e "${COLOR_ON_BLUE}BUILD${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_DEVELOP          : ${BUILD_DEVELOP}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_HEAD_UNIT        : ${BUILD_HEAD_UNIT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_ARM_UNIT         : ${BUILD_ARM_UNIT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_WAIST_DOWN_UNIT  : ${BUILD_WAIST_DOWN_UNIT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_MOBILITY_UNIT    : ${BUILD_MOBILITY_UNIT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_CLOUD_UNIT       : ${BUILD_CLOUD_UNIT}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    BUILD_MANAGEMENT_UNIT  : ${BUILD_MANAGEMENT_UNIT}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
 fi

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>maid_robot_system</name>
+  <name>maid_robot_system_interfaces</name>
   <version>0.0.1</version>
-  <description>This package is for running Maid Robot System for ROS2</description>
+  <description>This package is Maid Robot System interface for ROS2</description>
   <maintainer email="developer@masiro-project.com">Akari</maintainer>
   <license>MIT License</license>
   <url type="website">https://www.masiro.cafe/</url>
@@ -11,9 +11,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>rclcpp_components</depend>
-  <depend>maid_robot_system_interfaces</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
 
   <build_depend>rosidl_default_generators</build_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>

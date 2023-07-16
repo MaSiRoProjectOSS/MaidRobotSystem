@@ -14,19 +14,6 @@
                 "maid_robot_system",
                 "",
                 ""
-            ]
-        },
-        {
-            "label": "ROS2 : BUILD : DEBUG : maid_robot_system_develop",
-            "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
-            "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
-                "debug",
-                "maid_robot_system_develop",
-                "",
-                ""
             ],
             "group": {
                 "kind": "build",

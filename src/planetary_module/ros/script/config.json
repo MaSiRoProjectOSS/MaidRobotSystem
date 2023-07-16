@@ -1,0 +1,14 @@
+{
+    "BUILD_HEAD_UNIT": "ON",
+    "BUILD_ARM_UNIT": "ON",
+    "BUILD_WAIST_DOWN_UNIT": "ON",
+    "BUILD_MOBILITY_UNIT": "ON",
+    "BUILD_CLOUD_UNIT": "ON",
+    "BUILD_MANAGEMENT_UNIT": "ON",
+    "BUILD_DEVELOP": "ON",
+    "ROS_DOMAIN_ID": 0,
+    "MRS_WORKSPACE": "/opt/MaidRobotSystem",
+    "MRS_MY_NAME_IS": "miko",
+    "MRS_SKIN_HOME": "/opt/MaidRobotSystem/data/skin/miko",
+    "MRS_CAST_ID": 1000
+}

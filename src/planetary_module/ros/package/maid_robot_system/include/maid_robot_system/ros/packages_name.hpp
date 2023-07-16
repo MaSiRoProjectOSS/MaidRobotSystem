@@ -16,7 +16,6 @@
 
 /* ======================================================================== */
 #define MRS_PACKAGES_MAID_ROBOT_SYSTEM "maid_robot_system"
-#define MRS_PACKAGES_DEVELOP           "maid_robot_system_develop"
 /* ======================================================================== */
 
 #endif // MAID_ROBOT_SYSTEM_ROS_PACKAGES_NAME_HPP

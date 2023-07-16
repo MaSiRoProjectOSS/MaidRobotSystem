@@ -4,10 +4,24 @@
 # ///////////////////////////////////////////////////////////////////
 
 ## =======================================
+## Settings : From config.json
+## =======================================
+WORK_DIR=$(cd $(dirname $0) && pwd)
+WORK_DIR=`readlink -f ${WORK_DIR}`
+if [ -e ${WORK_DIR}/config.json ]; then
+    json=$(cat ${WORK_DIR}/config.json | jq  -c)
+    for key in $(echo $json | jq -r keys[]); do
+        value=$(echo $json | jq -r .$key)
+        export $key=$value
+    done
+fi
+
+## =======================================
 ## Settings
 ## =======================================
+export BUILD_DATE=`date +%Y%m%d_%m%d%y`
 ROS_DISTRO=humble
-export MRS_WORKSPACE=`cd ${1:-/opt/MaidRobotSystem} && pwd`
+export MRS_WORKSPACE=${MRS_WORKSPACE:-/opt/MaidRobotSystem}
 
 # Maid robot system
 export MRS_MY_NAME_IS=${MRS_MY_NAME_IS:-`hostname`}
@@ -39,9 +53,9 @@ fi
 # mkdir -p ${MRS_WORKSPACE}/.ros/log
 #export ROS_LOG_DIR=${MRS_WORKSPACE}/.ros_log
 export ROS_HOME=${MRS_WORKSPACE}
-export ROS_LOG_DIR=~/.ros
-export RCUTILS_LOGGING_BUFFERED_STREAM=1
-export RCUTILS_COLORIZED_OUTPUT=1
+export ROS_LOG_DIR=${ROS_LOG_DIR:-~/.ros$}
+export RCUTILS_LOGGING_BUFFERED_STREAM=${RCUTILS_LOGGING_BUFFERED_STREAM:-1}
+export RCUTILS_COLORIZED_OUTPUT=${RCUTILS_COLORIZED_OUTPUT:-1}
 #export RCUTILS_CONSOLE_OUTPUT_FORMAT="[{severity} {time}] [{name}]: {message} ({function_name}() at {file_name}:{line_number})"
 #export RCUTILS_LOGGING_USE_STDOUT=1
 
@@ -65,6 +79,7 @@ if [ -z "${ROS_IP}" ]; then
 fi
 export ROS_MASTER_URI=http://${ROS_IP}:11311
 # ROS 2
-export ROS_DOMAIN_ID=0
+export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+
 
 # ###################################################################
