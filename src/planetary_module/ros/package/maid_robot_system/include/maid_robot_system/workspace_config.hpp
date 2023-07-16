@@ -11,10 +11,8 @@
 #define MAID_ROBOT_SYSTEM_WORKSPACE_CONFIG_HPP
 
 #include "config/project_config.hpp"
-#include "ros/node_name.hpp"
-#include "ros/packages_name.hpp"
-#include "ros/parameter_name.hpp"
-#include "ros/topic_name.hpp"
+
+#include <maid_robot_system_interfaces/interfaces.hpp>
 
 /* ======================================================================== */
 /**

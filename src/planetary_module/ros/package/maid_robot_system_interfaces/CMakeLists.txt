@@ -18,6 +18,21 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
 endif()
 
+# set compile options
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wno-deprecated-declarations
+    -Wno-unused-parameter
+    -Wno-unused-function
+    -Wno-implicit-fallthrough
+    -Wno-unused-variable
+  )
+endif()
+#add_compile_options(--warn-unused-cli)
+
 
 # find dependencies
 find_package(std_msgs REQUIRED)
@@ -69,5 +84,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs geometry_msgs
 )
 
+include_directories(include)
+install(DIRECTORY include/
+  DESTINATION include
+)
+
+ament_export_include_directories(include)
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()

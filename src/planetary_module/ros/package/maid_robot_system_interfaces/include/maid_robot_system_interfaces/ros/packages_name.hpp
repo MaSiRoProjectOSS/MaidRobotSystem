@@ -11,11 +11,10 @@
     ros2 run maid_robot_system shell_node
                 ↑-------------- this
  ======================================================================== */
-#ifndef MAID_ROBOT_SYSTEM_ROS_PACKAGES_NAME_HPP
-#define MAID_ROBOT_SYSTEM_ROS_PACKAGES_NAME_HPP
+#ifndef MAID_ROBOT_SYSTEM_INTERFACES_ROS_PACKAGES_NAME_HPP
+#define MAID_ROBOT_SYSTEM_INTERFACES_ROS_PACKAGES_NAME_HPP
 
-/* ======================================================================== */
+#define MRS_PACKAGES_INTERFACES        "maid_robot_system_interfaces"
 #define MRS_PACKAGES_MAID_ROBOT_SYSTEM "maid_robot_system"
-/* ======================================================================== */
 
 #endif // MAID_ROBOT_SYSTEM_ROS_PACKAGES_NAME_HPP

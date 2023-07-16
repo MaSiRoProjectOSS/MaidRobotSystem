@@ -10,8 +10,9 @@ add_executable(${NODE_NAME}
 
 target_include_directories(${NODE_NAME}
 PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../include>
   $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../../include>
+  ${maid_robot_system_interfaces_INCLUDE_DIRS}
 PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
 )
@@ -20,6 +21,7 @@ ament_target_dependencies(${NODE_NAME}
   rclcpp
   rclcpp_components
   std_msgs
+  maid_robot_system_interfaces
 )
 
 install(TARGETS ${NODE_NAME}

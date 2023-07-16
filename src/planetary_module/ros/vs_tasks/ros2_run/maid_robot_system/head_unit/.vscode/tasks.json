@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "ROS2 : head_unit : BUILD : DEBUG",
+            "label": "ROS2 : head_unit : BUILD : maid_robot_system",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
             "args": [
@@ -17,8 +17,54 @@
             ],
             "group": {
                 "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "ROS2 : head_unit : BUILD : [ALL]",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "bulid",
+                "debug",
+                "",
+                "",
+                ""
+            ],
+            "group": {
+                "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "ROS2 : head_unit : BUILD : CLEAN",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "clean",
+                "",
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : BUILD : REBUILD",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "REBUILD",
+                "",
+                "",
+                "",
+                ""
+            ],
+            "dependsOn": [
+                "ROS2 : BUILD : CLEAN"
+            ]
         },
         {
             "label": "ROS2 : sample_node : RUN : launch : file",
