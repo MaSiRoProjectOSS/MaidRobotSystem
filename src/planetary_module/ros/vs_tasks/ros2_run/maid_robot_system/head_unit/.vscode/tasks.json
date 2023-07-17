@@ -3,13 +3,80 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+        // LAUNCH task
+        {
+            "label": "ROS2 : head_unit : RUN : launch : head_unit",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system",
+                "unit_head.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : RUN : launch : node : node_image_compressed",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system",
+                "node_image_compressed.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : RUN : launch : node : node_hitomi",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system",
+                "node_hitomi.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : RUN : launch : node : node_mitumeru",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system",
+                "node_mitumeru.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : RUN : launch : node : node_kubi",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system",
+                "node_kubi.launch.py",
+                "",
+                ""
+            ]
+        },
+        // BUILD task
         {
             "label": "ROS2 : head_unit : BUILD : maid_robot_system",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../../",
-                "bulid",
+                "build",
                 "debug",
                 "maid_robot_system",
                 "",
@@ -23,10 +90,10 @@
         {
             "label": "ROS2 : head_unit : BUILD : [ALL]",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../../",
-                "bulid",
+                "build",
                 "debug",
                 "",
                 "",
@@ -40,7 +107,7 @@
         {
             "label": "ROS2 : head_unit : BUILD : CLEAN",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../../",
                 "clean",
@@ -53,7 +120,7 @@
         {
             "label": "ROS2 : head_unit : BUILD : REBUILD",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../ros/script/build.sh",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "${workspaceFolder}/../../../../../",
                 "REBUILD",
@@ -66,45 +133,7 @@
                 "ROS2 : head_unit : BUILD : CLEAN"
             ]
         },
-        {
-            "label": "ROS2 : sample_node : RUN : launch : file",
-            "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
-            "args": [
-                "/opt/MaidRobotSystem",
-                "launch",
-                "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/node_sample.launch.py",
-                "",
-                "",
-                ""
-            ]
-        },
-        {
-            "label": "ROS2 : sample_node : RUN : launch : name",
-            "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
-            "args": [
-                "/opt/MaidRobotSystem",
-                "launch",
-                "maid_robot_system",
-                "node_sample.launch.py",
-                "",
-                ""
-            ]
-        },
-        {
-            "label": "ROS2 : sample_node : RUN : run",
-            "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
-            "args": [
-                "/opt/MaidRobotSystem",
-                "run",
-                "maid_robot_system",
-                "sample_node",
-                "",
-                ""
-            ]
-        },
+        // sample
         {
             "label": "ROS2 : sample_node : CTRL : sample_node : param : get : times",
             "type": "shell",

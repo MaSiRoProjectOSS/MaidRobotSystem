@@ -12,6 +12,10 @@
 /* ======================================================================== */
 // unit : head
 /* ======================================================================== */
+#define MRS_TOPIC_IMAGE_RAW_RIGHT        "image/right/raw"
+#define MRS_TOPIC_IMAGE_RAW_LEFT         "image/left/raw"
+#define MRS_TOPIC_IMAGE_COMPRESSED_RIGHT "image/right/compressed"
+#define MRS_TOPIC_IMAGE_COMPRESSED_LEFT  "image/left/compressed"
 
 /* ======================================================================== */
 // unit : arm

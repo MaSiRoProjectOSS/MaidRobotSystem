@@ -6,10 +6,18 @@
 ## =======================================
 ## Settings : From config.json
 ## =======================================
-WORK_DIR=$(cd $(dirname $0) && pwd)
-WORK_DIR=`readlink -f ${WORK_DIR}`
-if [ -e ${WORK_DIR}/config.json ]; then
-    json=$(cat ${WORK_DIR}/config.json | jq  -c)
+if [ "-bash" = "$0" ]; then
+    CONFIG_PATH=${1:-/opt/MaidRobotSystem/src/planetary_module/ros/script/config.json}
+else
+    WORK_DIR=$(cd $(dirname $0) && pwd)
+    CONFIG_PATH=`readlink -f ${WORK_DIR}/config.json `
+    CONFIG_PATH=${1:-${CONFIG_PATH}}
+fi
+if [ ! -f ${CONFIG_PATH} ]; then
+    CONFIG_PATH="/opt/MaidRobotSystem/src/planetary_module/ros/script/config.json"
+fi
+if [ -f ${CONFIG_PATH} ]; then
+    json=$(cat ${CONFIG_PATH} | jq  -c)
     for key in $(echo $json | jq -r keys[]); do
         value=$(echo $json | jq -r .$key)
         export $key=$value

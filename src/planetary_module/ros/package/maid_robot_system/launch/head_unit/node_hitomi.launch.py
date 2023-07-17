@@ -2,18 +2,21 @@ import os
 import subprocess
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
     my_system_name = '/maid_robot_system/'
+    output_type = 'screen'
 
     hitomi_node = Node(
         namespace=my_system_name,
         package='maid_robot_system',
         executable='hitomi_node',
-        output="screen",
+        output=output_type,
         parameters=[{
-            "skin_name": "masiro",
+            "skin_name": "miko",
             "l_x": 135.0,
             "l_y": 455.0,
             "r_x": -46.0,

@@ -14,13 +14,29 @@ from launch_ros.actions import PushRosNamespace
 def generate_launch_description():
     output_type = 'screen'
 
-    launch_head_unit = IncludeLaunchDescription(
+    launch_node_hitomi = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/unit_head.launch.py'))
+                'launch/head_unit/node_hitomi.launch.py'))
+    )
+
+    launch_node_mitumeru = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/node_mitumeru.launch.py'))
+    )
+
+    launch_node_kubi = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/node_kubi.launch.py'))
     )
 
     return LaunchDescription([
-        launch_head_unit
+        launch_node_hitomi,
+        launch_node_mitumeru,
+        launch_node_kubi
     ])

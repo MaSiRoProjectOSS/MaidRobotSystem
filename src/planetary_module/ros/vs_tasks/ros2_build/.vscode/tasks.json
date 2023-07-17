@@ -6,10 +6,10 @@
         {
             "label": "ROS2 : BUILD : DEBUG : maid_robot_system",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
+            "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
+                "${workspaceFolder}/../../package",
+                "build",
                 "debug",
                 "maid_robot_system",
                 "",
@@ -23,10 +23,10 @@
         {
             "label": "ROS2 : BUILD : ALL-BUILD",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
+            "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
-                "bulid",
+                "/opt/MaidRobotSystem",
+                "build",
                 "release",
                 "",
                 "",
@@ -40,9 +40,9 @@
         {
             "label": "ROS2 : BUILD : CLEAN",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
+            "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
+                "/opt/MaidRobotSystem",
                 "clean",
                 "",
                 "",
@@ -53,9 +53,9 @@
         {
             "label": "ROS2 : BUILD : REBUILD",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../planetary_module/ros/script/build.sh",
+            "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "${workspaceFolder}/../../../../planetary_module/ros/package",
+                "/opt/MaidRobotSystem",
                 "REBUILD",
                 "",
                 "",

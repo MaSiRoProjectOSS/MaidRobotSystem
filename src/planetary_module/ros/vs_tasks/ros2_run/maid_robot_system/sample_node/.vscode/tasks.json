@@ -6,7 +6,7 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : launch : file",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
@@ -19,7 +19,7 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : launch : name",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
@@ -32,7 +32,7 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : run",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "run",
@@ -45,7 +45,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : get : times",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -58,7 +58,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : get : offset",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -71,7 +71,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : times : 1.0",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -84,7 +84,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : times : 10.0",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -97,7 +97,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : offset : 0.0",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -110,7 +110,7 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : offset : 5.0",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "param",
@@ -123,7 +123,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : info : messaging/output",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "topic",
@@ -136,7 +136,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : info : messaging/input",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "topic",
@@ -149,7 +149,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : echo : messaging/output",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "topic",
@@ -162,7 +162,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : echo : messaging/input",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "topic",
@@ -175,7 +175,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : set : 0 : messaging/input",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/command_topic_pub.sh",
+            "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "/maid_robot_system/messaging/input",
@@ -187,7 +187,7 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : set : 1 : messaging/input",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/command_topic_pub.sh",
+            "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "/maid_robot_system/messaging/input",
