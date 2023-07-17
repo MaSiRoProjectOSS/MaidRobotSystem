@@ -18,14 +18,14 @@
             ]
         },
         {
-            "label": "ROS2 : head_unit : RUN : launch : node : node_image_compressed",
+            "label": "ROS2 : head_unit : RUN : launch : node : node_image_transport",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_image_compressed.launch.py",
+                "node_image_transport.launch.py",
                 "",
                 ""
             ]

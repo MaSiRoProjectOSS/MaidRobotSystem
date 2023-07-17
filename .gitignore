@@ -45,6 +45,7 @@
 **/.ros_externals
 
 # Myproject
+data/streaming*.ogv
 **/__*
 **/.mume
 **/VC.DB*
