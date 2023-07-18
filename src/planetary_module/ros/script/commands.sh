@@ -2,16 +2,14 @@
 
 ## ================================
 ## Settings
-WORK_FOLDER=`cd ${1:-/opt/MaidRobotSystem} && pwd`
-WORK_FOLDER=`readlink -f ${WORK_FOLDER}`
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
 SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
 
-PARAM_01=$2
-PARAM_02=$3
-PARAM_03=$4
-PARAM_04=$5
-PARAM_05=$6
+PARAM_01=$1
+PARAM_02=$2
+PARAM_03=$3
+PARAM_04=$4
+PARAM_05=$5
 ## ================================
 ## Escape sequence
 COLOR_ON_GREEN="\e[32m"
@@ -21,11 +19,11 @@ COLOR_OFF="\e[m"
 source ${SCRIPT_FOLDER}/env.sh
 ## ================================
 
-if [ ! -z "${WORK_FOLDER}" ]
+if [ ! -z "${MRS_WORKSPACE}" ]
 then
-    if [ -d "${WORK_FOLDER}" ]
+    if [ -d "${MRS_WORKSPACE}" ]
     then
-        cd ${WORK_FOLDER}
+        cd ${MRS_WORKSPACE}
 
         export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
         source /usr/share/colcon_cd/function/colcon_cd.sh

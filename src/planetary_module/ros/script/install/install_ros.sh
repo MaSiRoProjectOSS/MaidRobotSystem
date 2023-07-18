@@ -128,7 +128,7 @@ if "${INSTALL_ROS_UROS}"; then
     rosdep update
     rosdep install --from-paths src --ignore-src -y
     # micro-ros のsetupをコンパイル
-    ${MRS_WORKSPACE}/source/ros/build.sh ${MRS_WORKSPACE}/.colcon/src BUILD release micro_ros_setup
+    ${MRS_WORKSPACE}/source/ros/build.sh build release micro_ros_setup
     # micro-ros のsetupを使えるようにする
     source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
 

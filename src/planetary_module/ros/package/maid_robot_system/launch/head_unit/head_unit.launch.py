@@ -12,7 +12,6 @@ from launch_ros.actions import PushRosNamespace
 
 
 def generate_launch_description():
-    output_type = 'screen'
 
     launch_nodes_hitomi = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

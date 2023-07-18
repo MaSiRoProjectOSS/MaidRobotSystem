@@ -8,7 +8,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "run",
                 "--help",
                 "",
@@ -21,7 +20,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "launch",
                 "--help",
                 "",
@@ -34,7 +32,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "security",
                 "--help",
                 "",
@@ -47,7 +44,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "multicast",
                 "receive",
                 "",
@@ -60,7 +56,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "multicast",
                 "send",
                 "",
@@ -73,7 +68,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "topic",
                 "list",
                 "",
@@ -86,7 +80,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "service",
                 "list",
                 "",
@@ -99,7 +92,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "pkg",
                 "list",
                 "",
@@ -112,7 +104,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "pkg",
                 "executables",
                 "",
@@ -125,7 +116,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "param",
                 "list",
                 "",
@@ -138,7 +128,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "node",
                 "list",
                 "",
@@ -151,7 +140,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "lifecycle",
                 "nodes",
                 "",
@@ -164,7 +152,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "interface",
                 "list",
                 "-a",
@@ -177,7 +164,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "interface",
                 "list",
                 "-s",
@@ -190,7 +176,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "interface",
                 "list",
                 "-m",
@@ -203,7 +188,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "doctor",
                 "-r",
                 "hello",
@@ -216,7 +200,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "start",
                 "",
@@ -229,7 +212,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "stop",
                 "",
@@ -242,7 +224,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "daemon",
                 "status",
                 "",
@@ -255,7 +236,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "component",
                 "list",
                 "",
@@ -268,7 +248,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "action",
                 "list",
                 "",
@@ -281,7 +260,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "storage",
@@ -294,7 +272,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "converter",
@@ -307,7 +284,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "compressor",
@@ -320,7 +296,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/commands.sh",
             "args": [
-                "${workspaceFolder}/../../../../../",
                 "bag",
                 "list",
                 "decompressor",

@@ -1,3 +1,4 @@
+import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
@@ -5,93 +6,93 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    my_system_name = '/maid_robot_system/'
-    output_type = 'screen'
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
     transport_type = 'compressed'  # 'raw'/'compressed'/'theora'
 
     image_compressed_left_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='image_transport',
         executable='republish',
-        output=output_type,
+        output=_output_type,
         name='image_compressed_left_node',
         arguments=['compressed'],
         remappings=[
-            ('in', my_system_name+'image/left/raw'),
-            ('out', my_system_name+'image/left/compressed')
+            ('in',  _ros_namespace + '/image/left/raw'),
+            ('out', _ros_namespace + '/image/left/compressed')
         ],
         respawn=True,
         respawn_delay=2.0
     )
 
     image_compressed_right_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='image_transport',
         executable='republish',
-        output=output_type,
+        output=_output_type,
         name='image_compressed_right_node',
         arguments=['compressed'],
         remappings=[
-            ('in', my_system_name+'image/right/raw'),
-            ('out', my_system_name+'image/right/compressed')
+            ('in',  _ros_namespace + '/image/right/raw'),
+            ('out', _ros_namespace + '/image/right/compressed')
         ],
         respawn=True,
         respawn_delay=2.0
     )
 
     image_theora_left_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='theora_image_transport',
         executable='ogg_saver',
-        output=output_type,
+        output=_output_type,
         name='image_theora_left_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', my_system_name+'image/left/raw')
+            ('image', _ros_namespace + '/image/left/raw')
         ],
         respawn=True,
         respawn_delay=2.0
     )
 
     image_theora_right_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='theora_image_transport',
         executable='ogg_saver',
-        output=output_type,
+        output=_output_type,
         name='image_theora_right_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', my_system_name+'image/left/raw')
+            ('image', _ros_namespace + '/image/left/raw')
         ],
         respawn=True,
         respawn_delay=2.0
     )
 
     image_transport_left_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='image_transport',
         executable='republish',
-        output=output_type,
+        output=_output_type,
         name='image_transport_left_node',
         arguments=['raw'],
         remappings=[
-            ('in', my_system_name+'image/left/raw'),
-            ('out', my_system_name+'image/right/raw')
+            ('in',  _ros_namespace + '/image/left/raw'),
+            ('out', _ros_namespace + '/image/right/raw')
         ],
         respawn=True,
         respawn_delay=2.0
     )
 
     image_transport_right_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='image_transport',
         executable='republish',
-        output=output_type,
+        output=_output_type,
         name='image_transport_right_node',
         arguments=['raw'],
         remappings=[
-            ('in', my_system_name+'image/right/raw'),
-            ('out', my_system_name+'image/right/transport')
+            ('in',  _ros_namespace + '/image/right/raw'),
+            ('out', _ros_namespace + '/image/right/transport')
         ],
         respawn=True,
         respawn_delay=2.0

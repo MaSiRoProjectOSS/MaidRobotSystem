@@ -8,7 +8,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "${workspaceFolder}/../../package",
                 "build",
                 "debug",
                 "maid_robot_system",
@@ -25,7 +24,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "build",
                 "release",
                 "",
@@ -42,7 +40,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "clean",
                 "",
                 "",
@@ -55,8 +52,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
-                "/opt/MaidRobotSystem",
-                "REBUILD",
+                "rebuild",
                 "",
                 "",
                 "",

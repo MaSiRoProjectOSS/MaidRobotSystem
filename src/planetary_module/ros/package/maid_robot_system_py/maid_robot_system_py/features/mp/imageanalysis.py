@@ -52,6 +52,8 @@ class ImageAnalysis:
     pose_data = PoseInformation()
     flag_human_confront = 0
     flag_person_vertical = 0
+    holistic_left = None
+    holistic_right = None
 
     def __init__(self, min_detection_confidence, min_tracking_confidence):
         self.mp_face_detection = mp.solutions.face_detection

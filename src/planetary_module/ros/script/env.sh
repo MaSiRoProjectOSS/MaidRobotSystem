@@ -6,23 +6,31 @@
 ## =======================================
 ## Settings : From config.json
 ## =======================================
+CONFIG_ARRAY=("CAST" "MRS_ROS" "MRS" "BUILD" "BUILD2")
+
 if [ "-bash" = "$0" ]; then
-    CONFIG_PATH=${1:-/opt/MaidRobotSystem/src/planetary_module/ros/script/config.json}
+    CONFIG_PATH=${1:-/opt/MaidRobotSystem/data/config.json}
 else
     WORK_DIR=$(cd $(dirname $0) && pwd)
     CONFIG_PATH=`readlink -f ${WORK_DIR}/config.json `
     CONFIG_PATH=${1:-${CONFIG_PATH}}
 fi
 if [ ! -f ${CONFIG_PATH} ]; then
-    CONFIG_PATH="/opt/MaidRobotSystem/src/planetary_module/ros/script/config.json"
+    CONFIG_PATH="/opt/MaidRobotSystem/data/config.json"
 fi
 if [ -f ${CONFIG_PATH} ]; then
-    json=$(cat ${CONFIG_PATH} | jq  -c)
-    for key in $(echo $json | jq -r keys[]); do
-        value=$(echo $json | jq -r .$key)
-        export $key=$value
+    for CONFIG_RAW in "${CONFIG_ARRAY[@]}"
+    do
+        json=$(cat ${CONFIG_PATH} | jq  -c '.["'$CONFIG_RAW'"]')
+        if [ "null" != "$json" ]; then
+            for key in $(echo $json | jq -r keys[]); do
+                value=$(echo $json | jq -r .$key)
+                export $key=$value
+            done
+        fi
     done
 fi
+export ROS_DOMAIN_ID=$MRS_ROS_DOMAIN_ID
 
 ## =======================================
 ## Settings

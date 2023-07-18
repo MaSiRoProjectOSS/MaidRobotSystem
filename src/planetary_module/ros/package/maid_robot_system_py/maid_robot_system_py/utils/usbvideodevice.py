@@ -8,7 +8,7 @@ class UsbVideoDevice():
 
     def display(self):
         for (row_id, row_name, row_path) in self._deviceList:
-            print("{} : {}".format(row_path,  row_name))
+            print("{} : {}".format(row_path, row_name))
 
     def get_id_from_name(self, name):
         for (row_id, row_name, row_path) in self._deviceList:

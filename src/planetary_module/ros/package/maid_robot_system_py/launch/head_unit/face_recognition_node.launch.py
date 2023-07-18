@@ -1,3 +1,4 @@
+import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
@@ -5,14 +6,14 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    my_system_name = '/maid_robot_system/'
-    output_type = 'screen'
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
 
     face_recognition_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='maid_robot_system_py',
         executable='face_recognition_node',
-        output=output_type,
+        output=_output_type,
         parameters=[{
             "device/left/type": "v4l",
             "device/left/id":  -1,
@@ -26,7 +27,8 @@ def generate_launch_description():
             "device/right/height":  540,
             "confidence/min_detection": 0.5,
             "confidence/min_tracking": 0.5,
-            "update": False
+            "confidence/tracking_timeout": 3.0
+            "update": False,
         }],
         respawn=False,
         respawn_delay=2.0

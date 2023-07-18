@@ -3,183 +3,272 @@
 import rclpy
 import time
 import math
-import subprocess
+import copy
+import traceback
 import cv2 as cv
+import mediapipe as mp
 from rclpy.node import Node
-from std_msgs.msg import String
-from utils.cvfpscalc import CvFpsCalc
-from features.roscommunication import RosCommunication
-
-
-class RosCommunication2():
-    #####################################
-    param_device_left_id = -1
-    param_device_left_by_path = "--"
-    param_device_left_type = "v4l"
-    param_device_left_width = 960
-    param_device_left_height = 540
-    param_device_right_id = -1
-    param_device_right_by_path = "--"
-    param_device_right_type = "v4l"
-    param_device_right_width = 960
-    param_device_right_height = 540
-    param_confidence_min_detection = 0.5
-    param_confidence_min_tracking = 0.5
-    param_update= True
-
-    param_upper_body_only = True
-    param_box_rect = True
-    #####################################
-
-    def __init__(self,node):
-        node.declare_parameter("device/left/id", self.param_device_left_id)
-        node.declare_parameter("device/left/by_path", self.param_device_left_by_path)
-        node.declare_parameter("device/left/type", self.param_device_left_type)
-        node.declare_parameter("device/left/width", self.param_device_left_width)
-        node.declare_parameter("device/left/height", self.param_device_left_height)
-
-        node.declare_parameter("device/right/id", self.param_device_right_id)
-        node.declare_parameter("device/right/by_path", self.param_device_right_by_path)
-        node.declare_parameter("device/right/type", self.param_device_right_type)
-        node.declare_parameter("device/right/width", self.param_device_right_width)
-        node.declare_parameter("device/right/height", self.param_device_right_height)
-
-        node.declare_parameter("confidence/min_detection", self.param_confidence_min_detection)
-        node.declare_parameter("confidence/min_tracking", self.param_confidence_min_tracking)
-
-        node.declare_parameter("update", self.param_update)
-
-    def get_parameter(self, node):
-
-        self.param_device_left_id = node.get_parameter_or("device/left/id", self.param_device_left_id).get_parameter_value().integer_value
-        self.param_device_left_by_path = node.get_parameter_or("device/left/by_path", self.param_device_left_by_path).get_parameter_value().string_value
-        self.param_device_left_type = node.get_parameter_or("device/left/type", self.param_device_left_type).get_parameter_value().string_value
-        self.param_device_left_width = node.get_parameter_or("device/left/width", self.param_device_left_width).get_parameter_value().integer_value
-        self.param_device_left_height = node.get_parameter_or("device/left/height", self.param_device_left_height).get_parameter_value().integer_value
-
-        self.param_device_right_id = node.get_parameter_or("device/right/id", self.param_device_right_id).get_parameter_value().integer_value
-        self.param_device_right_by_path = node.get_parameter_or("device/right/by_path", self.param_device_right_by_path).get_parameter_value().string_value
-        self.param_device_right_type = node.get_parameter_or("device/right/type", self.param_device_right_type).get_parameter_value().string_value
-        self.param_device_right_width = node.get_parameter_or("device/right/width", self.param_device_right_width).get_parameter_value().integer_value
-        self.param_device_right_height = node.get_parameter_or("device/right/height", self.param_device_right_height).get_parameter_value().integer_value
-
-        self.param_confidence_min_detection = node.get_parameter_or("confidence/min_detection", self.param_confidence_min_detection).get_parameter_value().double_value
-        self.param_confidence_min_tracking = node.get_parameter_or("confidence/min_tracking", self.param_confidence_min_tracking).get_parameter_value().double_value
-        self.param_update = node.get_parameter_or("update", self.param_update).get_parameter_value().bool_value
-
-        node.get_logger().info('Parameter: ')
-        node.get_logger().info(' device: ')
-        node.get_logger().info('  left: ')
-        node.get_logger().info('   type   : ' + str(self.param_device_left_type))
-        node.get_logger().info('   id     : ' + str(self.param_device_left_id))
-        node.get_logger().info('   by_path: ' + str(self.param_device_left_by_path))
-        node.get_logger().info('   width  : ' + str(self.param_device_left_width))
-        node.get_logger().info('   height : ' + str(self.param_device_left_height))
-        node.get_logger().info('  right: ')
-        node.get_logger().info('   type   : ' + str(self.param_device_right_type))
-        node.get_logger().info('   id     : ' + str(self.param_device_right_id))
-        node.get_logger().info('   by_path: ' + str(self.param_device_right_by_path))
-        node.get_logger().info('   width  : ' + str(self.param_device_right_width))
-        node.get_logger().info('   height : ' + str(self.param_device_right_height))
-        node.get_logger().info('  confidence: ')
-        node.get_logger().info('   min_detection : ' + str(self.param_confidence_min_detection))
-        node.get_logger().info('   min_tracking  : ' + str(self.param_confidence_min_tracking))
-        node.get_logger().info('  update  : ' + str( self.param_update))
-
-
-class UsbVideoDevice():
-    _deviceList = []
-
-    def display(self):
-        for (row_id, row_name, row_path) in self._deviceList:
-            print("{} : {}".format(row_path, row_name))
-
-    def get_id_from_name(self, name):
-        for (row_id, row_name, row_path) in self._deviceList:
-            if (name in row_name):
-                return row_id
-        return -1
-
-    def get_id_from_id(self, id):
-        for (row_id, row_name, row_path) in self._deviceList:
-            if (id == row_id):
-                return row_id
-        return -1
-
-    def get_path(self, path):
-        for (_, name, p) in self._deviceList:
-            if (path in p):
-                return p
-        return ''
-
-    def __init__(self, device_name):
-        self._deviceList = []
-
-        try:
-            cmd = 'ls -la /dev/' + device_name + '/by-path'
-            res = subprocess.check_output(cmd.split())
-            by_path = res.decode()
-
-            for line in by_path.split('\n'):
-                if ('usb' in line):
-                    tmp = self._split(line, ' ')
-                    name = tmp[9]
-                    tmp2 = self._split(tmp[11], '../../video')
-                    deviceId = int(tmp2[0])
-                    self._deviceList.append(
-                        (deviceId, name, '/dev/video' + str(deviceId)))
-        except:
-            return
-
-    def _split(self, str, val):
-        tmp = str.split(val)
-        if ('' in tmp):
-            tmp.remove('')
-        return tmp
+from utils.usbvideodevice import UsbVideoDevice
+from maid_robot_system_py.features.ros.face_recognition_ros import FaceRecognitionRos
+from features.mp.poseinformation import PoseInformation
+from features.mp.schematicdiagram import SchematicDiagram
+from features.mp.imageanalysis import ImageAnalysis
 
 
 class ModelNode(Node):
-    _timer_period = 1  # seconds
+    #############################################################################
+    OFFSET_ANGLE_Z_LEFT = -40.0
+    OFFSET_ANGLE_Y_LEFT = 0.0
+    OFFSET_ANGLE_Z_RIGHT = -12.0
+    OFFSET_ANGLE_Y_RIGHT = 0.0
+    #############################################################################
+    target_angle_z_left = OFFSET_ANGLE_Z_LEFT
+    target_angle_z_right = OFFSET_ANGLE_Z_RIGHT
+    target_angle_y_left = OFFSET_ANGLE_Y_LEFT
+    target_angle_y_right = OFFSET_ANGLE_Y_RIGHT
+    #############################################################################
+    _ros_com = None
+    _timer = None
+    _timer_period = 0.016  # seconds
+    _timer_info = None
+    _timer_info_period = 0.5  # seconds
+    TIME_TIMER_TRACKING_TIMEOUT = 3.0
+
+    _video_device_left = -1
+    _video_device_right = -1
+    _cap_left = None
+    _cap_right = None
+    _tracking_time = None
+
+    #############################################################################
+    upper_body_only = True
+    use_brect = True
+
+    #############################################################################
+
+    def _reset_video_id(self, type, id, by_path):
+        result = -1
+        usbVideoDevice = UsbVideoDevice(type)
+        if -1 == id:
+            result = usbVideoDevice.get_id_from_name(by_path)
+        else:
+            result = usbVideoDevice.get_id_from_id(id)
+        return result
+
+    def _debug(self):
+        self._timer_period = 2
+        self._timer_info_period = 2
 
     def __init__(self, node_name):
-        #############################################################################
-        # ROS : Setup
         super().__init__(node_name)
-        #############################################################################
-        # set instance
-        self.ros_com = RosCommunication2(self)
-        # ia = ImageAnalysis(ros_com.param_min_detection_confidence, ros_com.param_min_tracking_confidence)
+        self._debug()
 
-        # get param
-        self.ros_com.get_parameter(self)
+    def fin(self):
+        if -1 != self._video_device_left:
+            self._cap_left .release()
+        if -1 != self._video_device_right:
+            self._cap_right.release()
 
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
+    def init(self):
+        result = True
+        try:
+            #############################################################################
+            # set instance
+            self._ros_com = FaceRecognitionRos(self)
+            self._ia = ImageAnalysis(self._ros_com.param_confidence_min_detection,  self._ros_com.param_confidence_min_tracking)
 
-        self.timer = self.create_timer(
-            self._timer_period, self._timer_callback)
+            # set video
 
-        self.i = 0
+            self._video_device_left = self._reset_video_id(self._ros_com.param_device_left_type, self._ros_com.param_device_left_id, self._ros_com.param_device_left_by_path)
+            self._video_device_right = self._reset_video_id(self._ros_com.param_device_right_type, self._ros_com.param_device_right_id, self._ros_com.param_device_right_by_path)
+            if -1 != self._video_device_left:
+                self._cap_left = cv.VideoCapture(self._video_device_left)
+                self._cap_left.set(cv.CAP_PROP_FRAME_WIDTH,  self._ros_com.param_device_left_width)
+                self._cap_left.set(cv.CAP_PROP_FRAME_HEIGHT,  self._ros_com.param_device_left_height)
+            if -1 != self._video_device_right:
+                self._cap_right = cv.VideoCapture(self._video_device_right)
+                self._cap_right.set(cv.CAP_PROP_FRAME_WIDTH,  self._ros_com.param_device_right_width)
+                self._cap_right.set(cv.CAP_PROP_FRAME_HEIGHT,  self._ros_com.param_device_right_height)
 
+            # self._ia.load_model()
 
-    def _timer_callback(self):
-        device_left_id = self.get_parameter(            "device/left/id").get_parameter_value().integer_value
-        msg = String()
-        msg.data = 'Hello World: %d' % self.i
-        self.publisher_.publish(msg)
-        # self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i = device_left_id
+            self._timer = self.create_timer(self._timer_period, self._callback_calculate)
+
+            self._tracking_time = time.time() + self. TIME_TIMER_TRACKING_TIMEOUT
+            self._timer_info = self.create_timer(self._timer_info_period, self._callback_info)
+
+        except Exception as exception:
+            result = False
+            traceback.print_exc()
+        return result
+
+    _running_cap_id = -1
+
+    def _callback_calculate(self):
+        try:
+            self._ros_com.get_parameter(self)
+            if (0 == self._running_cap_id):
+                self._running_cap_id = 1
+            else:
+                self._running_cap_id = 0
+            if 0 > self._video_device_left:
+                if 0 > self._video_device_right:
+                    rclpy.shutdown()
+            if (0 == self._running_cap_id):
+                ret, image = self._cap_left.read()
+            if (1 == self._running_cap_id):
+                ret, image = self._cap_right.read()
+            if True == ret:
+                image = cv.flip(image, 1)
+                debug_image = copy.deepcopy(image)
+                # Get image #############################################################
+                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                # read image
+                frame = image
+                frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+                gray = cv.cvtColor(frame, cv.COLOR_RGB2GRAY)
+
+                # Detect AR
+                # self._ia.detect_ar(gray)
+                # aruco_dict = aruco.Dictionary_get(aruco.DICT_5X5_250)
+                # parameters = aruco.DetectorParameters_create()
+                # corners, ids, rejectedImgPoints = aruco.detectMarkers(                    gray, aruco_dict, parameters=parameters)
+                # print("AR : " +ids)
+
+                # holistic
+                image.flags.writeable = False
+                if (0 == self._running_cap_id):
+                    results = self._left_holistic.process(image)
+                if (1 == self._running_cap_id):
+                    results = self._right_holistic.process(image)
+                image.flags.writeable = True
+
+                # Pose ###############################################################
+                pose_landmarks = results.pose_landmarks
+                human_up_hand_flag = 0
+                human_confront_flag = 0
+                flag_human_clear = 0
+
+                if pose_landmarks is not None:
+                    flag_human_clear = 1
+
+                    # 外接矩形の計算
+                    brect = SchematicDiagram.calc_bounding_rect(debug_image, pose_landmarks)
+                    # 描画
+                    Get_person_pos = [0, 0, 0, 0]
+                    get_person_data = PoseInformation()
+
+                    Get_eye_pos_x = [0, 0]
+                    debug_image = SchematicDiagram.draw_pose_landmarks(
+                        debug_image, pose_landmarks, self. upper_body_only, get_person_data, Get_eye_pos_x)
+
+                    target_position = PoseInformation.Axis3()
+
+                    # 見る人の部位を決める 手を上げられたら手を見る
+                    see_nose_flag = 1
+
+                    person_vertical_flag = 0
+                    # 人間の直立判定  逆転判定したら膝枕
+                    if (get_person_data.nose.y < get_person_data.shoulder_left.y and get_person_data.nose.y < get_person_data.shoulder_right.y):
+                        person_vertical_flag = 1
+
+                    # eye_cmd_angle.linear.x = 0
+                    if (person_vertical_flag == 1 and get_person_data.hand_left.get_flag == 1 and get_person_data.shoulder_left.get_flag == 1 and get_person_data.hand_left.y < get_person_data.shoulder_left.y):
+                        target_position = get_person_data.hand_left
+                        # eye_cmd_angle.linear.x = 1   # eyesmile
+                        see_nose_flag = 0
+                    if (person_vertical_flag == 1 and get_person_data.hand_right.get_flag == 1 and get_person_data.shoulder_right.get_flag == 1 and get_person_data.hand_right.y < get_person_data.shoulder_right.y):
+                        target_position = get_person_data.hand_right
+                        # eye_cmd_angle.linear.x = 6     #eye close
+                        see_nose_flag = 0
+                    if (see_nose_flag == 1):
+                        target_position = get_person_data.nose
+
+                    Get_face_x = target_position.x
+                    Get_face_y = target_position.y
+                    Get_face_z = target_position.z
+
+                    # 人が正対するとき 右目ｘ座標は左目ｘ座標より大きい 人が後ろ向きでも目の位置は推定される
+                    if (person_vertical_flag == 1):
+                        if (Get_eye_pos_x[0] != 0 and Get_eye_pos_x[1] != 0 and Get_eye_pos_x[0] > Get_eye_pos_x[1]):
+                            human_confront_flag = 1
+                        else:
+                            human_confront_flag = 0
+
+                    # ロール角度を計算
+                    target_roll = 0
+                    if 1 == human_confront_flag:
+                        if (get_person_data.R_eye.get_flag == 1 and get_person_data.L_eye.get_flag == 1):
+                            if (human_confront_flag == 1 and person_vertical_flag == 1):
+                                eye_dx = get_person_data.R_eye.x - get_person_data.L_eye.x
+                                eye_dy = get_person_data.R_eye.y - get_person_data.L_eye.y
+
+                                target_roll = (math.degrees(math.atan2(eye_dy, eye_dx)))
+
+                    To_face_yaw = ((Get_face_x / self._ros_com .CAMERA_PIXEL_X) - 0.5) * self._ros_com .CAMERA_ANGLE_X
+                    To_face_pitch = ((Get_face_y / self._ros_com .CAMERA_PIXEL_Y) - 0.5) * self._ros_com . CAMERA_ANGLE_Y
+
+                    self._ros_com.set_angle(To_face_yaw, To_face_pitch, target_roll,   self._ia.flag_human_confront,  self._ia.flag_person_vertical)
+
+                    if (0 == self._running_cap_id):
+                        target_angle_z_R = To_face_yaw + self. OFFSET_ANGLE_Z_LEFT
+                        target_angle_y_R = To_face_pitch + self. OFFSET_ANGLE_Y_LEFT
+                    if (1 == self._running_cap_id):
+                        target_angle_z_L = To_face_yaw + self.OFFSET_ANGLE_Z_RIGHT
+                        target_angle_y_L = To_face_pitch + self. OFFSET_ANGLE_Y_RIGHT
+                    target_angle_y = (target_angle_y_L + target_angle_y_R)/2.0
+                    target_angle_z = (target_angle_z_L + target_angle_z_R)/2.0
+
+                    self._ros_com.set_eye_angle((target_angle_y_L + target_angle_y_R)/2.0, (target_angle_z_L + target_angle_z_R)/2.0)
+
+                    if (self._ia.flag_human_confront == 1):
+                        self._ros_com.set_neck_confronted(target_angle_y,                                                     target_angle_z, target_roll)
+                    else:
+                        flag_human_clear = 1
+
+                    debug_image = SchematicDiagram.draw_bounding_rect(self.use_brect, debug_image, brect)
+
+                else:  # 人物が認識されなかったら
+                    flag_human_clear = 1
+
+                if (0 == self._running_cap_id):
+                    self._ros_com.set_image_left(debug_image)
+                if (1 == self._running_cap_id):
+                    self._ros_com.set_image_right(debug_image)
+
+                if (1 == flag_human_clear):
+                    if (time.time() > self._tracking_tim):
+                        self._tracking_tim = time.time() + self._ros_com.param_confidence_tracking_timeout
+                        self._ros_com.set_pose_clear()
+            self._ros_com.send()
+
+        except Exception as exception:
+            traceback.print_exc()
+
+    def _callback_info(self):
+        self._ros_com.send_info()
+        self._ros_com.get_parameter_update(self)
 
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ModelNode('face_recognition_node')
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    node_name = 'face_recognition_node'
+    traceback_logger = rclpy.logging.get_logger(node_name + '_logger')
+    node = ModelNode(node_name)
+
+    try:
+        if (True == node.init()):
+            rclpy.spin(node)
+
+    except Exception as exception:
+        traceback_logger.error(traceback.format_exc())
+        raise exception
+    finally:
+        node.fin()
+        node.destroy_node()
+        rclpy.shutdown()
+        cv.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+    main()

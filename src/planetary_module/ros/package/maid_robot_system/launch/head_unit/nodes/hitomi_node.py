@@ -7,14 +7,14 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    my_system_name = '/maid_robot_system/'
-    output_type = 'screen'
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
 
     hitomi_node = Node(
-        namespace=my_system_name,
+        namespace=_ros_namespace,
         package='maid_robot_system',
         executable='hitomi_node',
-        output=output_type,
+        output=_output_type,
         parameters=[{
             "skin_name": "miko",
             "l_x": 135.0,

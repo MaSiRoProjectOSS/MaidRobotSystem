@@ -1,16 +1,15 @@
 #!/bin/bash
 ############################################################################
 ##
-## ./build.sh [WORK_FOLDER] [WORK_COMMANDS] [WORK_BUILD_TYPE] [WORK_PACKAGES_SELECT] [WORK_ARG_OPTION]
+## ./build.sh [WORK_COMMANDS] [WORK_BUILD_TYPE] [WORK_PACKAGES_SELECT] [WORK_ARG_OPTION]
 ##
-##  WORK_FOLDER          : ${MRS_WORKSPACE}
-##  WORK_COMMANDS        : REBUILD or BUILD
+##  WORK_COMMANDS        : rebuild or build or clean
 ##  WORK_BUILD_TYPE      : debug or release
 ##  WORK_PACKAGES_SELECT : (your package name)
 ##  WORK_ARG_OPTION      : (add option)
 ##
 ##  exsample:
-##      ./build.sh ${MRS_WORKSPACE} BUILD release
+##      ./build.sh build release
 ##
 
 COLOR_ON_RED="\e[31m"
@@ -27,16 +26,16 @@ ret=0
 if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================
     ## command exsample:
-    ## /opt/MaidRobotSystem/source/ros/build.sh <workfolder> <BUILD | REBUILD> <debug | release> [packages-select]
+    ## /opt/MaidRobotSystem/source/ros/build.sh <build | rebuild | clean> <debug | release> [packages-select]
     ## ================================
     ## Settings
     WORK_COLCON_OPTION="--symlink-install --parallel-workers 4"
     ## ================================
-    WORK_FOLDER=`cd ${1:-${MRS_WORKSPACE}} && pwd`
-    WORK_COMMANDS=${2:-""}
-    WORK_BUILD_TYPE=${3:-""}
-    WORK_PACKAGES_SELECT=${4:-""}
-    WORK_ARG_OPTION=${5:-""}
+    TARGET_FOLDER=${MRS_ROS_PACKAGE_FOLDER}
+    WORK_COMMANDS=${1:-""}
+    WORK_BUILD_TYPE=${2:-""}
+    WORK_PACKAGES_SELECT=${3:-""}
+    WORK_ARG_OPTION=${4:-""}
     COMPLILEDATE=`date +"%Y%m%d_%H%M%S"`
     COMPLILEDATE_TEXT=`date +"%Y/%m/%d/ %H:%M:%S"`
     ## ================================
@@ -48,30 +47,30 @@ if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================
 
     WORK_CMAKE_ARGS=""
-    WORK_FOLDER_ARG="--base-paths ${WORK_FOLDER} --paths ${MRS_WORKSPACE}/.colcon"
+    TARGET_FOLDER_ARG="--base-paths ${TARGET_FOLDER} --paths ${MRS_WORKSPACE}/.colcon"
 
     ## ================================
     WORK_COLCON_PARAMETE=""
 
-    if [ ! -z "${WORK_FOLDER}" ]
+    if [ ! -z "${TARGET_FOLDER}" ]
     then
-        if [ -d "${WORK_FOLDER}" ]
+        if [ -d "${TARGET_FOLDER}" ]
         then
-            if [ "clean" = "${WORK_COMMANDS}" ]; then
+            if [ "clean" = "${WORK_COMMANDS,,}" ]; then
                 rm -rf ${MRS_WORKSPACE}/.colcon/*
                 echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
                 echo -e "${COLOR_ON_GREEN}    rm -rf ${MRS_WORKSPACE}/.colcon${COLOR_OFF}"
                 echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
             else
-                if [ "REBUILD" = "${WORK_COMMANDS}" ]; then
+                if [ "rebuild" = "${WORK_COMMANDS,,}" ]; then
                     #echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                    #echo "REBUILD (delete install folder)"
-                    #rm -rf ${WORK_FOLDER}/install
-                    #rm -rf ${WORK_FOLDER}/log
-                    #rm -rf ${WORK_FOLDER}/build
+                    #echo "rebuild (delete install folder)"
+                    #rm -rf ${TARGET_FOLDER}/install
+                    #rm -rf ${TARGET_FOLDER}/log
+                    #rm -rf ${TARGET_FOLDER}/build
                     WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
                 fi
-                if [ "debug" = "${WORK_BUILD_TYPE}" ]; then
+                if [ "debug" = "${WORK_BUILD_TYPE,,}" ]; then
                     WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" -DCMAKE_BUILD_TYPE=Debug"
                     COLCON_LOG_LEVEL=DEBUG
                 fi
@@ -79,8 +78,8 @@ if [ -n "${ROS_DISTRO}" ] ;then
                 source /usr/share/colcon_cd/function/colcon_cd.sh
                 export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
                 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-                if [ -e ${WORK_FOLDER}/install/ ]; then
-                    source ${WORK_FOLDER}/install/local_setup.bash
+                if [ -e ${TARGET_FOLDER}/install/ ]; then
+                    source ${TARGET_FOLDER}/install/local_setup.bash
                 fi
                 if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
                     source ${MRS_WORKSPACE}/.colcon/install/local_setup.bash
@@ -94,9 +93,9 @@ if [ -n "${ROS_DISTRO}" ] ;then
                 else
                     WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --allow-overriding maid_robot_system_interfaces"
                 fi
-                echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
+                echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
                 echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
+                colcon build ${WORK_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
                 ret=$?
                 if [ 0 -eq ${ret} ]; then
                     if [ -e ${MRS_WORKSPACE}/.colcon/install/ ]; then
@@ -106,7 +105,7 @@ if [ -n "${ROS_DISTRO}" ] ;then
             fi
         else
             echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-            echo -e "${COLOR_ON_RED}  Could not find the folder : ${WORK_FOLDER}${COLOR_OFF}"
+            echo -e "${COLOR_ON_RED}  Could not find the folder : ${TARGET_FOLDER}${COLOR_OFF}"
             echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
         fi
     else
@@ -119,7 +118,7 @@ if [ -n "${ROS_DISTRO}" ] ;then
     echo -e "${COLOR_ON_BLUE}Date : ${COMPLILEDATE_TEXT}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}ROS                        : ${ROS_DISTRO}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}Workspace                  : ${MRS_WORKSPACE}${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}Target folder              : ${WORK_FOLDER}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}Target folder              : ${TARGET_FOLDER}${COLOR_OFF}"
 
     echo -e "${COLOR_ON_BLUE}ENV${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}  ROS${COLOR_OFF}"

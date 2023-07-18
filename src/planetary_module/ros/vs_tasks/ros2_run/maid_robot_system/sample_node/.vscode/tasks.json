@@ -8,7 +8,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "launch",
                 "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/sample_node.launch.py",
                 "",
@@ -21,7 +20,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
                 "sample_node.launch.py",
@@ -34,7 +32,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "run",
                 "maid_robot_system",
                 "sample_node",
@@ -47,7 +44,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "get",
                 "/maid_robot_system/sample_node",
@@ -60,7 +56,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "get",
                 "/maid_robot_system/sample_node",
@@ -73,7 +68,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -86,7 +80,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -99,7 +92,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -112,7 +104,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -125,7 +116,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "topic",
                 "info",
                 "/maid_robot_system/messaging/output",
@@ -138,7 +128,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "topic",
                 "info",
                 "/maid_robot_system/messaging/input",
@@ -151,7 +140,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "topic",
                 "echo",
                 "/maid_robot_system/messaging/output",
@@ -164,7 +152,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/commands.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "topic",
                 "echo",
                 "/maid_robot_system/messaging/input",
@@ -177,7 +164,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_0.yaml",
@@ -189,7 +175,6 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
             "args": [
-                "/opt/MaidRobotSystem",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_1.yaml",
