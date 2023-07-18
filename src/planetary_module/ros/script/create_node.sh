@@ -16,6 +16,9 @@ fi
 
 ros2 pkg create \
     --build-type ament_cmake \
-    --dependencies rclcpp rclcpp_components std_msgs mrs_interfaces \
+    --dependencies rclcpp rclcpp_components maid_robot_system_interfaces \
     --license MIT \
+    --maintainer-name ${HOSTNAME} \
+    --description 'This package is ...' \
+    --maintainer-email developer@masiro-project.com \
     --node-name ${MY_NODE_NAME} ${MY_PACKAGE_NAME}

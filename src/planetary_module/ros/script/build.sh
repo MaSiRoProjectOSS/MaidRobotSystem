@@ -90,7 +90,9 @@ if [ -n "${ROS_DISTRO}" ] ;then
 
                 echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
                 if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
-                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}" --allow-overriding "${WORK_PACKAGES_SELECT}
+                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}" --allow-overriding "${WORK_PACKAGES_SELECT}" --allow-overriding maid_robot_system_interfaces"
+                else
+                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --allow-overriding maid_robot_system_interfaces"
                 fi
                 echo -e "${COLOR_ON_BLUE}Command: colcon build ${WORK_COLCON_OPTION} ${WORK_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
                 echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"

@@ -5,6 +5,32 @@
     "tasks": [
         // LAUNCH task
         {
+            "label": "ROS2 : head_unit : RUN : run : python_parameters",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system_py",
+                "python_parameters.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : head_unit : RUN : run : face_recognition_node",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "/opt/MaidRobotSystem",
+                "launch",
+                "maid_robot_system_py",
+                "face_recognition_node.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
             "label": "ROS2 : head_unit : RUN : launch : head_unit",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
@@ -12,66 +38,100 @@
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "unit_head.launch.py",
+                "head_unit.launch.py",
                 "",
                 ""
             ]
         },
         {
-            "label": "ROS2 : head_unit : RUN : launch : node : node_image_transport",
+            "label": "ROS2 : head_unit : RUN : launch : node : image_transport_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_image_transport.launch.py",
+                "image_transport_node.launch.py",
                 "",
                 ""
             ]
         },
         {
-            "label": "ROS2 : head_unit : RUN : launch : node : node_hitomi",
+            "label": "ROS2 : head_unit : RUN : launch : node : hitomi_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_hitomi.launch.py",
+                "hitomi_node.launch.py",
                 "",
                 ""
             ]
         },
         {
-            "label": "ROS2 : head_unit : RUN : launch : node : node_mitumeru",
+            "label": "ROS2 : head_unit : RUN : launch : node : mitumeru_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_mitumeru.launch.py",
+                "mitumeru_node.launch.py",
                 "",
                 ""
             ]
         },
         {
-            "label": "ROS2 : head_unit : RUN : launch : node : node_kubi",
+            "label": "ROS2 : head_unit : RUN : launch : node : kubi_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_kubi.launch.py",
+                "kubi_node.launch.py",
                 "",
                 ""
             ]
         },
         // BUILD task
         {
-            "label": "ROS2 : head_unit : BUILD : maid_robot_system",
+            "label": "ROS2 : head_unit : BUILD : packages-select : maid_robot_system_interfaces",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "build",
+                "debug",
+                "maid_robot_system_interfaces",
+                "",
+                ""
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "ROS2 : head_unit : BUILD : packages-select : maid_robot_system_py",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../script/build.sh",
+            "args": [
+                "${workspaceFolder}/../../../../../",
+                "build",
+                "debug",
+                "maid_robot_system_py",
+                "",
+                ""
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "ROS2 : head_unit : BUILD : packages-select : maid_robot_system",
             "type": "shell",
             "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [

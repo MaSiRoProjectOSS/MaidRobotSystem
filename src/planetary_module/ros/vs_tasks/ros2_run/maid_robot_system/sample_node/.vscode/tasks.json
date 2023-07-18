@@ -10,7 +10,7 @@
             "args": [
                 "/opt/MaidRobotSystem",
                 "launch",
-                "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/node_sample.launch.py",
+                "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/sample_node.launch.py",
                 "",
                 "",
                 ""
@@ -24,7 +24,7 @@
                 "/opt/MaidRobotSystem",
                 "launch",
                 "maid_robot_system",
-                "node_sample.launch.py",
+                "sample_node.launch.py",
                 "",
                 ""
             ]
