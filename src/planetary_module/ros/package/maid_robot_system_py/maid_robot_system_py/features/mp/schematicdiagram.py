@@ -1,15 +1,15 @@
+#!/usr/bin/env python3.10
+
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
-
-import PERSON_DATA
+from features.mp.poseinformation import PoseInformation
 
 
 class SchematicDiagram():
 
-    def draw_pose_landmarks(image, landmarks, upper_body_only, get_perosn_data, Get_eye_flag, visibility_th=0.5):
+    def draw_pose_landmarks(self, image, landmarks, upper_body_only, pose_data, eye_flag, visibility_th=0.5):
         image_width, image_height = image.shape[1], image.shape[0]
-    #    global Get_face_x,Get_face_y,Get_face_z
 
         landmark_point = []
 
@@ -24,12 +24,12 @@ class SchematicDiagram():
 
             if index == 0:  # 鼻
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                get_perosn_data.nose.set(landmark_x, landmark_y, landmark_z)
+                pose_data.nose.set(landmark_x, landmark_y, landmark_z)
             if index == 1:  # 右目：目頭
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 2:  # 右目：瞳
-                Get_eye_flag[0] = landmark_x
-                get_perosn_data.R_eye.set(landmark_x, landmark_y, landmark_z)
+                eye_flag[0] = landmark_x
+                pose_data.eye_right.set(landmark_x, landmark_y, landmark_z)
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 3:  # 右目：目尻
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
@@ -37,8 +37,8 @@ class SchematicDiagram():
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 5:  # 左目：瞳
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                Get_eye_flag[1] = landmark_x
-                get_perosn_data.L_eye.set(landmark_x, landmark_y, landmark_z)
+                eye_flag[1] = landmark_x
+                pose_data.eye_left.set(landmark_x, landmark_y, landmark_z)
             if index == 6:  # 左目：目尻
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 7:  # 右耳
@@ -51,10 +51,10 @@ class SchematicDiagram():
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 11:  # 右肩
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                get_perosn_data.R_shorder.set(landmark_x, landmark_y, landmark_z)
+                pose_data.shoulder_right.set(landmark_x, landmark_y, landmark_z)
             if index == 12:  # 左肩
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                get_perosn_data.L_shorder.set(landmark_x, landmark_y, landmark_z)
+                pose_data.shoulder_left.set(landmark_x, landmark_y, landmark_z)
             if index == 13:  # 右肘
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 14:  # 左肘
@@ -69,10 +69,10 @@ class SchematicDiagram():
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 19:  # 右手2(先端)
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                get_perosn_data.R_hand.set(landmark_x, landmark_y, landmark_z)
+                pose_data.hand_right.set(landmark_x, landmark_y, landmark_z)
             if index == 20:  # 左手2(先端)
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
-                get_perosn_data.L_hand.set(landmark_x, landmark_y, landmark_z)
+                pose_data.hand_left.set(landmark_x, landmark_y, landmark_z)
             if index == 21:  # 右手3(内側端)
                 cv.circle(image, (landmark_x, landmark_y), 5, (0, 255, 0), 2)
             if index == 22:  # 左手3(内側端)
@@ -108,87 +108,88 @@ class SchematicDiagram():
         if len(landmark_point) > 0:
             # 右目
             if landmark_point[1][0] > visibility_th and landmark_point[2][0] > visibility_th:
-                cv.line(image, landmark_point[1][1], landmark_point[2][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[1][1], landmark_point[2][1], (0, 255, 0), 2)
             if landmark_point[2][0] > visibility_th and landmark_point[3][0] > visibility_th:
-                cv.line(image, landmark_point[2][1], landmark_point[3][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[2][1], landmark_point[3][1], (0, 255, 0), 2)
 
             # 左目
             if landmark_point[4][0] > visibility_th and landmark_point[5][0] > visibility_th:
-                cv.line(image, landmark_point[4][1], landmark_point[5][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[4][1], landmark_point[5][1], (0, 255, 0), 2)
             if landmark_point[5][0] > visibility_th and landmark_point[6][0] > visibility_th:
-                cv.line(image, landmark_point[5][1], landmark_point[6][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[5][1], landmark_point[6][1], (0, 255, 0), 2)
 
             # 口
             if landmark_point[9][0] > visibility_th and landmark_point[10][0] > visibility_th:
-                cv.line(image, landmark_point[9][1], landmark_point[10][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[9][1], landmark_point[10][1], (0, 255, 0), 2)
 
             # 肩
             if landmark_point[11][0] > visibility_th and landmark_point[12][0] > visibility_th:
-                cv.line(image, landmark_point[11][1], landmark_point[12][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[11][1], landmark_point[12][1], (0, 255, 0), 2)
 
             # 右腕
             if landmark_point[11][0] > visibility_th and landmark_point[13][0] > visibility_th:
-                cv.line(image, landmark_point[11][1], landmark_point[13][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[11][1], landmark_point[13][1], (0, 255, 0), 2)
             if landmark_point[13][0] > visibility_th and landmark_point[15][0] > visibility_th:
-                cv.line(image, landmark_point[13][1], landmark_point[15][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[13][1], landmark_point[15][1], (0, 255, 0), 2)
 
             # 左腕
             if landmark_point[12][0] > visibility_th and landmark_point[14][0] > visibility_th:
-                cv.line(image, landmark_point[12][1], landmark_point[14][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[12][1], landmark_point[14][1], (0, 255, 0), 2)
             if landmark_point[14][0] > visibility_th and landmark_point[16][0] > visibility_th:
-                cv.line(image, landmark_point[14][1], landmark_point[16][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[14][1], landmark_point[16][1], (0, 255, 0), 2)
 
             # 右手
             if landmark_point[15][0] > visibility_th and landmark_point[17][0] > visibility_th:
-                cv.line(image, landmark_point[15][1], landmark_point[17][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[15][1], landmark_point[17][1], (0, 255, 0), 2)
             if landmark_point[17][0] > visibility_th and landmark_point[19][0] > visibility_th:
-                cv.line(image, landmark_point[17][1], landmark_point[19][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[17][1], landmark_point[19][1], (0, 255, 0), 2)
             if landmark_point[19][0] > visibility_th and landmark_point[21][0] > visibility_th:
-                cv.line(image, landmark_point[19][1], landmark_point[21][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[19][1], landmark_point[21][1], (0, 255, 0), 2)
             if landmark_point[21][0] > visibility_th and landmark_point[15][0] > visibility_th:
-                cv.line(image, landmark_point[21][1], landmark_point[15][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[21][1], landmark_point[15][1], (0, 255, 0), 2)
 
             # 左手
             if landmark_point[16][0] > visibility_th and landmark_point[18][0] > visibility_th:
-                cv.line(image, landmark_point[16][1], landmark_point[18][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[16][1], landmark_point[18][1], (0, 255, 0), 2)
             if landmark_point[18][0] > visibility_th and landmark_point[20][0] > visibility_th:
-                cv.line(image, landmark_point[18][1], landmark_point[20][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[18][1], landmark_point[20][1], (0, 255, 0), 2)
             if landmark_point[20][0] > visibility_th and landmark_point[22][0] > visibility_th:
-                cv.line(image, landmark_point[20][1], landmark_point[22][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[20][1], landmark_point[22][1], (0, 255, 0), 2)
             if landmark_point[22][0] > visibility_th and landmark_point[16][0] > visibility_th:
-                cv.line(image, landmark_point[22][1], landmark_point[16][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[22][1], landmark_point[16][1], (0, 255, 0), 2)
 
             # 胴体
             if landmark_point[11][0] > visibility_th and landmark_point[23][0] > visibility_th:
-                cv.line(image, landmark_point[11][1], landmark_point[23][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[11][1], landmark_point[23][1], (0, 255, 0), 2)
             if landmark_point[12][0] > visibility_th and landmark_point[24][0] > visibility_th:
-                cv.line(image, landmark_point[12][1], landmark_point[24][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[12][1], landmark_point[24][1], (0, 255, 0), 2)
             if landmark_point[23][0] > visibility_th and landmark_point[24][0] > visibility_th:
-                cv.line(image, landmark_point[23][1], landmark_point[24][1],                        (0, 255, 0), 2)
+                cv.line(image, landmark_point[23][1], landmark_point[24][1], (0, 255, 0), 2)
 
             if len(landmark_point) > 25:
                 # 右足
                 if landmark_point[23][0] > visibility_th and landmark_point[25][0] > visibility_th:
-                    cv.line(image, landmark_point[23][1], landmark_point[25][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[23][1], landmark_point[25][1],    (0, 255, 0), 2)
                 if landmark_point[25][0] > visibility_th and landmark_point[27][0] > visibility_th:
-                    cv.line(image, landmark_point[25][1], landmark_point[27][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[25][1], landmark_point[27][1],    (0, 255, 0), 2)
                 if landmark_point[27][0] > visibility_th and landmark_point[29][0] > visibility_th:
-                    cv.line(image, landmark_point[27][1], landmark_point[29][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[27][1], landmark_point[29][1],    (0, 255, 0), 2)
                 if landmark_point[29][0] > visibility_th and landmark_point[31][0] > visibility_th:
-                    cv.line(image, landmark_point[29][1], landmark_point[31][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[29][1], landmark_point[31][1],    (0, 255, 0), 2)
 
                 # 左足
                 if landmark_point[24][0] > visibility_th and landmark_point[26][0] > visibility_th:
-                    cv.line(image, landmark_point[24][1], landmark_point[26][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[24][1], landmark_point[26][1],    (0, 255, 0), 2)
                 if landmark_point[26][0] > visibility_th and landmark_point[28][0] > visibility_th:
-                    cv.line(image, landmark_point[26][1], landmark_point[28][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[26][1], landmark_point[28][1],    (0, 255, 0), 2)
                 if landmark_point[28][0] > visibility_th and landmark_point[30][0] > visibility_th:
-                    cv.line(image, landmark_point[28][1], landmark_point[30][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[28][1], landmark_point[30][1],    (0, 255, 0), 2)
                 if landmark_point[30][0] > visibility_th and landmark_point[32][0] > visibility_th:
-                    cv.line(image, landmark_point[30][1], landmark_point[32][1],                            (0, 255, 0), 2)
+                    cv.line(image, landmark_point[30][1], landmark_point[32][1],    (0, 255, 0), 2)
         return image
 
-    def draw_hands_landmarks(image,
+    def draw_hands_landmarks(self,
+                             image,
                              cx,
                              cy,
                              landmarks,
@@ -258,7 +259,7 @@ class SchematicDiagram():
                 cv.circle(image, (landmark_x, landmark_y), 12, (0, 255, 0), 2)
 
             if not upper_body_only:
-                cv.putText(image, "z:" + str(round(landmark_z, 3)),                        (landmark_x - 10, landmark_y - 10),                        cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1,                        cv.LINE_AA)
+                cv.putText(image, "z:" + str(round(landmark_z, 3)), (landmark_x - 10, landmark_y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv.LINE_AA)
 
         # 接続線
         if len(landmark_point) > 0:
@@ -303,7 +304,7 @@ class SchematicDiagram():
 
         return image
 
-    def draw_face_landmarks(image, landmarks):
+    def draw_face_landmarks(self, image, landmarks):
         image_width, image_height = image.shape[1], image.shape[0]
 
         landmark_point = []
@@ -330,50 +331,50 @@ class SchematicDiagram():
             cv.line(image, landmark_point[53], landmark_point[46], (0, 255, 0), 2)
 
             # 右眉毛(285：内側、276：外側)
-            cv.line(image, landmark_point[285], landmark_point[295], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[295], landmark_point[282], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[282], landmark_point[283], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[283], landmark_point[276], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[285], landmark_point[295], (0, 255, 0), 2)
+            cv.line(image, landmark_point[295], landmark_point[282], (0, 255, 0), 2)
+            cv.line(image, landmark_point[282], landmark_point[283], (0, 255, 0), 2)
+            cv.line(image, landmark_point[283], landmark_point[276], (0, 255, 0), 2)
 
             # 左目 (133：目頭、246：目尻)
-            cv.line(image, landmark_point[133], landmark_point[173], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[173], landmark_point[157], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[157], landmark_point[158], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[158], landmark_point[159], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[159], landmark_point[160], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[160], landmark_point[161], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[161], landmark_point[246], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[133], landmark_point[173], (0, 255, 0), 2)
+            cv.line(image, landmark_point[173], landmark_point[157], (0, 255, 0), 2)
+            cv.line(image, landmark_point[157], landmark_point[158], (0, 255, 0), 2)
+            cv.line(image, landmark_point[158], landmark_point[159], (0, 255, 0), 2)
+            cv.line(image, landmark_point[159], landmark_point[160], (0, 255, 0), 2)
+            cv.line(image, landmark_point[160], landmark_point[161], (0, 255, 0), 2)
+            cv.line(image, landmark_point[161], landmark_point[246], (0, 255, 0), 2)
 
-            cv.line(image, landmark_point[246], landmark_point[163], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[163], landmark_point[144], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[144], landmark_point[145], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[145], landmark_point[153], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[153], landmark_point[154], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[154], landmark_point[155], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[155], landmark_point[133], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[246], landmark_point[163], (0, 255, 0), 2)
+            cv.line(image, landmark_point[163], landmark_point[144], (0, 255, 0), 2)
+            cv.line(image, landmark_point[144], landmark_point[145], (0, 255, 0), 2)
+            cv.line(image, landmark_point[145], landmark_point[153], (0, 255, 0), 2)
+            cv.line(image, landmark_point[153], landmark_point[154], (0, 255, 0), 2)
+            cv.line(image, landmark_point[154], landmark_point[155], (0, 255, 0), 2)
+            cv.line(image, landmark_point[155], landmark_point[133], (0, 255, 0), 2)
 
             # 右目 (362：目頭、466：目尻)
-            cv.line(image, landmark_point[362], landmark_point[398], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[398], landmark_point[384], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[384], landmark_point[385], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[385], landmark_point[386], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[386], landmark_point[387], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[387], landmark_point[388], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[388], landmark_point[466], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[362], landmark_point[398], (0, 255, 0), 2)
+            cv.line(image, landmark_point[398], landmark_point[384], (0, 255, 0), 2)
+            cv.line(image, landmark_point[384], landmark_point[385], (0, 255, 0), 2)
+            cv.line(image, landmark_point[385], landmark_point[386], (0, 255, 0), 2)
+            cv.line(image, landmark_point[386], landmark_point[387], (0, 255, 0), 2)
+            cv.line(image, landmark_point[387], landmark_point[388], (0, 255, 0), 2)
+            cv.line(image, landmark_point[388], landmark_point[466], (0, 255, 0), 2)
 
-            cv.line(image, landmark_point[466], landmark_point[390], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[390], landmark_point[373], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[373], landmark_point[374], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[374], landmark_point[380], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[380], landmark_point[381], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[381], landmark_point[382], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[382], landmark_point[362], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[466], landmark_point[390], (0, 255, 0), 2)
+            cv.line(image, landmark_point[390], landmark_point[373], (0, 255, 0), 2)
+            cv.line(image, landmark_point[373], landmark_point[374], (0, 255, 0), 2)
+            cv.line(image, landmark_point[374], landmark_point[380], (0, 255, 0), 2)
+            cv.line(image, landmark_point[380], landmark_point[381], (0, 255, 0), 2)
+            cv.line(image, landmark_point[381], landmark_point[382], (0, 255, 0), 2)
+            cv.line(image, landmark_point[382], landmark_point[362], (0, 255, 0), 2)
 
             # 口 (308：右端、78：左端)
-            cv.line(image, landmark_point[308], landmark_point[415], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[415], landmark_point[310], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[310], landmark_point[311], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[311], landmark_point[312], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[308], landmark_point[415], (0, 255, 0), 2)
+            cv.line(image, landmark_point[415], landmark_point[310], (0, 255, 0), 2)
+            cv.line(image, landmark_point[310], landmark_point[311], (0, 255, 0), 2)
+            cv.line(image, landmark_point[311], landmark_point[312], (0, 255, 0), 2)
             cv.line(image, landmark_point[312], landmark_point[13], (0, 255, 0), 2)
             cv.line(image, landmark_point[13], landmark_point[82], (0, 255, 0), 2)
             cv.line(image, landmark_point[82], landmark_point[81], (0, 255, 0), 2)
@@ -387,14 +388,14 @@ class SchematicDiagram():
             cv.line(image, landmark_point[178], landmark_point[87], (0, 255, 0), 2)
             cv.line(image, landmark_point[87], landmark_point[14], (0, 255, 0), 2)
             cv.line(image, landmark_point[14], landmark_point[317], (0, 255, 0), 2)
-            cv.line(image, landmark_point[317], landmark_point[402], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[402], landmark_point[318], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[318], landmark_point[324], (0, 255, 0),                    2)
-            cv.line(image, landmark_point[324], landmark_point[308], (0, 255, 0),                    2)
+            cv.line(image, landmark_point[317], landmark_point[402], (0, 255, 0), 2)
+            cv.line(image, landmark_point[402], landmark_point[318], (0, 255, 0), 2)
+            cv.line(image, landmark_point[318], landmark_point[324], (0, 255, 0), 2)
+            cv.line(image, landmark_point[324], landmark_point[308], (0, 255, 0), 2)
 
         return image
 
-    def calc_bounding_rect(image, landmarks):
+    def calc_bounding_rect(self, image, landmarks):
         image_width, image_height = image.shape[1], image.shape[0]
 
         landmark_array = np.empty((0, 2), int)
@@ -411,7 +412,7 @@ class SchematicDiagram():
 
         return [x, y, x + w, y + h]
 
-    def calc_palm_moment(image, landmarks):
+    def calc_palm_moment(self, image, landmarks):
         image_width, image_height = image.shape[1], image.shape[0]
 
         palm_array = np.empty((0, 2), int)
@@ -442,9 +443,9 @@ class SchematicDiagram():
 
         return cx, cy
 
-    def draw_bounding_rect(use_brect, image, brect):
+    def draw_bounding_rect(self, use_brect, image, brect):
         if use_brect:
             # 外接矩形
-            cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[3]),                         (0, 255, 0), 2)
+            cv.rectangle(image, (brect[0], brect[1]), (brect[2], brect[3]), (0, 255, 0), 2)
 
         return image

@@ -4,9 +4,15 @@
 # ///////////////////////////////////////////////////////////////////
 
 ## =======================================
+## Escape sequence
+COLOR_ON_RED="\e[31m"
+COLOR_OFF="\e[m"
+## =======================================
+
+## =======================================
 ## Settings : From config.json
 ## =======================================
-CONFIG_ARRAY=("CAST" "MRS_ROS" "MRS" "BUILD" "BUILD2")
+CONFIG_ARRAY=("CAST" "MRS_ROS" "MRS" "CMAKE" "BUILD")
 
 if [ "-bash" = "$0" ]; then
     CONFIG_PATH=${1:-/opt/MaidRobotSystem/data/config.json}
@@ -24,19 +30,43 @@ if [ -f ${CONFIG_PATH} ]; then
         json=$(cat ${CONFIG_PATH} | jq  -c '.["'$CONFIG_RAW'"]')
         if [ "null" != "$json" ]; then
             for key in $(echo $json | jq -r keys[]); do
-                value=$(echo $json | jq -r .$key)
+                value=$(eval echo $(echo $json | jq -r .$key))
                 export $key=$value
             done
         fi
     done
 fi
-export ROS_DOMAIN_ID=$MRS_ROS_DOMAIN_ID
+if [ -n "${MRS_ROS_DOMAIN_ID}" ]; then
+    export ROS_DOMAIN_ID=$MRS_ROS_DOMAIN_ID
+fi
+if [ -n "${MRS_ROS_LOCALHOST_ONLY}" ]; then
+    export ROS_LOCALHOST_ONLY=$MRS_ROS_LOCALHOST_ONLY
+fi
+
 
 ## =======================================
 ## Settings
 ## =======================================
 export BUILD_DATE=`date +%Y%m%d_%m%d%y`
-ROS_DISTRO=humble
+if [ -z "${ROS_DISTRO}" ]; then
+    ROS_DISTRO=humble
+    if [ ! -d "/opt/ros/${ROS_DISTRO}" ];
+    then
+        ROS_DISTRO=rolling
+        if [ ! -d "/opt/ros/${ROS_DISTRO}" ];
+        then
+            ROS_DISTRO=foxy
+            if [ ! -d "/opt/ros/${ROS_DISTRO}" ];
+            then
+                echo -e "${COLOR_ON_RED}========================================${COLOR_OFF}"
+                echo -e "${COLOR_ON_RED}  Not support Distributions : ${ROS_DISTRO}.${COLOR_OFF}"
+                echo -e "${COLOR_ON_RED}========================================${COLOR_OFF}"
+                exit 1
+            fi
+        fi
+    fi
+fi
+
 export MRS_WORKSPACE=${MRS_WORKSPACE:-/opt/MaidRobotSystem}
 
 # Maid robot system

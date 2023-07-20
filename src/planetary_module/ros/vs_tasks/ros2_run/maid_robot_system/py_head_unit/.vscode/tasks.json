@@ -122,18 +122,6 @@
             "dependsOn": [
                 "ROS2 : test : CLEAN"
             ]
-        },
-        // sample
-        {
-            "label": "ROS2 : sample_node : CTRL : sample_node : topic : set : 1 : messaging/input",
-            "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/command_topic_pub.sh",
-            "args": [
-                "/maid_robot_system/messaging/input",
-                "std_msgs/msg/Float64",
-                "${workspaceFolder}/topic_input_1.yaml",
-                "-r 0.5"
-            ]
         }
     ]
 }

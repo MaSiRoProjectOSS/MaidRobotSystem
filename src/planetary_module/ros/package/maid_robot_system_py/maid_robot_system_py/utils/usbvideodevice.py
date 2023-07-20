@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 
 import subprocess
 
@@ -39,8 +39,8 @@ class UsbVideoDevice():
             for line in by_path.split('\n'):
                 if ('usb' in line):
                     tmp = self._split(line, ' ')
-                    name = tmp[9]
-                    tmp2 = self._split(tmp[11], '../../video')
+                    name = tmp[8]
+                    tmp2 = self._split(tmp[10], '../../video')
                     deviceId = int(tmp2[0])
                     self._deviceList.append(
                         (deviceId, name, '/dev/video' + str(deviceId)))

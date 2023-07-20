@@ -6,7 +6,6 @@ import math
 import copy
 import traceback
 import cv2 as cv
-import mediapipe as mp
 from rclpy.node import Node
 from utils.usbvideodevice import UsbVideoDevice
 from maid_robot_system_py.features.ros.face_recognition_ros import FaceRecognitionRos
@@ -46,9 +45,9 @@ class ModelNode(Node):
 
     #############################################################################
 
-    def _reset_video_id(self, type, id, by_path):
+    def _reset_video_id(self, video_type, id, by_path):
         result = -1
-        usbVideoDevice = UsbVideoDevice(type)
+        usbVideoDevice = UsbVideoDevice(video_type)
         if -1 == id:
             result = usbVideoDevice.get_id_from_name(by_path)
         else:
@@ -75,7 +74,7 @@ class ModelNode(Node):
             #############################################################################
             # set instance
             self._ros_com = FaceRecognitionRos(self)
-            self._ia = ImageAnalysis(self._ros_com.param_confidence_min_detection,  self._ros_com.param_confidence_min_tracking)
+            self._ia = ImageAnalysis(self._ros_com.param_confidence_min_detection, self._ros_com.param_confidence_min_tracking)
 
             # set video
 
@@ -83,19 +82,25 @@ class ModelNode(Node):
             self._video_device_right = self._reset_video_id(self._ros_com.param_device_right_type, self._ros_com.param_device_right_id, self._ros_com.param_device_right_by_path)
             if -1 != self._video_device_left:
                 self._cap_left = cv.VideoCapture(self._video_device_left)
-                self._cap_left.set(cv.CAP_PROP_FRAME_WIDTH,  self._ros_com.param_device_left_width)
-                self._cap_left.set(cv.CAP_PROP_FRAME_HEIGHT,  self._ros_com.param_device_left_height)
+                self._cap_left.set(cv.CAP_PROP_FRAME_WIDTH, self._ros_com.param_device_left_width)
+                self._cap_left.set(cv.CAP_PROP_FRAME_HEIGHT, self._ros_com.param_device_left_height)
             if -1 != self._video_device_right:
                 self._cap_right = cv.VideoCapture(self._video_device_right)
-                self._cap_right.set(cv.CAP_PROP_FRAME_WIDTH,  self._ros_com.param_device_right_width)
-                self._cap_right.set(cv.CAP_PROP_FRAME_HEIGHT,  self._ros_com.param_device_right_height)
+                self._cap_right.set(cv.CAP_PROP_FRAME_WIDTH, self._ros_com.param_device_right_width)
+                self._cap_right.set(cv.CAP_PROP_FRAME_HEIGHT, self._ros_com.param_device_right_height)
+            init_ros_func = True
+            if 0 > self._video_device_left:
+                if 0 > self._video_device_right:
+                    init_ros_func = False
+                    rclpy.shutdown()
 
-            # self._ia.load_model()
+            if [True == init_ros_func]:
+                # self._ia.load_model()
 
-            self._timer = self.create_timer(self._timer_period, self._callback_calculate)
+                self._timer = self.create_timer(self._timer_period, self._callback_calculate)
 
-            self._tracking_time = time.time() + self. TIME_TIMER_TRACKING_TIMEOUT
-            self._timer_info = self.create_timer(self._timer_info_period, self._callback_info)
+                self._tracking_time = time.time() + self. TIME_TIMER_TRACKING_TIMEOUT
+                self._timer_info = self.create_timer(self._timer_info_period, self._callback_info)
 
         except Exception as exception:
             result = False
@@ -138,9 +143,9 @@ class ModelNode(Node):
                 # holistic
                 image.flags.writeable = False
                 if (0 == self._running_cap_id):
-                    results = self._left_holistic.process(image)
+                    results = self._ia.holistic_left.process(image)
                 if (1 == self._running_cap_id):
-                    results = self._right_holistic.process(image)
+                    results = self._ia.holistic_right.process(image)
                 image.flags.writeable = True
 
                 # Pose ###############################################################
@@ -175,7 +180,7 @@ class ModelNode(Node):
                     # eye_cmd_angle.linear.x = 0
                     if (person_vertical_flag == 1 and get_person_data.hand_left.get_flag == 1 and get_person_data.shoulder_left.get_flag == 1 and get_person_data.hand_left.y < get_person_data.shoulder_left.y):
                         target_position = get_person_data.hand_left
-                        # eye_cmd_angle.linear.x = 1   # eyesmile
+                        # eye_cmd_angle.linear.x = 1   # eye smile
                         see_nose_flag = 0
                     if (person_vertical_flag == 1 and get_person_data.hand_right.get_flag == 1 and get_person_data.shoulder_right.get_flag == 1 and get_person_data.hand_right.y < get_person_data.shoulder_right.y):
                         target_position = get_person_data.hand_right
@@ -208,7 +213,7 @@ class ModelNode(Node):
                     To_face_yaw = ((Get_face_x / self._ros_com .CAMERA_PIXEL_X) - 0.5) * self._ros_com .CAMERA_ANGLE_X
                     To_face_pitch = ((Get_face_y / self._ros_com .CAMERA_PIXEL_Y) - 0.5) * self._ros_com . CAMERA_ANGLE_Y
 
-                    self._ros_com.set_angle(To_face_yaw, To_face_pitch, target_roll,   self._ia.flag_human_confront,  self._ia.flag_person_vertical)
+                    self._ros_com.set_angle(To_face_yaw, To_face_pitch, target_roll, self._ia.flag_human_confront, self._ia.flag_person_vertical)
 
                     if (0 == self._running_cap_id):
                         target_angle_z_R = To_face_yaw + self. OFFSET_ANGLE_Z_LEFT
@@ -222,7 +227,7 @@ class ModelNode(Node):
                     self._ros_com.set_eye_angle((target_angle_y_L + target_angle_y_R)/2.0, (target_angle_z_L + target_angle_z_R)/2.0)
 
                     if (self._ia.flag_human_confront == 1):
-                        self._ros_com.set_neck_confronted(target_angle_y,                                                     target_angle_z, target_roll)
+                        self._ros_com.set_neck_confronted(target_angle_y, target_angle_z, target_roll)
                     else:
                         flag_human_clear = 1
 
@@ -237,8 +242,8 @@ class ModelNode(Node):
                     self._ros_com.set_image_right(debug_image)
 
                 if (1 == flag_human_clear):
-                    if (time.time() > self._tracking_tim):
-                        self._tracking_tim = time.time() + self._ros_com.param_confidence_tracking_timeout
+                    if (time.time() > self._tracking_time):
+                        self._tracking_time = time.time() + self._ros_com.param_confidence_tracking_timeout
                         self._ros_com.set_pose_clear()
             self._ros_com.send()
 
@@ -262,7 +267,6 @@ def main(args=None):
 
     except Exception as exception:
         traceback_logger.error(traceback.format_exc())
-        raise exception
     finally:
         node.fin()
         node.destroy_node()

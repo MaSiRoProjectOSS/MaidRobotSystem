@@ -5,10 +5,10 @@
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
 SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
 
-CMD_TOPIC_NAME=$2
-CMD_MESSAGE_TYPE=$3
-CMD_YAML_FILE=`cat $4`
-CMD_OPTIONS=$5
+CMD_TOPIC_NAME=$1
+CMD_MESSAGE_TYPE=$2
+CMD_YAML_FILE=`cat $3
+CMD_OPTIONS=$4
 ## ================================
 ## Escape sequence
 COLOR_ON_GREEN="\e[32m"

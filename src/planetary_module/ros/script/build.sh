@@ -18,18 +18,36 @@ COLOR_ON_GREEN="\e[32m"
 COLOR_ON_YELLOW="\e[33m"
 COLOR_OFF="\e[m"
 ## ================================
+ret=0
 SCRIPT_FOLDER=$(cd $(dirname $0) && pwd)
+ADD_LOG_LEVEL=false
+
 #SCRIPT_FOLDER=`readlink -f ${SCRIPT_FOLDER}`
 source ${SCRIPT_FOLDER}/env.sh
+## ================================
+case $BUILD_PARALLEL_WORKERS in
+  *"nproc"*)
+    BUILD_PARALLEL_WORKERS=$(nproc)
+    ;;
+esac
+## ================================
+##  "BUILD_LOG_LEVEL": "CRITICAL"/"ERROR"/"WARNING"/"INFO"/"DEBUG"/"NOTSET"
+case "$BUILD_LOG_LEVEL" in
+    "CRITICAL" )    ADD_LOG_LEVEL=true  ;;
+    "ERROR" )       ADD_LOG_LEVEL=true  ;;
+    "WARNING" )     ADD_LOG_LEVEL=true  ;;
+    "INFO" )        ADD_LOG_LEVEL=true  ;;
+    "DEBUG" )       ADD_LOG_LEVEL=true  ;;
+    "NOTSET" )      ADD_LOG_LEVEL=true  ;;
+esac
 
-ret=0
 if [ -n "${ROS_DISTRO}" ] ;then
     ## ================================
     ## command exsample:
     ## /opt/MaidRobotSystem/source/ros/build.sh <build | rebuild | clean> <debug | release> [packages-select]
     ## ================================
     ## Settings
-    WORK_COLCON_OPTION="--symlink-install --parallel-workers 4"
+    WORK_COLCON_OPTION="--symlink-install --parallel-workers ${BUILD_PARALLEL_WORKERS}"
     ## ================================
     TARGET_FOLDER=${MRS_ROS_PACKAGE_FOLDER}
     WORK_COMMANDS=${1:-""}
@@ -45,8 +63,12 @@ if [ -n "${ROS_DISTRO}" ] ;then
     mkdir -p ${MRS_WORKSPACE}/.colcon
     cd ${MRS_WORKSPACE}/.colcon
     ## ================================
+    if [ -n "${CMAKE_ARGS}" ]; then
+        WORK_CMAKE_ARGS="--cmake-args "${CMAKE_ARGS}
+    else
+        WORK_CMAKE_ARGS=""
+    fi
 
-    WORK_CMAKE_ARGS=""
     TARGET_FOLDER_ARG="--base-paths ${TARGET_FOLDER} --paths ${MRS_WORKSPACE}/.colcon"
 
     ## ================================
@@ -70,9 +92,8 @@ if [ -n "${ROS_DISTRO}" ] ;then
                     #rm -rf ${TARGET_FOLDER}/build
                     WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
                 fi
-                if [ "debug" = "${WORK_BUILD_TYPE,,}" ]; then
-                    WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" -DCMAKE_BUILD_TYPE=Debug"
-                    COLCON_LOG_LEVEL=DEBUG
+                if [ true = ${ADD_LOG_LEVEL} ]; then
+                    COLCON_LOG_LEVEL=${BUILD_LOG_LEVEL^^}
                 fi
 
                 source /usr/share/colcon_cd/function/colcon_cd.sh
@@ -119,7 +140,9 @@ if [ -n "${ROS_DISTRO}" ] ;then
     echo -e "${COLOR_ON_BLUE}ROS                        : ${ROS_DISTRO}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}Workspace                  : ${MRS_WORKSPACE}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}Target folder              : ${TARGET_FOLDER}${COLOR_OFF}"
-
+if [ true = ${ADD_LOG_LEVEL} ]; then
+    echo -e "${COLOR_ON_BLUE}Log level                  : ${COLCON_LOG_LEVEL}${COLOR_OFF}"
+fi
     echo -e "${COLOR_ON_BLUE}ENV${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}  ROS${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    ROS_DOMAIN_ID          : ${ROS_DOMAIN_ID}${COLOR_OFF}"

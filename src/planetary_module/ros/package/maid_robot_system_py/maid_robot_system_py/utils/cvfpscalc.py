@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.10
+
 from collections import deque
 import cv2 as cv
 

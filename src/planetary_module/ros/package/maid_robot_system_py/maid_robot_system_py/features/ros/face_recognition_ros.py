@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.10
 
 import rclpy
 import numpy as np
@@ -62,7 +62,6 @@ class FaceRecognitionRos():
 
     def _create_publisher(self, node):
         queue_size = 10
-        self.publisher_ = node.create_publisher(String, 'topic', queue_size)
         self._pub_eye_cmd_angle = node.create_publisher(Twist,  'eye/cmd_angle', queue_size)
         self._pub_neck_cmd_angle = node.create_publisher(Twist,  'neck/cmd_pose', queue_size)
         self._pub_robot_left_view = node.create_publisher(Image,  'robot_view_left', queue_size)
@@ -125,40 +124,40 @@ class FaceRecognitionRos():
             self.param_update = False
 
     def print_parameter(self, node):
-        node.get_logger().info('Parameter: ')
-        node.get_logger().info(' device: ')
-        node.get_logger().info('  left: ')
-        node.get_logger().info('   type   : ' + str(self.param_device_left_type))
-        node.get_logger().info('   id     : ' + str(self.param_device_left_id))
-        node.get_logger().info('   by_path: ' + str(self.param_device_left_by_path))
-        node.get_logger().info('   width  : ' + str(self.param_device_left_width))
-        node.get_logger().info('   height : ' + str(self.param_device_left_height))
-        node.get_logger().info('  right: ')
-        node.get_logger().info('   type   : ' + str(self.param_device_right_type))
-        node.get_logger().info('   id     : ' + str(self.param_device_right_id))
-        node.get_logger().info('   by_path: ' + str(self.param_device_right_by_path))
-        node.get_logger().info('   width  : ' + str(self.param_device_right_width))
-        node.get_logger().info('   height : ' + str(self.param_device_right_height))
-        node.get_logger().info('  confidence: ')
-        node.get_logger().info('   min_detection : ' + str(self.param_confidence_min_detection))
-        node.get_logger().info('   min_tracking  : ' + str(self.param_confidence_min_tracking))
-        node.get_logger().info('  update  : ' + str(self.param_update))
+        node.get_logger().debug('Parameter: ')
+        node.get_logger().debug(' device: ')
+        node.get_logger().debug('  left: ')
+        node.get_logger().debug('   type   : ' + str(self.param_device_left_type))
+        node.get_logger().debug('   id     : ' + str(self.param_device_left_id))
+        node.get_logger().debug('   by_path: ' + str(self.param_device_left_by_path))
+        node.get_logger().debug('   width  : ' + str(self.param_device_left_width))
+        node.get_logger().debug('   height : ' + str(self.param_device_left_height))
+        node.get_logger().debug('  right: ')
+        node.get_logger().debug('   type   : ' + str(self.param_device_right_type))
+        node.get_logger().debug('   id     : ' + str(self.param_device_right_id))
+        node.get_logger().debug('   by_path: ' + str(self.param_device_right_by_path))
+        node.get_logger().debug('   width  : ' + str(self.param_device_right_width))
+        node.get_logger().debug('   height : ' + str(self.param_device_right_height))
+        node.get_logger().debug('  confidence: ')
+        node.get_logger().debug('   min_detection : ' + str(self.param_confidence_min_detection))
+        node.get_logger().debug('   min_tracking  : ' + str(self.param_confidence_min_tracking))
+        node.get_logger().debug('  update  : ' + str(self.param_update))
 
     def set_pose_clear(self):
         # set neck
-        self._data_neck_cmd_pose.linear.x = 0
-        self._flag_send_neck = 1
+        self._data_neck_cmd_pose.linear.x = 0.0
+        self._flag_send_neck = 1.0
         # set eye
-        self._data_eye_target.x = 0
-        self._data_eye_target.y = 0
-        self._flag_send_eye = 1
+        self._data_eye_target.x = 0.0
+        self._data_eye_target.y = 0.0
+        self._flag_send_eye = 1.0
 
     def set_neck_confronted(self, target_y, target_z, target_roll):
-        self._data_neck_cmd_pose.linear.x = 111
+        self._data_neck_cmd_pose.linear.x = 111.0
         self._data_neck_cmd_pose.angular.y = target_y / 2.5
         self._data_neck_cmd_pose.angular.z = target_z / -2.5
         self._data_neck_cmd_pose.angular.x = target_roll / 4.0
-        self._flag_send_neck = 1
+        self._flag_send_neck = 1.0
 
     def set_eye_angle(self, target_y, target_z):
         self._data_eye_cmd_angle.angular.y = target_y / -2.0
