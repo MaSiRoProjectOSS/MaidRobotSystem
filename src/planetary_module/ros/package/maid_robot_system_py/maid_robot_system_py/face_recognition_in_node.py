@@ -83,16 +83,23 @@ class ModelNode(Node):
             if -1 != self._video_device_id:
                 try:
                     self._cap = cv.VideoCapture(self._video_device_id)
-                    self._cap.set(cv.CAP_PROP_FRAME_WIDTH,
-                                  self._ros_com.param_video_width)
-                    self._cap.set(
-                        cv.CAP_PROP_FRAME_HEIGHT, self._ros_com.param_video_height)
-                    ret, image = self._cap.read()
-                    if (ret is False):
+                    if (not self._cap .isOpened()):
                         self._video_device_id = -1
                     else:
-                        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-                        self._ros_com.set_image(image)
+                        self._cap.set(cv.CAP_PROP_FRAME_WIDTH, self._ros_com.param_video_width)
+                        self._cap.set(cv.CAP_PROP_FRAME_HEIGHT, self._ros_com.param_video_height)
+                        # self._cap.set(cv.CAP_PROP_FPS, 30)
+                        # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('B', 'G', 'R', '3'))
+                        # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+                        self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
+                        # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
+                        self._cap.grab()
+                        ret, image = self._cap.read()
+                        if (ret is False):
+                            self._video_device_id = -1
+                        else:
+                            # image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                            self._ros_com.set_image(image)
                 except Exception as exception:
                     self.get_logger().error('Not open Camera : /dev/video'
                                             + str(self._video_device_id)
@@ -137,8 +144,8 @@ class ModelNode(Node):
             ret, image = self._cap.read()
             #####################################################
             if (ret is True):
-                image = cv.flip(image, 1)
-                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                # image = cv.flip(image, 1)
+                # image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 if (self._ros_com.param_image_overlay_information is True):
                     self._frame = copy.deepcopy(image)
                 #####################################################
