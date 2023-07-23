@@ -29,11 +29,12 @@ def generate_launch_description():
             "confidence/visibility_th": 0.2,
             "image/width": 800,
             "image/height": 600,
-            "image/overlay_information": True,
+            "image/overlay_information": False,
             "image/publish": False,
+            "features/detect_markers": False,
             "update": True,
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
 
@@ -57,12 +58,12 @@ def generate_launch_description():
             "confidence/visibility_th": 0.2,
             "image/width": 800,
             "image/height": 600,
-            "image/overlay_information": True,
+            "image/overlay_information": False,
             "image/publish": False,
             "features/detect_markers": False,
             "update": True,
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
     return LaunchDescription([

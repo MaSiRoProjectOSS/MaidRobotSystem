@@ -8,6 +8,7 @@ from rclpy.parameter import Parameter
 from sensor_msgs.msg import Image
 from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
 from mediapipe.python.solutions.pose import PoseLandmark
+from cv_bridge import CvBridge
 
 
 class FaceRecognitionRos():
@@ -15,6 +16,8 @@ class FaceRecognitionRos():
     #####################################
     _pub_image = None
     _pub_pose_landmark = None
+    _bridge = None
+
     #####################################
     param_topic_sub_name = ''
     param_device_id = -1
@@ -28,6 +31,7 @@ class FaceRecognitionRos():
     param_confidence_visibility_th = 0.5
     param_image_width = 800
     param_image_height = 600
+    _param_image_size = (800 * 600 * 3)
     param_image_overlay_information = False
     param_image_publish = False
     param_update = True
@@ -44,6 +48,7 @@ class FaceRecognitionRos():
     #####################################
 
     def __init__(self, node: Node):
+        self._bridge = CvBridge()
         self._init_param(node)
 
     def create_publisher(self, node: Node, id: int):
@@ -99,6 +104,7 @@ class FaceRecognitionRos():
                                          encoding='bgr8', is_bigendian=0, step=self.param_image_width * 3)
         self._data_image_overlay = Image(height=self.param_image_height, width=self.param_image_width,
                                          encoding='bgr8', is_bigendian=0, step=self.param_image_width * 3)
+        self._param_image_size = (self.param_image_width * self.param_image_height * 3)
 
     def get_parameter(self, node: Node, flag_initial):
         if (self.param_update is True):
@@ -179,6 +185,10 @@ class FaceRecognitionRos():
 
     def repackaging(self, landmarks: PoseLandmarkModel):
         human_detected = False
+        box_x_min = 1000
+        box_y_min = 1000
+        box_x_max = -1000
+        box_y_max = -1000
         for index, landmark in enumerate(landmarks.landmark):
             landmark_x = float(landmark.x)
             landmark_y = float(landmark.y)
@@ -189,6 +199,11 @@ class FaceRecognitionRos():
                 landmark_exist = False
             else:
                 human_detected = True
+                box_x_min = min(box_x_min, int(landmark_x))
+                box_y_min = min(box_x_min, int(landmark_y))
+                box_x_max = max(box_x_min, int(landmark_x))
+                box_y_max = max(box_x_min, int(landmark_y))
+
             if PoseLandmark.NOSE == index:
                 self.person_data.nose.x = landmark_x
                 self.person_data.nose.y = landmark_y
@@ -387,17 +402,25 @@ class FaceRecognitionRos():
                 self.person_data.right.foot_index.z = landmark_z
                 self.person_data.right.foot_index.exist = landmark_exist
                 self.person_data.right.foot_index.visibility = landmark_visibility
+        ##############################################
+        if (human_detected is False):
+            box_x_min = 0
+            box_y_min = 0
+            box_x_max = 0
+            box_y_max = 0
+        self.person_data.area.x = box_x_min
+        self.person_data.area.y = box_y_min
+        self.person_data.area.width = box_x_max - box_x_min
+        self.person_data.area.height = box_y_max - box_y_min
         self.person_data.human_detected = human_detected
 
     def set_image(self, image):
-        pub_data = np.reshape(
-            image, (self.param_image_height, self.param_image_width, 3))
-        self._data_image_scenery.data = pub_data.tolist()
+        if (self.param_image_publish is True):
+            self._data_image_scenery = self._bridge.cv2_to_imgmsg(np.array(image), "bgr8")
 
     def set_image_overlay(self, image):
-        pub_data = np.reshape(
-            image, (self.param_image_height, self.param_image_width, 3))
-        self._data_image_overlay.data = pub_data.tolist()
+        if (self.param_image_publish is True):
+            self._data_image_overlay = self._bridge.cv2_to_imgmsg(np.array(image), "bgr8")
 
     def send_image(self):
         if (self.param_image_publish is True):

@@ -7,9 +7,13 @@ import cv2.aruco as aruco
 
 class ImageAnalysis:
     _holistic = None
+    _detector = None
 
     def __init__(self, confidence_min_detection: float, confidence_min_tracking: float):
         self._load_model(confidence_min_detection, confidence_min_tracking)
+        dictionary = aruco.getPredefinedDictionary(aruco.DICT_5X5_250)
+        parameters = aruco.DetectorParameters()
+        self._detector = aruco.ArucoDetector(dictionary, parameters)
 
     def _load_model(self, confidence_min_detection: float, confidence_min_tracking: float):
         self._holistic = mp_holistic(
@@ -18,10 +22,7 @@ class ImageAnalysis:
         )
 
     def detect_ar(self, image):
-        dictionary = aruco.getPredefinedDictionary(aruco.DICT_5X5_250)
-        parameters = aruco.DetectorParameters()
-        detector = cv.aruco.ArucoDetector(dictionary, parameters)
-        corners, ids, rejectedImgPoints = detector.detectMarkers(image)
+        corners, ids, rejectedImgPoints = self._detector.detectMarkers(image)
         return ids
 
     def detect_holistic(self, image):

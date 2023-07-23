@@ -9,7 +9,7 @@
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
                 "build",
-                "debug",
+                "release",
                 "maid_robot_system",
                 "",
                 ""

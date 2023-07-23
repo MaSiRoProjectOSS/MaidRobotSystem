@@ -112,7 +112,7 @@
             "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "build",
-                "debug",
+                "release",
                 "maid_robot_system_py",
                 "",
                 ""
@@ -128,7 +128,7 @@
             "command": "${workspaceFolder}/../../../../script/build.sh",
             "args": [
                 "build",
-                "debug",
+                "release",
                 "",
                 "",
                 ""

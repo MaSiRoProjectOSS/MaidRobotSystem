@@ -20,11 +20,9 @@ class ModelNode(Node):
     ##########################################################################
     _ros_com = None
     _timer_recognition = None
-    _timer_recognition_period = 0.04  # seconds / FPS : 25
-    _timer_recognition_lock = True
+    _timer_recognition_period = 0.0334  # seconds / FPS : 30
     _timer_drawing = None
     _timer_drawing_period = 0.5  # seconds / FPS : 2
-    _timer_drawing_lock = True
 
     ##########################################################################
     _fps_calc = None
@@ -43,8 +41,8 @@ class ModelNode(Node):
     ##########################################################################
 
     def _develop(self):
-        self._timer_recognition_period = 3  # seconds
-        self._timer_drawing_period = 0.5  # seconds
+        self._timer_recognition_period = 1  # seconds
+        self._timer_drawing_period = 5  # seconds
 
     def _reset_video_id(self):
         path = ""
@@ -92,6 +90,9 @@ class ModelNode(Node):
                     ret, image = self._cap.read()
                     if (ret is False):
                         self._video_device_id = -1
+                    else:
+                        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                        self._ros_com.set_image(image)
                 except Exception as exception:
                     self.get_logger().error('Not open Camera : /dev/video'
                                             + str(self._video_device_id)
@@ -107,8 +108,6 @@ class ModelNode(Node):
                                        + ' : ' + str(self._ros_com.param_device_by_path))
                 # init lock
                 # self._lock = threading.Lock()
-                self._timer_recognition_lock = False
-                self._timer_drawing_lock = False
                 # set los
                 self._ros_com.create_publisher(self, self._video_device_id)
                 # set ros callback
@@ -128,51 +127,45 @@ class ModelNode(Node):
         return result
 
     def _callback_recognition(self):
-        if (self._timer_recognition_lock is False):
-            self._timer_recognition_lock = True
-            try:
+        try:
+            #####################################################
+            self._ros_com.get_parameter(self, False)
+            #####################################################
+            self._ros_com.person_data.human_detected = False
+            #####################################################
+            # Get image
+            ret, image = self._cap.read()
+            #####################################################
+            if (ret is True):
+                image = cv.flip(image, 1)
+                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                if (self._ros_com.param_image_overlay_information is True):
+                    self._frame = copy.deepcopy(image)
                 #####################################################
-                self._ros_com.get_parameter(self, False)
+                self._ros_com.set_image(image)
+                pose_landmarks = self._ia.detect_holistic(image)
+                if pose_landmarks is not None:
+                    self._ros_com.repackaging(pose_landmarks)
                 #####################################################
-                self._ros_com.person_data.human_detected = False
-                #####################################################
-                # Get image
-                ret, image = self._cap.read()
-                #####################################################
-                if (ret is True):
-                    image = cv.flip(image, 1)
-                    image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-                    #####################################################
-                    pose_landmarks = None
-                    if False:
-                        self._ros_com.set_image(image)
-                    pose_landmarks = self._ia.detect_holistic(image)
-                    if pose_landmarks is not None:
-                        self._ros_com.repackaging(pose_landmarks)
-                    self._frame = copy.deepcopy(
-                        cv.cvtColor(image, cv.COLOR_BGR2RGB))
-                    #####################################################
-                    if (self._ros_com.features_detect_markers is True):
-                        gray = cv.cvtColor(image, cv.COLOR_RGB2GRAY)
-                        self._ar_list = self._ia.detect_ar(self, gray)
-                    #####################################################
-
-                    if (self._debug_mode is True):
-                        if (self._ros_com.person_data.human_detected is True):
-                            self.get_logger().info(
-                                ' HUMAN_DETECTED [{}]'.format(str(self._ros_com.param_topic_sub_name)))
-                    #####################################################
-                #####################################################
-                self._display_fps = self._fps_calc.get()
+                if (self._ros_com.features_detect_markers is True):
+                    gray = cv.cvtColor(image, cv.COLOR_RGB2GRAY)
+                    self._ar_list = self._ia.detect_ar(self, gray)
                 #####################################################
 
-            except Exception as exception:
-                self.get_logger().error('Exception : ' + str(exception))
-                traceback.print_exc()
-            finally:
-                self._ros_com.send_recognition()
+                if (self._debug_mode is True):
+                    if (self._ros_com.person_data.human_detected is True):
+                        self.get_logger().info(
+                            ' HUMAN_DETECTED [{}]'.format(str(self._ros_com.param_topic_sub_name)))
+                #####################################################
+            #####################################################
+            self._display_fps = self._fps_calc.get()
+            #####################################################
 
-            self._timer_recognition_lock = False
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_recognition) : ' + str(exception))
+            traceback.print_exc()
+        finally:
+            self._ros_com.send_recognition()
 
     def _callback_output_information(self):
         if (self._ros_com.param_info_verbose is True):
@@ -186,26 +179,26 @@ class ModelNode(Node):
             ))
 
     def _callback_drawing(self):
-        if (self._timer_drawing_lock is False):
-            self._timer_drawing_lock = True
-            try:
-                if (self._ros_com.param_image_publish is True):
-                    image = copy.deepcopy(self._frame)
-                    schematic_diagram = self._sa.drawing(image,
-                                                         self._ros_com.person_data,
-                                                         self._draw_box
-                                                         )
-                    self._ros_com.set_image(schematic_diagram)
-                    # ##########################################################
-                    # send image
-                    self._ros_com.send_image()
-                    # ##########################################################
-            except Exception as exception:
-                self.get_logger().error('Exception : ' + str(exception))
-                traceback.print_exc()
-            finally:
-                self._ros_com.get_parameter_update(self)
-            self._timer_drawing_lock = False
+        try:
+            if (self._ros_com.param_image_publish is True):
+                if (self._ros_com.param_image_overlay_information is True):
+                    if (self._frame is not None):
+                        schematic_diagram = self._sa.drawing(copy.deepcopy(self._frame),
+                                                             self._ros_com.param_video_width,
+                                                             self._ros_com.param_video_height,
+                                                             self._ros_com.person_data,
+                                                             self._draw_box
+                                                             )
+                        self._ros_com.set_image_overlay(schematic_diagram)
+                # ##########################################################
+                # send image
+                self._ros_com.send_image()
+                # ##########################################################
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_drawing) : ' + str(exception))
+            traceback.print_exc()
+        finally:
+            self._ros_com.get_parameter_update(self)
 
 
 def main(args=None):
@@ -219,12 +212,12 @@ def main(args=None):
             rclpy.spin(node)
 
     except Exception as exception:
-        print(exception.message)
+        print(exception)
+        traceback.print_exc()
         traceback_logger.error(traceback.format_exc())
     finally:
         node.fin()
         node.destroy_node()
-        rclpy.shutdown()
         cv.destroyAllWindows()
 
 

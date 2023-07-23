@@ -68,6 +68,10 @@ set(MSG_POSE_FILE
   msg/pose/PoseLandmarkModel.msg
   msg/pose/BodySide.msg
 )
+#   MSG_DRAWING_FILE
+set(MSG_DRAWING_FILE
+  msg/drawing/Rect.msg
+)
 ###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -75,6 +79,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_EULER_FILE}
   ${MSG_CLASSES_FILE}
   ${MSG_POSE_FILE}
+  ${MSG_DRAWING_FILE}
 
   DEPENDENCIES std_msgs geometry_msgs
 )

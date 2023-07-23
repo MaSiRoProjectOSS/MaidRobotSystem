@@ -15,10 +15,10 @@
         "MRS_SKIN_HOME": "/opt/MaidRobotSystem/data/skin/${MRS_MY_NAME_IS}"
     },
     "CMAKE": {
-        "CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Debug"
+        "CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Release"
     },
     "BUILD": {
-        "BUILD_LOG_LEVEL": "DEBUG",
+        "BUILD_LOG_LEVEL": "RELEASE",
         "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
         "BUILD_HEAD_UNIT": "ON",
         "BUILD_ARM_UNIT": "ON",
