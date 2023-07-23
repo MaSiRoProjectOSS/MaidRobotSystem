@@ -1,209 +1,411 @@
 #!/usr/bin/env python3.10
 
-import rclpy
 import numpy as np
+import copy
 
-from std_msgs.msg import Float32MultiArray
+from rclpy.node import Node
+from rclpy.parameter import Parameter
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Pose2D
-from geometry_msgs.msg import Twist
-from std_msgs.msg import String
+from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
+from mediapipe.python.solutions.pose import PoseLandmark
 
 
 class FaceRecognitionRos():
+    _output_log = True
     #####################################
-    CAMERA_PIXEL_X = 800
-    CAMERA_PIXEL_Y = 600
-    CAMERA_ANGLE_X = -140.0
-    CAMERA_ANGLE_Y = -140.0
+    _pub_image = None
+    _pub_pose_landmark = None
     #####################################
-    _pub_person_angle = None
-    _pub_robot_left_view = None
-    _pub_robot_right_view = None
-    _pub_eye_target = None
-    _pub_eye_cmd_angle = None
-    _pub_neck_cmd_angle = None
-    #####################################
-    param_device_left_id = -1
-    param_device_left_by_path = '--'
-    param_device_left_type = 'v4l'
-    param_device_left_width = 960
-    param_device_left_height = 540
-    param_device_right_id = -1
-    param_device_right_by_path = '--'
-    param_device_right_type = 'v4l'
-    param_device_right_width = 960
-    param_device_right_height = 540
+    param_topic_sub_name = ''
+    param_device_id = -1
+    param_device_by_path = '--'
+    param_device_type = 'v4l'
+    param_video_width = 960
+    param_video_height = 540
+    param_video_angle = 90
     param_confidence_min_detection = 0.5
     param_confidence_min_tracking = 0.5
-    param_confidence_tracking_timeout = 3.0
+    param_confidence_visibility_th = 0.5
+    param_image_width = 800
+    param_image_height = 600
+    param_image_overlay_information = False
+    param_image_publish = False
     param_update = True
+    param_info_verbose = False
+    #####################################
+    features_detect_markers = False
 
-    param_upper_body_only = True
-    param_box_rect = True
     #####################################
-    _data_neck_cmd_pose = Twist()
-    _data_eye_cmd_angle = Twist()
-    _data_eye_target = Pose2D(x=0.0, y=0.0)
-    _data_person_angle = Float32MultiArray()
-    _data_robot_view_left = Image(height=CAMERA_PIXEL_Y, width=CAMERA_PIXEL_X,
-                                  encoding='bgr8', is_bigendian=0, step=CAMERA_PIXEL_X * 3)
-    _data_robot_view_right = Image(height=CAMERA_PIXEL_Y, width=CAMERA_PIXEL_X,
-                                   encoding='bgr8', is_bigendian=0, step=CAMERA_PIXEL_X * 3)
+    person_data = PoseLandmarkModel()
+    _data_image_scenery = None
+    _data_image_overlay = None
     #####################################
-    _flag_send_person_angle = 0
-    _flag_send_eye = 0
-    _flag_send_neck = 0
+    _all_new_parameters = None
     #####################################
 
-    def __init__(self, node):
+    def __init__(self, node: Node):
         self._init_param(node)
-        self._create_publisher(node)
 
-    def _create_publisher(self, node):
+    def create_publisher(self, node: Node, id: int):
         queue_size = 10
-        self._pub_eye_cmd_angle = node.create_publisher(Twist,  'eye/cmd_angle', queue_size)
-        self._pub_neck_cmd_angle = node.create_publisher(Twist,  'neck/cmd_pose', queue_size)
-        self._pub_robot_left_view = node.create_publisher(Image,  'robot_view_left', queue_size)
-        self._pub_robot_right_view = node.create_publisher(Image,  'robot_view_right', queue_size)
-        self._pub_eye_target = node.create_publisher(Pose2D, 'gaze/target', queue_size)
-        self._pub_person_angle = node.create_publisher(Float32MultiArray, 'gaze/get_person_angle', queue_size)
+        if (len(self.param_topic_sub_name) == 0):
+            sub_name = 'video' + id
+        else:
+            sub_name = self.param_topic_sub_name
+        self._pub_image = node.create_publisher(
+            Image, 'image/raw/' + sub_name, queue_size)
+        self._pub_pose_landmark = node.create_publisher(
+            PoseLandmarkModel, 'pose_landmark/' + sub_name, queue_size)
 
-    def _init_param(self, node):
-        node.declare_parameter('device/left/id', self.param_device_left_id)
-        node.declare_parameter('device/left/by_path', self.param_device_left_by_path)
-        node.declare_parameter('device/left/type', self.param_device_left_type)
-        node.declare_parameter('device/left/width', self.param_device_left_width)
-        node.declare_parameter('device/left/height', self.param_device_left_height)
+    def _init_param(self, node: Node):
+        node.declare_parameter('topic_sub_name', self.param_topic_sub_name)
+        node.declare_parameter('device/type', self.param_device_type)
+        node.declare_parameter('device/id', self.param_device_id)
+        node.declare_parameter('device/by_path',
+                               self.param_device_by_path)
+        node.declare_parameter('video/width',
+                               self.param_video_width)
+        node.declare_parameter('video/height',
+                               self.param_video_height)
+        node.declare_parameter('video/angle',
+                               self.param_video_angle)
 
-        node.declare_parameter('device/right/id', self.param_device_right_id)
-        node.declare_parameter('device/right/by_path', self.param_device_right_by_path)
-        node.declare_parameter('device/right/type', self.param_device_right_type)
-        node.declare_parameter('device/right/width', self.param_device_right_width)
-        node.declare_parameter('device/right/height', self.param_device_right_height)
+        node.declare_parameter('confidence/min_detection',
+                               self.param_confidence_min_detection)
+        node.declare_parameter('confidence/min_tracking',
+                               self.param_confidence_min_tracking)
+        node.declare_parameter('confidence/visibility_th',
+                               self.param_confidence_visibility_th)
 
-        node.declare_parameter('confidence/min_detection', self.param_confidence_min_detection)
-        node.declare_parameter('confidence/min_tracking', self.param_confidence_min_tracking)
-        node.declare_parameter('confidence/tracking_timeout', self.param_confidence_tracking_timeout)
+        node.declare_parameter('image/width', self.param_image_width)
+        node.declare_parameter('image/height', self.param_image_height)
+        node.declare_parameter('image/overlay_information',
+                               self.param_image_overlay_information)
+        node.declare_parameter('image/publish', self.param_image_publish)
 
         node.declare_parameter('update', self.param_update)
+        node.declare_parameter('info/verbose', self.param_info_verbose)
 
-        param_update = rclpy.parameter.Parameter(
-            'update',
-            rclpy.Parameter.Type.BOOL,
-            True
-        )
-        all_new_parameters = [param_update]
-        node.set_parameters(all_new_parameters)
-        self.get_parameter_update(node)
-        self.get_parameter(node)
+        node.declare_parameter('features/detect_markers',
+                               self.features_detect_markers)
 
-    def get_parameter_update(self, node):
-        self.param_update = node.get_parameter_or('update', self.param_update).get_parameter_value().bool_value
-        return self.param_update
+        param_update = Parameter('update',
+                                 Parameter.Type.BOOL,
+                                 False)
+        self._all_new_parameters = [param_update]
+        self.param_update = True
+        self.get_parameter(node, True)
+        self._data_image_scenery = Image(height=self.param_image_height, width=self.param_image_width,
+                                         encoding='bgr8', is_bigendian=0, step=self.param_image_width * 3)
+        self._data_image_overlay = Image(height=self.param_image_height, width=self.param_image_width,
+                                         encoding='bgr8', is_bigendian=0, step=self.param_image_width * 3)
 
-    def get_parameter(self, node):
-        if (True == self.param_update):
-            self.param_device_left_id = node.get_parameter_or('device/left/id', self.param_device_left_id).get_parameter_value().integer_value
-            self.param_device_left_by_path = node.get_parameter_or('device/left/by_path', self.param_device_left_by_path).get_parameter_value().string_value
-            self.param_device_left_type = node.get_parameter_or('device/left/type', self.param_device_left_type).get_parameter_value().string_value
-            self.param_device_left_width = node.get_parameter_or('device/left/width', self.param_device_left_width).get_parameter_value().integer_value
-            self.param_device_left_height = node.get_parameter_or('device/left/height', self.param_device_left_height).get_parameter_value().integer_value
+    def get_parameter(self, node: Node, flag_initial):
+        if (self.param_update is True):
+            if (flag_initial is True):
+                self.param_topic_sub_name = str(node.get_parameter_or(
+                    'topic_sub_name', self.param_topic_sub_name).get_parameter_value().string_value)
+                self.param_device_id = int(node.get_parameter_or(
+                    'device/id', self.param_device_id).get_parameter_value().integer_value)
+                self.param_device_by_path = str(node.get_parameter_or(
+                    'device/by_path', self.param_device_by_path).get_parameter_value().string_value)
+                self.param_device_type = str(node.get_parameter_or(
+                    'device/type', self.param_device_type).get_parameter_value().string_value)
+                self.param_video_width = int(node.get_parameter_or(
+                    'video/width', self.param_video_width).get_parameter_value().integer_value)
+                self.param_video_height = int(node.get_parameter_or(
+                    'video/height', self.param_video_height).get_parameter_value().integer_value)
+                self.param_video_angle = int(node.get_parameter_or(
+                    'video/angle', self.param_video_angle).get_parameter_value().integer_value)
 
-            self.param_device_right_id = node.get_parameter_or('device/right/id', self.param_device_right_id).get_parameter_value().integer_value
-            self.param_device_right_by_path = node.get_parameter_or('device/right/by_path', self.param_device_right_by_path).get_parameter_value().string_value
-            self.param_device_right_type = node.get_parameter_or('device/right/type', self.param_device_right_type).get_parameter_value().string_value
-            self.param_device_right_width = node.get_parameter_or('device/right/width', self.param_device_right_width).get_parameter_value().integer_value
-            self.param_device_right_height = node.get_parameter_or('device/right/height', self.param_device_right_height).get_parameter_value().integer_value
+                self.param_image_width = int(node.get_parameter_or(
+                    'image/width', self.param_image_width).get_parameter_value().integer_value)
+                self.param_image_height = int(node.get_parameter_or(
+                    'image/height', self.param_image_height).get_parameter_value().integer_value)
 
-            self.param_confidence_min_detection = node.get_parameter_or('confidence/min_detection', self.param_confidence_min_detection).get_parameter_value().double_value
-            self.param_confidence_min_tracking = node.get_parameter_or('confidence/min_tracking', self.param_confidence_min_tracking).get_parameter_value().double_value
-            self.param_confidence_tracking_timeout = node.get_parameter_or('confidence/tracking_timeout', self.param_confidence_tracking_timeout).get_parameter_value().double_value
+            self.param_confidence_min_detection = float(node.get_parameter_or(
+                'confidence/min_detection', self.param_confidence_min_detection).get_parameter_value().double_value)
+            self.param_confidence_min_tracking = float(node.get_parameter_or(
+                'confidence/min_tracking', self.param_confidence_min_tracking).get_parameter_value().double_value)
+            self.param_confidence_visibility_th = float(node.get_parameter_or(
+                'confidence/visibility_th', self.param_confidence_visibility_th).get_parameter_value().double_value)
+
+            self.param_image_overlay_information = bool(node.get_parameter_or(
+                'image/overlay_information', self.param_image_overlay_information).get_parameter_value().bool_value)
+            self.param_image_publish = bool(node.get_parameter_or(
+                'image/publish', self.param_image_publish).get_parameter_value().bool_value)
+            self.param_info_verbose = bool(node.get_parameter_or(
+                'info/verbose', self.param_info_verbose).get_parameter_value().bool_value)
+
+            self.features_detect_markers = bool(node.get_parameter_or(
+                'features/detect_markers', self.features_detect_markers).get_parameter_value().bool_value)
 
             self.print_parameter(node)
             self.param_update = False
+            node.set_parameters(self._all_new_parameters)
 
-    def print_parameter(self, node):
-        node.get_logger().debug('Parameter: ')
-        node.get_logger().debug(' device: ')
-        node.get_logger().debug('  left: ')
-        node.get_logger().debug('   type   : ' + str(self.param_device_left_type))
-        node.get_logger().debug('   id     : ' + str(self.param_device_left_id))
-        node.get_logger().debug('   by_path: ' + str(self.param_device_left_by_path))
-        node.get_logger().debug('   width  : ' + str(self.param_device_left_width))
-        node.get_logger().debug('   height : ' + str(self.param_device_left_height))
-        node.get_logger().debug('  right: ')
-        node.get_logger().debug('   type   : ' + str(self.param_device_right_type))
-        node.get_logger().debug('   id     : ' + str(self.param_device_right_id))
-        node.get_logger().debug('   by_path: ' + str(self.param_device_right_by_path))
-        node.get_logger().debug('   width  : ' + str(self.param_device_right_width))
-        node.get_logger().debug('   height : ' + str(self.param_device_right_height))
-        node.get_logger().debug('  confidence: ')
-        node.get_logger().debug('   min_detection : ' + str(self.param_confidence_min_detection))
-        node.get_logger().debug('   min_tracking  : ' + str(self.param_confidence_min_tracking))
-        node.get_logger().debug('  update  : ' + str(self.param_update))
+    def get_parameter_update(self, node: Node):
+        self.param_update = node.get_parameter_or(
+            'update', self.param_update).get_parameter_value().bool_value
+        return self.param_update
 
-    def set_pose_clear(self):
-        # set neck
-        self._data_neck_cmd_pose.linear.x = 0.0
-        self._flag_send_neck = 1.0
-        # set eye
-        self._data_eye_target.x = 0.0
-        self._data_eye_target.y = 0.0
-        self._flag_send_eye = 1.0
+    def print_parameter(self, node: Node):
+        if (self._output_log is True):
+            node.get_logger().info('Parameter: ')
+            node.get_logger().debug(' device: ')
+            node.get_logger().debug('   type   : ' + str(self.param_device_type))
+            node.get_logger().debug('   id     : ' + str(self.param_device_id))
+            node.get_logger().debug('   by_path: ' + str(self.param_device_by_path))
+            node.get_logger().debug('   width  : ' + str(self.param_video_width))
+            node.get_logger().debug('   height : ' + str(self.param_video_height))
+            node.get_logger().debug('   angle  : ' + str(self.param_video_angle))
+            node.get_logger().debug(' confidence: ')
+            node.get_logger().debug('  min_detection : '
+                                    + str(self.param_confidence_min_detection))
+            node.get_logger().debug('  min_tracking  : '
+                                    + str(self.param_confidence_min_tracking))
+            node.get_logger().debug('  visibility_th : '
+                                    + str(self.param_confidence_visibility_th))
+            node.get_logger().debug(' image: ')
+            node.get_logger().debug('  width   : ' + str(self.param_image_width))
+            node.get_logger().debug('  height  : ' + str(self.param_image_height))
+            node.get_logger().debug('  overlay : ' + str(self.param_image_overlay_information))
+            node.get_logger().debug('  publish : ' + str(self.param_image_publish))
+            node.get_logger().info(' update   : ' + str(self.param_update))
+            node.get_logger().debug(' info: ')
+            node.get_logger().debug('  verbose : ' + str(self.param_info_verbose))
+            node.get_logger().debug(' features: ')
+            node.get_logger().debug('  detect_markers : ' + str(self.features_detect_markers))
 
-    def set_neck_confronted(self, target_y, target_z, target_roll):
-        self._data_neck_cmd_pose.linear.x = 111.0
-        self._data_neck_cmd_pose.angular.y = target_y / 2.5
-        self._data_neck_cmd_pose.angular.z = target_z / -2.5
-        self._data_neck_cmd_pose.angular.x = target_roll / 4.0
-        self._flag_send_neck = 1.0
+    def repackaging(self, landmarks: PoseLandmarkModel):
+        human_detected = False
+        for index, landmark in enumerate(landmarks.landmark):
+            landmark_x = float(landmark.x)
+            landmark_y = float(landmark.y)
+            landmark_z = float(landmark.z)
+            landmark_exist = True
+            landmark_visibility = float(landmark.visibility)
+            if landmark_visibility < self.param_confidence_visibility_th:
+                landmark_exist = False
+            else:
+                human_detected = True
+            if PoseLandmark.NOSE == index:
+                self.person_data.nose.x = landmark_x
+                self.person_data.nose.y = landmark_y
+                self.person_data.nose.z = landmark_z
+                self.person_data.nose.exist = landmark_exist
+                self.person_data.nose.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_EYE_INNER == index:
+                self.person_data.left.eye_inner.x = landmark_x
+                self.person_data.left.eye_inner.y = landmark_y
+                self.person_data.left.eye_inner.z = landmark_z
+                self.person_data.left.eye_inner.exist = landmark_exist
+                self.person_data.left.eye_inner.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_EYE == index:
+                self.person_data.left.eye.x = landmark_x
+                self.person_data.left.eye.y = landmark_y
+                self.person_data.left.eye.z = landmark_z
+                self.person_data.left.eye.exist = landmark_exist
+                self.person_data.left.eye.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_EYE_OUTER == index:
+                self.person_data.left.eye_outer.x = landmark_x
+                self.person_data.left.eye_outer.y = landmark_y
+                self.person_data.left.eye_outer.z = landmark_z
+                self.person_data.left.eye_outer.exist = landmark_exist
+                self.person_data.left.eye_outer.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_EYE_INNER == index:
+                self.person_data.right.eye_inner.x = landmark_x
+                self.person_data.right.eye_inner.y = landmark_y
+                self.person_data.right.eye_inner.z = landmark_z
+                self.person_data.right.eye_inner.exist = landmark_exist
+                self.person_data.right.eye_inner.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_EYE == index:
+                self.person_data.right.eye.x = landmark_x
+                self.person_data.right.eye.y = landmark_y
+                self.person_data.right.eye.z = landmark_z
+                self.person_data.right.eye.exist = landmark_exist
+                self.person_data.right.eye.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_EYE_OUTER == index:
+                self.person_data.right.eye_outer.x = landmark_x
+                self.person_data.right.eye_outer.y = landmark_y
+                self.person_data.right.eye_outer.z = landmark_z
+                self.person_data.right.eye_outer.exist = landmark_exist
+                self.person_data.right.eye_outer.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_EAR == index:
+                self.person_data.left.ear.x = landmark_x
+                self.person_data.left.ear.y = landmark_y
+                self.person_data.left.ear.z = landmark_z
+                self.person_data.left.ear.exist = landmark_exist
+                self.person_data.left.ear.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_EAR == index:
+                self.person_data.right.ear.x = landmark_x
+                self.person_data.right.ear.y = landmark_y
+                self.person_data.right.ear.z = landmark_z
+                self.person_data.right.ear.exist = landmark_exist
+                self.person_data.right.ear.visibility = landmark_visibility
+            elif PoseLandmark.MOUTH_LEFT == index:
+                self.person_data.left.mouth.x = landmark_x
+                self.person_data.left.mouth.y = landmark_y
+                self.person_data.left.mouth.z = landmark_z
+                self.person_data.left.mouth.exist = landmark_exist
+                self.person_data.left.mouth.visibility = landmark_visibility
+            elif PoseLandmark.MOUTH_RIGHT == index:
+                self.person_data.right.mouth.x = landmark_x
+                self.person_data.right.mouth.y = landmark_y
+                self.person_data.right.mouth.z = landmark_z
+                self.person_data.right.mouth.exist = landmark_exist
+                self.person_data.right.mouth.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_SHOULDER == index:
+                self.person_data.left.shoulder.x = landmark_x
+                self.person_data.left.shoulder.y = landmark_y
+                self.person_data.left.shoulder.z = landmark_z
+                self.person_data.left.shoulder.exist = landmark_exist
+                self.person_data.left.shoulder.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_SHOULDER == index:
+                self.person_data.right.shoulder.x = landmark_x
+                self.person_data.right.shoulder.y = landmark_y
+                self.person_data.right.shoulder.z = landmark_z
+                self.person_data.right.shoulder.exist = landmark_exist
+                self.person_data.right.shoulder.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_ELBOW == index:
+                self.person_data.left.elbow.x = landmark_x
+                self.person_data.left.elbow.y = landmark_y
+                self.person_data.left.elbow.z = landmark_z
+                self.person_data.left.elbow.exist = landmark_exist
+                self.person_data.left.elbow.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_ELBOW == index:
+                self.person_data.right.elbow.x = landmark_x
+                self.person_data.right.elbow.y = landmark_y
+                self.person_data.right.elbow.z = landmark_z
+                self.person_data.right.elbow.exist = landmark_exist
+                self.person_data.right.elbow.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_WRIST == index:
+                self.person_data.left.wrist.x = landmark_x
+                self.person_data.left.wrist.y = landmark_y
+                self.person_data.left.wrist.z = landmark_z
+                self.person_data.left.wrist.exist = landmark_exist
+                self.person_data.left.wrist.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_WRIST == index:
+                self.person_data.right.wrist.x = landmark_x
+                self.person_data.right.wrist.y = landmark_y
+                self.person_data.right.wrist.z = landmark_z
+                self.person_data.right.wrist.exist = landmark_exist
+                self.person_data.right.wrist.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_PINKY == index:
+                self.person_data.left.pinky.x = landmark_x
+                self.person_data.left.pinky.y = landmark_y
+                self.person_data.left.pinky.z = landmark_z
+                self.person_data.left.pinky.exist = landmark_exist
+                self.person_data.left.pinky.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_PINKY == index:
+                self.person_data.right.pinky.x = landmark_x
+                self.person_data.right.pinky.y = landmark_y
+                self.person_data.right.pinky.z = landmark_z
+                self.person_data.right.pinky.exist = landmark_exist
+                self.person_data.right.pinky.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_INDEX == index:
+                self.person_data.left.index.x = landmark_x
+                self.person_data.left.index.y = landmark_y
+                self.person_data.left.index.z = landmark_z
+                self.person_data.left.index.exist = landmark_exist
+                self.person_data.left.index.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_INDEX == index:
+                self.person_data.right.index.x = landmark_x
+                self.person_data.right.index.y = landmark_y
+                self.person_data.right.index.z = landmark_z
+                self.person_data.right.index.exist = landmark_exist
+                self.person_data.right.index.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_THUMB == index:
+                self.person_data.left.thumb.x = landmark_x
+                self.person_data.left.thumb.y = landmark_y
+                self.person_data.left.thumb.z = landmark_z
+                self.person_data.left.thumb.exist = landmark_exist
+                self.person_data.left.thumb.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_THUMB == index:
+                self.person_data.right.thumb.x = landmark_x
+                self.person_data.right.thumb.y = landmark_y
+                self.person_data.right.thumb.z = landmark_z
+                self.person_data.right.thumb.exist = landmark_exist
+                self.person_data.right.thumb.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_HIP == index:
+                self.person_data.left.hip.x = landmark_x
+                self.person_data.left.hip.y = landmark_y
+                self.person_data.left.hip.z = landmark_z
+                self.person_data.left.hip.exist = landmark_exist
+                self.person_data.left.hip.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_HIP == index:
+                self.person_data.right.hip.x = landmark_x
+                self.person_data.right.hip.y = landmark_y
+                self.person_data.right.hip.z = landmark_z
+                self.person_data.right.hip.exist = landmark_exist
+                self.person_data.right.hip.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_KNEE == index:
+                self.person_data.left.knee.x = landmark_x
+                self.person_data.left.knee.y = landmark_y
+                self.person_data.left.knee.z = landmark_z
+                self.person_data.left.knee.exist = landmark_exist
+                self.person_data.left.knee.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_KNEE == index:
+                self.person_data.right.knee.x = landmark_x
+                self.person_data.right.knee.y = landmark_y
+                self.person_data.right.knee.z = landmark_z
+                self.person_data.right.knee.exist = landmark_exist
+                self.person_data.right.knee.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_ANKLE == index:
+                self.person_data.left.ankle.x = landmark_x
+                self.person_data.left.ankle.y = landmark_y
+                self.person_data.left.ankle.z = landmark_z
+                self.person_data.left.ankle.exist = landmark_exist
+                self.person_data.left.ankle.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_ANKLE == index:
+                self.person_data.right.ankle.x = landmark_x
+                self.person_data.right.ankle.y = landmark_y
+                self.person_data.right.ankle.z = landmark_z
+                self.person_data.right.ankle.exist = landmark_exist
+                self.person_data.right.ankle.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_HEEL == index:
+                self.person_data.left.heel.x = landmark_x
+                self.person_data.left.heel.y = landmark_y
+                self.person_data.left.heel.z = landmark_z
+                self.person_data.left.heel.exist = landmark_exist
+                self.person_data.left.heel.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_HEEL == index:
+                self.person_data.right.heel.x = landmark_x
+                self.person_data.right.heel.y = landmark_y
+                self.person_data.right.heel.z = landmark_z
+                self.person_data.right.heel.exist = landmark_exist
+                self.person_data.right.heel.visibility = landmark_visibility
+            elif PoseLandmark.LEFT_FOOT_INDEX == index:
+                self.person_data.left.foot_index.x = landmark_x
+                self.person_data.left.foot_index.y = landmark_y
+                self.person_data.left.foot_index.z = landmark_z
+                self.person_data.left.foot_index.exist = landmark_exist
+                self.person_data.left.foot_index.visibility = landmark_visibility
+            elif PoseLandmark.RIGHT_FOOT_INDEX == index:
+                self.person_data.right.foot_index.x = landmark_x
+                self.person_data.right.foot_index.y = landmark_y
+                self.person_data.right.foot_index.z = landmark_z
+                self.person_data.right.foot_index.exist = landmark_exist
+                self.person_data.right.foot_index.visibility = landmark_visibility
+        self.person_data.human_detected = human_detected
 
-    def set_eye_angle(self, target_y, target_z):
-        self._data_eye_cmd_angle.angular.y = target_y / -2.0
-        self._data_eye_cmd_angle.angular.z = target_z / 1.5
-        # eye_size
-        self._data_eye_cmd_angle.linear.y = 0.98
-        # _eye_cmd_angle.linear.z= 500 - 500* (abs(target_angle_z_L - target_angle_z_R) /10.0)
-
-    def set_angle(self, pitch, roll, yaw, flag1, flag2):
-        angle_data = []
-        angle_data.append(yaw)
-        angle_data.append(pitch)
-        angle_data.append(roll)
-        angle_data.append(flag1)
-        angle_data.append(flag2)
-
-        self._data_person_angle = Float32MultiArray(data=angle_data)
-        self._flag_send_person_angle = 1
-
-    def set_image_left(self, image):
+    def set_image(self, image):
         pub_data = np.reshape(
-            image, (self.CAMERA_PIXEL_X * self.CAMERA_PIXEL_Y * 3))
-        self._data_robot_view_left.data = pub_data.tolist()
+            image, (self.param_image_height, self.param_image_width, 3))
+        self._data_image_scenery.data = pub_data.tolist()
 
-    def set_image_right(self, image):
+    def set_image_overlay(self, image):
         pub_data = np.reshape(
-            image, (self.CAMERA_PIXEL_X * self.CAMERA_PIXEL_Y * 3))
-        self._data_robot_view_right.data = pub_data.tolist()
+            image, (self.param_image_height, self.param_image_width, 3))
+        self._data_image_overlay.data = pub_data.tolist()
 
-    def send_info(self):
-        # publish robot view
-        self._pub_robot_left_view.publish(self._data_robot_view_left)
-        self._pub_robot_right_view.publish(self._data_robot_view_right)
+    def send_image(self):
+        if (self.param_image_publish is True):
+            if (self.param_image_overlay_information is True):
+                self._pub_image.publish(self._data_image_overlay)
+            else:
+                self._pub_image.publish(self._data_image_scenery)
 
-    def send(self):
-        # publish eye angle
-        self._pub_eye_cmd_angle.publish(self._data_eye_cmd_angle)
-        # publish person angle
-        if (0 != self._flag_send_person_angle):
-            self._flag_send_person_angle = 0
-            self._pub_person_angle.publish(self._data_person_angle)
-        # publish neck position
-        if (0 != self._flag_send_neck):
-            self._flag_send_neck = 0
-            self._pub_neck_cmd_angle.publish(self._data_neck_cmd_pose)
-        # publish clear eye position
-        if (0 != self._flag_send_eye):
-            self._flag_send_eye = 0
-            self._pub_eye_target.publish(self._data_eye_target)
+    def send_recognition(self):
+        if (self.person_data.human_detected is True):
+            self._pub_pose_landmark.publish(self.person_data)

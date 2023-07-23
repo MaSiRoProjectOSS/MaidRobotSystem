@@ -13,10 +13,14 @@ setup(
             ['resource/' + package_name]),
         (os.path.join('share', package_name), ['package.xml']),
         # Add sub files.
-        (os.path.join('lib', package_name, 'features', 'mp'), glob(os.path.join(package_name , 'features', 'mp', '*.py'))),
-        (os.path.join('lib', package_name, 'features', 'ros'), glob(os.path.join(package_name , 'features', 'ros', '*.py'))),
-        (os.path.join('lib', package_name, 'features'), glob(os.path.join(package_name , 'features', '*.py'))),
-        (os.path.join('lib', package_name, 'utils'), glob(os.path.join(package_name , 'utils', '*.py'))),
+        (os.path.join('lib', package_name, 'features', 'mp'), glob(
+            os.path.join(package_name, 'features', 'mp', '*.py'))),
+        (os.path.join('lib', package_name, 'features', 'ros'), glob(
+            os.path.join(package_name, 'features', 'ros', '*.py'))),
+        (os.path.join('lib', package_name, 'features'), glob(
+            os.path.join(package_name, 'features', '*.py'))),
+        (os.path.join('lib', package_name, 'utils'), glob(
+            os.path.join(package_name, 'utils', '*.py'))),
         # Include all launch files.
         (os.path.join('share', package_name, 'launch'),
          glob(os.path.join('launch/*', '*.launch.py'))),
@@ -30,7 +34,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'face_recognition_node = maid_robot_system_py.face_recognition_node:main'
+            'face_recognition_in_node = maid_robot_system_py.face_recognition_in_node:main'
         ],
     },
 )

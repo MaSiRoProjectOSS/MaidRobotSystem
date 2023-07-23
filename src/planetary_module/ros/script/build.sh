@@ -151,6 +151,7 @@ fi
     echo -e "${COLOR_ON_BLUE}  MRS${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_CAST_ID            : ${MRS_CAST_ID}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_MY_NAME_IS         : ${MRS_MY_NAME_IS}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    MRS_ROS_NAMESPACE      : ${MRS_ROS_NAMESPACE}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_SKIN_HOME          : ${MRS_SKIN_HOME}${COLOR_OFF}"
 
     echo -e "${COLOR_ON_BLUE}BUILD${COLOR_OFF}"

@@ -4,13 +4,55 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "ROS2 : test : param : param_face_recognition_in_node.sh",
+            "type": "shell",
+            "command": "${workspaceFolder}/param_face_recognition_in_node.sh",
+        },
+        {
+            "label": "ROS2 : test : topic : echo : gaze/get_person_angle",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "topic",
+                "echo",
+                "${MRS_ROS_NAMESPACE}/gaze/get_person_angle",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : test : topic : echo : eye/cmd_angle",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "topic",
+                "echo",
+                "${MRS_ROS_NAMESPACE}/eye/cmd_angle",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : test : topic : echo : neck/cmd_pose",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "topic",
+                "echo",
+                "${MRS_ROS_NAMESPACE}/neck/cmd_pose",
+                "",
+                ""
+            ]
+        },
+        // ###############
+        {
             "label": "ROS2 : test : info : node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "node",
-                "list",
-                "",
+                "info",
+                "${MRS_ROS_NAMESPACE}/face_recognition_in_node",
                 "",
                 ""
             ]
@@ -59,7 +101,7 @@
             "args": [
                 "launch",
                 "maid_robot_system_py",
-                "face_recognition_node.launch.py",
+                "face_recognition_in_node.launch.py",
                 "",
                 ""
             ]

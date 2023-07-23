@@ -5,13 +5,13 @@
     "tasks": [
         // LAUNCH task
         {
-            "label": "ROS2 : head_unit : RUN : launch : run : face_recognition_node",
+            "label": "ROS2 : head_unit : RUN : launch : run : face_recognition_in_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "launch",
                 "maid_robot_system_py",
-                "face_recognition_node.launch.py",
+                "face_recognition_in_node.launch.py",
                 "",
                 ""
             ]

@@ -7,7 +7,7 @@
         "MRS_ROS_DOMAIN_ID": 0,
         "MRS_ROS_LOCALHOST_ONLY": 0,
         "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_MY_NAME_IS}",
-        "MRS_ROS_OUTPUT_TYPE": "log",
+        "MRS_ROS_OUTPUT_TYPE": "screen",
         "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package"
     },
     "MRS": {
@@ -19,7 +19,7 @@
     },
     "BUILD": {
         "BUILD_LOG_LEVEL": "DEBUG",
-        "BUILD_PARALLEL_WORKERS": "$(nproc)",
+        "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
         "BUILD_HEAD_UNIT": "ON",
         "BUILD_ARM_UNIT": "ON",
         "BUILD_WAIST_DOWN_UNIT": "ON",

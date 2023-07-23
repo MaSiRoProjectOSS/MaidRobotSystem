@@ -45,12 +45,6 @@ find_package(rosidl_default_generators REQUIRED)
 
 # generate message
 ###############################################
-#   MSG_EULER_FILE
-set(MSG_EULER_FILE
-  msg/euler/EulerFloat.msg
-  msg/euler/EulerInt16.msg
-)
-###############################################
 #   BUILD_DEVELOP
 if(BUILD_DEVELOP)
   set(MSG_DEVELOP_FILE
@@ -58,10 +52,29 @@ if(BUILD_DEVELOP)
   )
 endif()
 ###############################################
+#   MSG_EULER_FILE
+set(MSG_EULER_FILE
+  msg/euler/EulerFloat.msg
+  msg/euler/EulerInt16.msg
+)
+#   MSG_CLASSES_FILE
+set(MSG_CLASSES_FILE
+  msg/classes/Vector3.msg
+  msg/classes/Quaternion.msg
+  msg/classes/Landmark.msg
+)
+#   MSG_POSE_FILE
+set(MSG_POSE_FILE
+  msg/pose/PoseLandmarkModel.msg
+  msg/pose/BodySide.msg
+)
+###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_DEVELOP_FILE}
   ${MSG_EULER_FILE}
+  ${MSG_CLASSES_FILE}
+  ${MSG_POSE_FILE}
 
   DEPENDENCIES std_msgs geometry_msgs
 )

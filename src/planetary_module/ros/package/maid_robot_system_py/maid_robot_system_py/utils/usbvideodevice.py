@@ -8,11 +8,19 @@ class UsbVideoDevice():
 
     def display(self):
         for (row_id, row_name, row_path) in self._deviceList:
-            print("{} : {}".format(row_path, row_name))
+            print("{} : {} : {}".format(row_path, row_name, row_id))
 
-    def get_id_from_name(self, name):
+    def get_info(self, id):
         for (row_id, row_name, row_path) in self._deviceList:
-            if (name in row_name):
+            if (id == row_id):
+                return row_id, row_name, row_path
+        return -1, "", ""
+
+    def get_id_by_path(self, device_name):
+        if (len(device_name) == 0):
+            return -1
+        for (row_id, row_name, row_path) in self._deviceList:
+            if (device_name in row_name):
                 return row_id
         return -1
 
@@ -28,11 +36,10 @@ class UsbVideoDevice():
                 return p
         return ''
 
-    def __init__(self, device_name):
+    def __init__(self, device_type):
         self._deviceList = []
-
         try:
-            cmd = 'ls -la /dev/' + device_name + '/by-path'
+            cmd = 'ls -la /dev/' + device_type + '/by-path'
             res = subprocess.check_output(cmd.split())
             by_path = res.decode()
 
@@ -45,7 +52,7 @@ class UsbVideoDevice():
                     self._deviceList.append(
                         (deviceId, name, '/dev/video' + str(deviceId)))
         except:
-            return
+            self._deviceList = []
 
     def _split(self, str, val):
         tmp = str.split(val)
