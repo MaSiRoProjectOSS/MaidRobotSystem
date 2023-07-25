@@ -110,6 +110,7 @@ class ModelNode(Node):
                     self.get_logger().error('Not open Camera : /dev/video'
                                             + str(self._video_device_id)
                                             )
+                    self._video_device_id = -1
 
             # check video device
             if 0 > self._video_device_id:

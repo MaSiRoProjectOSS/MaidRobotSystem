@@ -22,7 +22,7 @@
         "ROS_LOCALHOST_ONLY": 0,
         "ROS_LOG_DIR": "${HOME}/.ros_log",
         "ROS_HOME": "${MRS_WORKSPACE}",
-        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity}] {message}",
+        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{time}][{severity}] {message}",
         "RCUTILS_LOGGING_BUFFERED_STREAM": 1,
         "RCUTILS_COLORIZED_OUTPUT": 1,
         "RCUTILS_LOGGING_USE_STDOUT": 1
