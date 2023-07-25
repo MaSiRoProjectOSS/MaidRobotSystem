@@ -210,10 +210,10 @@ class FaceRecognitionRos():
                 landmark_exist = False
             else:
                 human_detected = True
-                box_x_min = min(box_x_min, int(landmark_x))
-                box_y_min = min(box_x_min, int(landmark_y))
-                box_x_max = max(box_x_min, int(landmark_x))
-                box_y_max = max(box_x_min, int(landmark_y))
+                box_x_min = min(box_x_min, float(landmark_x))
+                box_y_min = min(box_y_min, float(landmark_y))
+                box_x_max = max(box_x_max, float(landmark_x))
+                box_y_max = max(box_y_max, float(landmark_y))
 
             if PoseLandmark.NOSE == index:
                 self.person_data.nose.x = landmark_x

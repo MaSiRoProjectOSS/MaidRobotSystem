@@ -95,13 +95,13 @@ class SchematicDiagram():
         # leg - left
         self.drawing_line(image, w, h, data.left.hip, data.left.knee)
         self.drawing_line(image, w, h, data.left.ankle, data.left.knee)
-        self.drawing_line(image, w, h, data.left.ankle, data.left.thumb)
+        self.drawing_line(image, w, h, data.left.ankle, data.left.foot_index)
         self.drawing_line(image, w, h, data.left.ankle, data.left.heel)
         self.drawing_line(image, w, h, data.left.heel, data.left.foot_index)
         # leg - right
         self.drawing_line(image, w, h, data.right.hip, data.right.knee)
         self.drawing_line(image, w, h, data.right.ankle, data.right.knee)
-        self.drawing_line(image, w, h, data.right.ankle, data.right.thumb)
+        self.drawing_line(image, w, h, data.right.ankle, data.right.foot_index)
         self.drawing_line(image, w, h, data.right.ankle, data.right.heel)
         self.drawing_line(image, w, h, data.right.heel, data.right.foot_index)
 

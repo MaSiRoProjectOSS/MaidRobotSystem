@@ -71,6 +71,7 @@ set(MSG_POSE_FILE
 #   MSG_DRAWING_FILE
 set(MSG_DRAWING_FILE
   msg/drawing/Rect.msg
+  msg/drawing/RectFloat.msg
 )
 ###############################################
 

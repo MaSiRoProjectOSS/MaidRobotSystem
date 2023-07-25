@@ -1,6 +1,6 @@
 
 bool    human_detected
-maid_robot_system_interfaces/Rect           area
+maid_robot_system_interfaces/RectFloat      area
 
 maid_robot_system_interfaces/Landmark       nose
 maid_robot_system_interfaces/BodySide       left
