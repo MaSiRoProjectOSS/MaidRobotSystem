@@ -35,7 +35,7 @@ endif()
 # Select build unit
 message(STATUS "Generate information")
 message(STATUS "  MRS_SKIN_HOME  : $ENV{MRS_SKIN_HOME}")
-message(STATUS "  MRS_MY_NAME_IS : $ENV{MRS_MY_NAME_IS}")
+message(STATUS "  MRS_CAST_NAME  : $ENV{MRS_CAST_NAME}")
 message(STATUS "  MRS_CAST_ID    : $ENV{MRS_CAST_ID}")
 message(STATUS "  BUILD_DATE     : $ENV{BUILD_DATE}")
 message(STATUS "Build target")
@@ -77,7 +77,7 @@ write_file(${CMAKE_CURRENT_SOURCE_DIR}/include/maid_robot_system/config/__genera
   "#define MAID_ROBOT_SYSTEM_CONFIG_GENERATE_CONFIG_HPP\n"
   "\n"
   "#define CONFIG_PATH_HOME   \"$ENV{MRS_SKIN_HOME}\"\n"
-  "#define CONFIG_SKIN_NAME   \"$ENV{MRS_MY_NAME_IS}\"\n"
+  "#define CONFIG_CAST_NAME   \"$ENV{MRS_CAST_NAME}\"\n"
   "#define CONFIG_CAST_ID     $ENV{MRS_CAST_ID}\n"
   "#define CONFIG_BUILD_DATE  \"$ENV{BUILD_DATE}\"\n"
   "\n"

@@ -30,11 +30,12 @@ then
         source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 
         echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
-        echo -e "${COLOR_ON_GREEN}  ROS           :${COLOR_OFF} ${ROS_DISTRO}"
-        echo -e "${COLOR_ON_GREEN}  ROS IP        :${COLOR_OFF} ${ROS_IP}"
-        echo -e "${COLOR_ON_GREEN}  ROS Domain    :${COLOR_OFF} ${ROS_DOMAIN_ID}"
-        echo -e "${COLOR_ON_GREEN}  CAST          :${COLOR_OFF} ${MRS_MY_NAME_IS} [ID:${MRS_CAST_ID}]"
-        echo -e "${COLOR_ON_GREEN}  Target Fodler :${COLOR_OFF} ${MRS_WORKSPACE}"
+        echo -e "${COLOR_ON_GREEN}  ROS                 :${COLOR_OFF} ${ROS_DISTRO}"
+        echo -e "${COLOR_ON_GREEN}  ROS IP              :${COLOR_OFF} ${ROS_IP}"
+        echo -e "${COLOR_ON_GREEN}  ROS Domain          :${COLOR_OFF} ${ROS_DOMAIN_ID}"
+        echo -e "${COLOR_ON_GREEN}  ROS LOCALHOST ONLY  :${ROS_LOCALHOST_ONLY}${COLOR_OFF}"
+        echo -e "${COLOR_ON_GREEN}  CAST                :${COLOR_OFF} ${MRS_CAST_NAME} [ID:${MRS_CAST_ID}]"
+        echo -e "${COLOR_ON_GREEN}  Target Fodler       :${COLOR_OFF} ${MRS_WORKSPACE}"
         echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
         echo -e "${COLOR_ON_GREEN}[command]${COLOR_OFF} ros2 ${PARAM_01} ${PARAM_02} ${PARAM_03} ${PARAM_04} ${PARAM_05}"
         echo -e ""

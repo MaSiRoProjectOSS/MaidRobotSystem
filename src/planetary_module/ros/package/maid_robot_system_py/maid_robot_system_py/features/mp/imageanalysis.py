@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.10
+# mediapipe ver.0.8.9.1
 
 from mediapipe.python.solutions.holistic import Holistic as mp_holistic
-import cv2 as cv
 import cv2.aruco as aruco
 
 

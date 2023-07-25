@@ -25,6 +25,10 @@ class FaceRecognitionRos():
     param_device_type = 'v4l'
     param_video_width = 960
     param_video_height = 540
+    param_video_area_x = 0
+    param_video_area_y = 0
+    param_video_area_width = 960
+    param_video_area_height = 540
     param_video_angle = 90
     param_confidence_min_detection = 0.5
     param_confidence_min_tracking = 0.5
@@ -66,33 +70,30 @@ class FaceRecognitionRos():
         node.declare_parameter('topic_sub_name', self.param_topic_sub_name)
         node.declare_parameter('device/type', self.param_device_type)
         node.declare_parameter('device/id', self.param_device_id)
-        node.declare_parameter('device/by_path',
-                               self.param_device_by_path)
-        node.declare_parameter('video/width',
-                               self.param_video_width)
-        node.declare_parameter('video/height',
-                               self.param_video_height)
-        node.declare_parameter('video/angle',
-                               self.param_video_angle)
+        node.declare_parameter('device/by_path', self.param_device_by_path)
 
-        node.declare_parameter('confidence/min_detection',
-                               self.param_confidence_min_detection)
-        node.declare_parameter('confidence/min_tracking',
-                               self.param_confidence_min_tracking)
-        node.declare_parameter('confidence/visibility_th',
-                               self.param_confidence_visibility_th)
+        node.declare_parameter('video/settings/width', self.param_video_width)
+        node.declare_parameter('video/settings/height', self.param_video_height)
+        node.declare_parameter('video/settings/angle', self.param_video_angle)
+
+        node.declare_parameter('video/area/x', self.param_video_area_x)
+        node.declare_parameter('video/area/y', self.param_video_area_y)
+        node.declare_parameter('video/area/width', self.param_video_area_width)
+        node.declare_parameter('video/area/height', self.param_video_area_height)
+
+        node.declare_parameter('confidence/min_detection', self.param_confidence_min_detection)
+        node.declare_parameter('confidence/min_tracking', self.param_confidence_min_tracking)
+        node.declare_parameter('confidence/visibility_th', self.param_confidence_visibility_th)
 
         node.declare_parameter('image/width', self.param_image_width)
         node.declare_parameter('image/height', self.param_image_height)
-        node.declare_parameter('image/overlay_information',
-                               self.param_image_overlay_information)
+        node.declare_parameter('image/overlay_information', self.param_image_overlay_information)
         node.declare_parameter('image/publish', self.param_image_publish)
 
         node.declare_parameter('update', self.param_update)
         node.declare_parameter('info/verbose', self.param_info_verbose)
 
-        node.declare_parameter('features/detect_markers',
-                               self.features_detect_markers)
+        node.declare_parameter('features/detect_markers', self.features_detect_markers)
 
         param_update = Parameter('update',
                                  Parameter.Type.BOOL,
@@ -118,11 +119,20 @@ class FaceRecognitionRos():
                 self.param_device_type = str(node.get_parameter_or(
                     'device/type', self.param_device_type).get_parameter_value().string_value)
                 self.param_video_width = int(node.get_parameter_or(
-                    'video/width', self.param_video_width).get_parameter_value().integer_value)
+                    'video/settings/width', self.param_video_width).get_parameter_value().integer_value)
                 self.param_video_height = int(node.get_parameter_or(
-                    'video/height', self.param_video_height).get_parameter_value().integer_value)
+                    'video/settings/height', self.param_video_height).get_parameter_value().integer_value)
                 self.param_video_angle = int(node.get_parameter_or(
-                    'video/angle', self.param_video_angle).get_parameter_value().integer_value)
+                    'video/settings/angle', self.param_video_angle).get_parameter_value().integer_value)
+
+                self.param_video_area_x = min(self.param_video_width, int(node.get_parameter_or(
+                    'video/area/x', self.param_video_area_x).get_parameter_value().integer_value))
+                self.param_video_area_y = min(self.param_video_height, int(node.get_parameter_or(
+                    'video/area/y', self.param_video_area_y).get_parameter_value().integer_value))
+                self.param_video_area_width = min(self.param_video_width, int(node.get_parameter_or(
+                    'video/area/width', self.param_video_area_width).get_parameter_value().integer_value))
+                self.param_video_area_height = min(self.param_video_height, int(node.get_parameter_or(
+                    'video/area/height', self.param_video_area_height).get_parameter_value().integer_value))
 
                 self.param_image_width = int(node.get_parameter_or(
                     'image/width', self.param_image_width).get_parameter_value().integer_value)
@@ -162,6 +172,7 @@ class FaceRecognitionRos():
             node.get_logger().debug('   type   : ' + str(self.param_device_type))
             node.get_logger().debug('   id     : ' + str(self.param_device_id))
             node.get_logger().debug('   by_path: ' + str(self.param_device_by_path))
+            node.get_logger().debug(' video: ')
             node.get_logger().debug('   width  : ' + str(self.param_video_width))
             node.get_logger().debug('   height : ' + str(self.param_video_height))
             node.get_logger().debug('   angle  : ' + str(self.param_video_angle))

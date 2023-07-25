@@ -146,11 +146,12 @@ fi
     echo -e "${COLOR_ON_BLUE}ENV${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}  ROS${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    ROS_DOMAIN_ID          : ${ROS_DOMAIN_ID}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    ROS_LOCALHOST_ONLY     : ${ROS_LOCALHOST_ONLY}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    ROS_IP                 : ${ROS_IP}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    ROS_MASTER_URI         : ${ROS_MASTER_URI}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}  MRS${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_CAST_ID            : ${MRS_CAST_ID}${COLOR_OFF}"
-    echo -e "${COLOR_ON_BLUE}    MRS_MY_NAME_IS         : ${MRS_MY_NAME_IS}${COLOR_OFF}"
+    echo -e "${COLOR_ON_BLUE}    MRS_SKIN_HOME          : ${MRS_CAST_NAME}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_ROS_NAMESPACE      : ${MRS_ROS_NAMESPACE}${COLOR_OFF}"
     echo -e "${COLOR_ON_BLUE}    MRS_SKIN_HOME          : ${MRS_SKIN_HOME}${COLOR_OFF}"
 

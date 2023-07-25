@@ -1,23 +1,34 @@
 {
-    "CAST": {
-        "MRS_MY_NAME_IS": "miko",
-        "MRS_CAST_ID": 1000
+    "Description": {
+        "USAGE": "",
+        "HELP": "",
+        "CMD": "source /opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh",
+        "CATION": "This is not allowed in text that '(', ')'"
     },
-    "MRS_ROS": {
-        "MRS_ROS_DOMAIN_ID": 0,
-        "MRS_ROS_LOCALHOST_ONLY": 0,
-        "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_MY_NAME_IS}",
-        "MRS_ROS_OUTPUT_TYPE": "screen",
-        "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package"
+    "CAST": {
+        "MRS_CAST_NAME": "miko",
+        "MRS_CAST_ID": 1000
     },
     "MRS": {
         "MRS_WORKSPACE": "/opt/MaidRobotSystem",
-        "MRS_SKIN_HOME": "/opt/MaidRobotSystem/data/skin/${MRS_MY_NAME_IS}"
+        "MRS_SKIN_HOME": "/opt/MaidRobotSystem/data/skin/${MRS_CAST_NAME}",
+        "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package",
+        "MRS_ROS_OUTPUT_TYPE": "screen",
+        "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}"
     },
-    "CMAKE": {
-        "CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Release"
+    "ROS_VARIABLES": {
+        "ROS_DISTRO": "humble",
+        "ROS_DOMAIN_ID": 0,
+        "ROS_LOCALHOST_ONLY": 0,
+        "ROS_LOG_DIR": "${HOME}/.ros_log",
+        "ROS_HOME": "${MRS_WORKSPACE}",
+        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity}] {message}",
+        "RCUTILS_LOGGING_BUFFERED_STREAM": 1,
+        "RCUTILS_COLORIZED_OUTPUT": 1,
+        "RCUTILS_LOGGING_USE_STDOUT": 1
     },
     "BUILD": {
+        "CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Release",
         "BUILD_LOG_LEVEL": "RELEASE",
         "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
         "BUILD_HEAD_UNIT": "ON",
@@ -27,5 +38,8 @@
         "BUILD_CLOUD_UNIT": "ON",
         "BUILD_MANAGEMENT_UNIT": "ON",
         "BUILD_DEVELOP": "ON"
+    },
+    "backup": {
+        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity} {time}] [{name}]: {message} {function_name} at {file_name}:{line_number}"
     }
 }

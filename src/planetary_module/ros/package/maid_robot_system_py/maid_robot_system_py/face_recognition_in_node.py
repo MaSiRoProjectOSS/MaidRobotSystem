@@ -91,8 +91,8 @@ class ModelNode(Node):
                         # self._cap.set(cv.CAP_PROP_FPS, 30)
                         # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('B', 'G', 'R', '3'))
                         # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-                        self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
-                        # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
+                        # self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
+                        self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
                         self._cap.grab()
                         ret, image = self._cap.read()
                         if (ret is False):
@@ -103,13 +103,18 @@ class ModelNode(Node):
                 except Exception as exception:
                     self.get_logger().error('Not open Camera : /dev/video'
                                             + str(self._video_device_id)
-                                            + " "
-                                            + exception.message)
+                                            + ' : '
+                                            + str(exception))
                     self._video_device_id = -1
+                except:
+                    self.get_logger().error('Not open Camera : /dev/video'
+                                            + str(self._video_device_id)
+                                            )
 
             # check video device
             if 0 > self._video_device_id:
-                rclpy.shutdown()
+                self.get_logger().error('Not fond Camera')
+                result = False
             else:
                 self.get_logger().info('Open Camera : /dev/video' + str(self._video_device_id)
                                        + ' : ' + str(self._ros_com.param_device_by_path))
@@ -141,11 +146,13 @@ class ModelNode(Node):
             self._ros_com.person_data.human_detected = False
             #####################################################
             # Get image
-            ret, image = self._cap.read()
+            ret, sc = self._cap.read()
             #####################################################
             if (ret is True):
+                image = sc[self._ros_com.param_video_area_x: self._ros_com.param_video_area_width,
+                           self._ros_com.param_video_area_y:self._ros_com.param_video_area_height]
                 # image = cv.flip(image, 1)
-                # image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                 if (self._ros_com.param_image_overlay_information is True):
                     self._frame = copy.deepcopy(image)
                 #####################################################
@@ -156,7 +163,7 @@ class ModelNode(Node):
                 #####################################################
                 if (self._ros_com.features_detect_markers is True):
                     gray = cv.cvtColor(image, cv.COLOR_RGB2GRAY)
-                    self._ar_list = self._ia.detect_ar(self, gray)
+                    self._ar_list = self._ia.detect_ar(gray)
                 #####################################################
 
                 if (self._debug_mode is True):
@@ -179,9 +186,10 @@ class ModelNode(Node):
             text_detect_markers = str(self._ar_list) if (
                 self._ros_com.features_detect_markers is True) else 'DISABLED'
             # Output information
-            self.get_logger().info('[{}] FPS : {}, AR : {}'.format(
+            self.get_logger().info('[{}] FPS : {}, {}, AR : {}'.format(
                 str(self._ros_com.param_topic_sub_name),
                 str(self._display_fps),
+                "HUMAN_DETECTED" if (self._ros_com.person_data.human_detected is True) else "--",
                 text_detect_markers
             ))
 
@@ -225,6 +233,7 @@ def main(args=None):
     finally:
         node.fin()
         node.destroy_node()
+        rclpy.shutdown()
         cv.destroyAllWindows()
 
 

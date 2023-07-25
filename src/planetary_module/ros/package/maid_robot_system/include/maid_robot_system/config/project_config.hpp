@@ -15,8 +15,8 @@
 #ifndef CONFIG_PATH_HOME
 #define CONFIG_PATH_HOME "/opt/MaidRobotSystem/data/skin"
 #endif
-#ifndef CONFIG_SKIN_NAME
-#define CONFIG_SKIN_NAME "miko"
+#ifndef CONFIG_CAST_NAME
+#define CONFIG_CAST_NAME "miko"
 #endif
 #ifndef CONFIG_CAST_ID
 #define CONFIG_CAST_ID 1000
