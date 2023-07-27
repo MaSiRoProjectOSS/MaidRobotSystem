@@ -91,7 +91,7 @@ class ModelNode(Node):
 
     ##########################################################################
     _timer_recognition = None
-    _timer_recognition_period_fps = 30  # 0.033 seconds
+    _timer_recognition_period_fps = 10
     _timer_output_information = None
     _timer_output_information_period_fps = 0.2  # 5 seconds
 
@@ -187,9 +187,9 @@ class ModelNode(Node):
     # ROS
     def _resizing(self, image):
         with self._lock:
-            dst = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-            dst = dst[self._param.video.area.start_y:self._param.video.area.end_y,
-                      self._param.video.area.start_x:self._param.video.area.end_x]
+            # dst = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            dst = image[self._param.video.area.start_y:self._param.video.area.end_y,
+                        self._param.video.area.start_x:self._param.video.area.end_x]
             if (self._param.video.settings.mirror is True):
                 dst = cv.flip(dst, 1)
             else:

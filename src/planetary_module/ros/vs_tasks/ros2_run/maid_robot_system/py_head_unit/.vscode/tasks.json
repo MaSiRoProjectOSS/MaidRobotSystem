@@ -4,11 +4,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "ROS2 : test : param : get : video_capture_node",
+            "label": "ROS2 : right : param : get : video_capture_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
             "args": [
-                "/maid_robot_system/miko/video_capture_node"
+                "/maid_robot_system/miko/right_video_capture_node"
+            ]
+        },
+        {
+            "label": "ROS2 : left : param : get : video_capture_node",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "/maid_robot_system/miko/left_video_capture_node"
             ]
         },
         {

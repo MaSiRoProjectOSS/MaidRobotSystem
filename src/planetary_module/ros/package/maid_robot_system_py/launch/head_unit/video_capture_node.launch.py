@@ -32,8 +32,8 @@ def generate_launch_description():
             "video/area/center_y": 0,
             "video/area/width": 0,
             "video/area/height": 0,
-            "publisher/resize/width": 0,
-            "publisher/resize/height": 0
+            "publisher/resize/width": 640,
+            "publisher/resize/height": 512
         }],
         respawn=True,
         respawn_delay=2.0
@@ -62,8 +62,8 @@ def generate_launch_description():
             "video/area/center_y": 0,
             "video/area/width": 0,
             "video/area/height": 0,
-            "publisher/resize/width": 0,
-            "publisher/resize/height": 0
+            "publisher/resize/width": 640,
+            "publisher/resize/height": 512
         }],
         respawn=True,
         respawn_delay=2.0
