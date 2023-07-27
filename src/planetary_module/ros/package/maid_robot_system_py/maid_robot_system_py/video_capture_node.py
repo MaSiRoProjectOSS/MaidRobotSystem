@@ -64,27 +64,6 @@ class ParamValue():
 
     def print_parameter(self, node):
         node.get_logger().info('<Parameter Update> : {}/{}'.format(node.get_namespace(), node.get_name()))
-        node.get_logger().info(' device: ')
-        node.get_logger().info('   type   : ' + str(self.device.type))
-        node.get_logger().info('   id     : ' + str(self.device.id))
-        node.get_logger().info('   by_path: ' + str(self.device.name_by_path))
-        node.get_logger().info(' video: ')
-        node.get_logger().info('   format : ' + str(self.video.settings.format))
-        node.get_logger().info('   mirror : {}'.format(self.video.settings.mirror))
-        node.get_logger().info('   width  : ' + str(self.video.settings.width))
-        node.get_logger().info('   height : ' + str(self.video.settings.height))
-        node.get_logger().info('   angle  : ' + str(self.video.settings.angle))
-        node.get_logger().info(' area: ')
-        node.get_logger().info('   start  : [{}, {}]'.format(self.video.area.start_x, self.video.area.start_y))
-        node.get_logger().info('   end    : [{}, {}]'.format(self.video.area.end_x, self.video.area.end_y))
-        node.get_logger().info(' publisher : ')
-        node.get_logger().info('  width   : ' + str(self.video.resize.width))
-        node.get_logger().info('  height  : ' + str(self.video.resize.height))
-        node.get_logger().info(' info : ')
-        node.get_logger().info('   verbose : {}'.format(self.info.verbose))
-
-    def print_parameter2(self, node):
-        node.get_logger().info('<Parameter Update> : {}/{}'.format(node.get_namespace(), node.get_name()))
         node.get_logger().debug(' device: ')
         node.get_logger().debug('   type   : ' + str(self.device.type))
         node.get_logger().debug('   id     : ' + str(self.device.id))
