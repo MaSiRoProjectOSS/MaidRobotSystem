@@ -73,6 +73,15 @@ set(MSG_DRAWING_FILE
   msg/drawing/Rect.msg
   msg/drawing/RectFloat.msg
 )
+#   MSG_DETECTION_FILE
+set(MSG_DETECTION_FILE
+  msg/detection/PoseDetection.msg
+)
+#   MSG_FORMAT_FILE
+set(MSG_FORMAT_FILE
+  msg/format/VideoInfo.msg
+)
+
 ###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -81,6 +90,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_CLASSES_FILE}
   ${MSG_POSE_FILE}
   ${MSG_DRAWING_FILE}
+  ${MSG_FORMAT_FILE}
+  ${MSG_DETECTION_FILE}
 
   DEPENDENCIES std_msgs geometry_msgs
 )

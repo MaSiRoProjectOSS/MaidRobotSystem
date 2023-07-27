@@ -13,11 +13,11 @@ def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
 
-    face_recognition_in_node = IncludeLaunchDescription(
+    recognition_in_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system_py'),
-                'launch/face_recognition_node.launch.py'))
+                'launch/recognition_node.launch.py'))
     )
     mitumeru_node = Node(
         namespace=_ros_namespace,
@@ -53,5 +53,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         mitumeru_node,
-        face_recognition_in_node
+        recognition_in_node
     ])

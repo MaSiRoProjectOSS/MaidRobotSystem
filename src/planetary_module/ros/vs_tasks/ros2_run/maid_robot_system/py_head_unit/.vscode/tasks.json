@@ -4,9 +4,12 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "ROS2 : test : param : param_face_recognition_in_node.sh",
+            "label": "ROS2 : test : param : get : video_capture_node",
             "type": "shell",
-            "command": "${workspaceFolder}/param_face_recognition_in_node.sh",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "/maid_robot_system/miko/video_capture_node"
+            ]
         },
         {
             "label": "ROS2 : test : topic : echo : gaze/get_person_angle",
@@ -52,7 +55,7 @@
             "args": [
                 "node",
                 "info",
-                "${MRS_ROS_NAMESPACE}/face_recognition_in_node",
+                "${MRS_ROS_NAMESPACE}/recognition_in_node",
                 "",
                 ""
             ]
@@ -95,13 +98,25 @@
         },
         //////////////////////
         {
-            "label": "ROS2 : test : run",
+            "label": "ROS2 : test : run : video_capture_node",
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
             "args": [
                 "launch",
                 "maid_robot_system_py",
-                "face_recognition_in_node.launch.py",
+                "video_capture_node.launch.py",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : test : run : recognition_in_node",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "launch",
+                "maid_robot_system_py",
+                "recognition_in_node.launch.py",
                 "",
                 ""
             ]

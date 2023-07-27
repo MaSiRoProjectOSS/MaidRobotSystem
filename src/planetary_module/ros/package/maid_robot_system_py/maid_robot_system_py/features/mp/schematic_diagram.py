@@ -1,8 +1,8 @@
 #!/usr/bin/env python3.10
 
 import cv2 as cv
-import numpy as np
 from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
+from maid_robot_system_interfaces.msg._rect_float import RectFloat
 from maid_robot_system_interfaces.msg._landmark import Landmark
 
 
@@ -108,15 +108,18 @@ class SchematicDiagram():
     def draw_box(self, image, x, y, w, h):
         cv.rectangle(image, (int(x), int(y)), (int(x + w), int(y + h)), self._color, self._thickness)
 
-    def drawing(self, image, width, height, person_data: PoseLandmarkModel, flag_box):
-        if person_data.human_detected is True:
+    def drawing(self, image, width: float, height:
+                float, person_data: PoseLandmarkModel, area: RectFloat,
+                human_detected: bool, flag_box: bool):
+
+        if human_detected is True:
             self.drawing_points(image, width, height, person_data)
             self.drawing_lines(image, width, height, person_data)
 
             if flag_box is True:
-                box_01 = (width * person_data.area.x)
-                box_02 = (height * person_data.area.y)
-                box_03 = (width * person_data.area.width)
-                box_04 = (height * person_data.area.height)
+                box_01 = (width * area.x)
+                box_02 = (height * area.y)
+                box_03 = (width * area.width)
+                box_04 = (height * area.height)
                 self.draw_box(image, box_01, box_02, box_03, box_04)
         return image

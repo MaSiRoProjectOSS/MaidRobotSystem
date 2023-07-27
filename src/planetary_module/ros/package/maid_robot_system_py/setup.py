@@ -9,6 +9,7 @@ setup(
     version='0.23.7',
     packages=[package_name],
     data_files=[
+        # Add package.xml
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         (os.path.join('share', package_name), ['package.xml']),
@@ -34,7 +35,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'face_recognition_in_node = maid_robot_system_py.face_recognition_in_node:main'
+            'video_capture_node = maid_robot_system_py.video_capture_node:main',
+            'recognition_in_node = maid_robot_system_py.recognition_in_node:main'
         ],
     },
 )

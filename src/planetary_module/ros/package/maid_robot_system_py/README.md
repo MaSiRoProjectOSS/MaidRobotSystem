@@ -23,7 +23,7 @@ top to bottom direction
 
 rectangle head_unit as " " {
 
-  storage face_recognition_in_node_left as "face_recognition_in_node [left]"  #Physical  {
+  storage recognition_in_node_left as "recognition_in_node [left]"  #Physical  {
       rectangle TOPIC_CAMERA_RAW_LEFT [
       "**/camera/raw/left"
       ----
@@ -40,7 +40,7 @@ rectangle head_unit as " " {
       $msg_pose_data
       ]
   }
-  storage face_recognition_in_node_right as "face_recognition_in_node [right]"  #Physical  {
+  storage recognition_in_node_right as "recognition_in_node [right]"  #Physical  {
       rectangle TOPIC_CAMERA_RAW_RIGHT [
       "**/camera/raw/right"
       ----
@@ -126,12 +126,13 @@ title face_recognition_node
 
 salt
 {{T
-    + <$python> face_recognition_in_node.py      | face_recognition_in_nodeの本体
+    + <$python> recognition_in_node.py      | recognition_in_nodeの本体
      ++ <$ma_folder> utils
-     +++ <$python> usbvideodevice.py        | USB-WebカメラのデバイスIDを取得する
+     +++ <$python> usb_video_device.py        | USB-WebカメラのデバイスIDを取得する
+     +++ <$python> cv_fps_calc.py             | FPSの計算を行う
      ++ <$ma_folder>features
      +++ <$ma_folder>ros
-     ++++ <$python> face_recognition_ros.py   | face_recognition_in_nodeのROSインターフェース
+     ++++ <$python> face_recognition_ros.py   | recognition_in_nodeのROSインターフェース
      +++ <$ma_folder>mp
      ++++ <$python> imageanalysis.py          | mediapipeの画像解析
      ++++ <$python> poseinformation.py        | mediapipeの姿勢情報
