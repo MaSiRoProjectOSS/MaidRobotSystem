@@ -1,0 +1,59 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ROS2 : maid_robot_system : video_capture_node : right : param",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "${MRS_ROS_NAMESPACE}/right_video_capture_node"
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : video_capture_node : right : node : info",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "node",
+                "info",
+                "${MRS_ROS_NAMESPACE}/right_video_capture_node",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : video_capture_node : left : param",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "${MRS_ROS_NAMESPACE}/left_video_capture_node"
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : video_capture_node : left : node : info",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "node",
+                "info",
+                "${MRS_ROS_NAMESPACE}/left_video_capture_node",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : video_capture_node : run",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "launch",
+                "maid_robot_system_py",
+                "video_capture_node.launch.py",
+                "",
+                ""
+            ]
+        }
+    ]
+}

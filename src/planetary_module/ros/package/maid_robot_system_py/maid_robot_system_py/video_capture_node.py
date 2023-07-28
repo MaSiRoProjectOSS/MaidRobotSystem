@@ -15,7 +15,7 @@ from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
 
 
-class ParamValue():
+class VideoCaptureNodeParam():
     class ParamInfo():
         def __init__(self):
             self.verbose = True
@@ -31,13 +31,14 @@ class ParamValue():
         class ParamVideoSettings():
             def __init__(self):
                 self.format = ''
-                self.mirror = True
                 self.width = 1280
                 self.height = 1024
                 self.angle = 140
+                self.fps = 30.0
 
         class ParamVideoArea():
             def __init__(self):
+                self.mirror = True
                 self.start_x = 0
                 self.start_y = 0
                 self.end_x = 0
@@ -47,20 +48,21 @@ class ParamValue():
                 self.width = 0
                 self.height = 0
 
-        class ParamVideoResize():
-            def __init__(self):
-                self.width = 0
-                self.height = 0
-
         def __init__(self):
             self.settings = self.ParamVideoSettings()
             self.area = self.ParamVideoArea()
-            self.resize = self.ParamVideoResize()
+
+    class ParamVideoSender():
+        def __init__(self):
+            self.width = 0
+            self.height = 0
+            self.fps = 10.0
 
     def __init__(self):
         self.info = self.ParamInfo()
         self.device = self.ParamDevice()
         self.video = self.ParamVideo()
+        self.sender = self.ParamVideoSender()
 
     def print_parameter(self, node):
         node.get_logger().info('<Parameter Update> : {}/{}'.format(node.get_namespace(), node.get_name()))
@@ -70,28 +72,28 @@ class ParamValue():
         node.get_logger().debug('   by_path: ' + str(self.device.name_by_path))
         node.get_logger().debug(' video: ')
         node.get_logger().debug('   format : ' + str(self.video.settings.format))
-        node.get_logger().debug('   mirror : {}'.format(self.video.settings.mirror))
+        node.get_logger().debug('   mirror : {}'.format(self.video.area.mirror))
         node.get_logger().debug('   width  : ' + str(self.video.settings.width))
         node.get_logger().debug('   height : ' + str(self.video.settings.height))
         node.get_logger().debug('   angle  : ' + str(self.video.settings.angle))
+        node.get_logger().debug('   fps    : ' + str(self.video.settings.fps))
         node.get_logger().debug(' area: ')
         node.get_logger().debug('   start  : [{}, {}]'.format(self.video.area.start_x, self.video.area.start_y))
         node.get_logger().debug('   end    : [{}, {}]'.format(self.video.area.end_x, self.video.area.end_y))
         node.get_logger().debug(' publisher : ')
-        node.get_logger().debug('  width   : ' + str(self.video.resize.width))
-        node.get_logger().debug('  height  : ' + str(self.video.resize.height))
+        node.get_logger().debug('  width   : ' + str(self.sender.width))
+        node.get_logger().debug('  height  : ' + str(self.sender.height))
+        node.get_logger().debug('  fps     : ' + str(self.sender.fps))
         node.get_logger().debug(' info : ')
         node.get_logger().debug('   verbose : {}'.format(self.info.verbose))
 
 
-class ModelNode(Node):
+class VideoCaptureNode(Node):
     ##########################################################################
     _debug_mode = False
-    _capture_fps = 30
 
     ##########################################################################
     _timer_recognition = None
-    _timer_recognition_period_fps = 10
     _timer_output_information = None
     _timer_output_information_period_fps = 0.2  # 5 seconds
 
@@ -107,12 +109,12 @@ class ModelNode(Node):
     _display_fps = 0
 
     ##########################################################################
-    _topic_queue_size = 10
+    _topic_queue_size = 2
     _topic_name = 'image'
     _pub_image = None
     _data_image = None
     _bridge = None
-    _param = ParamValue()
+    _param = VideoCaptureNodeParam()
 
     ##########################################################################
     # finalize
@@ -123,7 +125,6 @@ class ModelNode(Node):
     ##########################################################################
     # initialize
     def _develop(self):
-        self._timer_recognition_period_fps = 1  # seconds
         self._timer_output_information_period_fps = 0.2  # seconds
 
     def __init__(self, node_name):
@@ -150,7 +151,9 @@ class ModelNode(Node):
                     if (not self._cap .isOpened()):
                         self._param.device.id = -1
                     else:
-                        self._video_set_cv_setting(self._param.video.settings.format, self._param.video.settings.width, self._param.video.settings.height, self._capture_fps)
+                        self._video_set_cv_setting(self._param.video.settings.format,
+                                                   self._param.video.settings.width, self._param.video.settings.height,
+                                                   self._param.video.settings.fps)
 
                         self._cap.grab()
                         ret, image = self._cap.read()
@@ -190,11 +193,11 @@ class ModelNode(Node):
             # dst = cv.cvtColor(image, cv.COLOR_BGR2RGB)
             dst = image[self._param.video.area.start_y:self._param.video.area.end_y,
                         self._param.video.area.start_x:self._param.video.area.end_x]
-            if (self._param.video.settings.mirror is True):
+            if (self._param.video.area.mirror is True):
                 dst = cv.flip(dst, 1)
             else:
                 dst = cv.flip(dst, 0)
-            dst = self._resize(dst, self._param.video.resize.width, self._param.video.resize.height)
+            dst = self._resize(dst, self._param.sender.width, self._param.sender.height)
         return dst
 
     def _set_image(self, image):
@@ -210,7 +213,7 @@ class ModelNode(Node):
     def _create_timer(self):
         # set ros callback
         self._timer_recognition = self.create_timer(
-            (1.0 / self._timer_recognition_period_fps), self._callback_recognition)
+            (1.0 / self._param.sender.fps), self._callback_recognition)
         self._timer_output_information = self.create_timer(
             (1.0 / self._timer_output_information_period_fps), self._callback_output_information)
 
@@ -275,11 +278,22 @@ class ModelNode(Node):
         self._param.video.area.end_y = end_y
 
     def _update_device_info(self):
-        param_type = Parameter('device/type', Parameter.Type.STRING, self._param.device.type)
-        param_id = Parameter('device/id', Parameter.Type.INTEGER, self._param.device.id)
-        param_name_by_path = Parameter('device/by_path', Parameter.Type.STRING, self._param.device.name_by_path)
+        self._param.video.settings.format = self._video_to_txt_cv_fourcc(self._cap.get(cv.CAP_PROP_FOURCC))
+        self._param.video.settings.width = int(self._cap.get(cv.CAP_PROP_FRAME_WIDTH))
+        self._param.video.settings.height = int(self._cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+        self._param.video.settings.fps = float(self._cap.get(cv.CAP_PROP_FPS))
 
-        new_parameters = [param_type, param_id, param_name_by_path]
+        param_type = Parameter('configuration/device/type', Parameter.Type.STRING, self._param.device.type)
+        param_id = Parameter('configuration/device/id', Parameter.Type.INTEGER, self._param.device.id)
+        param_name_by_path = Parameter('configuration/device/by_path', Parameter.Type.STRING, self._param.device.name_by_path)
+
+        param_format = Parameter('configuration/video/settings/format', Parameter.Type.STRING, self._param.video.settings.format)
+        param_device_width = Parameter('configuration/video/settings/width', Parameter.Type.INTEGER, self._param.video.settings.width)
+        param_device_height = Parameter('configuration/video/settings/height', Parameter.Type.INTEGER, self._param.video.settings.height)
+        param_device_fps = Parameter('configuration/video/settings/fps', Parameter.Type.DOUBLE, float(self._param.video.settings.fps))
+
+        new_parameters = [param_type, param_id, param_name_by_path,
+                          param_format, param_device_width, param_device_height, param_device_fps]
 
         self.set_parameters(new_parameters)
 
@@ -290,48 +304,54 @@ class ModelNode(Node):
                 self.get_logger().info('[{}/{}] Got {}={}'.format(
                     self.get_namespace(), self.get_name(), parameter.name, parameter.value))
 
-                if (parameter.name == 'info/verbose'):
+                if (parameter.name == 'preference/info/verbose'):
                     self._param.info.verbose = parameter.value
                     result = True
-                if (parameter.name == 'publisher/resize/width'):
-                    self._param.video.resize.width = parameter.value
+                if (parameter.name == 'preference/publisher/resize/width'):
+                    self._param.sender.width = parameter.value
                     result = True
-                if (parameter.name == 'publisher/resize/height'):
-                    self._param.video.resize.height = parameter.value
+                if (parameter.name == 'preference/publisher/resize/height'):
+                    self._param.sender.height = parameter.value
                     result = True
-                if (parameter.name == 'video/settings/format'):
-                    self._param.video.settings.format = parameter.value
+                if (parameter.name == 'preference/video/area/mirror'):
+                    self._param.video.area.mirror = parameter.value
                     result = True
-                if (parameter.name == 'video/settings/mirror'):
-                    self._param.video.settings.mirror = parameter.value
-                    result = True
-                if (parameter.name == 'video/settings/width'):
-                    self._param.video.settings.width = parameter.value
-                    result = True
-                if (parameter.name == 'video/settings/height'):
-                    self._param.video.settings.height = parameter.value
-                    result = True
-                if (parameter.name == 'video/settings/angle'):
-                    self._param.video.settings.angle = parameter.value
-                    result = True
-                if (parameter.name == 'video/area/center_x'):
+                if (parameter.name == 'preference/video/area/center_x'):
                     self._param.video.area.center_x = parameter.value
                     result = True
-                if (parameter.name == 'video/area/center_y'):
+                if (parameter.name == 'preference/video/area/center_y'):
                     self._param.video.area.center_y = parameter.value
                     result = True
-                if (parameter.name == 'video/area/width'):
+                if (parameter.name == 'preference/video/area/width'):
                     self._param.video.area.width = parameter.value
                     result = True
-                if (parameter.name == 'video/area/height'):
+                if (parameter.name == 'preference/video/area/height'):
                     self._param.video.area.height = parameter.value
                     result = True
-                if (parameter.name == 'device/id'):
-                    result = True
-                if (parameter.name == 'device/by_path'):
-                    result = True
-                if (parameter.name == 'device/type'):
-                    result = True
+                if (parameter.name == 'configuration/device/id'):
+                    if (parameter.value == self._param.device.id):
+                        result = True
+                if (parameter.name == 'configuration/device/by_path'):
+                    if (parameter.value == self._param.device.name_by_path):
+                        result = True
+                if (parameter.name == 'configuration/device/type'):
+                    if (parameter.value == self._param.device.type):
+                        result = True
+                if (parameter.name == 'configuration/video/settings/format'):
+                    if (parameter.value == self._param.video.settings.format):
+                        result = True
+                if (parameter.name == 'configuration/video/settings/width'):
+                    if (parameter.value == self._param.video.settings.width):
+                        result = True
+                if (parameter.name == 'configuration/video/settings/height'):
+                    if (parameter.value == self._param.video.settings.height):
+                        result = True
+                if (parameter.name == 'configuration/video/settings/angle'):
+                    if (parameter.value == self._param.video.settings.angle):
+                        result = True
+                if (parameter.name == 'configuration/video/settings/fps'):
+                    if (parameter.value == self._param.video.settings.fps):
+                        result = True
             if (result is True):
                 self._calc_area(self._param.video.settings.width, self._param.video.settings.height,
                                 self._param.video.area.center_x, self._param.video.area.center_y,
@@ -343,18 +363,20 @@ class ModelNode(Node):
 
     def _get_parameter(self):
         with self._lock:
-            self._param.info.verbose = self.get_parameter('info/verbose').get_parameter_value().bool_value
-            self._param.video.resize.width = self.get_parameter('publisher/resize/width').get_parameter_value().integer_value
-            self._param.video.resize.height = self.get_parameter('publisher/resize/height').get_parameter_value().integer_value
-            self._param.video.settings.format = self.get_parameter('video/settings/format').get_parameter_value().string_value
-            self._param.video.settings.mirror = self.get_parameter('video/settings/mirror').get_parameter_value().bool_value
-            self._param.video.settings.width = self.get_parameter('video/settings/width').get_parameter_value().integer_value
-            self._param.video.settings.height = self.get_parameter('video/settings/height').get_parameter_value().integer_value
-            self._param.video.settings.angle = self.get_parameter('video/settings/angle').get_parameter_value().integer_value
-            self._param.video.area.center_x = self.get_parameter('video/area/center_x').get_parameter_value().integer_value
-            self._param.video.area.center_y = self.get_parameter('video/area/center_y').get_parameter_value().integer_value
-            self._param.video.area.width = self.get_parameter('video/area/width').get_parameter_value().integer_value
-            self._param.video.area.height = self.get_parameter('video/area/height').get_parameter_value().integer_value
+            self._param.info.verbose = self.get_parameter('preference/info/verbose').get_parameter_value().bool_value
+            self._param.sender.width = self.get_parameter('preference/publisher/resize/width').get_parameter_value().integer_value
+            self._param.sender.height = self.get_parameter('preference/publisher/resize/height').get_parameter_value().integer_value
+            self._param.sender.fps = self.get_parameter('configuration/publisher/interval_fps').get_parameter_value().double_value
+            self._param.video.settings.format = self.get_parameter('configuration/video/settings/format').get_parameter_value().string_value
+            self._param.video.settings.width = self.get_parameter('configuration/video/settings/width').get_parameter_value().integer_value
+            self._param.video.settings.height = self.get_parameter('configuration/video/settings/height').get_parameter_value().integer_value
+            self._param.video.settings.angle = self.get_parameter('configuration/video/settings/angle').get_parameter_value().integer_value
+            self._param.video.settings.fps = self.get_parameter('configuration/video/settings/fps').get_parameter_value().double_value
+            self._param.video.area.mirror = self.get_parameter('preference/video/area/mirror').get_parameter_value().bool_value
+            self._param.video.area.center_x = self.get_parameter('preference/video/area/center_x').get_parameter_value().integer_value
+            self._param.video.area.center_y = self.get_parameter('preference/video/area/center_y').get_parameter_value().integer_value
+            self._param.video.area.width = self.get_parameter('preference/video/area/width').get_parameter_value().integer_value
+            self._param.video.area.height = self.get_parameter('preference/video/area/height').get_parameter_value().integer_value
             self._calc_area(self._param.video.settings.width, self._param.video.settings.height,
                             self._param.video.area.center_x, self._param.video.area.center_y,
                             self._param.video.area.width, self._param.video.area.height)
@@ -362,33 +384,35 @@ class ModelNode(Node):
 
     def _init_param(self):
         # info
-        self.declare_parameter('info/verbose', self._param.info.verbose)
+        self.declare_parameter('preference/info/verbose', self._param.info.verbose)
         # device
-        self.declare_parameter('device/type', self._param.device.type)
-        self.declare_parameter('device/id', self._param.device.id)
-        self.declare_parameter('device/by_path', self._param.device.name_by_path)
+        self.declare_parameter('configuration/device/type', self._param.device.type)
+        self.declare_parameter('configuration/device/id', self._param.device.id)
+        self.declare_parameter('configuration/device/by_path', self._param.device.name_by_path)
         # publisher
-        self.declare_parameter('publisher/resize/width', self._param.video.resize.width)
-        self.declare_parameter('publisher/resize/height', self._param.video.resize.height)
+        self.declare_parameter('preference/publisher/resize/width', self._param.sender.width)
+        self.declare_parameter('preference/publisher/resize/height', self._param.sender.height)
+        self.declare_parameter('configuration/publisher/interval_fps', self._param.sender.fps)
         # video
-        self.declare_parameter('video/settings/format', self._param.video.settings.format)
-        self.declare_parameter('video/settings/mirror', self._param.video.settings.mirror)
-        self.declare_parameter('video/settings/width', self._param.video.settings.width)
-        self.declare_parameter('video/settings/height', self._param.video.settings.height)
-        self.declare_parameter('video/settings/angle', self._param.video.settings.angle)
+        self.declare_parameter('configuration/video/settings/format', self._param.video.settings.format)
+        self.declare_parameter('configuration/video/settings/width', self._param.video.settings.width)
+        self.declare_parameter('configuration/video/settings/height', self._param.video.settings.height)
+        self.declare_parameter('configuration/video/settings/angle', self._param.video.settings.angle)
+        self.declare_parameter('configuration/video/settings/fps', self._param.video.settings.fps)
 
         width = (self._param.video.area.end_x - self._param.video.area.start_x)
         height = (self._param.video.area.end_y - self._param.video.area.end_x)
-        center_x = (self._param.video.settings.width / 2) - self._param.video.area.start_x - (width / 2)
-        center_y = (self._param.video.settings.height / 2) - self._param.video.area.start_y - (height / 2)
-        self.declare_parameter('video/area/center_x', int(center_x))
-        self.declare_parameter('video/area/center_y', int(center_y))
-        self.declare_parameter('video/area/width', int(width))
-        self.declare_parameter('video/area/height', int(height))
+        center_x = self._param.video.area.start_x - ((self._param.video.settings.width / 2) - (width / 2))
+        center_y = self._param.video.area.start_y - ((self._param.video.settings.height / 2) - (height / 2))
+        self.declare_parameter('preference/video/area/center_x', int(center_x))
+        self.declare_parameter('preference/video/area/center_y', int(center_y))
+        self.declare_parameter('preference/video/area/width', int(width))
+        self.declare_parameter('preference/video/area/height', int(height))
+        self.declare_parameter('preference/video/area/mirror', self._param.video.area.mirror)
         # init parameter
-        self._param.device.type = self.get_parameter('device/type').get_parameter_value().string_value
-        self._param.device.name_by_path = self.get_parameter('device/by_path').get_parameter_value().string_value
-        self._param.device.id = self.get_parameter('device/id').get_parameter_value().integer_value
+        self._param.device.type = self.get_parameter('configuration/device/type').get_parameter_value().string_value
+        self._param.device.name_by_path = self.get_parameter('configuration/device/by_path').get_parameter_value().string_value
+        self._param.device.id = self.get_parameter('configuration/device/id').get_parameter_value().integer_value
         # set callback
         self._get_parameter()
         self.add_on_set_parameters_callback(self._callback_on_params)
@@ -456,7 +480,7 @@ def main(args=None):
     rclpy.init(args=args)
     node_name = 'video_capture_node'
     traceback_logger = rclpy.logging.get_logger(node_name + '_logger')
-    node = ModelNode(node_name)
+    node = VideoCaptureNode(node_name)
 
     try:
         if (node.open() is True):

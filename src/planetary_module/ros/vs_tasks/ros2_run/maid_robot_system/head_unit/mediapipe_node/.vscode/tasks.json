@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ROS2 : maid_robot_system : mediapipe_node : run",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "launch",
+                "maid_robot_system_py",
+                "mediapipe_node.launch.py",
+                "",
+                ""
+            ]
+        }
+    ]
+}

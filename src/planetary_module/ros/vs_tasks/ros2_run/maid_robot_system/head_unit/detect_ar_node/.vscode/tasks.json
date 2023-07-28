@@ -1,0 +1,59 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ROS2 : maid_robot_system : detect_ar_node : right : param",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "${MRS_ROS_NAMESPACE}/right_detect_ar_node"
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : detect_ar_node : right : node : info",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "node",
+                "info",
+                "${MRS_ROS_NAMESPACE}/right_detect_ar_node",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : detect_ar_node : left : param",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "args": [
+                "${MRS_ROS_NAMESPACE}/left_detect_ar_node"
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : detect_ar_node : left : node : info",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "node",
+                "info",
+                "${MRS_ROS_NAMESPACE}/left_detect_ar_node",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : maid_robot_system : detect_ar_node : run",
+            "type": "shell",
+            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "args": [
+                "launch",
+                "maid_robot_system_py",
+                "detect_ar_node.launch.py",
+                "",
+                ""
+            ]
+        }
+    ]
+}

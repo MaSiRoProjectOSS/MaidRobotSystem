@@ -3,14 +3,65 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+        //////////////////////////////////////////////////////////////
+        // GENERAL
+        //////////////////////////////////////////////////////////////
         {
-            "label": "ROS2 : BUILD : DEBUG : maid_robot_system",
+            "label": "ROS2 : GENERAL : info : node",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../script/commands.sh",
+            "args": [
+                "node",
+                "list",
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : GENERAL : info : topic",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../script/commands.sh",
+            "args": [
+                "topic",
+                "list",
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : GENERAL : info : param",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../script/commands.sh",
+            "args": [
+                "param",
+                "list",
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : GENERAL : info : pkg",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../script/commands.sh",
+            "args": [
+                "pkg",
+                "executables",
+                "",
+                "",
+                ""
+            ]
+        },
+        {
+            "label": "ROS2 : GENERAL : DEBUG_BUILD",
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
                 "build",
-                "release",
-                "maid_robot_system",
+                "debug",
+                "",
                 "",
                 ""
             ],
@@ -20,7 +71,7 @@
             }
         },
         {
-            "label": "ROS2 : BUILD : ALL-BUILD",
+            "label": "ROS2 : GENERAL : [ALL] BUILD",
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
@@ -36,7 +87,7 @@
             }
         },
         {
-            "label": "ROS2 : BUILD : CLEAN",
+            "label": "ROS2 : GENERAL : CLEAN",
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
@@ -48,7 +99,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : REBUILD",
+            "label": "ROS2 : GENERAL : REBUILD",
             "type": "shell",
             "command": "${workspaceFolder}/../../script/build.sh",
             "args": [
@@ -59,7 +110,7 @@
                 ""
             ],
             "dependsOn": [
-                "ROS2 : BUILD : CLEAN"
+                "ROS2 : GENERAL : CLEAN"
             ]
         }
     ]

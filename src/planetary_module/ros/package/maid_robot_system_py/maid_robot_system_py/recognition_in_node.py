@@ -12,7 +12,7 @@ from features.mp.image_analysis import ImageAnalysis
 from utils.cv_fps_calc import CvFpsCalc
 
 
-class ModelNode(Node):
+class RecognitionInNode(Node):
     _debug_mode = False
     _enable_holistic = True
     ##########################################################################
@@ -278,7 +278,7 @@ def main(args=None):
     rclpy.init(args=args)
     node_name = 'recognition_in_node'
     traceback_logger = rclpy.logging.get_logger(node_name + '_logger')
-    node = ModelNode(node_name)
+    node = RecognitionInNode(node_name)
 
     try:
         if (node.init() is True):
