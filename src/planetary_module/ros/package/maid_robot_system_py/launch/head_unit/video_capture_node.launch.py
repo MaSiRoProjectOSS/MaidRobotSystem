@@ -7,7 +7,11 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
+    _mrs_v4l_left_id = int(os.environ.get('MRS_V4L_LEFT_ID'))
+    _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
+    _mrs_v4l_right_id = int(os.environ.get('MRS_V4L_RIGHT_ID'))
 
     left_video_capture_node = Node(
         namespace=_ros_namespace,
@@ -20,8 +24,8 @@ def generate_launch_description():
         ],
         parameters=[{
             "configuration/device/type": "v4l",
-            "configuration/device/by_path": "",
-            "configuration/device/id": 1,
+            "configuration/device/by_path": _mrs_v4l_left_by_path,
+            "configuration/device/id": _mrs_v4l_left_id,
             "configuration/video/settings/format": "MJPG",
             "configuration/video/settings/width": 1280,
             "configuration/video/settings/height": 1024,
@@ -52,15 +56,15 @@ def generate_launch_description():
         ],
         parameters=[{
             "configuration/device/type": "v4l",
-            "configuration/device/by_path": "",
-            "configuration/device/id": 3,
+            "configuration/device/by_path": _mrs_v4l_right_by_path,
+            "configuration/device/id": _mrs_v4l_right_id,
             "configuration/video/settings/format": "MJPG",
             "configuration/video/settings/width": 1280,
             "configuration/video/settings/height": 1024,
             "configuration/video/settings/angle": 140,
             "configuration/video/settings/fps": 30.0,
             "configuration/publisher/interval_fps": 10.0,
-            "preference/info/verbose": True,
+            "preference/info/verbose": False,
             "preference/video/area/mirror": True,
             "preference/video/area/center_x": 0,
             "preference/video/area/center_y": 0,

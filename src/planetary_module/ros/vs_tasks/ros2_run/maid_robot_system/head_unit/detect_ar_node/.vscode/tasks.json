@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
             "args": [
-                "${MRS_ROS_NAMESPACE}/right_detect_ar_node"
+                "${MRS_ROS_NAMESPACE}/head_unit/right_detect_ar_node"
             ]
         },
         {
@@ -18,7 +18,7 @@
             "args": [
                 "node",
                 "info",
-                "${MRS_ROS_NAMESPACE}/right_detect_ar_node",
+                "${MRS_ROS_NAMESPACE}/head_unit/right_detect_ar_node",
                 "",
                 ""
             ]
@@ -28,7 +28,7 @@
             "type": "shell",
             "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
             "args": [
-                "${MRS_ROS_NAMESPACE}/left_detect_ar_node"
+                "${MRS_ROS_NAMESPACE}/head_unit/left_detect_ar_node"
             ]
         },
         {
@@ -38,7 +38,7 @@
             "args": [
                 "node",
                 "info",
-                "${MRS_ROS_NAMESPACE}/left_detect_ar_node",
+                "${MRS_ROS_NAMESPACE}/head_unit/left_detect_ar_node",
                 "",
                 ""
             ]

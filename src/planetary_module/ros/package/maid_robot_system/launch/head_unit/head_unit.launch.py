@@ -34,8 +34,32 @@ def generate_launch_description():
                 'launch/head_unit/nodes/kubi_node.launch.py'))
     )
 
+    launch_nodes_video_capture_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/video_capture_node.launch.py'))
+    )
+
+    launch_nodes_detect_ar_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/detect_ar_node.launch.py'))
+    )
+
+    launch_nodes_mediapipe_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/mediapipe_node.launch.py'))
+    )
+
     return LaunchDescription([
-        launch_nodes_hitomi,
-        launch_nodes_mitumeru,
-        launch_nodes_kubi
+        # launch_nodes_hitomi,
+        # launch_nodes_mitumeru,
+        # launch_nodes_kubi,
+        launch_nodes_mediapipe_node,
+        launch_nodes_detect_ar_node,
+        launch_nodes_video_capture_node
     ])

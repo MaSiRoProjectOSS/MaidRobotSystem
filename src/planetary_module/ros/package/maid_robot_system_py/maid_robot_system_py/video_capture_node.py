@@ -65,7 +65,7 @@ class VideoCaptureNodeParam():
         self.sender = self.ParamVideoSender()
 
     def print_parameter(self, node):
-        node.get_logger().info('<Parameter Update> : {}/{}'.format(node.get_namespace(), node.get_name()))
+        node.get_logger().debug('<Parameter>')
         node.get_logger().debug(' device: ')
         node.get_logger().debug('   type   : ' + str(self.device.type))
         node.get_logger().debug('   id     : ' + str(self.device.id))
@@ -357,6 +357,7 @@ class VideoCaptureNode(Node):
                                 self._param.video.area.center_x, self._param.video.area.center_y,
                                 self._param.video.area.width, self._param.video.area.height)
                 self._param.print_parameter(self)
+                self.get_logger().info('<Parameter Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
             else:
                 self.get_logger().warn('<Parameter NOT Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
         return SetParametersResult(successful=result)
@@ -436,8 +437,7 @@ class VideoCaptureNode(Node):
         self._cap.set(cv.CAP_PROP_FRAME_WIDTH, width)
         self._cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
         self._cap.set(cv.CAP_PROP_FPS, fps)
-        if (self._param.info.verbose is True):
-            self._video_output_video_information()
+        self._video_output_video_information()
 
     def _video_output_video_information(self):
         if (self._cap is not None):

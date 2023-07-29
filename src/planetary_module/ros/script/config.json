@@ -14,7 +14,11 @@
         "MRS_SKIN_HOME": "/opt/MaidRobotSystem/data/skin/${MRS_CAST_NAME}",
         "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package",
         "MRS_ROS_OUTPUT_TYPE": "screen",
-        "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}"
+        "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
+        "MRS_V4L_LEFT_BY_PATH": "",
+        "MRS_V4L_LEFT_ID": 1,
+        "MRS_V4L_RIGHT_BY_PATH": "",
+        "MRS_V4L_RIGHT_ID": 3
     },
     "ROS_VARIABLES": {
         "ROS_DISTRO": "humble",

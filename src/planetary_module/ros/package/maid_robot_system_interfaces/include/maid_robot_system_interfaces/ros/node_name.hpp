@@ -19,6 +19,10 @@
 #define MRS_NODE_MITUMERU "mitumeru_node"
 #define MRS_NODE_HITOMI   "hitomi_node"
 #define MRS_NODE_KUBI     "kubi_node"
+
+#define MRS_NODE_DETECT_AR "detect_ar_node"
+#define MRS_NODE_MEDIAPIPE "mediapipe_node"
+#define MRS_NODE_VIDEO     "video_capture_node"
 /* ======================================================================== */
 
 /* ======================================================================== */
