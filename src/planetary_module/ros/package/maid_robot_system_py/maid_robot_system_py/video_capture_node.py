@@ -101,6 +101,7 @@ class VideoCaptureNode(Node):
     _lock = None
     _cap = None
     _param = None
+    _initialized = False
     ##########################################################################
     _fps_calc = None
     _timer_output_information = None
@@ -137,6 +138,7 @@ class VideoCaptureNode(Node):
         if (self._debug_mode is True):
             self._develop()
         try:
+            self._initialized = False
             ###################################################################
             # set instance
             self._fps_calc = CvFpsCalc(buffer_len=self._timer_output_information_size)
@@ -184,6 +186,9 @@ class VideoCaptureNode(Node):
             self.get_logger().error('Exception : ' + str(exception))
             result = False
             traceback.print_exc()
+        finally:
+            self._initialized = result
+
         return result
 
     ##########################################################################
@@ -301,8 +306,9 @@ class VideoCaptureNode(Node):
         result = False
         with self._lock:
             for parameter in parameter_list:
-                self.get_logger().info('[{}/{}] Got {}={}'.format(
-                    self.get_namespace(), self.get_name(), parameter.name, parameter.value))
+                if (self._initialized is True):
+                    self.get_logger().info('[{}/{}] Got {}={}'.format(
+                        self.get_namespace(), self.get_name(), parameter.name, parameter.value))
 
                 if (parameter.name == 'preference/info/verbose'):
                     self._param.info.verbose = parameter.value
@@ -357,9 +363,11 @@ class VideoCaptureNode(Node):
                                 self._param.video.area.center_x, self._param.video.area.center_y,
                                 self._param.video.area.width, self._param.video.area.height)
                 self._param.print_parameter(self)
-                self.get_logger().info('<Parameter Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
+                if (self._initialized is True):
+                    self.get_logger().info('<Parameter Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
             else:
-                self.get_logger().warn('<Parameter NOT Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
+                if (self._initialized is True):
+                    self.get_logger().warn('<Parameter NOT Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
         return SetParametersResult(successful=result)
 
     def _get_parameter(self):
