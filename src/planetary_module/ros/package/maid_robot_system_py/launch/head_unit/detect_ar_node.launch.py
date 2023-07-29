@@ -20,7 +20,8 @@ def generate_launch_description():
             ('out', _ros_namespace + '/ar/right')
         ],
         parameters=[{
-            "confidence/fps": 1.0,
+            "confidence/fps": 0.5,
+            "preference/video/mirror": False,
             "preference/info/verbose": True
         }],
         respawn=False,

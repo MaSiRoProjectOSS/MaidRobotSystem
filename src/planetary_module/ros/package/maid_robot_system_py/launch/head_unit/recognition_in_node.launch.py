@@ -8,6 +8,10 @@ from launch.substitutions import TextSubstitution
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
+    _mrs_v4l_left_id = int(os.environ.get('MRS_V4L_LEFT_ID'))
+    _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
+    _mrs_v4l_right_id = int(os.environ.get('MRS_V4L_RIGHT_ID'))
 
     left_recognition_in_node = Node(
         namespace=_ros_namespace,
@@ -19,8 +23,8 @@ def generate_launch_description():
             "info/verbose": True,
             "topic_sub_name": "left",
             "device/type": "v4l",
-            "device/id": -1,
-            "device/by_path": "usb-0:1.1:1.0-video-index0",
+            "device/id": _mrs_v4l_left_id,
+            "device/by_path": _mrs_v4l_left_by_path,
             "video/settings/width": 1280,
             "video/settings/height": 1024,
             "video/settings/angle": 140,
@@ -33,9 +37,9 @@ def generate_launch_description():
             "confidence/visibility_th": 0.5,
             "image/width": 1280,
             "image/height": 1024,
-            "image/overlay_information": False,
+            "image/overlay_information": True,
             "image/publish": True,
-            "features/detect_markers": False,
+            "features/detect_markers": True,
             "update": True,
         }],
         respawn=False,
@@ -52,8 +56,8 @@ def generate_launch_description():
             "info/verbose": True,
             "topic_sub_name": "right",
             "device/type": "v4l",
-            "device/id": -1,
-            "device/by_path": "usb-0:1:1.0-video-index0",
+            "device/id": _mrs_v4l_right_id,
+            "device/by_path": _mrs_v4l_right_by_path,
             "video/settings/width": 1280,
             "video/settings/height": 1024,
             "video/settings/angle": 140,
@@ -64,12 +68,12 @@ def generate_launch_description():
             "confidence/min_detection": 0.5,
             "confidence/min_tracking": 0.5,
             "confidence/visibility_th": 0.5,
-            "image/width": 1280,
-            "image/height": 1024,
-            "image/overlay_information": False,
+            "image/width": 640,
+            "image/height": 512,
+            "image/overlay_information": True,
             "image/publish": True,
-            "features/detect_markers": False,
-            "update": True,
+            "features/detect_markers": True,
+            "update": True
         }],
         respawn=False,
         respawn_delay=2.0

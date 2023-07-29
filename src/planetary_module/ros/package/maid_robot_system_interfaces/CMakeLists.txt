@@ -81,6 +81,10 @@ set(MSG_DETECTION_FILE
 set(MSG_FORMAT_FILE
   msg/format/VideoInfo.msg
 )
+#   MSG_ARUCO_FILE
+set(MSG_ARUCO_FILE
+  msg/aruco/ArMarkers.msg
+)
 
 ###############################################
 
@@ -92,6 +96,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_DRAWING_FILE}
   ${MSG_FORMAT_FILE}
   ${MSG_DETECTION_FILE}
+  ${MSG_ARUCO_FILE}
 
   DEPENDENCIES std_msgs geometry_msgs
 )

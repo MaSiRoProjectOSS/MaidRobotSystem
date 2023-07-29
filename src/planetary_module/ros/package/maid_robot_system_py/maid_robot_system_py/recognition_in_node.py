@@ -5,7 +5,7 @@ import traceback
 import copy
 import cv2 as cv
 from rclpy.node import Node
-from utils.cv_fps_calc import UsbVideoDevice
+from utils.usb_video_device import UsbVideoDevice
 from features.ros.ros_comm_recognition import RosCommRecognition
 from features.mp.schematic_diagram import SchematicDiagram
 from features.mp.image_analysis import ImageAnalysis
