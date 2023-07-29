@@ -53,6 +53,7 @@ class DetectARNode(Node):
     _pub_queue_size = 5
     _pub_name = 'out'
     _send_msg = Int16MultiArray()
+    _bridge = None
 
     def __init__(self, node_name):
         super().__init__(node_name)
@@ -63,6 +64,7 @@ class DetectARNode(Node):
         result = True
         try:
             self._param.init(self)
+            self._bridge = CvBridge()
 
             # ##################################################################
             dictionary = aruco.getPredefinedDictionary(aruco.DICT_5X5_250)
@@ -108,13 +110,15 @@ class DetectARNode(Node):
         # self.get_logger().info('_callback_timer_detect')
         if (self._lifo.empty() is False):
             msg = self._lifo.get()
-            cv_image = CvBridge().imgmsg_to_cv2(msg, "bgr8")
-            ids = self.detect_ar(cv_image)
+            cv_image = self._bridge.imgmsg_to_cv2(msg, "bgr8")
+            gray = cv.cvtColor(cv_image, cv.COLOR_RGB2GRAY)
+            ids = self.detect_ar(gray)
             if (ids is not None):
-                self._send_msg.data = ids
-                if (self._param.info_verbose is True):
-                    self.get_logger().info(ids)
                 self.get_logger().info('publish msg')
+                if (self._param.info_verbose is True):
+                    pass
+                self.get_logger().info(ids)
+                self._send_msg.data = ids
                 self._pub.publish(self._send_msg)
         while not self._lifo.empty():
             self._lifo.get()
