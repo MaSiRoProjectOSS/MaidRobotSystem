@@ -8,11 +8,34 @@ from cv_bridge import CvBridge
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from rcl_interfaces.msg import SetParametersResult
-from features.mp.image_analysis import ImageAnalysis
 from utils.cv_fps_calc import CvFpsCalc
+from mediapipe.python.solutions.pose import PoseLandmark
+from mediapipe.python.solutions.holistic import Holistic as mp_holistic
 from maid_robot_system_interfaces.msg._pose_detection import PoseDetection
 from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
-from mediapipe.python.solutions.pose import PoseLandmark
+
+
+class ImageAnalysis:
+    _holistic = None
+
+    def __init__(self, confidence_min_detection: float, confidence_min_tracking: float):
+        self._load_model(confidence_min_detection, confidence_min_tracking)
+
+    def _load_model(self, confidence_min_detection: float, confidence_min_tracking: float):
+        self._holistic = mp_holistic(
+            min_detection_confidence=confidence_min_detection,
+            min_tracking_confidence=confidence_min_tracking,
+        )
+
+    def detect_holistic(self, image):
+        landmarks = None
+        if self._holistic is not None:
+            image.flags.writeable = False
+            results = self._holistic.process(image)
+            image.flags.writeable = True
+            if results is not None:
+                landmarks = results.pose_landmarks
+        return landmarks
 
 
 class VideoCaptureNodeParam():
@@ -109,6 +132,7 @@ class MediapipeNode(Node):
     _timer_output_information = None
     _timer_output_information_period = (1.0 / 5.0)
     _timer_output_information_size = (5 * 60)
+    _display_fps = 0
 
     def __init__(self, node_name):
         super().__init__(node_name)
@@ -116,15 +140,13 @@ class MediapipeNode(Node):
         self._param = VideoCaptureNodeParam()
 
     def open(self):
-        result = True
+        result = False
         try:
             self._param.init(self)
             self._pose_detection_msg = PoseDetection()
             self._fps_calc = CvFpsCalc(
                 buffer_len=self._timer_output_information_size)
-
             # ##################################################################
-
             self._ia = ImageAnalysis(self._param.preference_confidence_min_detection,
                                      self._param.preference_confidence_min_tracking)
             # ##################################################################
@@ -132,6 +154,7 @@ class MediapipeNode(Node):
             self._create_publisher()
             self._create_subscription()
             self._create_timer()
+            result = True
         except Exception as exception:
             self.get_logger().error('Exception : ' + str(exception))
             result = False
@@ -149,10 +172,48 @@ class MediapipeNode(Node):
 
     def _create_timer(self):
         # set ros callback
-        self.get_logger().error('[{}] configuration_publisher_interval_fps'.format(self._param.configuration_publisher_interval_fps))
-        self.get_logger().error('[{}] _timer_output_information_period'.format(self._timer_output_information_period))
         self._timer_recognition = self.create_timer((1.0 / float(self._param.configuration_publisher_interval_fps)), self._callback_timer_detect)
         self._timer_output_information = self.create_timer((1.0 / float(self._timer_output_information_period)), self._callback_output_information)
+
+    def _callback_listener_image(self, msg):
+        if (self._lifo.full() is True):
+            self._lifo.get()
+        self._lifo.put(msg)
+        pass
+
+    def _callback_timer_detect(self):
+        try:
+            if (self._lifo.empty() is False):
+                self._pose_detection_msg.human_detected = False
+                msg = self._lifo.get()
+                cv_image = CvBridge().imgmsg_to_cv2(msg, "bgr8")
+                pose_landmarks = self._ia.detect_holistic(cv_image)
+                if pose_landmarks is not None:
+                    self.repackaging(pose_landmarks)
+                    self._pub.publish(self._pose_detection_msg)
+                    #####################################################
+                    if (self._report_detected is True):
+                        if (self._pose_detection_msg.human_detected is not self._previous_human_detected):
+                            if (self._pose_detection_msg.human_detected is True):
+                                self.get_logger().info(
+                                    '[{}] HUMAN_DETECTED'.format(self.get_name()))
+                            else:
+                                self.get_logger().info(
+                                    '[{}] LOSE_TRACKING'.format(self.get_name()))
+                            self._previous_human_detected = self._pose_detection_msg.human_detected
+                #####################################################
+                self._display_fps = self._fps_calc.get()
+                #####################################################
+
+            while not self._lifo.empty():
+                self._lifo.get()
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_recognition) : ' + str(exception))
+            traceback.print_exc()
+
+    def _callback_output_information(self):
+        if (self._param.preference_info_verbose is True):
+            self.get_logger().info('[{}/{}] FPS : {:.4g}'.format(self.get_namespace(), self.get_name(), self._display_fps))
 
     ##################################################################################
 
@@ -388,47 +449,6 @@ class MediapipeNode(Node):
         self._pose_detection_msg.human_detected = human_detected
 
     ##################################################################################
-
-    def _callback_listener_image(self, msg):
-        # self.get_logger().info('_callback_listener_image')
-        if (self._lifo.full() is True):
-            self._lifo.get()
-        self._lifo.put(msg)
-        pass
-
-    def _callback_timer_detect(self):
-        try:
-            if (self._lifo.empty() is False):
-                self._pose_detection_msg.human_detected = False
-                msg = self._lifo.get()
-                cv_image = CvBridge().imgmsg_to_cv2(msg, "bgr8")
-                pose_landmarks = self._ia.detect_holistic(cv_image)
-                if pose_landmarks is not None:
-                    self.repackaging(pose_landmarks)
-                    self.get_logger().info('publish msg')
-                    self._pub.publish(self._pose_detection_msg)
-                    #####################################################
-                    if (self._report_detected is True):
-                        if (self._pose_detection_msg.human_detected is not self._previous_human_detected):
-                            if (self._pose_detection_msg.human_detected is True):
-                                self.get_logger().info(
-                                    '[{}] HUMAN_DETECTED'.format(self.get_name()))
-                            else:
-                                self.get_logger().info(
-                                    '[{}] LOSE_TRACKING'.format(self.get_name()))
-                            self._previous_human_detected = self._pose_detection_msg.human_detected
-                #####################################################
-                self._display_fps = self._fps_calc.get()
-                #####################################################
-
-            while not self._lifo.empty():
-                self._lifo.get()
-        except Exception as exception:
-            self.get_logger().error('Exception (_callback_recognition) : ' + str(exception))
-            traceback.print_exc()
-
-    def _callback_output_information(self):
-        self.get_logger().info('[{}/{}] FPS : {:.4g}'.format(self.get_namespace(), self.get_name(), self._display_fps))
 
 
 def main(args=None):

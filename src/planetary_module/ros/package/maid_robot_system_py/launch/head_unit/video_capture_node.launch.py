@@ -20,6 +20,7 @@ def generate_launch_description():
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
+            ('video_device_info', _ros_namespace + '/video_device_info/left'),
             ('image', _ros_namespace + '/image/raw/left')
         ],
         parameters=[{
@@ -52,6 +53,7 @@ def generate_launch_description():
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
+            ('video_device_info', _ros_namespace + '/video_device_info/right'),
             ('image', _ros_namespace + '/image/raw/right')
         ],
         parameters=[{

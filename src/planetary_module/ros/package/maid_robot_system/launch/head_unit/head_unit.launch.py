@@ -60,6 +60,6 @@ def generate_launch_description():
         # launch_nodes_mitumeru,
         # launch_nodes_kubi,
         launch_nodes_mediapipe_node,
-        launch_nodes_detect_ar_node,
+        # launch_nodes_detect_ar_node,
         launch_nodes_video_capture_node
     ])

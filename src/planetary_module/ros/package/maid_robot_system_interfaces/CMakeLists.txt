@@ -86,6 +86,9 @@ set(MSG_ARUCO_FILE
   msg/aruco/ArMarkers.msg
 )
 
+set(SRV_FILES_SRV
+  "srv/VideoDeviceInfo.srv"
+)
 ###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -98,6 +101,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_DETECTION_FILE}
   ${MSG_ARUCO_FILE}
 
+  ${SRV_FILES_SRV}
   DEPENDENCIES std_msgs geometry_msgs
 )
 

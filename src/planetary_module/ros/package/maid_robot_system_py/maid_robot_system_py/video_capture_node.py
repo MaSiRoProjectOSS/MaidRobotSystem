@@ -13,6 +13,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
+from maid_robot_system_interfaces.srv._video_device_info import VideoDeviceInfo
 
 
 class VideoCaptureNodeParam():
@@ -118,6 +119,10 @@ class VideoCaptureNode(Node):
     _param = VideoCaptureNodeParam()
 
     ##########################################################################
+    _service_name = 'video_device_info'
+    _service = None
+
+    ##########################################################################
     # finalize
     def closing(self):
         if (self._cap is not None):
@@ -179,6 +184,7 @@ class VideoCaptureNode(Node):
                 self.get_logger().info('Open Camera : /dev/video' + str(self._param.device.id)
                                        + ' : ' + str(self._param.device.name_by_path))
                 # create ros
+                self._create_service()
                 self._create_publisher()
                 self._create_timer()
 
@@ -192,7 +198,7 @@ class VideoCaptureNode(Node):
         return result
 
     ##########################################################################
-    # ROS
+    # image
     def _resizing(self, image):
         with self._lock:
             # dst = cv.cvtColor(image, cv.COLOR_BGR2RGB)
@@ -212,16 +218,6 @@ class VideoCaptureNode(Node):
         if (self._data_image is not None):
             self._pub_image.publish(self._data_image)
 
-    def _create_publisher(self):
-        self._pub_image = self.create_publisher(Image, self._topic_name, self._topic_queue_size)
-
-    def _create_timer(self):
-        # set ros callback
-        self._timer_recognition = self.create_timer(
-            (1.0 / self._param.sender.fps), self._callback_recognition)
-        self._timer_output_information = self.create_timer(
-            (1.0 / self._timer_output_information_period_fps), self._callback_output_information)
-
     def _resize(self, image, width, height):
         im_h, im_w = image.shape[:2]
         if ((width == 0) or (height == 0)):
@@ -235,6 +231,34 @@ class VideoCaptureNode(Node):
             new_w = width
             new_h = round(new_w / aspect)
         return cv.resize(image, dsize=(new_w, new_h))
+
+    ##########################################################################
+    # ROS
+    def _create_service(self):
+        self._service = self.create_service(VideoDeviceInfo, self._service_name, self._callback_video_device_info)
+
+    def _create_publisher(self):
+        self._pub_image = self.create_publisher(Image, self._topic_name, self._topic_queue_size)
+
+    def _create_timer(self):
+        # set ros callback
+        self._timer_recognition = self.create_timer(
+            (1.0 / self._param.sender.fps), self._callback_recognition)
+        self._timer_output_information = self.create_timer(
+            (1.0 / self._timer_output_information_period_fps), self._callback_output_information)
+
+    ##########################################################################
+    # ROS callback
+    def _callback_video_device_info(self, request, response):
+        response.type = str(self._param.device.type)
+        response.id = self._param.device.id
+        response.by_path = self._param.device.name_by_path
+        response.video_info.angle = self._param.video.settings.angle
+        response.video_info.width = self._param.video.settings.width
+        response.video_info.height = self._param.video.settings.height
+        response.video_info.fps = self._param.video.settings.fps
+        response.video_info.format = self._param.video.settings.format
+        return response
 
     def _callback_recognition(self):
         try:
