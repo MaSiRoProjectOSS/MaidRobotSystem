@@ -171,6 +171,8 @@ class MediapipeExtNode(Node):
                                                          pose_msg.detected_area,
                                                          pose_msg.human_detected,
                                                          self._param.drawing_box)
+                    # float(self._ros_com.param_video_area_end_x - self._ros_com.param_video_area_start_x),
+                    # float(self._ros_com.param_video_area_end_y - self._ros_com.param_video_area_start_y),
                     schematic_diagram = self._resize(schematic_diagram, self._param.width, self._param.height)
                     self._send_msg = self._bridge.cv2_to_imgmsg(np.array(schematic_diagram), "bgr8")
                     self._pub_image.publish(self._send_msg)

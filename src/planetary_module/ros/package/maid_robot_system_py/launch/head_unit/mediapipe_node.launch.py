@@ -20,16 +20,15 @@ def generate_launch_description():
             ('out', _ros_namespace + '/data/left')
         ],
         parameters=[{
-            "configuration/publisher/interval_fps": 30.0,
-            "preference/info/verbose": True,
+            "configuration/publisher/interval_fps": 10.0,
+            "preference/info/verbose": False,
             "preference/confidence/min_detection": 0.5,
             "preference/confidence/min_tracking": 0.5,
             "preference/confidence/visibility_th": 0.5,
             "preference/video/area/center_x": 0,
             "preference/video/area/center_y": 0,
             "preference/video/area/width": 0,
-            "preference/video/area/height": 0,
-            "preference/image/publish": True
+            "preference/video/area/height": 0
         }],
         respawn=False,
         respawn_delay=2.0
@@ -46,15 +45,14 @@ def generate_launch_description():
         ],
         parameters=[{
             "configuration/publisher/interval_fps": 10.0,
-            "preference/info/verbose": True,
+            "preference/info/verbose": False,
             "preference/confidence/min_detection": 0.5,
             "preference/confidence/min_tracking": 0.5,
             "preference/confidence/visibility_th": 0.5,
             "preference/video/area/center_x": 0,
             "preference/video/area/center_y": 0,
             "preference/video/area/width": 0,
-            "preference/video/area/height": 0,
-            "preference/image/publish": True
+            "preference/video/area/height": 0
         }],
         respawn=False,
         respawn_delay=2.0

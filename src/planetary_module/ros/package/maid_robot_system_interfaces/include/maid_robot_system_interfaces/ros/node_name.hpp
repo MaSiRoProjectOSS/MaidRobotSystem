@@ -43,7 +43,7 @@
 
 /* ======================================================================== */
 // management
-#define MRS_NODE_CONDITION_MONITORING_NODE "condition_monitoring_node"
+#define MRS_NODE_CONDITION_MONITORING "condition_monitoring_node"
 /* ======================================================================== */
 
 /* ======================================================================== */

@@ -69,9 +69,6 @@ class VideoCaptureNodeParam():
             if (parameter.name == "preference/video/area/height"):
                 self.preference_video_area_height = parameter.value
                 result = True
-            if (parameter.name == "preference/image/publish"):
-                self.preference_image_publish = parameter.value
-                result = True
         return SetParametersResult(successful=result)
 
     def get_parameter(self, node: Node):
@@ -83,7 +80,6 @@ class VideoCaptureNodeParam():
         self.preference_video_area_center_y = node.get_parameter("preference/video/area/center_y").get_parameter_value().integer_value
         self.preference_video_area_width = node.get_parameter("preference/video/area/width").get_parameter_value().integer_value
         self.preference_video_area_height = node.get_parameter("preference/video/area/height").get_parameter_value().integer_value
-        self.preference_image_publish = node.get_parameter("preference/image/publish").get_parameter_value().bool_value
         self.configuration_publisher_interval_fps = node.get_parameter("configuration/publisher/interval_fps").get_parameter_value().double_value
 
     def init(self, node: Node):
@@ -113,7 +109,6 @@ class VideoCaptureNodeParam():
         self.preference_video_area_center_y = 0
         self.preference_video_area_width = 0
         self.preference_video_area_height = 0
-        self.preference_image_publish = True
         self.configuration_publisher_interval_fps = 10.0
 
 

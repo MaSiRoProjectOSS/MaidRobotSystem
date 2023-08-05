@@ -41,6 +41,7 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -s -DNDEBUG -march=native")
 # find dependencies
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 # generate message
@@ -86,8 +87,9 @@ set(MSG_ARUCO_FILE
   msg/aruco/ArMarkers.msg
 )
 
-set(SRV_FILES_SRV
-  "srv/VideoDeviceInfo.srv"
+set(SRV_FILES
+  srv/VideoCapture.srv
+  srv/VideoDeviceInfo.srv
 )
 ###############################################
 
@@ -100,9 +102,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_FORMAT_FILE}
   ${MSG_DETECTION_FILE}
   ${MSG_ARUCO_FILE}
-
-  ${SRV_FILES_SRV}
-  DEPENDENCIES std_msgs geometry_msgs
+  ${SRV_FILES}
+  DEPENDENCIES std_msgs geometry_msgs sensor_msgs
 )
 
 include_directories(include)

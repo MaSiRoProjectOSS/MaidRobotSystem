@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<maid_robot_system::NodeImplement>( //
             MRS_PACKAGES_MAID_ROBOT_SYSTEM,
-            MRS_NODE_CONDITION_MONITORING_NODE,
+            MRS_NODE_CONDITION_MONITORING,
             argc,
             argv));
     rclcpp::shutdown();

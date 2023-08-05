@@ -3,7 +3,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import TextSubstitution
-
+import maid_robot_system_interfaces.srv as MrsSrv
 
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
@@ -20,27 +20,31 @@ def generate_launch_description():
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
-            ('video_device_info', _ros_namespace + '/video_device_info/left'),
+            ('get/info', _ros_namespace + '/video/info/left'),
+            ('get/image', _ros_namespace + '/video/image/left'),
             ('image', _ros_namespace + '/image/raw/left')
         ],
         parameters=[{
-            "configuration/device/type": "v4l",
-            "configuration/device/by_path": _mrs_v4l_left_by_path,
-            "configuration/device/id": _mrs_v4l_left_id,
-            "configuration/video/settings/format": "MJPG",
-            "configuration/video/settings/width": 1280,
-            "configuration/video/settings/height": 1024,
-            "configuration/video/settings/angle": 140,
-            "configuration/video/settings/fps": 30.0,
-            "configuration/publisher/interval_fps": 10.0,
-            "preference/info/verbose": False,
-            "preference/video/area/mirror": False,
-            "preference/video/area/center_x": 0,
-            "preference/video/area/center_y": 0,
-            "preference/video/area/width": 0,
-            "preference/video/area/height": 0,
-            "preference/publisher/resize/width": 640,
-            "preference/publisher/resize/height": 512
+            "device/TYPE": "v4l",
+            "device/BY_PATH": _mrs_v4l_left_by_path,
+            "device/ID": _mrs_v4l_left_id,
+            "device/settings/FORMAT": "MJPG",
+            "device/settings/WIDTH": 1280,
+            "device/settings/HEIGHT": 1024,
+            "device/settings/ANGLE": 140,
+            "device/settings/FPS": 30.0,
+            "notify/message/verbose": False,
+            "settings/area/mirror": False,
+            "settings/area/upside_down": False,
+            "settings/area/clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
+            "settings/area/center_x": 0,
+            "settings/area/center_y": 0,
+            "settings/area/width": 0,
+            "settings/area/height": 0,
+            "publisher/INTERVAL_FPS": 10.0,
+            "publisher/resize/width": 640,
+            "publisher/resize/height": 512,
+            "publisher/enable": True
         }],
         respawn=True,
         respawn_delay=2.0
@@ -53,27 +57,31 @@ def generate_launch_description():
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
-            ('video_device_info', _ros_namespace + '/video_device_info/right'),
+            ('get/info', _ros_namespace + '/video/info/right'),
+            ('get/image', _ros_namespace + '/video/image/right'),
             ('image', _ros_namespace + '/image/raw/right')
         ],
         parameters=[{
-            "configuration/device/type": "v4l",
-            "configuration/device/by_path": _mrs_v4l_right_by_path,
-            "configuration/device/id": _mrs_v4l_right_id,
-            "configuration/video/settings/format": "MJPG",
-            "configuration/video/settings/width": 1280,
-            "configuration/video/settings/height": 1024,
-            "configuration/video/settings/angle": 140,
-            "configuration/video/settings/fps": 30.0,
-            "configuration/publisher/interval_fps": 10.0,
-            "preference/info/verbose": False,
-            "preference/video/area/mirror": False,
-            "preference/video/area/center_x": 0,
-            "preference/video/area/center_y": 0,
-            "preference/video/area/width": 0,
-            "preference/video/area/height": 0,
-            "preference/publisher/resize/width": 640,
-            "preference/publisher/resize/height": 512
+            "device/TYPE": "v4l",
+            "device/BY_PATH": _mrs_v4l_right_by_path,
+            "device/ID": _mrs_v4l_right_id,
+            "device/settings/FORMAT": "MJPG",
+            "device/settings/WIDTH": 1280,
+            "device/settings/HEIGHT": 1024,
+            "device/settings/ANGLE": 140,
+            "device/settings/FPS": 30.0,
+            "notify/message/verbose": False,
+            "settings/area/mirror": False,
+            "settings/area/upside_down": False,
+            "settings/area/clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
+            "settings/area/center_x": 0,
+            "settings/area/center_y": 0,
+            "settings/area/width": 0,
+            "settings/area/height": 0,
+            "publisher/INTERVAL_FPS": 10.0,
+            "publisher/resize/width": 640,
+            "publisher/resize/height": 512,
+            "publisher/enable": True
         }],
         respawn=True,
         respawn_delay=2.0

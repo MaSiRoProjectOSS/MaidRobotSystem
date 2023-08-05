@@ -3,6 +3,7 @@
 import rclpy
 import traceback
 import threading
+import copy
 import cv2 as cv
 import numpy as np
 from rclpy.node import Node
@@ -13,279 +14,165 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
-from maid_robot_system_interfaces.srv._video_device_info import VideoDeviceInfo
+import maid_robot_system_interfaces.srv as MrsSrv
+
+
+class VideoDeviceManager():
+    cap = None
+
+    def __init__(self):
+        pass
+
+    def search_video(self, type, id, path):
+        result = -1
+        usbVideoDevice = UsbVideoDevice(type)
+        result = usbVideoDevice.get_id_by_path(path)
+        if (-1 == result):
+            result = usbVideoDevice.get_id_from_id(id)
+        return usbVideoDevice.get_info(result)
+
+    def open(self, device_id):
+        self.cap = cv.VideoCapture(device_id)
+
+    def closing(self):
+        self.cap.release()
+
+    def isOpened(self):
+        if (self.cap is not None):
+            return self.cap.isOpened()
+        else:
+            return False
+
+    def set_video_setting(self, format, width, height, fps=30):
+        if (self.cap is not None):
+            if (format == 'MJPG'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))  # .avi
+            if (format == 'H264'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
+            if (format == 'YUYV'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
+            if (format == 'BGR3'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('B', 'G', 'R', '3'))
+            if (format == 'MP4V'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'V'))  # .mp4
+            if (format == 'MP4S'):
+                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'S'))  # .mp4
+
+            self.cap.set(cv.CAP_PROP_FRAME_WIDTH, width)
+            self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
+            self.cap.set(cv.CAP_PROP_FPS, fps)
+
+    def video_output_video_information(self):
+        result = False
+        ret_txt = ''
+        if (self.cap is not None):
+            fourcc = self.txt_cv_fourcc()
+            width = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)
+            height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)
+            fps = self.cap.get(cv.CAP_PROP_FPS)
+            mode = self._video_to_txt_cv_mode(self.cap.get(cv.CAP_PROP_MODE))
+            format = self.cap.get(cv.CAP_PROP_FORMAT)
+
+            ret_txt = "fourcc:{}, fps:{} [{:.4g} ms], width:{}, height:{}, mode:{}, format:{}".format(
+                fourcc, fps, (1 / float(fps)), width, height, mode, format)
+            result = True
+        return result, ret_txt
+
+    def txt_cv_fourcc(self, ):
+        v = int(self.cap.get(cv.CAP_PROP_FOURCC))
+        return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
+
+    def _video_to_txt_cv_mode(self, mode):
+        if (0 == mode):
+            return "BGR"
+        elif (1 == mode):
+            return "RGB"
+        elif (2 == mode):
+            return "GRAY"
+        elif (3 == mode):
+            return "YUYV"
+        else:
+            return "Unknown" + str(mode)
 
 
 class VideoCaptureNodeParam():
-    class ParamInfo():
-        def __init__(self):
-            self.verbose = True
-
+    # ############################################
     class ParamDevice():
         def __init__(self):
-            self.type = 'v4l'
-            self.id = 1
-            self.name_by_path = ''
-            self.path = ''
+            self.TYPE = 'v4l'
+            self.NAME_BY_PATH = ''
+            self.PATH = ''
+            self.ID = -1
+            self.FORMAT = "MJPG"
+            self.WIDTH = 1280
+            self.HEIGHT = 1024
+            self.ANGLE = 140
+            self.FPS = 30.0
+            pass
 
-    class ParamVideo():
-        class ParamVideoSettings():
-            def __init__(self):
-                self.format = ''
-                self.width = 1280
-                self.height = 1024
-                self.angle = 140
-                self.fps = 30.0
-
-        class ParamVideoArea():
-            def __init__(self):
-                self.mirror = True
-                self.start_x = 0
-                self.start_y = 0
-                self.end_x = 0
-                self.end_y = 0
-                self.center_x = 0
-                self.center_y = 0
-                self.width = 0
-                self.height = 0
-
+    class ParamNotify():
         def __init__(self):
-            self.settings = self.ParamVideoSettings()
-            self.area = self.ParamVideoArea()
+            self.mess_verbose = False
 
-    class ParamVideoSender():
+    class ParamSettings():
         def __init__(self):
+            self.mirror = False
+            self.upside_down = False
+            self.clockwise = int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK)
+            self.AREA_CENTER_X = 0
+            self.AREA_CENTER_Y = 0
+            self.AREA_WIDTH = 0
+            self.AREA_HEIGHT = 0
+            #######################
+            self.calc_start_x = 0
+            self.calc_start_y = 0
+            self.calc_end_x = 0
+            self.calc_end_y = 0
+
+    class ParamPublisher():
+        def __init__(self):
+            self.INTERVAL_FPS = 10.0
             self.width = 0
             self.height = 0
-            self.fps = 10.0
+            self.enable = True
+    # ############################################
 
-    def __init__(self):
-        self.info = self.ParamInfo()
-        self.device = self.ParamDevice()
-        self.video = self.ParamVideo()
-        self.sender = self.ParamVideoSender()
+    def print_parameter(self, node: Node):
+        node.get_logger().info('<Parameter>')
 
-    def print_parameter(self, node):
-        node.get_logger().debug('<Parameter>')
-        node.get_logger().debug(' device: ')
-        node.get_logger().debug('   type   : ' + str(self.device.type))
-        node.get_logger().debug('   id     : ' + str(self.device.id))
-        node.get_logger().debug('   by_path: ' + str(self.device.name_by_path))
-        node.get_logger().debug(' video: ')
-        node.get_logger().debug('   format : ' + str(self.video.settings.format))
-        node.get_logger().debug('   mirror : {}'.format(self.video.area.mirror))
-        node.get_logger().debug('   width  : ' + str(self.video.settings.width))
-        node.get_logger().debug('   height : ' + str(self.video.settings.height))
-        node.get_logger().debug('   angle  : ' + str(self.video.settings.angle))
-        node.get_logger().debug('   fps    : ' + str(self.video.settings.fps))
-        node.get_logger().debug(' area: ')
-        node.get_logger().debug('   start  : [{}, {}]'.format(self.video.area.start_x, self.video.area.start_y))
-        node.get_logger().debug('   end    : [{}, {}]'.format(self.video.area.end_x, self.video.area.end_y))
-        node.get_logger().debug(' publisher : ')
-        node.get_logger().debug('  width   : ' + str(self.sender.width))
-        node.get_logger().debug('  height  : ' + str(self.sender.height))
-        node.get_logger().debug('  fps     : ' + str(self.sender.fps))
-        node.get_logger().debug(' info : ')
-        node.get_logger().debug('   verbose : {}'.format(self.info.verbose))
+        node.get_logger().info(' device: ')
+        node.get_logger().info('   type    : ' + str(self.device.TYPE))
+        node.get_logger().info('   id      : ' + str(self.device.ID))
+        node.get_logger().info('   by_path : ' + str(self.device.NAME_BY_PATH))
+        node.get_logger().info('   path    : ' + str(self.device.PATH))
 
+        node.get_logger().info(' video: ')
+        node.get_logger().info('   format : ' + str(self.device.FORMAT))
+        node.get_logger().info('   width  : ' + str(self.device.WIDTH))
+        node.get_logger().info('   height : ' + str(self.device.HEIGHT))
+        node.get_logger().info('   angle  : ' + str(self.device.ANGLE))
+        node.get_logger().info('   fps    : ' + str(self.device.FPS))
 
-class VideoCaptureNode(Node):
-    ##########################################################################
-    _debug_mode = False
+        node.get_logger().info(' area: ')
+        node.get_logger().info('   mirror      : {}'.format(self.settings.mirror))
+        node.get_logger().info('   upside_down : {}'.format(self.settings.upside_down))
+        node.get_logger().info('   clockwise   : {}'.format(self.settings.clockwise))
+        node.get_logger().info('   center      : [{}, {}]'.format(self.settings.AREA_CENTER_X, self.settings.AREA_CENTER_Y))
+        node.get_logger().info('   w/h         : [{}, {}]'.format(self.settings.AREA_WIDTH, self.settings.AREA_HEIGHT))
+        node.get_logger().info('   start       : [{}, {}]'.format(self.settings.calc_start_x, self.settings.calc_start_y))
+        node.get_logger().info('   end         : [{}, {}]'.format(self.settings.calc_end_x, self.settings.calc_end_y))
 
-    ##########################################################################
-    _timer_recognition = None
-    _timer_output_information = None
-    _timer_output_information_period_fps = 0.2  # 5 seconds
+        node.get_logger().info(' publisher : ')
+        node.get_logger().info('  enable  : ' + str(self.publisher.enable))
+        node.get_logger().info('  width   : ' + str(self.publisher.width))
+        node.get_logger().info('  height  : ' + str(self.publisher.height))
+        node.get_logger().info('  fps     : ' + str(self.publisher.INTERVAL_FPS))
 
-    ##########################################################################
-    _lock = None
-    _cap = None
-    _param = None
-    _initialized = False
-    ##########################################################################
-    _fps_calc = None
-    _timer_output_information = None
-    _timer_output_information_period = 5.0  # seconds
-    _timer_output_information_size = (5 * 60)
-    _display_fps = 0
+        node.get_logger().info(' info : ')
+        node.get_logger().info('   verbose : {}'.format(self.notify.mess_verbose))
 
-    ##########################################################################
-    _topic_queue_size = 2
-    _topic_name = 'image'
-    _pub_image = None
-    _data_image = None
-    _bridge = None
-    _param = VideoCaptureNodeParam()
-
-    ##########################################################################
-    _service_name = 'video_device_info'
-    _service = None
-
-    ##########################################################################
-    # finalize
-    def closing(self):
-        if (self._cap is not None):
-            self._cap .release()
-
-    ##########################################################################
-    # initialize
-    def _develop(self):
-        self._timer_output_information_period_fps = 0.2  # seconds
-
-    def __init__(self, node_name):
-        super().__init__(node_name)
-        self._lock = threading.Lock()
-        self._init_param()
-
-    def open(self):
-        result = True
-        if (self._debug_mode is True):
-            self._develop()
-        try:
-            self._initialized = False
-            ###################################################################
-            # set instance
-            self._fps_calc = CvFpsCalc(buffer_len=self._timer_output_information_size)
-            self._bridge = CvBridge()
-
-            # set video
-            self._param.device.id, self._param.device.name_by_path, self._param.device.path = self._video_search_video(self._param.device.type, self._param.device.id, self._param.device.name_by_path)
-
-            if (-1 != self._param.device.id):
-                try:
-                    self._cap = cv.VideoCapture(self._param.device.id)
-                    if (not self._cap .isOpened()):
-                        self._param.device.id = -1
-                    else:
-                        self._video_set_cv_setting(self._param.video.settings.format,
-                                                   self._param.video.settings.width, self._param.video.settings.height,
-                                                   self._param.video.settings.fps)
-
-                        self._cap.grab()
-                        ret, image = self._cap.read()
-                        if (ret is False):
-                            self._param.device.id = -1
-                        else:
-                            self._resizing(image)
-                except Exception as exception:
-                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.id) + ' : ' + str(exception))
-                    self._param.device.id = -1
-                except:
-                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.id))
-                    self._param.device.id = -1
-
-            # check video device
-            if (0 > self._param.device.id):
-                self.get_logger().error('Not found Camera')
-                result = False
-            else:
-                self._update_device_info()
-                self.get_logger().info('Open Camera : /dev/video' + str(self._param.device.id)
-                                       + ' : ' + str(self._param.device.name_by_path))
-                # create ros
-                self._create_service()
-                self._create_publisher()
-                self._create_timer()
-
-        except Exception as exception:
-            self.get_logger().error('Exception : ' + str(exception))
-            result = False
-            traceback.print_exc()
-        finally:
-            self._initialized = result
-
-        return result
-
-    ##########################################################################
-    # image
-    def _resizing(self, image):
-        with self._lock:
-            # dst = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-            dst = image[self._param.video.area.start_y:self._param.video.area.end_y,
-                        self._param.video.area.start_x:self._param.video.area.end_x]
-            if (self._param.video.area.mirror is True):
-                dst = cv.flip(dst, 1)
-            else:
-                dst = cv.flip(dst, 0)
-            dst = self._resize(dst, self._param.sender.width, self._param.sender.height)
-        return dst
-
-    def _set_image(self, image):
-        self._data_image = self._bridge.cv2_to_imgmsg(np.array(image), "bgr8")
-
-    def _send_image(self):
-        if (self._data_image is not None):
-            self._pub_image.publish(self._data_image)
-
-    def _resize(self, image, width, height):
-        im_h, im_w = image.shape[:2]
-        if ((width == 0) or (height == 0)):
-            width = im_w
-            height = im_h
-        aspect = im_w / im_h
-        if (width / height >= aspect):
-            new_h = height
-            new_w = round(new_h * aspect)
-        else:
-            new_w = width
-            new_h = round(new_w / aspect)
-        return cv.resize(image, dsize=(new_w, new_h))
-
-    ##########################################################################
-    # ROS
-    def _create_service(self):
-        self._service = self.create_service(VideoDeviceInfo, self._service_name, self._callback_video_device_info)
-
-    def _create_publisher(self):
-        self._pub_image = self.create_publisher(Image, self._topic_name, self._topic_queue_size)
-
-    def _create_timer(self):
-        # set ros callback
-        self._timer_recognition = self.create_timer(
-            (1.0 / self._param.sender.fps), self._callback_recognition)
-        self._timer_output_information = self.create_timer(
-            (1.0 / self._timer_output_information_period_fps), self._callback_output_information)
-
-    ##########################################################################
-    # ROS callback
-    def _callback_video_device_info(self, request, response):
-        response.type = str(self._param.device.type)
-        response.id = self._param.device.id
-        response.by_path = self._param.device.name_by_path
-        response.video_info.angle = self._param.video.settings.angle
-        response.video_info.width = self._param.video.settings.width
-        response.video_info.height = self._param.video.settings.height
-        response.video_info.fps = self._param.video.settings.fps
-        response.video_info.format = self._param.video.settings.format
-        return response
-
-    def _callback_recognition(self):
-        try:
-            #####################################################
-            # Get image
-            ret, sc = self._cap.read()
-            #####################################################
-            if (ret is True):
-                image = self._resizing(sc)
-                self._set_image(image)
-                self._send_image()
-                #####################################################
-                self._display_fps = self._fps_calc.get()
-                #####################################################
-
-        except Exception as exception:
-            self.get_logger().error('Exception (_callback_recognition) : ' + str(exception))
-            traceback.print_exc()
-
-    def _callback_output_information(self):
-        if (self._param.info.verbose is True):
-            # Output information
-            self.get_logger().info('[{}/{}] FPS : {:.4g}'.format(self.get_namespace(), self.get_name(), self._display_fps))
-
-    ##########################################################################
-    # ROS Parameter
-    def _calc_area(self, width, height, area_center_x, area_center_y, area_width, area_height):
+    def _calc_area(self, width, height,
+                   area_center_x, area_center_y, area_width, area_height):
 
         area_x = int((width / 2) - (area_width / 2) + area_center_x)
         area_y = int((height / 2) - (area_height / 2) + area_center_y)
@@ -301,211 +188,426 @@ class VideoCaptureNode(Node):
             start_y = 0
             end_y = height
 
-        self._param.video.area.start_x = start_x
-        self._param.video.area.start_y = start_y
-        self._param.video.area.end_x = end_x
-        self._param.video.area.end_y = end_y
+        self.settings.calc_start_x = start_x
+        self.settings.calc_start_y = start_y
+        self.settings.calc_end_x = end_x
+        self.settings.calc_end_y = end_y
 
-    def _update_device_info(self):
-        self._param.video.settings.format = self._video_to_txt_cv_fourcc(self._cap.get(cv.CAP_PROP_FOURCC))
-        self._param.video.settings.width = int(self._cap.get(cv.CAP_PROP_FRAME_WIDTH))
-        self._param.video.settings.height = int(self._cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-        self._param.video.settings.fps = float(self._cap.get(cv.CAP_PROP_FPS))
+    def update_device_info(self, node: Node, type, by_path, id, path, fourcc_text, width, height, fps):
+        self.device.TYPE = type
+        self.device.NAME_BY_PATH = by_path
+        self.device.ID = int(id)
+        self.device.PATH = path
+        self.device.FORMAT = fourcc_text
+        self.device.WIDTH = int(width)
+        self.device.HEIGHT = int(height)
+        # self.device.ANGLE = self.device.ANGLE
+        self.device.FPS = float(fps)
 
-        param_type = Parameter('configuration/device/type', Parameter.Type.STRING, self._param.device.type)
-        param_id = Parameter('configuration/device/id', Parameter.Type.INTEGER, self._param.device.id)
-        param_name_by_path = Parameter('configuration/device/by_path', Parameter.Type.STRING, self._param.device.name_by_path)
-
-        param_format = Parameter('configuration/video/settings/format', Parameter.Type.STRING, self._param.video.settings.format)
-        param_device_width = Parameter('configuration/video/settings/width', Parameter.Type.INTEGER, self._param.video.settings.width)
-        param_device_height = Parameter('configuration/video/settings/height', Parameter.Type.INTEGER, self._param.video.settings.height)
-        param_device_fps = Parameter('configuration/video/settings/fps', Parameter.Type.DOUBLE, float(self._param.video.settings.fps))
-
-        new_parameters = [param_type, param_id, param_name_by_path,
-                          param_format, param_device_width, param_device_height, param_device_fps]
-
-        self.set_parameters(new_parameters)
+        new_parameters = [Parameter('device/TYPE', Parameter.Type.STRING, self.device.TYPE),
+                          Parameter('device/BY_PATH', Parameter.Type.STRING, self.device.NAME_BY_PATH),
+                          Parameter('device/ID', Parameter.Type.INTEGER, self.device.ID),
+                          Parameter('device/PATH', Parameter.Type.STRING, self.device.PATH),
+                          Parameter('device/settings/FORMAT', Parameter.Type.STRING, self.device.FORMAT),
+                          Parameter('device/settings/WIDTH', Parameter.Type.INTEGER, self.device.WIDTH),
+                          Parameter('device/settings/HEIGHT', Parameter.Type.INTEGER, self.device.HEIGHT),
+                          Parameter('device/settings/ANGLE', Parameter.Type.INTEGER, self.device.ANGLE),
+                          Parameter('device/settings/FPS', Parameter.Type.DOUBLE, self.device.FPS)
+                          ]
+        node.set_parameters(new_parameters)
 
     def _callback_on_params(self, parameter_list):
         result = False
-        with self._lock:
-            for parameter in parameter_list:
-                if (self._initialized is True):
-                    self.get_logger().info('[{}/{}] Got {}={}'.format(
-                        self.get_namespace(), self.get_name(), parameter.name, parameter.value))
-
-                if (parameter.name == 'preference/info/verbose'):
-                    self._param.info.verbose = parameter.value
+        buf_area_x = self.settings.AREA_CENTER_X
+        buf_area_y = self.settings.AREA_CENTER_Y
+        buf_area_width = self.settings.AREA_WIDTH
+        buf_area_height = self.settings.AREA_HEIGHT
+        for parameter in parameter_list:
+            # device
+            if (parameter.name == 'device/TYPE'):
+                if (parameter.value == self.device.TYPE):
                     result = True
-                if (parameter.name == 'preference/publisher/resize/width'):
-                    self._param.sender.width = parameter.value
+            if (parameter.name == 'device/BY_PATH'):
+                if (parameter.value == self.device.NAME_BY_PATH):
                     result = True
-                if (parameter.name == 'preference/publisher/resize/height'):
-                    self._param.sender.height = parameter.value
+            if (parameter.name == 'device/PATH'):
+                if (parameter.value == self.device.PATH):
                     result = True
-                if (parameter.name == 'preference/video/area/mirror'):
-                    self._param.video.area.mirror = parameter.value
+            if (parameter.name == 'device/ID'):
+                if (parameter.value == self.device.ID):
                     result = True
-                if (parameter.name == 'preference/video/area/center_x'):
-                    self._param.video.area.center_x = parameter.value
+            if (parameter.name == 'device/settings/FORMAT'):
+                if (parameter.value == self.device.FORMAT):
                     result = True
-                if (parameter.name == 'preference/video/area/center_y'):
-                    self._param.video.area.center_y = parameter.value
+            if (parameter.name == 'device/settings/WIDTH'):
+                if (parameter.value == self.device.WIDTH):
                     result = True
-                if (parameter.name == 'preference/video/area/width'):
-                    self._param.video.area.width = parameter.value
+            if (parameter.name == 'device/settings/HEIGHT'):
+                if (parameter.value == self.device.HEIGHT):
                     result = True
-                if (parameter.name == 'preference/video/area/height'):
-                    self._param.video.area.height = parameter.value
+            if (parameter.name == 'device/settings/ANGLE'):
+                if (parameter.value == self.device.ANGLE):
                     result = True
-                if (parameter.name == 'configuration/device/id'):
-                    if (parameter.value == self._param.device.id):
-                        result = True
-                if (parameter.name == 'configuration/device/by_path'):
-                    if (parameter.value == self._param.device.name_by_path):
-                        result = True
-                if (parameter.name == 'configuration/device/type'):
-                    if (parameter.value == self._param.device.type):
-                        result = True
-                if (parameter.name == 'configuration/video/settings/format'):
-                    if (parameter.value == self._param.video.settings.format):
-                        result = True
-                if (parameter.name == 'configuration/video/settings/width'):
-                    if (parameter.value == self._param.video.settings.width):
-                        result = True
-                if (parameter.name == 'configuration/video/settings/height'):
-                    if (parameter.value == self._param.video.settings.height):
-                        result = True
-                if (parameter.name == 'configuration/video/settings/angle'):
-                    if (parameter.value == self._param.video.settings.angle):
-                        result = True
-                if (parameter.name == 'configuration/video/settings/fps'):
-                    if (parameter.value == self._param.video.settings.fps):
-                        result = True
-            if (result is True):
-                self._calc_area(self._param.video.settings.width, self._param.video.settings.height,
-                                self._param.video.area.center_x, self._param.video.area.center_y,
-                                self._param.video.area.width, self._param.video.area.height)
-                self._param.print_parameter(self)
-                if (self._initialized is True):
-                    self.get_logger().info('<Parameter Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
-            else:
-                if (self._initialized is True):
-                    self.get_logger().warn('<Parameter NOT Update> : {}/{}'.format(self.get_namespace(), self.get_name()))
+            if (parameter.name == 'device/settings/FPS'):
+                if (parameter.value == self.device.FPS):
+                    result = True
+            # notify
+            if (parameter.name == 'notify/message/verbose'):
+                self.notify.mess_verbose = parameter.value
+                result = True
+            # settings
+            if (parameter.name == 'settings/area/mirror'):
+                self.settings.mirror = parameter.value
+                result = True
+            if (parameter.name == 'settings/area/upside_down'):
+                self.settings.upside_down = parameter.value
+                result = True
+            if (parameter.name == 'settings/area/clockwise'):
+                value = parameter.value
+                if (value is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK):
+                    self.settings.clockwise = parameter.value
+                    result = True
+                if (value is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_03_O_CLOCK):
+                    self.settings.clockwise = parameter.value
+                    result = True
+                if (value is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_06_O_CLOCK):
+                    self.settings.clockwise = parameter.value
+                    result = True
+                if (value is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_09_O_CLOCK):
+                    self.settings.clockwise = parameter.value
+                    result = True
+            if (parameter.name == 'settings/area/center_x'):
+                buf_area_x = parameter.value
+                result = True
+            if (parameter.name == 'settings/area/center_y'):
+                buf_area_y = parameter.value
+                result = True
+            if (parameter.name == 'settings/area/width'):
+                buf_area_width = parameter.value
+                result = True
+            if (parameter.name == 'settings/area/height'):
+                buf_area_height = parameter.value
+                result = True
+            # publisher
+            if (parameter.name == 'publisher/INTERVAL_FPS'):
+                if (parameter.value == self.publisher.INTERVAL_FPS):
+                    result = True
+            if (parameter.name == 'publisher/resize/width'):
+                self.publisher.width = parameter.value
+                result = True
+            if (parameter.name == 'publisher/resize/height'):
+                self.publisher.height = parameter.value
+                result = True
+            if (parameter.name == 'publisher/enable'):
+                self.publisher.enable = parameter.value
+                result = True
+        if (result is True):
+            self.settings.AREA_CENTER_X = buf_area_x
+            self.settings.AREA_CENTER_Y = buf_area_y
+            self.settings.AREA_WIDTH = buf_area_width
+            self.settings.AREA_HEIGHT = buf_area_height
+            self._calc_area(self.device.WIDTH, self.device.HEIGHT,
+                            self.settings.AREA_CENTER_X, self.settings.AREA_CENTER_Y,
+                            self.settings.AREA_WIDTH, self.settings.AREA_HEIGHT)
         return SetParametersResult(successful=result)
 
-    def _get_parameter(self):
-        with self._lock:
-            self._param.info.verbose = self.get_parameter('preference/info/verbose').get_parameter_value().bool_value
-            self._param.sender.width = self.get_parameter('preference/publisher/resize/width').get_parameter_value().integer_value
-            self._param.sender.height = self.get_parameter('preference/publisher/resize/height').get_parameter_value().integer_value
-            self._param.sender.fps = self.get_parameter('configuration/publisher/interval_fps').get_parameter_value().double_value
-            self._param.video.settings.format = self.get_parameter('configuration/video/settings/format').get_parameter_value().string_value
-            self._param.video.settings.width = self.get_parameter('configuration/video/settings/width').get_parameter_value().integer_value
-            self._param.video.settings.height = self.get_parameter('configuration/video/settings/height').get_parameter_value().integer_value
-            self._param.video.settings.angle = self.get_parameter('configuration/video/settings/angle').get_parameter_value().integer_value
-            self._param.video.settings.fps = self.get_parameter('configuration/video/settings/fps').get_parameter_value().double_value
-            self._param.video.area.mirror = self.get_parameter('preference/video/area/mirror').get_parameter_value().bool_value
-            self._param.video.area.center_x = self.get_parameter('preference/video/area/center_x').get_parameter_value().integer_value
-            self._param.video.area.center_y = self.get_parameter('preference/video/area/center_y').get_parameter_value().integer_value
-            self._param.video.area.width = self.get_parameter('preference/video/area/width').get_parameter_value().integer_value
-            self._param.video.area.height = self.get_parameter('preference/video/area/height').get_parameter_value().integer_value
-            self._calc_area(self._param.video.settings.width, self._param.video.settings.height,
-                            self._param.video.area.center_x, self._param.video.area.center_y,
-                            self._param.video.area.width, self._param.video.area.height)
-        self._param.print_parameter(self)
-
-    def _init_param(self):
-        # info
-        self.declare_parameter('preference/info/verbose', self._param.info.verbose)
+    def _init_param(self, node: Node):
         # device
-        self.declare_parameter('configuration/device/type', self._param.device.type)
-        self.declare_parameter('configuration/device/id', self._param.device.id)
-        self.declare_parameter('configuration/device/by_path', self._param.device.name_by_path)
+        node.declare_parameter('device/TYPE', self.device.TYPE)
+        node.declare_parameter('device/BY_PATH', self.device.NAME_BY_PATH)
+        node.declare_parameter('device/PATH', self.device.PATH)
+        node.declare_parameter('device/ID', self.device.ID)
+        node.declare_parameter('device/settings/FORMAT', self.device.FORMAT)
+        node.declare_parameter('device/settings/WIDTH', self.device.WIDTH)
+        node.declare_parameter('device/settings/HEIGHT', self.device.HEIGHT)
+        node.declare_parameter('device/settings/ANGLE', self.device.ANGLE)
+        node.declare_parameter('device/settings/FPS', self.device.FPS)
+        # notify
+        node.declare_parameter('notify/message/verbose', self.notify.mess_verbose)
+        # settings
+        node.declare_parameter('settings/area/mirror', self.settings.mirror)
+        node.declare_parameter('settings/area/upside_down', self.settings.upside_down)
+        node.declare_parameter('settings/area/clockwise', self.settings.clockwise)
+        node.declare_parameter('settings/area/center_x', self.settings.AREA_CENTER_X)
+        node.declare_parameter('settings/area/center_y', self.settings.AREA_CENTER_Y)
+        node.declare_parameter('settings/area/width', self.settings.AREA_WIDTH)
+        node.declare_parameter('settings/area/height', self.settings.AREA_HEIGHT)
         # publisher
-        self.declare_parameter('preference/publisher/resize/width', self._param.sender.width)
-        self.declare_parameter('preference/publisher/resize/height', self._param.sender.height)
-        self.declare_parameter('configuration/publisher/interval_fps', self._param.sender.fps)
-        # video
-        self.declare_parameter('configuration/video/settings/format', self._param.video.settings.format)
-        self.declare_parameter('configuration/video/settings/width', self._param.video.settings.width)
-        self.declare_parameter('configuration/video/settings/height', self._param.video.settings.height)
-        self.declare_parameter('configuration/video/settings/angle', self._param.video.settings.angle)
-        self.declare_parameter('configuration/video/settings/fps', self._param.video.settings.fps)
-
-        width = (self._param.video.area.end_x - self._param.video.area.start_x)
-        height = (self._param.video.area.end_y - self._param.video.area.end_x)
-        center_x = self._param.video.area.start_x - ((self._param.video.settings.width / 2) - (width / 2))
-        center_y = self._param.video.area.start_y - ((self._param.video.settings.height / 2) - (height / 2))
-        self.declare_parameter('preference/video/area/center_x', int(center_x))
-        self.declare_parameter('preference/video/area/center_y', int(center_y))
-        self.declare_parameter('preference/video/area/width', int(width))
-        self.declare_parameter('preference/video/area/height', int(height))
-        self.declare_parameter('preference/video/area/mirror', self._param.video.area.mirror)
-        # init parameter
-        self._param.device.type = self.get_parameter('configuration/device/type').get_parameter_value().string_value
-        self._param.device.name_by_path = self.get_parameter('configuration/device/by_path').get_parameter_value().string_value
-        self._param.device.id = self.get_parameter('configuration/device/id').get_parameter_value().integer_value
+        node.declare_parameter('publisher/INTERVAL_FPS', self.publisher.INTERVAL_FPS)
+        node.declare_parameter('publisher/resize/width', self.publisher.width)
+        node.declare_parameter('publisher/resize/height', self.publisher.height)
+        node.declare_parameter('publisher/enable', self.publisher.enable)
+        ####################
+        # get parameter
+        self.get_parameter(node)
         # set callback
-        self._get_parameter()
-        self.add_on_set_parameters_callback(self._callback_on_params)
+        node.add_on_set_parameters_callback(self._callback_on_params)
+
+    def get_parameter(self, node: Node):
+        # device
+        self.device.TYPE = node.get_parameter('device/TYPE').get_parameter_value().string_value
+        self.device.NAME_BY_PATH = node.get_parameter('device/BY_PATH').get_parameter_value().string_value
+        self.device.ID = node.get_parameter('device/ID').get_parameter_value().integer_value
+        self.device.FORMAT = node.get_parameter('device/settings/FORMAT').get_parameter_value().string_value
+        self.device.WIDTH = node.get_parameter('device/settings/WIDTH').get_parameter_value().integer_value
+        self.device.HEIGHT = node.get_parameter('device/settings/HEIGHT').get_parameter_value().integer_value
+        self.device.ANGLE = node.get_parameter('device/settings/ANGLE').get_parameter_value().integer_value
+        self.device.FPS = node.get_parameter('device/settings/FPS').get_parameter_value().double_value
+        # notify
+        self.notify.mess_verbose = node.get_parameter('notify/message/verbose').get_parameter_value().bool_value
+        # settings
+        self.settings.mirror = node.get_parameter('settings/area/mirror').get_parameter_value().bool_value
+        self.settings.upside_down = node.get_parameter('settings/area/upside_down').get_parameter_value().bool_value
+        self.settings.clockwise = node.get_parameter('settings/area/clockwise').get_parameter_value().integer_value
+        self.settings.AREA_CENTER_X = node.get_parameter('settings/area/center_x').get_parameter_value().integer_value
+        self.settings.AREA_CENTER_Y = node.get_parameter('settings/area/center_y').get_parameter_value().integer_value
+        self.settings.AREA_WIDTH = node.get_parameter('settings/area/width').get_parameter_value().integer_value
+        self.settings.AREA_HEIGHT = node.get_parameter('settings/area/height').get_parameter_value().integer_value
+        # publisher
+        self.publisher.INTERVAL_FPS = node.get_parameter('publisher/INTERVAL_FPS').get_parameter_value().double_value
+        self.publisher.width = node.get_parameter('publisher/resize/width').get_parameter_value().integer_value
+        self.publisher.height = node.get_parameter('publisher/resize/height').get_parameter_value().integer_value
+        self.publisher.enable = node.get_parameter('publisher/enable').get_parameter_value().bool_value
+        self._calc_area(self.device.WIDTH, self.device.HEIGHT,
+                        self.settings.AREA_CENTER_X, self.settings.AREA_CENTER_Y,
+                        self.settings.AREA_WIDTH, self.settings.AREA_HEIGHT)
+
+    def init(self, node: Node):
+        self.device = self.ParamDevice()
+        self.notify = self.ParamNotify()
+        self.settings = self.ParamSettings()
+        self.publisher = self.ParamPublisher()
+        self._init_param(node)
+
+    def __init__(self):
+        pass
+
+
+class VideoCaptureNode(Node):
+    _service_name_info = 'get/info'
+    _service_name_capture = 'get/image'
+    _topic_name = 'image'
+    ##########################################################################
+    _debug = False
+    ##########################################################################
+    _param = None
+    _video = None
+    ##########################################################################
+    _fps_calc = None
+    _bridge = None
+    _display_fps = 0
 
     ##########################################################################
-    # Video
-    def _video_set_cv_setting(self, format, width, height, fps=30):
-        if (format == 'MJPG'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))  # .avi
-        if (format == 'H264'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
-        if (format == 'YUYV'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
-        if (format == 'BGR3'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('B', 'G', 'R', '3'))
-        if (format == 'MP4V'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'V'))  # .mp4
-        if (format == 'MP4S'):
-            self._cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'S'))  # .mp4
+    _topic_queue_size = 2
+    _timer_output_information_period_fps = 0.2  # 5 seconds
+    _timer_output_information_size = (5 * 60)
+    ##########################################################################
 
-        self._cap.set(cv.CAP_PROP_FRAME_WIDTH, width)
-        self._cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
-        self._cap.set(cv.CAP_PROP_FPS, fps)
-        self._video_output_video_information()
+    def __init__(self, node_name):
+        super().__init__(node_name)
+        self._lock = threading.Lock()
+        self._param = VideoCaptureNodeParam()
+        self._video = VideoDeviceManager()
 
-    def _video_output_video_information(self):
-        if (self._cap is not None):
-            fourcc = self._video_to_txt_cv_fourcc(self._cap.get(cv.CAP_PROP_FOURCC))
-            width = self._cap.get(cv.CAP_PROP_FRAME_WIDTH)
-            height = self._cap.get(cv.CAP_PROP_FRAME_HEIGHT)
-            fps = self._cap.get(cv.CAP_PROP_FPS)
-            mode = self._video_to_txt_cv_mode(self._cap.get(cv.CAP_PROP_MODE))
-            format = self._cap.get(cv.CAP_PROP_FORMAT)
+    def closing(self):
+        if (self._video is not None):
+            self._video.closing()
 
-            self.get_logger().info("fourcc:{}, fps:{} [{:.4g} ms], width:{}, height:{}, mode:{}, format:{}".format(
-                fourcc, fps, (1 / float(fps)), width, height, mode, format))
+    def open(self):
+        result = False
+        try:
+            self._param.init(self)
+            ###################################################################
+            # set instance
+            self._fps_calc = CvFpsCalc(buffer_len=self._timer_output_information_size)
+            self._bridge = CvBridge()
 
-    def _video_search_video(self, type, id, path):
-        result = -1
-        usbVideoDevice = UsbVideoDevice(type)
-        result = usbVideoDevice.get_id_by_path(path)
-        if (-1 == result):
-            result = usbVideoDevice.get_id_from_id(id)
-        return usbVideoDevice.get_info(result)
+            # set video
+            self._param.device.ID, self._param.device.NAME_BY_PATH, self._param.device.PATH = self._video.search_video(self._param.device.TYPE, self._param.device.ID, self._param.device.NAME_BY_PATH)
+            if (-1 != self._param.device.ID):
+                try:
+                    self._video.open(self._param.device.ID)
+                    if (not self._video.isOpened()):
+                        self._param.device.ID = -1
+                    else:
+                        self._video.set_video_setting(self._param.device.FORMAT,
+                                                      self._param.device.WIDTH,
+                                                      self._param.device.HEIGHT,
+                                                      self._param.device.FPS)
+                        self._video.cap.grab()
+                        ret = self._callback_video_capture()
+                        if (ret is False):
+                            self._param.device.ID = -1
 
-    def _video_to_txt_cv_fourcc(self, v):
-        v = int(v)
-        return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
+                        # check video device
+                        if (0 > self._param.device.ID):
+                            self.get_logger().error('Not found Camera')
+                        else:
+                            self._param.update_device_info(self,
+                                                           self._param.device.TYPE,
+                                                           self._param.device.NAME_BY_PATH,
+                                                           self._param.device.ID,
+                                                           self._param.device.PATH,
+                                                           self._video.txt_cv_fourcc(),
+                                                           self._video.cap.get(cv.CAP_PROP_FRAME_WIDTH),
+                                                           self._video.cap.get(cv.CAP_PROP_FRAME_HEIGHT),
+                                                           self._video.cap.get(cv.CAP_PROP_FPS))
+                            if (self._debug is True):
+                                self._param.print_parameter(self)
+                            self.get_logger().info('Open Camera : {}({})'.format(self._param.device.PATH, self._param.device.NAME_BY_PATH))
+                            ret, text = self._video.video_output_video_information()
+                            if (ret is True):
+                                self.get_logger().info('  {}'.format(text))
+                            # create ros
+                            self._create_service()
+                            self._create_publisher()
+                            self._create_timer()
+                            result = True
+                except Exception as exception:
+                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.ID) + ' : ' + str(exception))
+                    self._param.device.ID = -1
+                except:
+                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.ID))
+                    self._param.device.ID = -1
 
-    def _video_to_txt_cv_mode(self, mode):
-        if (0 == mode):
-            return "BGR"
-        elif (1 == mode):
-            return "RGB"
-        elif (2 == mode):
-            return "GRAY"
-        elif (3 == mode):
-            return "YUYV"
+        except Exception as exception:
+            self.get_logger().error('Exception : ' + str(exception))
+            result = False
+            traceback.print_exc()
+
+        return result
+
+    ##########################################################################
+    # Image
+    def _repack(self, image, start_x, start_y, end_x, end_y, mirror, upside_down, clockwise):
+        dst = image[start_y:end_y, start_x:end_x]
+        if ((upside_down is True) or (self._param.settings.mirror is True)):
+            if (upside_down is False):
+                # mirror
+                op_flip = 1
+            elif ((mirror is False)):
+                # upside_down
+                op_flip = 0
+            else:
+                # upside_down and mirror
+                op_flip = -1
+            dst = cv.flip(dst, op_flip)
+        if (clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK):
+            pass
+        if (clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_03_O_CLOCK):
+            dst = cv.rotate(dst, cv.ROTATE_90_CLOCKWISE)
+        if (clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_06_O_CLOCK):
+            dst = cv.rotate(dst, cv.ROTATE_180)
+        if (clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_09_O_CLOCK):
+            dst = cv.rotate(dst, cv.ROTATE_90_COUNTERCLOCKWISE)
+        return dst
+
+    def _set_image(self, image):
+        return self._bridge.cv2_to_imgmsg(np.array(image), "bgr8")
+
+    def _resize(self, image, width, height):
+        im_h, im_w = image.shape[:2]
+        if ((im_w != 0) and (im_h != 0)):
+            if ((width == 0) or (height == 0)):
+                width = im_w
+                height = im_h
+            aspect = im_w / im_h
+            if (width / height >= aspect):
+                new_h = height
+                new_w = round(new_h * aspect)
+            else:
+                new_w = width
+                new_h = round(new_w / aspect)
+            return cv.resize(image, dsize=(new_w, new_h))
         else:
-            return "Unknown" + str(mode)
+            return image
+
+    ##########################################################################
+    # ROS
+    def _create_service(self):
+        self._service_info = self.create_service(MrsSrv.VideoDeviceInfo, self._service_name_info, self._callback_srv_video_device_info)
+        self._service_capture = self.create_service(MrsSrv.VideoCapture, self._service_name_capture, self._callback_srv_video_capture)
+
+    def _create_publisher(self):
+        self._pub_image = self.create_publisher(Image, self._topic_name, self._topic_queue_size)
+
+    def _create_timer(self):
+        self._timer_capture = self.create_timer((1.0 / self._param.device.FPS), self._callback_video_capture)
+        self._timer_send = self.create_timer((1.0 / self._param.publisher.INTERVAL_FPS), self._callback_send)
+        self._timer_output_information = self.create_timer((1.0 / self._timer_output_information_period_fps), self._callback_output_information)
+
+    ##########################################################################
+    # ## ROS callback
+    def _callback_srv_video_device_info(self,
+                                        request: MrsSrv.VideoDeviceInfo.Request,
+                                        response: MrsSrv.VideoDeviceInfo.Response):
+        response.id = self._param.device.ID
+        response.type = str(self._param.device.TYPE)
+        response.by_path_name = str(self._param.device.NAME_BY_PATH)
+        response.path = str(self._param.device.PATH)
+        response.video_info.angle = self._param.device.ANGLE
+        response.video_info.width = self._param.device.WIDTH
+        response.video_info.height = self._param.device.HEIGHT
+        response.video_info.fps = self._param.device.FPS
+        response.video_info.format = str(self._param.device.FORMAT)
+        return response
+
+    # ## video capture
+    def _callback_srv_video_capture(self,
+                                    request: MrsSrv.VideoCapture.Request,
+                                    response: MrsSrv.VideoCapture.Response):
+        with self._lock:
+            image = copy.deepcopy(self._image)
+        if (image is not None):
+            response.image = self._resize(image, request.resize_width, request.resize_height)
+
+        return response
+
+    # ## video capture
+    def _callback_video_capture(self):
+        result = False
+        try:
+            result, sc = self._video.cap.read()
+            #####################################################
+            if (result is True):
+                with self._lock:
+                    self._image = self._repack(sc,
+                                               self._param.settings.calc_start_x,
+                                               self._param.settings.calc_start_y,
+                                               self._param.settings.calc_end_x,
+                                               self._param.settings.calc_end_y,
+                                               self._param.settings.mirror,
+                                               self._param.settings.upside_down,
+                                               self._param.settings.clockwise)
+                #####################################################
+                self._display_fps = self._fps_calc.get()
+                #####################################################
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_video_capture) : ' + str(exception))
+            traceback.print_exc()
+        return result
+
+    # ##
+    def _callback_send(self):
+        try:
+            if (self._param.publisher.enable is True):
+                with self._lock:
+                    image = copy.deepcopy(self._image)
+                if (image is not None):
+                    image = self._resize(image, self._param.publisher.width, self._param.publisher.height)
+                    self._send_data = self._set_image(image)
+                    if (self._send_data is not None):
+                        self._pub_image.publish(self._send_data)
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_send) : ' + str(exception))
+            traceback.print_exc()
+            pass
+
+    # ## Output message
+    def _callback_output_information(self):
+        if (self._param.notify.mess_verbose is True):
+            # Output information
+            self.get_logger().info('[{}/{}] FPS : {:.4g}'.format(self.get_namespace(), self.get_name(), self._display_fps))
 
 
 def main(args=None):
