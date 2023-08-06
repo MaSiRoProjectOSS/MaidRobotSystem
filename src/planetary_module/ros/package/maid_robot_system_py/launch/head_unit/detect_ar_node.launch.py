@@ -16,13 +16,17 @@ def generate_launch_description():
         name='left_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in', _ros_namespace + '/image/raw/left'),
+            ('in_srv', _ros_namespace + '/video/image/left'),
             ('out', _ros_namespace + '/data/ar/left')
         ],
         parameters=[{
-            "confidence/fps": 0.5,
-            "preference/video/mirror": False,
-            "preference/info/verbose": False
+            "INTERVAL_MS": 500,
+            "timeout_ms": 5000,
+            "mirror": False,
+            "upside_down": False,
+            "width": 320,
+            "height": 256,
+            "notify/message/verbose": False
         }],
         respawn=False,
         respawn_delay=2.0
@@ -35,15 +39,19 @@ def generate_launch_description():
         name='right_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in', _ros_namespace + '/image/raw/right'),
+            ('in_srv', _ros_namespace + '/video/image/right'),
             ('out', _ros_namespace + '/data/ar/right')
         ],
         parameters=[{
-            "confidence/fps": 0.5,
-            "preference/video/mirror": False,
-            "preference/info/verbose": False
+            "INTERVAL_MS": 500,
+            "timeout_ms": 5000,
+            "mirror": False,
+            "upside_down": False,
+            "width": 320,
+            "height": 256,
+            "notify/message/verbose": False
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
 

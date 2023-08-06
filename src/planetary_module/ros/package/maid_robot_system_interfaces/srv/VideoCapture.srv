@@ -3,13 +3,13 @@ int32 ROTATE_CLOCKWISE_03_O_CLOCK = 1
 int32 ROTATE_CLOCKWISE_06_O_CLOCK = 2
 int32 ROTATE_CLOCKWISE_09_O_CLOCK = 3
 
-bool    mirror
-bool    upside_down
-int32   clockwise
-int32   area_offset_x
-int32   area_offset_y
-int32   area_width
-int32   area_height
+#bool    mirror
+#bool    upside_down
+#int32   clockwise
+#int32   area_offset_x
+#int32   area_offset_y
+#int32   area_width
+#int32   area_height
 int32   resize_width
 int32   resize_height
 ---

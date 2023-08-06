@@ -35,7 +35,8 @@ class VideoDeviceManager():
         self.cap = cv.VideoCapture(device_id)
 
     def closing(self):
-        self.cap.release()
+        if (self.cap is not None):
+            self.cap.release()
 
     def isOpened(self):
         if (self.cap is not None):
@@ -384,9 +385,9 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'get/info'
-    _service_name_capture = 'get/image'
-    _topic_name = 'image'
+    _service_name_info = 'info'
+    _service_name_capture = 'out_srv'
+    _topic_name = 'out_topic'
     ##########################################################################
     _debug = False
     ##########################################################################
@@ -481,7 +482,7 @@ class VideoCaptureNode(Node):
     # Image
     def _repack(self, image, start_x, start_y, end_x, end_y, mirror, upside_down, clockwise):
         dst = image[start_y:end_y, start_x:end_x]
-        if ((upside_down is True) or (self._param.settings.mirror is True)):
+        if ((upside_down is True) or (mirror is True)):
             if (upside_down is False):
                 # mirror
                 op_flip = 1
@@ -559,8 +560,8 @@ class VideoCaptureNode(Node):
         with self._lock:
             image = copy.deepcopy(self._image)
         if (image is not None):
-            response.image = self._resize(image, request.resize_width, request.resize_height)
-
+            image = self._resize(image, request.resize_width, request.resize_height)
+        response.image = self._set_image(image)
         return response
 
     # ## video capture

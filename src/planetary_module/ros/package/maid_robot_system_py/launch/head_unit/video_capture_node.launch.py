@@ -20,9 +20,9 @@ def generate_launch_description():
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
-            ('get/info', _ros_namespace + '/video/info/left'),
-            ('get/image', _ros_namespace + '/video/image/left'),
-            ('image', _ros_namespace + '/image/raw/left')
+            ('info', _ros_namespace + '/video/info/left'),
+            ('out_srv', _ros_namespace + '/video/image/left'),
+            ('out_topic', _ros_namespace + '/image/raw/left')
         ],
         parameters=[{
             "device/TYPE": "v4l",
@@ -44,7 +44,7 @@ def generate_launch_description():
             "publisher/INTERVAL_FPS": 10.0,
             "publisher/resize/width": 640,
             "publisher/resize/height": 512,
-            "publisher/enable": True
+            "publisher/enable": False
         }],
         respawn=True,
         respawn_delay=2.0
@@ -57,9 +57,9 @@ def generate_launch_description():
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
-            ('get/info', _ros_namespace + '/video/info/right'),
-            ('get/image', _ros_namespace + '/video/image/right'),
-            ('image', _ros_namespace + '/image/raw/right')
+            ('info', _ros_namespace + '/video/info/right'),
+            ('out_srv', _ros_namespace + '/video/image/right'),
+            ('out_topic', _ros_namespace + '/image/raw/right')
         ],
         parameters=[{
             "device/TYPE": "v4l",
@@ -81,7 +81,7 @@ def generate_launch_description():
             "publisher/INTERVAL_FPS": 10.0,
             "publisher/resize/width": 640,
             "publisher/resize/height": 512,
-            "publisher/enable": True
+            "publisher/enable": False
         }],
         respawn=True,
         respawn_delay=2.0

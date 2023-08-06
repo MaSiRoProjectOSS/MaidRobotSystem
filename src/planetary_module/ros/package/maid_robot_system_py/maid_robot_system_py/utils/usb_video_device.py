@@ -45,10 +45,12 @@ class UsbVideoDevice():
 
             for line in by_path.split('\n'):
                 if ('usb' in line):
-                    tmp = self._split(line, ' ')
-                    name = tmp[8]
-                    tmp2 = self._split(tmp[10], '../../video')
-                    deviceId = int(tmp2[0])
+                    tmp = self._split(line, ' -> ')
+                    tmp1 = self._split(tmp[0], ' ')
+                    pos = len(tmp1) - 1
+                    name = tmp1[pos]
+                    tmp2 = self._split(line, '../../video')
+                    deviceId = int(tmp2[1])
                     self._deviceList.append(
                         (deviceId, name, '/dev/video' + str(deviceId)))
         except:
