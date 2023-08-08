@@ -62,21 +62,18 @@ set(MSG_EULER_FILE
 set(MSG_CLASSES_FILE
   msg/classes/Vector3.msg
   msg/classes/Quaternion.msg
-  msg/classes/Landmark.msg
 )
 #   MSG_POSE_FILE
 set(MSG_POSE_FILE
-  msg/pose/PoseLandmarkModel.msg
+  msg/pose/PoseDetection.msg
+  msg/pose/Landmark.msg
   msg/pose/BodySide.msg
+  msg/pose/PoseLandmarkModel.msg
 )
 #   MSG_DRAWING_FILE
 set(MSG_DRAWING_FILE
   msg/drawing/Rect.msg
   msg/drawing/RectFloat.msg
-)
-#   MSG_DETECTION_FILE
-set(MSG_DETECTION_FILE
-  msg/detection/PoseDetection.msg
 )
 #   MSG_FORMAT_FILE
 set(MSG_FORMAT_FILE
@@ -90,6 +87,7 @@ set(MSG_ARUCO_FILE
 set(SRV_FILES
   srv/VideoCapture.srv
   srv/VideoDeviceInfo.srv
+  srv/MediaPipePoseLandmarkDetection.srv
 )
 ###############################################
 
@@ -100,7 +98,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_POSE_FILE}
   ${MSG_DRAWING_FILE}
   ${MSG_FORMAT_FILE}
-  ${MSG_DETECTION_FILE}
   ${MSG_ARUCO_FILE}
   ${SRV_FILES}
   DEPENDENCIES std_msgs geometry_msgs sensor_msgs

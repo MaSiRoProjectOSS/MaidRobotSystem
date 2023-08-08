@@ -5,13 +5,14 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import TextSubstitution
 import maid_robot_system_interfaces.srv as MrsSrv
 
+
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
     _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
-    _mrs_v4l_left_id = int(os.environ.get('MRS_V4L_LEFT_ID'))
+    _mrs_v4l_left_id = int("{}".format(os.environ.get('MRS_V4L_LEFT_ID')))
     _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
-    _mrs_v4l_right_id = int(os.environ.get('MRS_V4L_RIGHT_ID'))
+    _mrs_v4l_right_id = int("{}".format(os.environ.get('MRS_V4L_RIGHT_ID')))
 
     left_video_capture_node = Node(
         namespace=_ros_namespace,

@@ -7,11 +7,11 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
     _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
-    _mrs_v4l_left_id = int(os.environ.get('MRS_V4L_LEFT_ID'))
+    _mrs_v4l_left_id = int("{}".format(os.environ.get('MRS_V4L_LEFT_ID')))
     _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
-    _mrs_v4l_right_id = int(os.environ.get('MRS_V4L_RIGHT_ID'))
+    _mrs_v4l_right_id = int("{}".format(os.environ.get('MRS_V4L_RIGHT_ID')))
 
     left_recognition_in_node = Node(
         namespace=_ros_namespace,
@@ -42,7 +42,7 @@ def generate_launch_description():
             "features/detect_markers": True,
             "update": True,
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
 
@@ -75,10 +75,10 @@ def generate_launch_description():
             "features/detect_markers": True,
             "update": True
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
     return LaunchDescription([
-        # left_recognition_in_node,
+        left_recognition_in_node,
         right_recognition_in_node
     ])

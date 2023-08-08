@@ -7,7 +7,7 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
 
     left_detect_ar_node = Node(
         namespace=_ros_namespace,
@@ -28,7 +28,7 @@ def generate_launch_description():
             "height": 256,
             "notify/message/verbose": False
         }],
-        respawn=False,
+        respawn=True,
         respawn_delay=2.0
     )
 

@@ -7,7 +7,7 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE') + '/head_unit'
+    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
 
     right_mediapipe_ext_node = Node(
         namespace=_ros_namespace,
@@ -16,16 +16,15 @@ def generate_launch_description():
         name='right_mediapipe_ext_node',
         output=_output_type,
         remappings=[
-            ('in/image', _ros_namespace + '/image/raw/right'),
-            ('in/pose_data', _ros_namespace + '/data/pose/right'),
-            ('out/image', _ros_namespace + '/image/pose/right'),
+            ('in_srv', _ros_namespace + '/image/add_pose/right'),
+            ('out', _ros_namespace + '/image/pose/right')
         ],
         parameters=[{
-            "configuration/publisher/interval_fps": 4.0,
-            "preference/info/verbose": True,
-            "preference/image/drawing_box": True,
-            "preference/image/width": 320,
-            "preference/image/height": 256
+            "INTERVAL_MS": 500,
+            "timeout_ms": 5000,
+            "drawing_box": True,
+            "publisher/resize/width": 640,
+            "publisher/resize/height": 512
         }],
         respawn=False,
         respawn_delay=2.0

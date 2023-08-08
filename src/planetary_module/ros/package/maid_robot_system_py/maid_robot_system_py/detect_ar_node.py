@@ -2,7 +2,6 @@
 
 import rclpy
 import traceback
-import queue
 import cv2 as cv
 import numpy as np
 import cv2.aruco as aruco
@@ -11,7 +10,6 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from rcl_interfaces.msg import SetParametersResult
 from maid_robot_system_interfaces.msg._ar_markers import ArMarkers
-import maid_robot_system_interfaces.srv as MrsSrv
 from maid_robot_system_interfaces.srv._video_capture import VideoCapture
 from utils.cv_fps_calc import CvFpsCalc
 
@@ -81,7 +79,7 @@ class DetectARNode(Node):
     _timer_output_info_time_ms = 5000
     _display_fps = 0
     _detector = None
-    _request = None
+    _request = VideoCapture.Request()
     _fps_calc = None
     _timer_output_information_size = (5 * 60)
     #################################
@@ -124,7 +122,7 @@ class DetectARNode(Node):
         while not self._client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
         self._request = VideoCapture.Request()
-        self._request_image()
+        self._request_image(self.get_clock().now().nanoseconds)
 
     def _create_publisher(self):
         self._pub = self.create_publisher(ArMarkers, self._out_data_name, self._out_data_queue_size)
@@ -142,53 +140,55 @@ class DetectARNode(Node):
         return corners, ids
 
     ##################################################################################
-    def _request_image(self):
+    def _request_image(self, current_ns):
         self._request.resize_width = self._param.width
         self._request.resize_height = self._param.height
         self._response = self._client.call_async(self._request)
-        self._next_time = (self._param.timeout_ms * 1000) + cv.getTickFrequency()
+        self._next_time = (self._param.timeout_ms * 1000 * 1000) + current_ns
 
     def _callback_timer_detect(self):
         try:
-            if (self._response.done() is True):
-                msg = self._response.result()
-                cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
-                gray = cv.cvtColor(cv_image, cv.COLOR_RGB2GRAY)
-                if ((self._param.upside_down is True) or (self._param.mirror is True)):
-                    if (self._param.upside_down is False):
-                        # mirror
-                        op_flip = 1
-                    elif ((self._param.mirror is False)):
-                        # upside_down
-                        op_flip = 0
-                    else:
-                        # upside_down and mirror
-                        op_flip = -1
-                    gray = cv.flip(gray, op_flip)
-                if (self._debug_mode is True):
-                    if (self._pub_image is not None):
-                        debug_image = cv.cvtColor(gray, cv.COLOR_GRAY2RGB)
-                        debug_send_data = self._bridge.cv2_to_imgmsg(np.array(debug_image), "bgr8")
-                        self._pub_image.publish(debug_send_data)
-                corners, ids = self.detect_ar(gray)
-                if (ids is not None):
-                    if (self._param.info_verbose is True):
-                        self.get_logger().info('[{}/{}] size:{}, id:{}'.format(self.get_namespace(), self.get_name(), ids.size, str(ids)))
-                    data = []
-                    for num in range(ids.size):
-                        if (ids[num] is not None):
-                            data.append(int(ids[num]))
-                        if (corners[num] is not None):
-                            pass
-                    self._send_msg.ids = (data)
-                    self._pub.publish(self._send_msg)
-                #####################################################
-                self._request_image()
-                self._display_fps = self._fps_calc.get()
-                #####################################################
+            current_ns = self.get_clock().now().nanoseconds
+            if (self._response is not None):
+                if (self._response.done() is True):
+                    msg = self._response.result()
+                    cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
+                    gray = cv.cvtColor(cv_image, cv.COLOR_RGB2GRAY)
+                    if ((self._param.upside_down is True) or (self._param.mirror is True)):
+                        if (self._param.upside_down is False):
+                            # mirror
+                            op_flip = 1
+                        elif ((self._param.mirror is False)):
+                            # upside_down
+                            op_flip = 0
+                        else:
+                            # upside_down and mirror
+                            op_flip = -1
+                        gray = cv.flip(gray, op_flip)
+                    if (self._debug_mode is True):
+                        if (self._pub_image is not None):
+                            debug_image = cv.cvtColor(gray, cv.COLOR_GRAY2RGB)
+                            debug_send_data = self._bridge.cv2_to_imgmsg(np.array(debug_image), "bgr8")
+                            self._pub_image.publish(debug_send_data)
+                    corners, ids = self.detect_ar(gray)
+                    if (ids is not None):
+                        if (self._param.info_verbose is True):
+                            self.get_logger().info('[{}/{}] size:{}, id:{}'.format(self.get_namespace(), self.get_name(), ids.size, str(ids)))
+                        data = []
+                        for num in range(ids.size):
+                            if (ids[num] is not None):
+                                data.append(int(ids[num]))
+                            if (corners[num] is not None):
+                                pass
+                        self._send_msg.ids = (data)
+                        self._pub.publish(self._send_msg)
+                    #####################################################
+                    self._request_image(current_ns)
+                    self._display_fps = self._fps_calc.get()
+                    #####################################################
 
-            if (self._next_time <= cv.getTickFrequency()):
-                self._request_image()
+            if (self._next_time <= current_ns):
+                self._request_image(current_ns)
                 self.get_logger().warning('Timeout')
         except Exception as exception:
             self.get_logger().error('Exception (_callback_recognition) : ' + str(exception))

@@ -44,7 +44,7 @@ class VideoDeviceManager():
         else:
             return False
 
-    def set_video_setting(self, format, width, height, fps=30):
+    def set_video_setting(self, format, width, height, fps=30.0):
         if (self.cap is not None):
             if (format == 'MJPG'):
                 self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))  # .avi
@@ -340,12 +340,6 @@ class VideoCaptureNodeParam():
         node.declare_parameter('publisher/enable', self.publisher.enable)
         ####################
         # get parameter
-        self.get_parameter(node)
-        # set callback
-        node.add_on_set_parameters_callback(self._callback_on_params)
-
-    def get_parameter(self, node: Node):
-        # device
         self.device.TYPE = node.get_parameter('device/TYPE').get_parameter_value().string_value
         self.device.NAME_BY_PATH = node.get_parameter('device/BY_PATH').get_parameter_value().string_value
         self.device.ID = node.get_parameter('device/ID').get_parameter_value().integer_value
@@ -354,6 +348,12 @@ class VideoCaptureNodeParam():
         self.device.HEIGHT = node.get_parameter('device/settings/HEIGHT').get_parameter_value().integer_value
         self.device.ANGLE = node.get_parameter('device/settings/ANGLE').get_parameter_value().integer_value
         self.device.FPS = node.get_parameter('device/settings/FPS').get_parameter_value().double_value
+        self.publisher.INTERVAL_FPS = node.get_parameter('publisher/INTERVAL_FPS').get_parameter_value().double_value
+        self.get_parameter(node)
+        # set callback
+        node.add_on_set_parameters_callback(self._callback_on_params)
+
+    def get_parameter(self, node: Node):
         # notify
         self.notify.mess_verbose = node.get_parameter('notify/message/verbose').get_parameter_value().bool_value
         # settings
@@ -365,7 +365,6 @@ class VideoCaptureNodeParam():
         self.settings.AREA_WIDTH = node.get_parameter('settings/area/width').get_parameter_value().integer_value
         self.settings.AREA_HEIGHT = node.get_parameter('settings/area/height').get_parameter_value().integer_value
         # publisher
-        self.publisher.INTERVAL_FPS = node.get_parameter('publisher/INTERVAL_FPS').get_parameter_value().double_value
         self.publisher.width = node.get_parameter('publisher/resize/width').get_parameter_value().integer_value
         self.publisher.height = node.get_parameter('publisher/resize/height').get_parameter_value().integer_value
         self.publisher.enable = node.get_parameter('publisher/enable').get_parameter_value().bool_value
@@ -388,6 +387,7 @@ class VideoCaptureNode(Node):
     _service_name_info = 'info'
     _service_name_capture = 'out_srv'
     _topic_name = 'out_topic'
+    _timeout_ms = 5000
     ##########################################################################
     _debug = False
     ##########################################################################
@@ -403,6 +403,10 @@ class VideoCaptureNode(Node):
     _timer_output_information_period_fps = 0.2  # 5 seconds
     _timer_output_information_size = (5 * 60)
     ##########################################################################
+    _timer_capture = None
+    _timer_send = None
+    _timer_output_information = None
+    _is_running = False
 
     def __init__(self, node_name):
         super().__init__(node_name)
@@ -410,7 +414,11 @@ class VideoCaptureNode(Node):
         self._param = VideoCaptureNodeParam()
         self._video = VideoDeviceManager()
 
+    def is_running(self):
+        return self._is_running
+
     def closing(self):
+        self._request_shutdown()
         if (self._video is not None):
             self._video.closing()
 
@@ -436,6 +444,7 @@ class VideoCaptureNode(Node):
                                                       self._param.device.HEIGHT,
                                                       self._param.device.FPS)
                         self._video.cap.grab()
+                        self._next_time = (self._timeout_ms * 1000 * 1000) + self.get_clock().now().nanoseconds
                         ret = self._callback_video_capture()
                         if (ret is False):
                             self._param.device.ID = -1
@@ -455,7 +464,7 @@ class VideoCaptureNode(Node):
                                                            self._video.cap.get(cv.CAP_PROP_FPS))
                             if (self._debug is True):
                                 self._param.print_parameter(self)
-                            self.get_logger().info('Open Camera : {}({})'.format(self._param.device.PATH, self._param.device.NAME_BY_PATH))
+                            self.get_logger().info('Open Camera : {} ({})'.format(self._param.device.PATH, self._param.device.NAME_BY_PATH))
                             ret, text = self._video.video_output_video_information()
                             if (ret is True):
                                 self.get_logger().info('  {}'.format(text))
@@ -476,6 +485,7 @@ class VideoCaptureNode(Node):
             result = False
             traceback.print_exc()
 
+        self._is_running = result
         return result
 
     ##########################################################################
@@ -537,6 +547,15 @@ class VideoCaptureNode(Node):
         self._timer_send = self.create_timer((1.0 / self._param.publisher.INTERVAL_FPS), self._callback_send)
         self._timer_output_information = self.create_timer((1.0 / self._timer_output_information_period_fps), self._callback_output_information)
 
+    def _request_shutdown(self):
+        if (self._timer_capture is not None):
+            self._timer_capture.cancel()
+        if (self._timer_send is not None):
+            self._timer_send.cancel()
+        if (self._timer_output_information is not None):
+            self._timer_output_information.cancel()
+        self._is_running = False
+
     ##########################################################################
     # ## ROS callback
     def _callback_srv_video_device_info(self,
@@ -568,6 +587,7 @@ class VideoCaptureNode(Node):
     def _callback_video_capture(self):
         result = False
         try:
+            current_ns = self.get_clock().now().nanoseconds
             result, sc = self._video.cap.read()
             #####################################################
             if (result is True):
@@ -581,8 +601,12 @@ class VideoCaptureNode(Node):
                                                self._param.settings.upside_down,
                                                self._param.settings.clockwise)
                 #####################################################
+                self._next_time = (self._timeout_ms * 1000 * 1000) + current_ns
                 self._display_fps = self._fps_calc.get()
                 #####################################################
+            if (self._next_time <= current_ns):
+                self.get_logger().warning('[{}/{}] Timeout : [{}]'.format(self.get_namespace(), self.get_name(), current_ns))
+                self._request_shutdown()
         except Exception as exception:
             self.get_logger().error('Exception (_callback_video_capture) : ' + str(exception))
             traceback.print_exc()
@@ -619,7 +643,8 @@ def main(args=None):
 
     try:
         if (node.open() is True):
-            rclpy.spin(node)
+            while (node.is_running() is True):
+                rclpy.spin_once(node)
 
     except Exception as exception:
         traceback_logger.error(exception)
