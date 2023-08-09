@@ -18,8 +18,7 @@ def generate_launch_description():
         output=_output_type,
         remappings=[
             ('in_srv', _ros_namespace + '/video/image/left'),
-            ('control', _ros_namespace + '/control/left'),
-            ('out_srv', _ros_namespace + '/image/add_pose/left'),
+            ('out_srv', _ros_namespace + '/mediapipe/pose/left'),
             ('out', _ros_namespace + '/data/pose/left')
         ],
         parameters=[{
@@ -47,8 +46,7 @@ def generate_launch_description():
         output=_output_type,
         remappings=[
             ('in_srv', _ros_namespace + '/video/image/right'),
-            ('control', _ros_namespace + '/control/right'),
-            ('out_srv', _ros_namespace + '/image/add_pose/right'),
+            ('out_srv', _ros_namespace + '/mediapipe/pose/right'),
             ('out', _ros_namespace + '/data/pose/right')
         ],
         parameters=[{

@@ -18,6 +18,7 @@ import maid_robot_system_interfaces.srv as MrsSrv
 from maid_robot_system_interfaces.msg._pose_detection import PoseDetection
 from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
 from maid_robot_system_interfaces.srv._video_capture import VideoCapture
+from collections import deque
 
 
 class ImageAnalysis:
@@ -175,6 +176,7 @@ class MediapipeNode(Node):
     _timeout_ms = 5000
     _request_width = 640
     _request_height = 512
+    _elapsed = deque(maxlen=30)
 
     def __init__(self, node_name):
         super().__init__(node_name)
@@ -211,7 +213,7 @@ class MediapipeNode(Node):
 
     ##################################################################################
     def _create_service_client(self):
-        self._service_data = self.create_service(MrsSrv.VideoCapture, self._out_srv_name, self._callback_srv_data)
+        self._service_data = self.create_service(MrsSrv.MediaPipePoseLandmarkDetection, self._out_srv_name, self._callback_srv_data)
         self._client = self.create_client(VideoCapture, self._in_srv_name)
         while not self._client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
@@ -259,11 +261,9 @@ class MediapipeNode(Node):
             return image
 
     ##################################################################################
-    def _callback_srv_data(self,
-                           request: MrsSrv.MediaPipePoseLandmarkDetection.Request,
-                           response: MrsSrv.MediaPipePoseLandmarkDetection.Response):
-        self.get_logger().warning('_callback_srv_data')
-        response = self._msg
+    def _callback_srv_data(self, request, response):
+        response.data = self._msg.data
+        response.image = self._msg.image
         return response
 
     def _callback_recognition(self):
@@ -298,12 +298,12 @@ class MediapipeNode(Node):
                     pose_landmarks = self._ia.detect_holistic(cv_image,
                                                               self._param.confidence_min_detection,
                                                               self._param.confidence_min_tracking)
+                    self._msg.image = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")
                     if pose_landmarks is not None:
                         self._msg.data = self.repackaging(pose_landmarks,
                                                               self._param.confidence_min_detection,
                                                               self._param.confidence_min_tracking,
                                                               self._param.confidence_visibility_th)
-                        self._msg.image = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")
                         self._pub.publish(self._msg.data)
                         if (self._report_detected is True):
                             if (self._msg.data.human_detected is not self._previous_human_detected):
@@ -318,6 +318,7 @@ class MediapipeNode(Node):
                     #####################################################
                     self._request_image(current_ns)
                     self._display_fps = self._fps_calc.get()
+                    self._elapsed.append(self.get_clock().now().nanoseconds - current_ns)
                     #####################################################
 
             if (self._next_time <= current_ns):
@@ -330,7 +331,10 @@ class MediapipeNode(Node):
 
     def _callback_output_information(self):
         if (self._param.info_verbose is True):
-            self.get_logger().info('[{}/{}] FPS : {:.4g}'.format(self.get_namespace(), self.get_name(), self._display_fps))
+            self.get_logger().info('[{}/{}] FPS : {:.4g} Elapsed : {} ms'.format(self.get_namespace(),
+                                                                              self.get_name(),
+                                                                              self._display_fps,
+                                                                              round((sum(self._elapsed) / len(self._elapsed)) / (1000.0 * 1000.0), 2)))
 
     ##################################################################################
 
