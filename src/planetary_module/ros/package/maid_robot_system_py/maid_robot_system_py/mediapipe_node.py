@@ -11,12 +11,10 @@ from rclpy.node import Node
 from rclpy.parameter import Parameter
 from rcl_interfaces.msg import SetParametersResult
 from utils.cv_fps_calc import CvFpsCalc
-from sensor_msgs.msg import Image
 from mediapipe.python.solutions.pose import PoseLandmark
 from mediapipe.python.solutions.holistic import Holistic as mp_holistic
 import maid_robot_system_interfaces.srv as MrsSrv
 from maid_robot_system_interfaces.msg._pose_detection import PoseDetection
-from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
 from maid_robot_system_interfaces.srv._video_capture import VideoCapture
 from collections import deque
 
@@ -52,7 +50,7 @@ class ImageAnalysis:
         return landmarks
 
 
-class VideoCaptureNodeParam():
+class MediapipeNodeParam():
 
     def update_parameters(self, node: Node):
         new_parameters = [Parameter("confidence/min_detection", Parameter.Type.DOUBLE, self.confidence_min_detection),
@@ -180,7 +178,7 @@ class MediapipeNode(Node):
 
     def __init__(self, node_name):
         super().__init__(node_name)
-        self._param = VideoCaptureNodeParam()
+        self._param = MediapipeNodeParam()
         self._bridge = CvBridge()
         self._msg = MrsSrv.MediaPipePoseLandmarkDetection.Response()
         self._previous_human_detected = False

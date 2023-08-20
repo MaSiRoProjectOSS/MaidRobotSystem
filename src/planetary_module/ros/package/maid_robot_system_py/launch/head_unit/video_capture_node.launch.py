@@ -21,9 +21,9 @@ def generate_launch_description():
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/info/left'),
-            ('out_srv', _ros_namespace + '/video/image/left'),
-            ('out_topic', _ros_namespace + '/image/raw/left')
+            ('info', _ros_namespace + '/video/left/info'),
+            ('out_srv', _ros_namespace + '/video/left/image'),
+            ('out_topic', _ros_namespace + '/image/left/raw')
         ],
         parameters=[{
             "device/TYPE": "v4l",
@@ -58,9 +58,9 @@ def generate_launch_description():
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/info/right'),
-            ('out_srv', _ros_namespace + '/video/image/right'),
-            ('out_topic', _ros_namespace + '/image/raw/right')
+            ('info', _ros_namespace + '/video/right/info'),
+            ('out_srv', _ros_namespace + '/video/right/image'),
+            ('out_topic', _ros_namespace + '/image/right/raw')
         ],
         parameters=[{
             "device/TYPE": "v4l",

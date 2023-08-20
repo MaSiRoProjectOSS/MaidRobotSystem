@@ -16,8 +16,8 @@ def generate_launch_description():
         name='left_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + '/video/image/left'),
-            ('out', _ros_namespace + '/data/ar/left')
+            ('in_srv', _ros_namespace + '/video/left/image'),
+            ('out', _ros_namespace + '/data/left/ar')
         ],
         parameters=[{
             "INTERVAL_MS": 500,
@@ -39,8 +39,8 @@ def generate_launch_description():
         name='right_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + '/video/image/right'),
-            ('out', _ros_namespace + '/data/ar/right')
+            ('in_srv', _ros_namespace + '/video/right/image'),
+            ('out', _ros_namespace + '/data/right/ar')
         ],
         parameters=[{
             "INTERVAL_MS": 500,

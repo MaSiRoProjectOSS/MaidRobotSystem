@@ -13,12 +13,6 @@ def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
 
-    recognition_in_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/recognition_node.launch.py'))
-    )
     mitumeru_node = Node(
         namespace=_ros_namespace,
         package='maid_robot_system',
@@ -52,6 +46,5 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        mitumeru_node,
-        recognition_in_node
+        mitumeru_node
     ])

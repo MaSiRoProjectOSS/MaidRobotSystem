@@ -83,11 +83,18 @@ set(MSG_FORMAT_FILE
 set(MSG_ARUCO_FILE
   msg/aruco/ArMarkers.msg
 )
+#   MSG_MRS_FILE
+set(MSG_MRS_FILE
+  msg/mrs/MrsHitomi.msg
+  msg/mrs/MrsKubi.msg
+  msg/mrs/MrsKuchibiru.msg
+  msg/mrs/MrsVoice.msg
+)
 
 set(SRV_FILES
+  srv/MediaPipePoseLandmarkDetection.srv
   srv/VideoCapture.srv
   srv/VideoDeviceInfo.srv
-  srv/MediaPipePoseLandmarkDetection.srv
 )
 ###############################################
 
@@ -100,6 +107,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_FORMAT_FILE}
   ${MSG_ARUCO_FILE}
   ${SRV_FILES}
+  ${MSG_MRS_FILE}
   DEPENDENCIES std_msgs geometry_msgs sensor_msgs
 )
 
