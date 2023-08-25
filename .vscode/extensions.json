@@ -1,0 +1,18 @@
+{
+    // See http://go.microsoft.com/fwlink/?LinkId=827846
+    // for the documentation about the extensions.json format
+    "recommendations": [
+        "DavidAnson.vscode-markdownlint",
+        "jebbs.plantuml",
+        "mhutchie.git-graph",
+        "platformio.platformio-ide",
+        "saikou9901.evilinspector",
+        "shardulm94.trailing-spaces",
+        "shd101wyy.markdown-preview-enhanced",
+        "streetsidesoftware.code-spell-checker",
+        "xaver.clang-format"
+    ],
+    "unwantedRecommendations": [
+        "ms-vscode.cpptools-extension-pack"
+    ]
+}
