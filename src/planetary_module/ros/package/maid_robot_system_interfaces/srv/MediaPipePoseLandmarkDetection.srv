@@ -1,0 +1,4 @@
+
+---
+maid_robot_system_interfaces/PoseDetection      data
+sensor_msgs/Image                               image
