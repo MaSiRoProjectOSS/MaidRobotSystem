@@ -13,6 +13,13 @@ from launch_ros.actions import PushRosNamespace
 
 def generate_launch_description():
 
+    launch_nodes_voice_recognition = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/voice_recognition_node.launch.py'))
+    )
+
     launch_nodes_hitomi = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -63,11 +70,12 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        launch_nodes_voice_recognition,
         launch_nodes_hitomi,
         launch_nodes_mitumeru,
         launch_nodes_kubi,
         # launch_nodes_mediapipe_ext_node,
-        launch_nodes_mediapipe_node,
+        # launch_nodes_mediapipe_node,
         # launch_nodes_detect_ar_node,
-        launch_nodes_video_capture_node
+        # launch_nodes_video_capture_node
     ])

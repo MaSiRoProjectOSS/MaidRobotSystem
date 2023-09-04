@@ -14,14 +14,16 @@
 #include "parameter.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-#include <std_msgs/msg/float64.hpp>
+#include <maid_robot_system_interfaces/msg/ar_markers.hpp>
+#include <maid_robot_system_interfaces/msg/mrs_voice.hpp>
+#include <maid_robot_system_interfaces/msg/pose_detection.hpp>
 
 namespace maid_robot_system
 {
 class NodeImplement : public rclcpp::Node {
 private:
 public:
-    NodeImplement(std::string package_name, std::string node_name, int argc, char **argv);
+    NodeImplement(std::string node_name, int argc, char **argv);
     ~NodeImplement();
 
 private:
@@ -29,21 +31,33 @@ private:
     // Variable
     // =============================
     ModelImplement _model;
-    std_msgs::msg::Float64 _convert_msg;
+    maid_robot_system_interfaces::msg::MrsHitomi _msg_hitomi;
+    maid_robot_system_interfaces::msg::MrsKubi _msg_kubi;
+    maid_robot_system_interfaces::msg::MrsKuchibiru _msg_kuchibiru;
 
 private:
     // =============================
     // ROS : publisher
     // =============================
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr _pub_value;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsHitomi>::SharedPtr _pub_hitomi;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKubi>::SharedPtr _pub_kubi;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKuchibiru>::SharedPtr _pub_kuchibiru;
 
 private:
     // =============================
     // ROS : subscription
     // =============================
-    void callback_message(const std_msgs::msg::Float64 &msg);
+    void callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg);
+    void callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg);
+    void callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg);
+    void callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg);
+    void callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg);
 
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_left;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_right;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::ArMarkers>::SharedPtr _sub_ar_left;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::ArMarkers>::SharedPtr _sub_ar_right;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsVoice>::SharedPtr _sub_voice;
 
 private:
     // =============================
@@ -61,22 +75,22 @@ private:
     void callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
-    // Parameter
-
-private:
-    // =============================
-    // ROS : information
-    // =============================
-    std::string _package_name = "";
-    std::string _node_name    = "";
-
 private:
     // =============================
     // CONST
     // =============================
     const int CONFIG_QOS               = 255;
-    const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 1000 };
+    const int CONFIG_SUBSCRIPTION_SIZE = 2;
+    const std::chrono::milliseconds TP_MSEC{ 16 };
+
+    const std::string MRS_TOPIC_IN_POSE_LEFT  = "in/pose/left";
+    const std::string MRS_TOPIC_IN_POSE_RIGHT = "in/pose/left";
+    const std::string MRS_TOPIC_IN_AR_LEFT    = "in/ar/left";
+    const std::string MRS_TOPIC_IN_AR_RIGHT   = "in/ar/left";
+    const std::string MRS_TOPIC_IN_VOICE      = "in/voice";
+    const std::string MRS_TOPIC_OUT_HITOMI    = "out/hitomi";
+    const std::string MRS_TOPIC_OUT_KUBI      = "out/kubi";
+    const std::string MRS_TOPIC_OUT_KUCHIBIRU = "out/kuchibiru";
 };
 
 } // namespace maid_robot_system

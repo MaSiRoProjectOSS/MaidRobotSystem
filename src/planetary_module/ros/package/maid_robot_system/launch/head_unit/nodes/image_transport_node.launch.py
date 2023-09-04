@@ -62,7 +62,7 @@ def generate_launch_description():
         name='image_theora_right_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', _ros_namespace + '/image/left/raw')
+            ('image', _ros_namespace + '/image/right/raw')
         ],
         respawn=True,
         respawn_delay=2.0
@@ -77,7 +77,7 @@ def generate_launch_description():
         arguments=['raw'],
         remappings=[
             ('in',  _ros_namespace + '/image/left/raw'),
-            ('out', _ros_namespace + '/image/right/raw')
+            ('out', _ros_namespace + '/image/left/transport')
         ],
         respawn=True,
         respawn_delay=2.0

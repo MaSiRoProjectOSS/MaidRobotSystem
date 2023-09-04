@@ -21,7 +21,7 @@ namespace maid_robot_system
 class NodeImplement : public rclcpp::Node {
 private:
 public:
-    NodeImplement(std::string package_name, std::string node_name, int argc, char **argv);
+    NodeImplement(std::string node_name, int argc, char **argv);
     ~NodeImplement();
 
 private:
@@ -61,15 +61,6 @@ private:
     void callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
-    // Parameter
-
-private:
-    // =============================
-    // ROS : information
-    // =============================
-    std::string _package_name = "";
-    std::string _node_name    = "";
-
 private:
     // =============================
     // CONST
@@ -77,6 +68,9 @@ private:
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 1000 };
+
+    const std::string MRS_TOPIC_OUTPUT = "out";
+    const std::string MRS_TOPIC_INPUT  = "in";
 };
 
 } // namespace maid_robot_system

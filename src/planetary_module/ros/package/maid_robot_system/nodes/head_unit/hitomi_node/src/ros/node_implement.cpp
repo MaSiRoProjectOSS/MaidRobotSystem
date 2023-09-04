@@ -12,7 +12,6 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-
 void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
 {
     this->_convert_msg.data = this->_model.calculate(msg.data);
@@ -78,12 +77,9 @@ void NodeImplement::callback_timer()
     }
 }
 
-NodeImplement::NodeImplement(std::string package_name, std::string node_name, int argc, char **argv) : Node(node_name)
+NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-    this->_package_name = package_name;
-    this->_node_name    = node_name;
-
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->_node_name.c_str(), "start.");
+    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
 
     // set parameter
     this->callback_param();
@@ -91,14 +87,14 @@ NodeImplement::NodeImplement(std::string package_name, std::string node_name, in
     // set publisher
     this->_pub_value =                                      //
             this->create_publisher<std_msgs::msg::Float64>( //
-                    MRS_TOPIC_SAMPLE_OUTPUT,                //
+                    this->MRS_TOPIC_OUTPUT,                 //
                     rclcpp::QoS(this->CONFIG_QOS)           //
             );
     // set subscription
     this->_sub_value =                                                               //
             this->create_subscription<std_msgs::msg::Float64>(                       //
-                    MRS_TOPIC_SAMPLE_INPUT,                                          //
-                    sizeof(std_msgs::msg::Float64) * this->CONFIG_SUBSCRIPTION_SIZE, //
+                    this->MRS_TOPIC_INPUT,                                           //
+               this->CONFIG_SUBSCRIPTION_SIZE, //
                     std::bind(&NodeImplement::callback_message, this, _1));
 
     this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
@@ -106,7 +102,7 @@ NodeImplement::NodeImplement(std::string package_name, std::string node_name, in
 
 NodeImplement::~NodeImplement()
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->_node_name.c_str(), "fin.");
+    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "fin.");
 }
 
 } // namespace maid_robot_system

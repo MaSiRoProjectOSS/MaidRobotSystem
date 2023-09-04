@@ -17,84 +17,6 @@ from rcl_interfaces.msg import SetParametersResult
 import maid_robot_system_interfaces.srv as MrsSrv
 
 
-class VideoDeviceManager():
-    cap = None
-
-    def __init__(self):
-        pass
-
-    def search_video(self, type, id, path):
-        result = -1
-        usbVideoDevice = UsbVideoDevice(type)
-        result = usbVideoDevice.get_id_by_path(path)
-        if (-1 == result):
-            result = usbVideoDevice.get_id_from_id(id)
-        return usbVideoDevice.get_info(result)
-
-    def open(self, device_id):
-        self.cap = cv.VideoCapture(device_id)
-
-    def closing(self):
-        if (self.cap is not None):
-            self.cap.release()
-
-    def isOpened(self):
-        if (self.cap is not None):
-            return self.cap.isOpened()
-        else:
-            return False
-
-    def set_video_setting(self, format, width, height, fps=30.0):
-        if (self.cap is not None):
-            if (format == 'MJPG'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))  # .avi
-            if (format == 'H264'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('H', '2', '6', '4'))
-            if (format == 'YUYV'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('Y', 'U', 'Y', 'V'))
-            if (format == 'BGR3'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('B', 'G', 'R', '3'))
-            if (format == 'MP4V'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'V'))  # .mp4
-            if (format == 'MP4S'):
-                self.cap.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'P', '4', 'S'))  # .mp4
-
-            self.cap.set(cv.CAP_PROP_FRAME_WIDTH, width)
-            self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
-            self.cap.set(cv.CAP_PROP_FPS, fps)
-
-    def video_output_video_information(self):
-        result = False
-        ret_txt = ''
-        if (self.cap is not None):
-            fourcc = self.txt_cv_fourcc()
-            width = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)
-            height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)
-            fps = self.cap.get(cv.CAP_PROP_FPS)
-            mode = self._video_to_txt_cv_mode(self.cap.get(cv.CAP_PROP_MODE))
-            format = self.cap.get(cv.CAP_PROP_FORMAT)
-
-            ret_txt = "fourcc:{}, fps:{} [{:.4g} ms], width:{}, height:{}, mode:{}, format:{}".format(
-                fourcc, fps, (1 / float(fps)), width, height, mode, format)
-            result = True
-        return result, ret_txt
-
-    def txt_cv_fourcc(self, ):
-        v = int(self.cap.get(cv.CAP_PROP_FOURCC))
-        return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
-
-    def _video_to_txt_cv_mode(self, mode):
-        if (0 == mode):
-            return "BGR"
-        elif (1 == mode):
-            return "RGB"
-        elif (2 == mode):
-            return "GRAY"
-        elif (3 == mode):
-            return "YUYV"
-        else:
-            return "Unknown" + str(mode)
-
 
 class VideoCaptureNodeParam():
     # ############################################
@@ -142,14 +64,7 @@ class VideoCaptureNodeParam():
     def print_parameter(self, node: Node):
         node.get_logger().info('<Parameter>')
 
-        node.get_logger().info(' device: ')
-        node.get_logger().info('   type    : ' + str(self.device.TYPE))
-        node.get_logger().info('   id      : ' + str(self.device.ID))
-        node.get_logger().info('   by_path : ' + str(self.device.NAME_BY_PATH))
-        node.get_logger().info('   path    : ' + str(self.device.PATH))
-
         node.get_logger().info(' video: ')
-        node.get_logger().info('   format : ' + str(self.device.FORMAT))
         node.get_logger().info('   width  : ' + str(self.device.WIDTH))
         node.get_logger().info('   height : ' + str(self.device.HEIGHT))
         node.get_logger().info('   angle  : [{}, {}]'.format(self.device.ANGLE_X,self.device.ANGLE_Y))
@@ -392,7 +307,8 @@ class VideoCaptureNodeParam():
 class VideoCaptureNode(Node):
     _service_name_info = 'info'
     _service_name_capture = 'out_srv'
-    _topic_name = 'out_topic'
+    _topic_out_name = 'out_topic'
+    _topic_in_name = 'in_topic'
     _timeout_ms = 5000
     ##########################################################################
     _debug = False
@@ -418,15 +334,12 @@ class VideoCaptureNode(Node):
         super().__init__(node_name)
         self._lock = threading.Lock()
         self._param = VideoCaptureNodeParam()
-        self._video = VideoDeviceManager()
 
     def is_running(self):
         return self._is_running
 
     def closing(self):
         self._request_shutdown()
-        if (self._video is not None):
-            self._video.closing()
 
     def open(self):
         result = False
@@ -437,54 +350,12 @@ class VideoCaptureNode(Node):
             self._fps_calc = CvFpsCalc(buffer_len=self._timer_output_information_size)
             self._bridge = CvBridge()
 
-            # set video
-            self._param.device.ID, self._param.device.NAME_BY_PATH, self._param.device.PATH = self._video.search_video(self._param.device.TYPE, self._param.device.ID, self._param.device.NAME_BY_PATH)
-            if (-1 != self._param.device.ID):
-                try:
-                    self._video.open(self._param.device.ID)
-                    if (not self._video.isOpened()):
-                        self._param.device.ID = -1
-                    else:
-                        self._video.set_video_setting(self._param.device.FORMAT,
-                                                      self._param.device.WIDTH,
-                                                      self._param.device.HEIGHT,
-                                                      self._param.device.FPS)
-                        self._video.cap.grab()
-                        self._next_time = (self._timeout_ms * 1000 * 1000) + self.get_clock().now().nanoseconds
-                        ret = self._callback_video_capture()
-                        if (ret is False):
-                            self._param.device.ID = -1
-
-                        # check video device
-                        if (0 > self._param.device.ID):
-                            self.get_logger().error('Not found Camera')
-                        else:
-                            self._param.update_device_info(self,
-                                                           self._param.device.TYPE,
-                                                           self._param.device.NAME_BY_PATH,
-                                                           self._param.device.ID,
-                                                           self._param.device.PATH,
-                                                           self._video.txt_cv_fourcc(),
-                                                           self._video.cap.get(cv.CAP_PROP_FRAME_WIDTH),
-                                                           self._video.cap.get(cv.CAP_PROP_FRAME_HEIGHT),
-                                                           self._video.cap.get(cv.CAP_PROP_FPS))
-                            if (self._debug is True):
-                                self._param.print_parameter(self)
-                            self.get_logger().info('Open Camera : {} ({})'.format(self._param.device.PATH, self._param.device.NAME_BY_PATH))
-                            ret, text = self._video.video_output_video_information()
-                            if (ret is True):
-                                self.get_logger().info('  {}'.format(text))
-                            # create ros
-                            self._create_service()
-                            self._create_publisher()
-                            self._create_timer()
-                            result = True
-                except Exception as exception:
-                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.ID) + ' : ' + str(exception))
-                    self._param.device.ID = -1
-                except:
-                    self.get_logger().error('Not open Camera : /dev/video' + str(self._param.device.ID))
-                    self._param.device.ID = -1
+            # create ros
+            self._create_service()
+            self._create_publisher()
+            self._create_subscription()
+            self._create_timer()
+            result = True
 
         except Exception as exception:
             self.get_logger().error('Exception : ' + str(exception))
@@ -545,11 +416,17 @@ class VideoCaptureNode(Node):
         self._service_info = self.create_service(MrsSrv.VideoDeviceInfo, self._service_name_info, self._callback_srv_video_device_info)
         self._service_capture = self.create_service(MrsSrv.VideoCapture, self._service_name_capture, self._callback_srv_video_capture)
 
+    def _create_subscription(self):
+        self._sub_image = self.create_subscription(
+            Image,
+             self._topic_in_name,
+            self._callback_video_capture,
+            self._topic_queue_size)
+
     def _create_publisher(self):
-        self._pub_image = self.create_publisher(Image, self._topic_name, self._topic_queue_size)
+        self._pub_image = self.create_publisher(Image, self._topic_out_name, self._topic_queue_size)
 
     def _create_timer(self):
-        self._timer_capture = self.create_timer((1.0 / self._param.device.FPS), self._callback_video_capture)
         self._timer_send = self.create_timer((1.0 / self._param.publisher.INTERVAL_FPS), self._callback_send)
         self._timer_output_information = self.create_timer((1.0 / self._timer_output_information_period_fps), self._callback_output_information)
 
@@ -591,33 +468,12 @@ class VideoCaptureNode(Node):
         return response
 
     # ## video capture
-    def _callback_video_capture(self):
-        result = False
-        try:
-            current_ns = self.get_clock().now().nanoseconds
-            result, sc = self._video.cap.read()
-            #####################################################
-            if (result is True):
-                with self._lock:
-                    self._image = self._repack(sc,
-                                               self._param.settings.calc_start_x,
-                                               self._param.settings.calc_start_y,
-                                               self._param.settings.calc_end_x,
-                                               self._param.settings.calc_end_y,
-                                               self._param.settings.mirror,
-                                               self._param.settings.upside_down,
-                                               self._param.settings.clockwise)
-                #####################################################
-                self._next_time = (self._timeout_ms * 1000 * 1000) + current_ns
-                self._display_fps = self._fps_calc.get()
-                #####################################################
-            if (self._next_time <= current_ns):
-                self.get_logger().warning('[{}/{}] Timeout : [{}]'.format(self.get_namespace(), self.get_name(), current_ns))
-                self._request_shutdown()
-        except Exception as exception:
-            self.get_logger().error('Exception (_callback_video_capture) : ' + str(exception))
-            traceback.print_exc()
-        return result
+    def _callback_video_capture(self, msg):
+        with self._lock:
+            self._image = self._bridge.imgmsg_to_cv2(msg, "bgr8")
+        #####################################################
+        self._display_fps = self._fps_calc.get()
+        #####################################################
 
     # ##
     def _callback_send(self):

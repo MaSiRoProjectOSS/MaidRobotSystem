@@ -11,10 +11,10 @@
 
 int main(int argc, char **argv)
 {
+    std::string node_name = NODE_NAME;
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<maid_robot_system::NodeImplement>( //
-            MRS_PACKAGES_MAID_ROBOT_SYSTEM,
-            MRS_NODE_CONDITION_MONITORING,
+            node_name,
             argc,
             argv));
     rclcpp::shutdown();

@@ -1,0 +1,30 @@
+import os
+import subprocess
+from launch import LaunchDescription
+from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import TextSubstitution
+
+
+def generate_launch_description():
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
+
+    voice_recognition_node = Node(
+        namespace=_ros_namespace,
+        package='maid_robot_system',
+        executable='voice_recognition_node',
+        output=_output_type,
+        remappings=[
+            ('out', _ros_namespace + '/data/voice')
+        ],
+        parameters=[{
+            "to": 135.0,
+        }],
+        respawn=True,
+        respawn_delay=2.0
+    )
+
+    return LaunchDescription([
+        voice_recognition_node
+    ])

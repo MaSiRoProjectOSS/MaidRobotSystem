@@ -18,6 +18,7 @@ def generate_launch_description():
         output=_output_type,
         remappings=[
             ('in_srv', _ros_namespace + '/video/left/image'),
+            ('in_srv_video', _ros_namespace + '/video/left/info'),
             ('out_srv', _ros_namespace + '/mediapipe/left/pose'),
             ('out', _ros_namespace + '/data/left/pose')
         ],
@@ -46,6 +47,7 @@ def generate_launch_description():
         output=_output_type,
         remappings=[
             ('in_srv', _ros_namespace + '/video/right/image'),
+            ('in_srv_video', _ros_namespace + '/video/right/info'),
             ('out_srv', _ros_namespace + '/mediapipe/right/pose'),
             ('out', _ros_namespace + '/data/right/pose')
         ],

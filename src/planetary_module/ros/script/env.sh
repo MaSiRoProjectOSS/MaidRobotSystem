@@ -51,12 +51,14 @@ if [ -f ${CONFIG_PATH} ]; then
     JSON_DATA=$(cat ${CONFIG_PATH})
     for CONFIG_RAW in "${CONFIG_ARRAY[@]}"
     do
-        JSON_KEY=$(echo ${JSON_DATA} | jq -c '.["'$CONFIG_RAW'"]')
+        export JSON_KEY=$(echo ${JSON_DATA} | jq -c '.'$CONFIG_RAW)
         if [ "null" != "${JSON_KEY}" ]; then
-            for key in $(echo ${JSON_KEY} | jq -r keys[]); do
-                value=$(eval echo $(echo ${JSON_KEY} | jq -r .$key))
-                export $key="$value"
-            done
+            echo ${JSON_KEY} | jq -r ' to_entries[] | [.key, .value] | @tsv' | {
+                while read key value; do
+                    buf=$(eval echo ${value})
+                    export $key="${buf}"
+                done
+            }
         fi
     done
 fi

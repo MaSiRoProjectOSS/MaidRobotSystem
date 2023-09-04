@@ -2,6 +2,10 @@
 
 set(NODE_NAME mitumeru_node)
 
+add_definitions(
+  -DNODE_NAME="${NODE_NAME}"
+)
+
 add_executable(${NODE_NAME}
   src/main.cpp
   src/ros/node_implement.cpp

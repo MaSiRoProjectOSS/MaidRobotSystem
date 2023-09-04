@@ -18,28 +18,18 @@ def generate_launch_description():
         package='maid_robot_system',
         executable='mitumeru_node',
         output=_output_type,
+        remappings=[
+            ('in/pose/left', _ros_namespace + '/in/pose/left'),
+            ('in/pose/right', _ros_namespace + '/in/pose/right'),
+            ('in/ar/left', _ros_namespace + '/in/ar/left'),
+            ('in/ar/right', _ros_namespace + '/in/ar/right'),
+            ('in/voice', _ros_namespace + '/data/voice'),
+            ('out/hitomi', _ros_namespace + '/data/hitomi'),
+            ('out/kubi', _ros_namespace + '/data/kubi'),
+            ('out/kuchibiru', _ros_namespace + '/data/kuchibiru')
+        ],
         parameters=[{
-            "device": {
-                "left": {
-                    "type": "v4l",
-                    "id": -1,
-                    "by_path": "usb-0:1.1:1.0-video-index0",
-                    "width": 960,
-                    "height": 540
-                },
-                "right": {
-                    "type": "v4l",
-                    "id": -1,
-                    "by_path": "usb-0:1:1.0-video-index0",
-                    "width": 960,
-                    "height": 540
-                }
-            },
-            "confidence": {
-                "min_detection": 0.5,
-                "min_tracking": 0.5
-            },
-            "update": False
+            "id": -1
         }],
         respawn=True,
         respawn_delay=2.0

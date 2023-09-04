@@ -1,6 +1,6 @@
-# [node] kubi_node
+# [node] voice_recognition_node
 
-set(NODE_NAME kubi_node)
+set(NODE_NAME voice_recognition_node)
 
 add_definitions(
   -DNODE_NAME="${NODE_NAME}"
