@@ -4,37 +4,39 @@
     "version": "2.0.0",
     "tasks": [
         //////////////////////////////////////////////////////////////
-        // GENERAL / info
+        // ROS2 : GENERAL / info
         //////////////////////////////////////////////////////////////
         {
             "label": "ROS2 : GENERAL : info : node",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/commands.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "aros2",
                 "node",
                 "list",
-                "",
-                "",
                 ""
             ]
         },
         {
             "label": "ROS2 : GENERAL : info : topic",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/commands.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "aros2",
                 "topic",
                 "list",
-                "",
-                "",
                 ""
             ]
         },
         {
             "label": "ROS2 : GENERAL : info : param",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/commands.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "aros2",
                 "param",
                 "list",
                 "",
@@ -45,8 +47,10 @@
         {
             "label": "ROS2 : GENERAL : info : pkg",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/commands.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "aros2",
                 "pkg",
                 "executables",
                 "",
@@ -55,13 +59,15 @@
             ]
         },
         //////////////////////////////////////////////////////////////
-        // GENERAL / build
+        // ROS2 : GENERAL / build
         //////////////////////////////////////////////////////////////
         {
-            "label": "ROS2 : GENERAL : DEBUG_BUILD",
+            "label": "ROS2 : BUILD : DEBUG",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/build.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "mrs_build",
                 "build",
                 "debug",
                 "",
@@ -74,10 +80,12 @@
             }
         },
         {
-            "label": "ROS2 : GENERAL : [ALL] BUILD",
+            "label": "ROS2 : BUILD : [ALL] ",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/build.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "mrs_build",
                 "build",
                 "release",
                 "",
@@ -90,10 +98,12 @@
             }
         },
         {
-            "label": "ROS2 : GENERAL : CLEAN",
+            "label": "ROS2 : BUILD : CLEAN",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/build.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "mrs_build",
                 "clean",
                 "",
                 "",
@@ -102,10 +112,12 @@
             ]
         },
         {
-            "label": "ROS2 : GENERAL : REBUILD",
+            "label": "ROS2 : BUILD : REBUILD",
             "type": "shell",
-            "command": "${workspaceFolder}/../../script/build.sh",
+            "command": "${workspaceFolder}/../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "mrs_build",
                 "rebuild",
                 "",
                 "",
@@ -113,8 +125,36 @@
                 ""
             ],
             "dependsOn": [
-                "ROS2 : GENERAL : CLEAN"
+                "ROS2 : BUILD : CLEAN"
+            ]
+        },
+        //////////////////////////////////////////////////////////////
+        // MRS
+        //////////////////////////////////////////////////////////////
+        {
+            "label": "MRS : mrs_help",
+            "type": "shell",
+            "hide": true,
+            "isBackground": true,
+            "command": "${workspaceFolder}/../../script/mrs.sh",
+            "args": [
+                "--mrs_config=${workspaceFolder}/../../script/config.json",
+                "mrs_help",
+                ""
+            ]
+        },
+        {
+            "label": "MRS : mrs_env",
+            "type": "shell",
+            "hide": true,
+            "isBackground": true,
+            "command": "${workspaceFolder}/../../script/mrs.sh",
+            "args": [
+                "--mrs_config ${workspaceFolder}/../../script/config.json",
+                "mrs_env",
+                ""
             ]
         }
+        //////////////////////////////////////////////////////////////
     ]
 }

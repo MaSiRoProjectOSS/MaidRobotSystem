@@ -6,8 +6,10 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : launch : file",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "launch",
                 "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/sample_node.launch.py",
                 "",
@@ -18,8 +20,10 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : launch : name",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "launch",
                 "maid_robot_system",
                 "sample_node.launch.py",
@@ -30,8 +34,10 @@
         {
             "label": "ROS2 : RUN : sample_node : exec : run",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "run",
                 "maid_robot_system",
                 "sample_node",
@@ -42,8 +48,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : get : times",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "get",
                 "/maid_robot_system/sample_node",
@@ -54,8 +62,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : get : offset",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "get",
                 "/maid_robot_system/sample_node",
@@ -66,8 +76,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : times : 1.0",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -78,8 +90,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : times : 10.0",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -90,8 +104,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : offset : 0.0",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -102,8 +118,10 @@
         {
             "label": "ROS2 : RUN : sample_node : param : set : offset : 5.0",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "param",
                 "set",
                 "/maid_robot_system/sample_node",
@@ -114,8 +132,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : info : messaging/output",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "topic",
                 "info",
                 "/maid_robot_system/messaging/output",
@@ -126,8 +146,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : info : messaging/input",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "topic",
                 "info",
                 "/maid_robot_system/messaging/input",
@@ -138,8 +160,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : echo : messaging/output",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "topic",
                 "echo",
                 "/maid_robot_system/messaging/output",
@@ -150,8 +174,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : echo : messaging/input",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/commands.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2",
                 "topic",
                 "echo",
                 "/maid_robot_system/messaging/input",
@@ -162,8 +188,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : set : 0 : messaging/input",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_0.yaml",
@@ -173,8 +201,10 @@
         {
             "label": "ROS2 : RUN : sample_node : topic : set : 1 : messaging/input",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../script/command_topic_pub.sh",
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_1.yaml",

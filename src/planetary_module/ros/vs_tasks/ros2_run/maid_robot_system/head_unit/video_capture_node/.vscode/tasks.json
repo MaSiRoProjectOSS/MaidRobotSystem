@@ -6,16 +6,20 @@
         {
             "label": "ROS2 : maid_robot_system : video_capture_node : right : param",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2_param_list",
                 "${MRS_ROS_NAMESPACE}/head_unit/right_video_capture_node"
             ]
         },
         {
             "label": "ROS2 : maid_robot_system : video_capture_node : right : node : info",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2",
                 "node",
                 "info",
                 "${MRS_ROS_NAMESPACE}/head_unit/right_video_capture_node",
@@ -26,16 +30,20 @@
         {
             "label": "ROS2 : maid_robot_system : video_capture_node : left : param",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/param_list.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2_param_list",
                 "${MRS_ROS_NAMESPACE}/head_unit/left_video_capture_node"
             ]
         },
         {
             "label": "ROS2 : maid_robot_system : video_capture_node : left : node : info",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2",
                 "node",
                 "info",
                 "${MRS_ROS_NAMESPACE}/head_unit/left_video_capture_node",
@@ -46,8 +54,10 @@
         {
             "label": "ROS2 : maid_robot_system : video_capture_node : run",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2",
                 "launch",
                 "maid_robot_system_py",
                 "video_capture_node.launch.py",

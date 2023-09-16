@@ -1,7 +1,6 @@
 {
     "Description": {
         "USAGE": "",
-        "HELP": "",
         "CMD": "source /opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh",
         "CATION": "This is not allowed in text that '(', ')'"
     },
@@ -18,7 +17,14 @@
         "MRS_V4L_LEFT_BY_PATH": "",
         "MRS_V4L_LEFT_ID": 1,
         "MRS_V4L_RIGHT_BY_PATH": "",
-        "MRS_V4L_RIGHT_ID": 3
+        "MRS_V4L_RIGHT_ID": 3,
+        "BUILD_HEAD_UNIT": "ON",
+        "BUILD_ARM_UNIT": "ON",
+        "BUILD_WAIST_DOWN_UNIT": "ON",
+        "BUILD_MOBILITY_UNIT": "ON",
+        "BUILD_CLOUD_UNIT": "ON",
+        "BUILD_MANAGEMENT_UNIT": "ON",
+        "BUILD_DEVELOP": "ON"
     },
     "ROS_VARIABLES": {
         "ROS_DISTRO": "humble",
@@ -32,16 +38,10 @@
         "RCUTILS_LOGGING_USE_STDOUT": 1
     },
     "BUILD": {
-        "CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Release",
+        "BUILD_CMAKE_ARGS": "-DCMAKE_BUILD_TYPE=Release",
         "BUILD_LOG_LEVEL": "RELEASE",
         "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
-        "BUILD_HEAD_UNIT": "ON",
-        "BUILD_ARM_UNIT": "ON",
-        "BUILD_WAIST_DOWN_UNIT": "ON",
-        "BUILD_MOBILITY_UNIT": "ON",
-        "BUILD_CLOUD_UNIT": "ON",
-        "BUILD_MANAGEMENT_UNIT": "ON",
-        "BUILD_DEVELOP": "ON"
+        "BUILD_COLCON_OPTION": "--symlink-install --parallel-workers ${BUILD_PARALLEL_WORKERS}"
     },
     "backup": {
         "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity} {time}] [{name}]: {message} {function_name} at {file_name}:{line_number}"

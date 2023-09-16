@@ -6,8 +6,10 @@
         {
             "label": "ROS2 : maid_robot_system : head_unit : run",
             "type": "shell",
-            "command": "/opt/MaidRobotSystem/src/planetary_module/ros/script/commands.sh",
+            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
             "args": [
+                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "aros2",
                 "launch",
                 "maid_robot_system",
                 "head_unit.launch.py",
