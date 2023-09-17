@@ -16,6 +16,7 @@ bool ModelImplement::calculate(maid_robot_system_interfaces::msg::MrsHitomi &msg
                                maid_robot_system_interfaces::msg::MrsKuchibiru &msg_kuchibiru)
 {
     bool result = false;
+    /*
     if (human_find_flag == 0 or (human_find_flag == 1 and human_confront_flag == 0)) {
         if (time.time() - timer_tracking_timeout > TIME_timer_tracking_timeout) {
             timer_tracking_timeout = time.time() - 0.5;
@@ -24,6 +25,7 @@ bool ModelImplement::calculate(maid_robot_system_interfaces::msg::MrsHitomi &msg
             To_face_yaw            = 0;
         }
     }
+    */
     // TODO
     /*
 一定時間経過後も人が見つからない場合は、首を中央に戻す
@@ -41,14 +43,14 @@ get_eye_cmd_angle.angular.y; // y 座標
 get_eye_cmd_angle.angular.z; // x 座標
 
                 if (cap_mode == "left"):
-                    offset_z_angle = -40.0
+                    offset_x_angle = -40.0
                     offset_y_angle = 0.0
-                    target_angle_z_R = to_face_yaw + offset_z_angle
+                    target_angle_z_R = to_face_yaw + offset_x_angle
                     target_angle_y_R = to_face_pitch + offset_y_angle
                 if (cap_mode == "right"):
-                    offset_z_angle = -12.0
+                    offset_x_angle = -12.0
                     offset_y_angle = 0.0
-                    target_angle_z_L = to_face_yaw + offset_z_angle
+                    target_angle_z_L = to_face_yaw + offset_x_angle
                     target_angle_y_L = to_face_pitch + offset_y_angle
 
                 target_angle_z = (target_angle_z_L + target_angle_z_R) / 2.0
@@ -85,6 +87,7 @@ get_eye_cmd_angle.angular.z; // x 座標
                     pub_neck_cmd_angle.publish(neck_cmd_pose)
 
     */
+    /*
     target_angle_z          = (target_angle_z_L + target_angle_z_R) / 2.0;
     target_angle_y          = (target_angle_y_L + target_angle_y_R) / 2.0;
     eye_cmd_angle.angular.y = target_angle_y / -2.0;
@@ -102,6 +105,7 @@ get_eye_cmd_angle.angular.z; // x 座標
         this->_get_value_kubi(&msg_kubi);
         this->_get_value_kuchibiru(&msg_kuchibiru);
     }
+    */
     return result;
 }
 // =============================
@@ -122,10 +126,10 @@ bool ModelImplement::set_value_ar(ModelStructure::INPUT_TYPE type, int id)
 {
     bool result = false;
     switch (type) {
-        case ModelStructure::INPUT_TYPE::Aright.LEFT:
+        case ModelStructure::INPUT_TYPE::AR_LEFT:
             result = true;
             break;
-        case ModelStructure::INPUT_TYPE::Aright.RIGHT:
+        case ModelStructure::INPUT_TYPE::AR_RIGHT:
             result = true;
             break;
         default:
@@ -133,15 +137,15 @@ bool ModelImplement::set_value_ar(ModelStructure::INPUT_TYPE type, int id)
     }
     return result;
 }
-bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection)
+bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection msg)
 {
     bool result = false;
     switch (type) {
         case ModelStructure::INPUT_TYPE::POSE_LEFT:
-            result = this->_calculate_pose(msg, this->_eye_left));
+            result = this->_calculate_pose(msg, this->_eye_left);
             break;
         case ModelStructure::INPUT_TYPE::POSE_RIGHT:
-            result = this->_calculate_pose(msg, this->_eye_right));
+            result = this->_calculate_pose(msg, this->_eye_right);
             break;
         default:
             break;
@@ -174,7 +178,8 @@ void ModelImplement::_get_value_kuchibiru(maid_robot_system_interfaces::msg::Mrs
 bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::PoseDetection msg, st_eye &data)
 {
     // ターゲットの位置を決定する。
-    bool result              = false;
+    bool result = false;
+    /*
     data.detected            = msg.human_detected;
     double target_roll       = 0;
     double x                 = data.landmark.nose.x;
@@ -207,15 +212,15 @@ bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::Po
                     // ロール角度を計算
                     double eye_dx = data.landmark.right.eye.x - data.landmark.left.eye.x;
                     double eye_dy = data.landmark.right.eye.y - data.landmark.left.eye.y;
-                    target_roll   = (math.degrees(math.atan2(eye_dy, eye_dx)));
+                    target_roll   = (Math.degrees(Math.atan2(eye_dy, eye_dx)));
                 }
             }
         }
         data.x           = (x - 0.5) + data.offset_x_angle;
         data.y           = (y - 0.5) + data.offset_y_angle;
-        data.target_roll = target_roll:
+        data.target_roll = target_roll;
     }
-
+*/
     return result;
 }
 
@@ -224,9 +229,9 @@ bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::Po
 // =============================
 ModelImplement::ModelImplement()
 {
-    this->_eye_left.offset_z_angle  = -40.0;
+    this->_eye_left.offset_x_angle  = -40.0;
     this->_eye_left.offset_y_angle  = 0.0;
-    this->_eye_right.offset_z_angle = -12.0;
+    this->_eye_right.offset_x_angle = -12.0;
     this->_eye_right.offset_y_angle = 0.0;
 }
 

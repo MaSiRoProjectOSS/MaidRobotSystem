@@ -12,7 +12,6 @@
 
 namespace maid_robot_system
 {
-
 class ModelImplement {
 public:
     // =============================
@@ -25,6 +24,7 @@ public:
 
     double get_times();
     double get_offset();
+    double get_value();
 
 private:
     // =============================
@@ -35,9 +35,9 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    double _offset = 0;
-    double _times  = 1;
-    double _value  = 0;
+    double _offset = 200;
+    double _times  = 300;
+    double _value  = 100;
 
 public:
     // =============================

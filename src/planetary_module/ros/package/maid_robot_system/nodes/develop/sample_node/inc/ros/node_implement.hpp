@@ -52,8 +52,7 @@ private:
     // =============================
     void callback_param();
     std::shared_ptr<rclcpp::ParameterEventHandler> _sub_parameter;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> _handle_param1;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> _handle_param2;
+    OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
     // =============================

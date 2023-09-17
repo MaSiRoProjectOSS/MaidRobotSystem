@@ -186,8 +186,9 @@
             ]
         },
         {
-            "label": "ROS2 : RUN : sample_node : topic : set : 0 : messaging/input",
+            "label": "ROS2 : RUN : sample_node : topic : set : loop : 0 : messaging/input",
             "type": "shell",
+            "isBackground": true,
             "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
                 "--mrs_config=${workspaceFolder}/../../../../script/config.json",
@@ -199,8 +200,9 @@
             ]
         },
         {
-            "label": "ROS2 : RUN : sample_node : topic : set : 1 : messaging/input",
+            "label": "ROS2 : RUN : sample_node : topic : set : loop : 1 : messaging/input",
             "type": "shell",
+            "isBackground": true,
             "command": "${workspaceFolder}/../../../../script/mrs.sh",
             "args": [
                 "--mrs_config=${workspaceFolder}/../../../../script/config.json",
@@ -209,6 +211,34 @@
                 "std_msgs/msg/Float64",
                 "${workspaceFolder}/topic_input_1.yaml",
                 "-r 0.5"
+            ]
+        },
+        {
+            "label": "ROS2 : RUN : sample_node : topic : set : once : 0 : messaging/input",
+            "type": "shell",
+            "isBackground": true,
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
+            "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2_topic_pub",
+                "/maid_robot_system/messaging/input",
+                "std_msgs/msg/Float64",
+                "${workspaceFolder}/topic_input_0.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "ROS2 : RUN : sample_node : topic : set : once : 1 : messaging/input",
+            "type": "shell",
+            "isBackground": true,
+            "command": "${workspaceFolder}/../../../../script/mrs.sh",
+            "args": [
+                "--mrs_config=${workspaceFolder}/../../../../script/config.json",
+                "aros2_topic_pub",
+                "/maid_robot_system/messaging/input",
+                "std_msgs/msg/Float64",
+                "${workspaceFolder}/topic_input_1.yaml",
+                "--once"
             ]
         }
     ]

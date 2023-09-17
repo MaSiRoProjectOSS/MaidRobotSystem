@@ -15,6 +15,8 @@
 #include <maid_robot_system_interfaces/msg/mrs_hitomi.hpp>
 #include <maid_robot_system_interfaces/msg/mrs_kubi.hpp>
 #include <maid_robot_system_interfaces/msg/mrs_kuchibiru.hpp>
+#include <maid_robot_system_interfaces/msg/pose_detection.hpp>
+#include <maid_robot_system_interfaces/state/mrs_mode.hpp>
 #include <stdio.h>
 #include <string>
 

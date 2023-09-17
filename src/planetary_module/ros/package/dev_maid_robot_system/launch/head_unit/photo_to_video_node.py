@@ -9,35 +9,21 @@ import maid_robot_system_interfaces.srv as MrsSrv
 def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
     _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
-    _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
-    _mrs_v4l_left_id = int("{}".format(os.environ.get('MRS_V4L_LEFT_ID')))
-    _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
-    _mrs_v4l_right_id = int("{}".format(os.environ.get('MRS_V4L_RIGHT_ID')))
-    _save_folder = "{}/tmp/image".format(os.environ.get('MRS_DATA_FOLDER'))
 
-    left_video_capture_node = Node(
+
+    left_photo_to_video_node = Node(
         namespace=_ros_namespace,
-        package='maid_robot_system_py',
-        executable='video_capture_node',
-        name='left_video_capture_node',
+        package='dev_maid_robot_system',
+        executable='photo_to_video_node',
+        name='left_photo_to_video_node',
         output=_output_type,
         remappings=[
             ('info', _ros_namespace + '/video/left/info'),
-            ('save', _ros_namespace + '/video/left/save'),
             ('out_srv', _ros_namespace + '/video/left/image'),
             ('out_topic', _ros_namespace + '/image/left/raw')
         ],
         parameters=[{
-            "device/TYPE": "v4l",
-            "device/BY_PATH": _mrs_v4l_left_by_path,
-            "device/ID": _mrs_v4l_left_id,
-            "device/settings/FORMAT": "MJPG",
-            "device/settings/WIDTH": 1280,
-            "device/settings/HEIGHT": 1024,
-            "device/settings/ANGLE_X": 140,
-            "device/settings/ANGLE_Y": 140,
-            "device/settings/FPS": 30.0,
-            "save_folder": _save_folder,
+            "photo": "",
             "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,
@@ -55,29 +41,19 @@ def generate_launch_description():
         respawn_delay=2.0
     )
 
-    right_video_capture_node = Node(
+    right_photo_to_video_node = Node(
         namespace=_ros_namespace,
-        package='maid_robot_system_py',
-        executable='video_capture_node',
-        name='right_video_capture_node',
+        package='dev_maid_robot_system',
+        executable='photo_to_video_node',
+        name='right_photo_to_video_node',
         output=_output_type,
         remappings=[
             ('info', _ros_namespace + '/video/right/info'),
-            ('save', _ros_namespace + '/video/right/save'),
             ('out_srv', _ros_namespace + '/video/right/image'),
             ('out_topic', _ros_namespace + '/image/right/raw')
         ],
         parameters=[{
-            "device/TYPE": "v4l",
-            "device/BY_PATH": _mrs_v4l_right_by_path,
-            "device/ID": _mrs_v4l_right_id,
-            "device/settings/FORMAT": "MJPG",
-            "device/settings/WIDTH": 1280,
-            "device/settings/HEIGHT": 1024,
-            "device/settings/ANGLE_X": 140,
-            "device/settings/ANGLE_Y": 140,
-            "device/settings/FPS": 30.0,
-            "save_folder": _save_folder,
+            "photo": "",
             "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,
@@ -96,6 +72,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        left_video_capture_node,
-        right_video_capture_node
+        left_photo_to_video_node,
+        right_photo_to_video_node
     ])

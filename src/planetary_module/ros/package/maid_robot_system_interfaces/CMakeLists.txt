@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.8)
 project(maid_robot_system_interfaces)
 
 # Select build unit
-set(BUILD_DEVELOP ON)
+set(MRS_BUILD_DEVELOP ON)
 
-if(DEFINED ENV{BUILD_DEVELOP})
-  set(BUILD_DEVELOP $ENV{BUILD_DEVELOP})
+if(DEFINED ENV{MRS_BUILD_DEVELOP})
+  set(MRS_BUILD_DEVELOP $ENV{MRS_BUILD_DEVELOP})
 endif()
 
 # Default to C99
@@ -46,8 +46,8 @@ find_package(rosidl_default_generators REQUIRED)
 
 # generate message
 ###############################################
-#   BUILD_DEVELOP
-if(BUILD_DEVELOP)
+#   MRS_BUILD_DEVELOP
+if(MRS_BUILD_DEVELOP)
   set(MSG_DEVELOP_FILE
     msg/sample/MrsSample.msg
   )

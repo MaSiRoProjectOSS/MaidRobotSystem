@@ -11,7 +11,6 @@
 
 namespace maid_robot_system
 {
-
 // =============================
 // PUBLIC : Function
 // =============================
@@ -39,6 +38,10 @@ double ModelImplement::get_times()
 double ModelImplement::get_offset()
 {
     return this->_offset;
+}
+double ModelImplement::get_value()
+{
+    return this->_value;
 }
 
 // =============================

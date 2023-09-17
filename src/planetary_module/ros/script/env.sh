@@ -3,9 +3,6 @@
 # source /opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh
 # ///////////////////////////////////////////////////////////////////
 
-## =======================================
-## FUNCTION
-## =======================================
 function mrs_help {
     ## =======================================
     ## Escape sequence
@@ -13,202 +10,22 @@ function mrs_help {
     local COLOR_ON_RED="\e[31m"
     local COLOR_OFF="\e[m"
     ## =======================================
-    echo -e "mrs_help        : Display command list"
-    echo -e "mrs_build       : Run MRS build"
-    echo -e "mrs_create_node NODE_NAME PACKAGE_NAME : Creating a ROS package template"
-    echo -e "    NODE_NAME     : Name of the empty executable"
-    echo -e "    PACKAGE_NAME  : The package nam$"
-    echo -e "mrs_load_config : "
-    #echo -e "mrs_set_export  : "
-    #echo -e "mrs_default     : "
+    echo -e "mrs_help         : Display command list"
+    echo -e "mrs_build        : Run MRS build"
+    echo -e "mrs_create_node  : Creating a ROS package template"
+    echo -e "mrs_load_config  : "
+    #echo -e "mrs_set_export   : "
+    #echo -e "mrs_default      : "
 
-    echo -e "aros2           : "
-    echo -e "aros2_topic_pub : "
-    echo -e "aros2_param_list: "
-    #echo -e "aros_default   : "
+    echo -e "aros2            : "
+    echo -e "aros2_topic_pub  : "
+    echo -e "aros2_param_list : "
+    #echo -e "aros_default    : "
 }
 
-function mrs_build {
-    BUILD_DATE=`date +%Y%m%d%H%M%S`
-    ############################################################################
-    ##
-    ## mrs_build WORK_COMMANDS WORK_BUILD_TYPE WORK_PACKAGES_SELECT WORK_ARG_OPTION
-    ##
-    ##  WORK_COMMANDS        : rebuild or build or clean
-    ##  WORK_BUILD_TYPE      : debug or release
-    ##  WORK_PACKAGES_SELECT : (your package name)
-    ##  WORK_ARG_OPTION      : (add option)
-    ##
-    ##  exsample:
-    ##      ./build.sh build release
-    ##
-    local COLOR_ON_RED="\e[31m"
-    local COLOR_ON_BLUE="\e[34m"
-    local COLOR_ON_GREEN="\e[32m"
-    local COLOR_ON_YELLOW="\e[33m"
-    local COLOR_ON=${COLOR_ON_BLUE}
-    local COLOR_OFF="\e[m"
-    ## ================================
-    ret=0
-    ADD_LOG_LEVEL=false
-
-    mrs_load_config ${MRS_CONFIG}
-    aros2_default
-    ## ================================
-    ##  "BUILD_LOG_LEVEL": "CRITICAL"/"ERROR"/"WARNING"/"INFO"/"DEBUG"/"NOTSET"
-    case "$BUILD_LOG_LEVEL" in
-        "CRITICAL" )    ADD_LOG_LEVEL=true  ;;
-        "ERROR" )       ADD_LOG_LEVEL=true  ;;
-        "WARNING" )     ADD_LOG_LEVEL=true  ;;
-        "INFO" )        ADD_LOG_LEVEL=true  ;;
-        "DEBUG" )       ADD_LOG_LEVEL=true  ;;
-        "NOTSET" )      ADD_LOG_LEVEL=true  ;;
-    esac
-
-    if [ -n "${ROS_DISTRO}" ] ;then
-        ## ================================
-        ## command exsample:
-        ## /opt/MaidRobotSystem/source/ros/build.sh <build | rebuild | clean> <debug | release> [packages-select]
-        ## ================================
-        TARGET_FOLDER=${MRS_ROS_PACKAGE_FOLDER}
-        WORK_COMMANDS=${1:-"build"}
-        WORK_BUILD_TYPE=${2:-"release"}
-        WORK_PACKAGES_SELECT=${3:-""}
-        shift
-        shift
-        shift
-        local WORK_ARG_OPTION=""
-        while (( $# > 0 ))
-        do
-            WORK_ARG_OPTION=" "$1
-            shift
-        done
-        COMPLILEDATE=`date +"%Y%m%d_%H%M%S"`
-        COMPLILEDATE_TEXT=`date +"%Y/%m/%d/ %H:%M:%S"`
-        ## ================================
-        ## Escape sequence
-        COLOR_ON_RED="\e[31m"
-        COLOR_OFF="\e[m"
-        local MRS_COLCON=${MRS_WORKSPACE}/.colcon
-        mkdir -p ${MRS_COLCON}
-        pushd ${MRS_COLCON} > /dev/null
-            ## ================================
-            if [ -n "${CMAKE_ARGS}" ]; then
-                WORK_CMAKE_ARGS="--cmake-args "${CMAKE_ARGS}
-            else
-                WORK_CMAKE_ARGS=""
-            fi
-
-            TARGET_FOLDER_ARG="--base-paths ${TARGET_FOLDER} --paths ${MRS_COLCON}"
-
-            ## ================================
-            WORK_COLCON_PARAMETE=""
-
-            if [ ! -z "${TARGET_FOLDER}" ]
-            then
-                if [ -d "${TARGET_FOLDER}" ]
-                then
-                    if [ "clean" = "${WORK_COMMANDS,,}" ]; then
-                        rm -rf ${MRS_COLCON}/*
-                        history -s ${MRS_COLCON}/*
-                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} rm -rf ${MRS_COLCON}"
-                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                    else
-                        if [ "rebuild" = "${WORK_COMMANDS,,}" ]; then
-                            #echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                            #echo "rebuild (delete install folder)"
-                            #rm -rf ${TARGET_FOLDER}/install
-                            #rm -rf ${TARGET_FOLDER}/log
-                            #rm -rf ${TARGET_FOLDER}/build
-                            WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
-                        fi
-                        if [ true = ${ADD_LOG_LEVEL} ]; then
-                            COLCON_LOG_LEVEL=${BUILD_LOG_LEVEL^^}
-                        fi
-
-                        source /usr/share/colcon_cd/function/colcon_cd.sh
-                        export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
-                        source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
-                        if [ -e ${TARGET_FOLDER}/install/ ]; then
-                            source ${TARGET_FOLDER}/install/local_setup.bash
-                        fi
-                        if [ -e ${MRS_COLCON}/install/ ]; then
-                            source ${MRS_COLCON}/install/local_setup.bash
-                        fi
-
-                        MAKEFLAGS=-j4
-
-                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                        if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
-                            WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}" --allow-overriding "${WORK_PACKAGES_SELECT}" --allow-overriding maid_robot_system_interfaces"
-                        else
-                            WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --allow-overriding maid_robot_system_interfaces"
-                        fi
-                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
-                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                        colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
-                        ret=$?
-                        history -s colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
-                        if [ 0 -eq ${ret} ]; then
-                            if [ -e ${MRS_COLCON}/install/ ]; then
-                                source ${MRS_COLCON}/install/local_setup.bash
-                            fi
-                        else
-                            COLOR_ON=${COLOR_ON_RED}
-                        fi
-                    fi
-                else
-                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-                    echo -e "${COLOR_ON_RED}  Could not find the folder :${COLOR_OFF} ${TARGET_FOLDER}"
-                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-                fi
-            else
-                echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-                echo -e "${COLOR_ON_RED}  Specify a folder as the argument.${COLOR_OFF}"
-                echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-            fi
-        popd > /dev/null
-
-    echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
-    echo -e "${COLOR_ON}Date :${COLOR_OFF} ${COMPLILEDATE_TEXT}"
-    echo -e "${COLOR_ON}ROS                        :${COLOR_OFF} ${ROS_DISTRO}"
-    echo -e "${COLOR_ON}Colcon Workspace           :${COLOR_OFF} ${MRS_COLCON}"
-    echo -e "${COLOR_ON}Target Folder              :${COLOR_OFF} ${TARGET_FOLDER}"
-    if [ true = ${ADD_LOG_LEVEL} ]; then
-        echo -e "${COLOR_ON}Log level                  :${COLOR_OFF ${COLCON_LOG_LEVEL}}"
-    fi
-        echo -e "${COLOR_ON}ENV${COLOR_OFF}"
-        echo -e "${COLOR_ON}  ROS${COLOR_OFF}"
-        echo -e "${COLOR_ON}    ROS_DOMAIN_ID          :${COLOR_OFF} ${ROS_DOMAIN_ID}"
-        echo -e "${COLOR_ON}    ROS_LOCALHOST_ONLY     :${COLOR_OFF} ${ROS_LOCALHOST_ONLY}"
-        echo -e "${COLOR_ON}    ROS_IP                 :${COLOR_OFF} ${ROS_IP}"
-        echo -e "${COLOR_ON}    ROS_MASTER_URI         :${COLOR_OFF} ${ROS_MASTER_URI}"
-        echo -e "${COLOR_ON}  MRS${COLOR_OFF}"
-        echo -e "${COLOR_ON}    MRS_CAST_ID            :${COLOR_OFF} ${MRS_CAST_ID}"
-        echo -e "${COLOR_ON}    MRS_SKIN_HOME          :${COLOR_OFF} ${MRS_CAST_NAME}"
-        echo -e "${COLOR_ON}    MRS_ROS_NAMESPACE      :${COLOR_OFF} ${MRS_ROS_NAMESPACE}"
-        echo -e "${COLOR_ON}    MRS_SKIN_HOME          :${COLOR_OFF} ${MRS_SKIN_HOME}"
-
-        echo -e "${COLOR_ON}BUILD${COLOR_OFF}"
-        echo -e "${COLOR_ON}    BUILD_DEVELOP          :${COLOR_OFF} ${BUILD_DEVELOP}"
-        echo -e "${COLOR_ON}    BUILD_HEAD_UNIT        :${COLOR_OFF} ${BUILD_HEAD_UNIT}"
-        echo -e "${COLOR_ON}    BUILD_ARM_UNIT         :${COLOR_OFF} ${BUILD_ARM_UNIT}"
-        echo -e "${COLOR_ON}    BUILD_WAIST_DOWN_UNIT  :${COLOR_OFF} ${BUILD_WAIST_DOWN_UNIT}"
-        echo -e "${COLOR_ON}    BUILD_MOBILITY_UNIT    :${COLOR_OFF} ${BUILD_MOBILITY_UNIT}"
-        echo -e "${COLOR_ON}    BUILD_CLOUD_UNIT       :${COLOR_OFF} ${BUILD_CLOUD_UNIT}"
-        echo -e "${COLOR_ON}    BUILD_MANAGEMENT_UNIT  :${COLOR_OFF} ${BUILD_MANAGEMENT_UNIT}"
-        echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
-    fi
-
-    if [ 0 -ne ${ret} ]; then
-        echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}  Build failed(${ret}).${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
-    fi
-}
-
-
+## =======================================
+## FUNCTION : COMMON
+## =======================================
 function mrs_set_export {
     IFS=$'\t'
     while (( $# > 0 ))
@@ -281,12 +98,9 @@ function mrs_load_config {
         local CONFIG_RAW=""
         for CONFIG_RAW in "${CONFIG_ARRAY[@]}"
         do
-            local JSON_KEY=$(echo ${JSON_DATA} | jq -c '.'$CONFIG_RAW)
-            if [ "null" != "${JSON_KEY}" ]; then
-                local EXPORTLIST=$(echo ${JSON_KEY} | jq -r ' to_entries[] | [.key, .value] | @tsv')
-                IFS=$'\n'
-                mrs_set_export ${EXPORTLIST}
-            fi
+            local EXPORTLIST=$(echo ${JSON_DATA} | jq -r '.'${CONFIG_RAW}' | to_entries[] | [.key, .value] | @tsv')
+            IFS=$'\n'
+            mrs_set_export ${EXPORTLIST}
         done
     fi
     IFS=$' \t\n'
@@ -303,69 +117,6 @@ function mrs_save_config {
     # echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
     # echo -e "${COLOR_ON_GREEN}MRS CONFIG : ${MRS_CONFIG}.${COLOR_OFF}"
     # echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
-}
-
-function mrs_create_node {
-    ## ================================
-    ## Escape sequence
-    local COLOR_ON_GREEN="\e[32m"
-    local COLOR_ON_RED="\e[31m"
-    local COLOR_OFF="\e[m"
-    local COLOR_ON=${COLOR_ON_GREEN}
-    ## ================================
-    local MY_NODE_NAME=$1
-    local MY_PACKAGE_NAME=$2
-    shift
-    shift
-
-    ## ================================
-    mrs_load_config ${MRS_CONFIG}
-    aros2_default
-    ## ================================
-    local DESCRIPTION_TEXT="This packageis..."
-    local ARGS_IN=()
-    ARGS_IN+=("--destination-directory ${MRS_ROS_PACKAGE_FOLDER}")
-    ARGS_IN+=("--build-type ament_cmake")
-    #ARGS_IN+=("--description '${DESCRIPTION_TEXT}'")
-    ARGS_IN+=("--license MIT")
-    ARGS_IN+=("--dependencies rclcpp rclcpp_components maid_robot_system_interfaces")
-    ARGS_IN+=("--maintainer-name $(git config --global user.name)")
-    ARGS_IN+=("--maintainer-email developer@masiro-project.com")
-    ARGS_IN+=("--node-name ${MY_NODE_NAME}")
-    while (( $# > 0 ))
-    do
-        ARGS_IN+=($1)
-        shift
-    done
-    ARGS_IN+=(${MY_PACKAGE_NAME})
-
-    if [ -z "${MY_NODE_NAME}" ]; then
-        echo -e "${COLOR_ON_RED}usage: mrs_create_node NODE_NAME PACKAGE_NAME${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}    NODE_NAME     : Name of the empty executable${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}    PACKAGE_NAME  : The package nam${COLOR_OFF}"
-    elif [ -z "${MY_PACKAGE_NAME}" ]; then
-        echo -e "${COLOR_ON_RED}usage: mrs_create_node NODE_NAME PACKAGE_NAME${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}    NODE_NAME     : Name of the empty executable${COLOR_OFF}"
-        echo -e "${COLOR_ON_RED}    PACKAGE_NAME  : The package nam${COLOR_OFF}"
-    else
-        pushd ${MRS_ROS_PACKAGE_FOLDER} > /dev/null
-            ros2 pkg create --description 'This package is ...' ${ARGS_IN[@]}
-            ret=$?
-            history -s mrs_create_node ${MY_NODE_NAME} ${MY_PACKAGE_NAME}
-
-            if [ 0 -ne ${ret} ]; then
-                COLOR_ON=${COLOR_ON_RED}
-            fi
-            echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
-            if [ 0 -ne ${ret} ]; then
-                echo -e "${COLOR_ON}[ERROR]${COLOR_OFF}"
-            fi
-            echo -e "${COLOR_ON}  DIRECTORY :${COLOR_OFF} ${MRS_ROS_PACKAGE_FOLDER}/${MY_PACKAGE_NAME}"
-            echo -e "${COLOR_ON}  NODE NAME :${COLOR_OFF} ${MY_NODE_NAME}"
-            echo -e "${COLOR_ON}  COMMAND   : ros2 pkg create --description 'This package is ...' ${ARGS_IN[@]}${COLOR_OFF}"
-            echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
-        popd > /dev/null
-    fi
 }
 
 function mrs_default {
@@ -397,6 +148,30 @@ function aros2_default {
     ### ROS 2
     export ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
     export ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY:-0}
+     if [ -z "${MRS_ROS_LOG_LEVEL}" ] ;then
+        export MRS_ROS_LOG_LEVEL="INFO"
+    else
+        case "${MRS_ROS_LOG_LEVEL^^}" in
+            F* )
+                export MRS_ROS_LOG_LEVEL="FATAL"
+                ;;
+            E* )
+                export MRS_ROS_LOG_LEVEL="ERROR"
+                ;;
+            W* )
+                export MRS_ROS_LOG_LEVEL="WARN"
+                ;;
+            I* )
+                export MRS_ROS_LOG_LEVEL="INFO"
+                ;;
+            D* )
+                export MRS_ROS_LOG_LEVEL="DEBUG"
+                ;;
+            * )
+                export MRS_ROS_LOG_LEVEL="INFO"
+                ;;
+        esac
+    fi
 
     ## =======================================
     ## Settings
@@ -447,6 +222,245 @@ function aros2_default {
     fi
 }
 
+## =======================================
+## FUNCTION
+## =======================================
+
+function mrs_build {
+    BUILD_DATE=`date +%Y%m%d%H%M%S`
+    ############################################################################
+    ##
+    ## mrs_build WORK_COMMANDS WORK_BUILD_TYPE WORK_PACKAGES_SELECT WORK_ARG_OPTION
+    ##
+    ##  WORK_COMMANDS        : rebuild or build or clean
+    ##  WORK_BUILD_TYPE      : debug or release
+    ##  WORK_PACKAGES_SELECT : (your package name)
+    ##  WORK_ARG_OPTION      : (add option)
+    ##
+    ##  exsample:
+    ##      ./build.sh build release
+    ##
+    local COLOR_ON_RED="\e[31m"
+    local COLOR_ON_BLUE="\e[34m"
+    local COLOR_ON_GREEN="\e[32m"
+    local COLOR_ON_YELLOW="\e[33m"
+    local COLOR_ON=${COLOR_ON_BLUE}
+    local COLOR_OFF="\e[m"
+    ## ================================
+    ret=0
+
+    mrs_load_config ${MRS_CONFIG}
+    aros2_default
+
+    if [ -n "${ROS_DISTRO}" ] ;then
+        ## ================================
+        ## command exsample:
+        ## /opt/MaidRobotSystem/source/ros/build.sh <build | rebuild | clean> <debug | release> [packages-select]
+        ## ================================
+        local TARGET_FOLDER=${MRS_ROS_PACKAGE_FOLDER}
+        local WORK_COMMANDS=${1:-"build"}
+        local WORK_BUILD_TYPE=${2:-${BUILD_TYPE}}
+        local WORK_PACKAGES_SELECT=${3:-""}
+        shift
+        shift
+        shift
+        local WORK_COLCON_PARAMETE=""
+        local WORK_ARG_OPTION=""
+        local WORK_CMAKE_ARGS=""
+        while (( $# > 0 ))
+        do
+            WORK_ARG_OPTION=" "$1
+            shift
+        done
+        COMPLILEDATE=`date +"%Y%m%d_%H%M%S"`
+        COMPLILEDATE_TEXT=`date +"%Y/%m/%d/ %H:%M:%S"`
+        ## ================================
+        ##  "BUILD_LOG_LEVEL": "CRITICAL"/"ERROR"/"WARNING"/"INFO"/"DEBUG"/"NOTSET"
+        if [ -z "${BUILD_LOG_LEVEL}" ] ;then
+            COLCON_LOG_LEVEL="INFO"
+        else
+            case "${BUILD_LOG_LEVEL^^}" in
+                "CRITICAL" )    COLCON_LOG_LEVEL="CRITICAL" ;;
+                "ERROR" )       COLCON_LOG_LEVEL="ERROR" ;;
+                "WARNING" )     COLCON_LOG_LEVEL="WARNING" ;;
+                "INFO" )        COLCON_LOG_LEVEL="INFO" ;;
+                "DEBUG" )       COLCON_LOG_LEVEL="DEBUG" ;;
+                "NOTSET" )      COLCON_LOG_LEVEL="NOTSET" ;;
+                * )             COLCON_LOG_LEVEL="INFO" ;;
+            esac
+        fi
+        if [[ "debug" == "${WORK_BUILD_TYPE,,}" ]]; then
+            WORK_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug"
+        else
+            WORK_CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release"
+        fi
+        ## ================================
+
+        local MRS_COLCON=${MRS_WORKSPACE}/.colcon
+        mkdir -p ${MRS_COLCON}
+        pushd ${MRS_COLCON} > /dev/null
+            ## ================================
+            if [ -n "${BUILD_CMAKE_ARGS}" ]; then
+                WORK_CMAKE_ARGS=" "${BUILD_CMAKE_ARGS}
+            fi
+            if [ ! -z "${WORK_CMAKE_ARGS}" ]; then
+                WORK_CMAKE_ARGS="--cmake-args "${WORK_CMAKE_ARGS}
+            fi
+
+            TARGET_FOLDER_ARG="--base-paths ${TARGET_FOLDER} --paths ${MRS_COLCON}"
+
+            ## ================================
+
+            if [ ! -z "${TARGET_FOLDER}" ]
+            then
+                if [ -d "${TARGET_FOLDER}" ]
+                then
+                    if [ "clean" = "${WORK_COMMANDS,,}" ]; then
+                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} rm -rf ${MRS_COLCON}"
+                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                        rm -rf ${MRS_COLCON}/*
+                        history -s ${MRS_COLCON}/*
+                    else
+                        if [ "rebuild" = "${WORK_COMMANDS,,}" ]; then
+                            WORK_COLCON_PARAMETE="--cmake-clean-first --cmake-clean-cache"
+                        fi
+
+                        source /usr/share/colcon_cd/function/colcon_cd.sh
+                        export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
+                        source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
+
+                        MAKEFLAGS=-j4
+
+                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                        if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
+                            WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}
+                        fi
+                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
+                        echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
+                        colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
+                        ret=$?
+                        history -s colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
+                        if [ 0 -eq ${ret} ]; then
+                            if [ -e ${MRS_COLCON}/install/ ]; then
+                                source ${MRS_COLCON}/install/local_setup.bash
+                            fi
+                        else
+                            COLOR_ON=${COLOR_ON_RED}
+                        fi
+                    fi
+                else
+                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+                    echo -e "${COLOR_ON_RED}  Could not find the folder :${COLOR_OFF} ${TARGET_FOLDER}"
+                    echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+                fi
+            else
+                echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+                echo -e "${COLOR_ON_RED}  Specify a folder as the argument.${COLOR_OFF}"
+                echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+            fi
+        popd > /dev/null
+
+        echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+        echo -e "${COLOR_ON}Date :${COLOR_OFF} ${COMPLILEDATE_TEXT}"
+        echo -e "${COLOR_ON}ROS                           :${COLOR_OFF} ${ROS_DISTRO}"
+        echo -e "${COLOR_ON}Colcon Workspace              :${COLOR_OFF} ${MRS_COLCON}"
+        echo -e "${COLOR_ON}Target Folder                 :${COLOR_OFF} ${TARGET_FOLDER}"
+        echo -e "${COLOR_ON}Colcon${COLOR_OFF}"
+        echo -e "${COLOR_ON}  Log level                   :${COLOR_OFF} ${COLCON_LOG_LEVEL}"
+        echo -e "${COLOR_ON}ENV${COLOR_OFF}"
+        echo -e "${COLOR_ON}  ROS${COLOR_OFF}"
+        echo -e "${COLOR_ON}    ROS_DOMAIN_ID             :${COLOR_OFF} ${ROS_DOMAIN_ID}"
+        echo -e "${COLOR_ON}    ROS_LOCALHOST_ONLY        :${COLOR_OFF} ${ROS_LOCALHOST_ONLY}"
+        echo -e "${COLOR_ON}    ROS_IP                    :${COLOR_OFF} ${ROS_IP}"
+        echo -e "${COLOR_ON}    ROS_MASTER_URI            :${COLOR_OFF} ${ROS_MASTER_URI}"
+        echo -e "${COLOR_ON}  MRS${COLOR_OFF}"
+        echo -e "${COLOR_ON}    MRS_CAST_ID               :${COLOR_OFF} ${MRS_CAST_ID}"
+        echo -e "${COLOR_ON}    MRS_CAST_NAME             :${COLOR_OFF} ${MRS_CAST_NAME}"
+        echo -e "${COLOR_ON}    MRS_CAST_SKIN             :${COLOR_OFF} ${MRS_CAST_SKIN}"
+        echo -e "${COLOR_ON}    MRS_ROS_NAMESPACE         :${COLOR_OFF} ${MRS_ROS_NAMESPACE}"
+
+        echo -e "${COLOR_ON}BUILD${COLOR_OFF}"
+        echo -e "${COLOR_ON}    MRS_BUILD_DEVELOP         :${COLOR_OFF} ${MRS_BUILD_DEVELOP}"
+        echo -e "${COLOR_ON}    MRS_BUILD_HEAD_UNIT       :${COLOR_OFF} ${MRS_BUILD_HEAD_UNIT}"
+        echo -e "${COLOR_ON}    MRS_BUILD_ARM_UNIT        :${COLOR_OFF} ${MRS_BUILD_ARM_UNIT}"
+        echo -e "${COLOR_ON}    MRS_BUILD_WAIST_DOWN_UNIT :${COLOR_OFF} ${MRS_BUILD_WAIST_DOWN_UNIT}"
+        echo -e "${COLOR_ON}    MRS_BUILD_MOBILITY_UNIT   :${COLOR_OFF} ${MRS_BUILD_MOBILITY_UNIT}"
+        echo -e "${COLOR_ON}    MRS_BUILD_CLOUD_UNIT      :${COLOR_OFF} ${MRS_BUILD_CLOUD_UNIT}"
+        echo -e "${COLOR_ON}    MRS_BUILD_MANAGEMENT_UNIT :${COLOR_OFF} ${MRS_BUILD_MANAGEMENT_UNIT}"
+        echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+    fi
+
+    if [ 0 -ne ${ret} ]; then
+        echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}  Build failed(${ret}).${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}===============================================================================${COLOR_OFF}"
+    fi
+}
+
+function mrs_create_node {
+    ## ================================
+    ## Escape sequence
+    local COLOR_ON_GREEN="\e[32m"
+    local COLOR_ON_RED="\e[31m"
+    local COLOR_OFF="\e[m"
+    local COLOR_ON=${COLOR_ON_GREEN}
+    ## ================================
+    local MY_NODE_NAME=$1
+    local MY_PACKAGE_NAME=$2
+    shift
+    shift
+
+    ## ================================
+    mrs_load_config ${MRS_CONFIG}
+    aros2_default
+    ## ================================
+    local DESCRIPTION_TEXT="This packageis..."
+    local ARGS_IN=()
+    ARGS_IN+=("--destination-directory ${MRS_ROS_PACKAGE_FOLDER}")
+    ARGS_IN+=("--build-type ament_cmake")
+    #ARGS_IN+=("--build-type ament_python")
+    #ARGS_IN+=("--description '${DESCRIPTION_TEXT}'")
+    ARGS_IN+=("--license MIT")
+    ARGS_IN+=("--dependencies rclcpp rclcpp_components maid_robot_system_interfaces")
+    ARGS_IN+=("--maintainer-name $(git config --global user.name)")
+    ARGS_IN+=("--maintainer-email developer@masiro-project.com")
+    ARGS_IN+=("--node-name ${MY_NODE_NAME}")
+    while (( $# > 0 ))
+    do
+        ARGS_IN+=($1)
+        shift
+    done
+    ARGS_IN+=(${MY_PACKAGE_NAME})
+
+    if [ -z "${MY_NODE_NAME}" ]; then
+        echo -e "${COLOR_ON_RED}usage: mrs_create_node NODE_NAME PACKAGE_NAME${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}    NODE_NAME     : Name of the empty executable${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}    PACKAGE_NAME  : The package nam${COLOR_OFF}"
+    elif [ -z "${MY_PACKAGE_NAME}" ]; then
+        echo -e "${COLOR_ON_RED}usage: mrs_create_node NODE_NAME PACKAGE_NAME${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}    NODE_NAME     : Name of the empty executable${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}    PACKAGE_NAME  : The package nam${COLOR_OFF}"
+    else
+        pushd ${MRS_ROS_PACKAGE_FOLDER} > /dev/null
+            ros2 pkg create --description 'This package is ...' ${ARGS_IN[@]}
+            ret=$?
+            history -s mrs_create_node ${MY_NODE_NAME} ${MY_PACKAGE_NAME}
+
+            if [ 0 -ne ${ret} ]; then
+                COLOR_ON=${COLOR_ON_RED}
+            fi
+            echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+            if [ 0 -ne ${ret} ]; then
+                echo -e "${COLOR_ON}[ERROR]${COLOR_OFF}"
+            fi
+            echo -e "${COLOR_ON}  DIRECTORY :${COLOR_OFF} ${MRS_ROS_PACKAGE_FOLDER}/${MY_PACKAGE_NAME}"
+            echo -e "${COLOR_ON}  NODE NAME :${COLOR_OFF} ${MY_NODE_NAME}"
+            echo -e "${COLOR_ON}  COMMAND   :${COLOR_OFF} ros2 pkg create --description 'This package is ...' ${ARGS_IN[@]}"
+            echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+        popd > /dev/null
+    fi
+}
 
 function aros2 {
     ## ================================
@@ -512,31 +526,38 @@ function aros2_param_list {
     local COLOR_OFF="\e[m"
     local COLOR_ON=${COLOR_ON_GREEN}
     ## ================================
-    local PACKAGE_NAME=$1
+    local NODE_NAME=$1
 
     ## ================================
     mrs_load_config ${MRS_CONFIG}
     aros2_default
     ## ================================
 
-    if [ -z "${PACKAGE_NAME}" ]; then
-        PACKAGE_NAME=$(ros2 pkg list | grep 'maid_' | fzf)
+    if [ -z "${NODE_NAME}" ]; then
+        NODE_NAME=$(ros2 node list | grep 'maid_' | fzf)
     fi
-    if [ ! -z "${PACKAGE_NAME}" ]; then
-        local PARAM_ARRAY=($(ros2 param list ${PACKAGE_NAME}))
+    if [ "--help" = "${NODE_NAME}" ]; then
+        echo -e "${COLOR_ON_RED}usage: aros2_param_list NODE_NAME${COLOR_OFF}"
+        echo -e ""
+        echo -e "${COLOR_ON_RED}  positional arguments::${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}    NODE_NAME  : The node name${COLOR_OFF}"
+        return
+    fi
+    if [ ! -z "${NODE_NAME}" ]; then
+        local PARAM_ARRAY=($(ros2 param list ${NODE_NAME}))
         local PARAM_COUNT=${#PARAM_ARRAY[@]}
         local RAW_COUNT=0
         echo "----------------"
-        echo "ros2 param get ${PACKAGE_NAME} ..."
+        echo "ros2 param get ${NODE_NAME} ..."
         for PARAM_RAW in "${PARAM_ARRAY[@]}"
         do
             RAW_COUNT=$((RAW_COUNT+1))
-            value=$(ros2 param get ${PACKAGE_NAME} ${PARAM_RAW})
+            value=$(ros2 param get ${NODE_NAME} ${PARAM_RAW})
             printf "  [%03s/%03s] %-35s : %s\n" "${RAW_COUNT}" "${PARAM_COUNT}" "${PARAM_RAW:0:34}" "${value}"
         done
-        history -s aros2_param_list ${PACKAGE_NAME}
+        history -s aros2_param_list ${NODE_NAME}
     else
-        echo -e "${COLOR_ON_RED}Not found package${COLOR_OFF}"
+        echo -e "${COLOR_ON_RED}Not found node${COLOR_OFF}"
     fi
 }
 
@@ -563,27 +584,22 @@ function aros2_topic_pub {
         shift
         shift
         shift
-        echo ========================================
         local CMD_OPTIONS=()
         while (( $# > 0 ))
         do
             CMD_OPTIONS+=($1)
             shift
         done
-        echo ========================================
         ## ================================
         mrs_load_config ${MRS_CONFIG}
         aros2_default
         ## ================================
-        echo ========================================
 
         if [ ! -z "${MRS_WORKSPACE}" ]
         then
             if [ -d "${MRS_WORKSPACE}" ]
             then
-        echo ========================================
-                pushd ${MRS_WORKSPACE}
-        echo ========================================
+                pushd ${MRS_WORKSPACE} > /dev/null
                     export _colcon_cd_root=/opt/ros/${ROS_DISTRO}/
                     source /usr/share/colcon_cd/function/colcon_cd.sh
                     source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash

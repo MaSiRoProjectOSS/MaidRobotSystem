@@ -17,11 +17,11 @@ namespace maid_robot_system
 // =============================
 void NodeImplement::callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
-    this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_LEFT, &msg);
+    this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_LEFT, msg);
 }
 void NodeImplement::callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
-    this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_RIGHT, &msg);
+    this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_RIGHT, msg);
 }
 void NodeImplement::callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg)
 {
@@ -94,7 +94,7 @@ void NodeImplement::callback_param()
 // =============================
 void NodeImplement::callback_timer()
 {
-    bool result = this->_model.calculate();
+    bool result = this->_model.calculate(this->_msg_hitomi, this->_msg_kubi, this->_msg_kuchibiru);
     this->_pub_hitomi->publish(this->_msg_hitomi);
     this->_pub_kubi->publish(this->_msg_kubi);
     this->_pub_kuchibiru->publish(this->_msg_kuchibiru);
