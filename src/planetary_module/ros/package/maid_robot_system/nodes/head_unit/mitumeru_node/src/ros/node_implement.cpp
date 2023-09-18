@@ -27,6 +27,7 @@ void NodeImplement::callback_ar_left(const maid_robot_system_interfaces::msg::Ar
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
+            RCLCPP_DEBUG(this->get_logger(), "[%s] : %ld", this->get_name(), msg.ids[i]);
             this->_model.set_value_ar(ModelStructure::INPUT_TYPE::AR_LEFT, msg.ids[i]);
         }
     }
@@ -35,12 +36,14 @@ void NodeImplement::callback_ar_right(const maid_robot_system_interfaces::msg::A
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
+            RCLCPP_DEBUG(this->get_logger(), "[%s] : %ld", this->get_name(), msg.ids[i]);
             this->_model.set_value_ar(ModelStructure::INPUT_TYPE::AR_RIGHT, msg.ids[i]);
         }
     }
 }
 void NodeImplement::callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg)
 {
+    RCLCPP_DEBUG(this->get_logger(), "[%s] : %d", this->get_name(), msg.command);
     this->_model.set_value_voice(msg.text, msg.command);
 }
 
@@ -50,43 +53,108 @@ void NodeImplement::callback_voice(const maid_robot_system_interfaces::msg::MrsV
 void NodeImplement::callback_param()
 {
     // declare_parameter
-    // this->declare_parameter(MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
-    // this->declare_parameter(MRS_PARAMETER_SAMPLE_OFFSET, this->_model.get_offset());
+    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_X_LEFT, this->_model.param.oculus_center_x_left);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_Y_LEFT, this->_model.param.oculus_center_y_left);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_UP_LEFT, this->_model.param.oculus_offset_up_left);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_DOWN_LEFT, this->_model.param.oculus_offset_down_left);
+
+    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_X_RIGHT, this->_model.param.oculus_center_x_right);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_Y_RIGHT, this->_model.param.oculus_center_y_right);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_UP_RIGHT, this->_model.param.oculus_offset_up_right);
+    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_DOWN_RIGHT, this->_model.param.oculus_offset_down_right);
+
+    this->declare_parameter(this->MRS_PARAM_NECK_PITCH_MIN, this->_model.param.neck_pitch_min);
+    this->declare_parameter(this->MRS_PARAM_NECK_PITCH_MAX, this->_model.param.neck_pitch_max);
+    this->declare_parameter(this->MRS_PARAM_NECK_YAW_MIN, this->_model.param.neck_yaw_min);
+    this->declare_parameter(this->MRS_PARAM_NECK_YAW_MAX, this->_model.param.neck_yaw_max);
+    this->declare_parameter(this->MRS_PARAM_NECK_ROLL_MIN, this->_model.param.neck_roll_min);
+    this->declare_parameter(this->MRS_PARAM_NECK_ROLL_MAX, this->_model.param.neck_roll_max);
+
+    this->declare_parameter(this->MRS_PARAM_LIP_MIN, this->_model.param.lip_min);
+    this->declare_parameter(this->MRS_PARAM_LIP_MAX, this->_model.param.lip_max);
 
     // make parameter callback
-    this->_sub_parameter = std::make_shared<rclcpp::ParameterEventHandler>(this);
-    auto cb              = [this](const rclcpp::Parameter &param) {
-        std::string p_name = param.get_name().c_str();
-        RCLCPP_INFO(this->get_logger(), "GET param - %s", p_name.c_str());
-        switch (param.get_type()) {
-            case rclcpp::PARAMETER_DOUBLE:
-                /*
-                if (0 == p_name.compare(MRS_PARAMETER_SAMPLE_TIMES)) {
-                    // this->_model.set_times(param.as_double());
-                    RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
-                }
-                if (0 == p_name.compare(MRS_PARAMETER_SAMPLE_OFFSET)) {
-                    // this->_model.set_offset(param.as_double());
-                    RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", MRS_PARAMETER_SAMPLE_OFFSET, this->_model.get_offset());
-                }
-                */
-                break;
-            case rclcpp::PARAMETER_INTEGER:
-            case rclcpp::PARAMETER_NOT_SET:
-            case rclcpp::PARAMETER_BOOL:
-            case rclcpp::PARAMETER_STRING:
-            case rclcpp::PARAMETER_BYTE_ARRAY:
-            case rclcpp::PARAMETER_BOOL_ARRAY:
-            case rclcpp::PARAMETER_INTEGER_ARRAY:
-            case rclcpp::PARAMETER_DOUBLE_ARRAY:
-            case rclcpp::PARAMETER_STRING_ARRAY:
-            default:
-                break;
-        }
-    };
+    this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
+        auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
+        RCLCPP_DEBUG(this->get_logger(), "callback param");
 
-    this->_handle_param1 = this->_sub_parameter->add_parameter_callback(MRS_PARAMETER_SAMPLE_OFFSET, cb);
-    this->_handle_param2 = this->_sub_parameter->add_parameter_callback(MRS_PARAMETER_SAMPLE_TIMES, cb);
+        results->successful = false;
+        results->reason     = "";
+
+        for (auto &&param : params) {
+            switch (param.get_type()) {
+                case rclcpp::PARAMETER_DOUBLE:
+                    if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_X_LEFT) {
+                        this->_model.param.oculus_center_x_left = param.as_double();
+                        results->successful                     = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_Y_LEFT) {
+                        this->_model.param.oculus_center_y_left = param.as_double();
+                        results->successful                     = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_UP_LEFT) {
+                        this->_model.param.oculus_offset_up_left = param.as_double();
+                        results->successful                      = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_DOWN_LEFT) {
+                        this->_model.param.oculus_offset_down_left = param.as_double();
+                        results->successful                        = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_X_RIGHT) {
+                        this->_model.param.oculus_center_x_right = param.as_double();
+                        results->successful                      = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_Y_RIGHT) {
+                        this->_model.param.oculus_center_y_right = param.as_double();
+                        results->successful                      = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_UP_RIGHT) {
+                        this->_model.param.oculus_offset_up_right = param.as_double();
+                        results->successful                       = true;
+                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_DOWN_RIGHT) {
+                        this->_model.param.oculus_offset_down_right = param.as_double();
+                        results->successful                         = true;
+                    }
+                    break;
+                case rclcpp::PARAMETER_INTEGER:
+
+                    if (param.get_name() == this->MRS_PARAM_NECK_PITCH_MIN) {
+                        this->_model.param.neck_pitch_min = param.as_int();
+                        results->successful               = true;
+                    } else if (param.get_name() == this->MRS_PARAM_NECK_PITCH_MAX) {
+                        this->_model.param.neck_pitch_max = param.as_int();
+                        results->successful               = true;
+                    } else if (param.get_name() == this->MRS_PARAM_NECK_YAW_MIN) {
+                        this->_model.param.neck_yaw_min = param.as_int();
+                        results->successful             = true;
+                    } else if (param.get_name() == this->MRS_PARAM_NECK_YAW_MAX) {
+                        this->_model.param.neck_yaw_max = param.as_int();
+                        results->successful             = true;
+                    } else if (param.get_name() == this->MRS_PARAM_NECK_ROLL_MIN) {
+                        this->_model.param.neck_roll_min = param.as_int();
+                        results->successful              = true;
+                    } else if (param.get_name() == this->MRS_PARAM_NECK_ROLL_MAX) {
+                        this->_model.param.neck_roll_max = param.as_int();
+                        results->successful              = true;
+                    } else if (param.get_name() == this->MRS_PARAM_LIP_MIN) {
+                        this->_model.param.lip_min = param.as_int();
+                        results->successful        = true;
+                    } else if (param.get_name() == this->MRS_PARAM_LIP_MAX) {
+                        this->_model.param.lip_max = param.as_int();
+                        results->successful        = true;
+                    }
+
+                    break;
+                case rclcpp::PARAMETER_NOT_SET:
+                case rclcpp::PARAMETER_BOOL:
+                case rclcpp::PARAMETER_STRING:
+                case rclcpp::PARAMETER_BYTE_ARRAY:
+                case rclcpp::PARAMETER_BOOL_ARRAY:
+                case rclcpp::PARAMETER_INTEGER_ARRAY:
+                case rclcpp::PARAMETER_DOUBLE_ARRAY:
+                case rclcpp::PARAMETER_STRING_ARRAY:
+                default:
+                    results->successful = false;
+                    results->reason     = "Wrong operation";
+                    break;
+            }
+        }
+        return *results;
+    });
 }
 
 // =============================
@@ -94,10 +162,15 @@ void NodeImplement::callback_param()
 // =============================
 void NodeImplement::callback_timer()
 {
-    bool result = this->_model.calculate(this->_msg_hitomi, this->_msg_kubi, this->_msg_kuchibiru);
-    this->_pub_hitomi->publish(this->_msg_hitomi);
-    this->_pub_kubi->publish(this->_msg_kubi);
-    this->_pub_kuchibiru->publish(this->_msg_kuchibiru);
+    bool result = this->_model.calculate();
+    if (true == result) {
+        this->_model.get_msg_oculus(this->_msg_oculus);
+        this->_model.get_msg_neck(this->_msg_neck);
+        this->_model.get_msg_lip(this->_msg_lip);
+    }
+    this->_pub_oculus->publish(this->_msg_oculus);
+    this->_pub_neck->publish(this->_msg_neck);
+    this->_pub_lip->publish(this->_msg_lip);
 }
 
 // =============================
@@ -111,19 +184,19 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     this->callback_param();
 
     // set publisher
-    this->_pub_hitomi =                                                           //
+    this->_pub_oculus =                                                           //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsHitomi>( //
-                    this->MRS_TOPIC_OUT_HITOMI,                                   //
+                    this->MRS_TOPIC_OUT_OCULUS,                                   //
                     rclcpp::QoS(this->CONFIG_QOS)                                 //
             );
-    this->_pub_kubi =                                                           //
+    this->_pub_neck =                                                           //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsKubi>( //
-                    this->MRS_TOPIC_OUT_KUBI,                                   //
+                    this->MRS_TOPIC_OUT_NECK,                                   //
                     rclcpp::QoS(this->CONFIG_QOS)                               //
             );
-    this->_pub_kuchibiru =                                                           //
+    this->_pub_lip =                                                                 //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsKuchibiru>( //
-                    this->MRS_TOPIC_OUT_KUCHIBIRU,                                   //
+                    this->MRS_TOPIC_OUT_LIP,                                         //
                     rclcpp::QoS(this->CONFIG_QOS)                                    //
             );
 

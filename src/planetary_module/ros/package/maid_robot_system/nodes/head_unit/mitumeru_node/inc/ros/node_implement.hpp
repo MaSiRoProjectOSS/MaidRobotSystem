@@ -11,7 +11,6 @@
 #define MRS_NODE_MITUMERU_NODE_IMPLEMENT_HPP
 
 #include "models/model_implement.hpp"
-#include "parameter.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <maid_robot_system_interfaces/msg/ar_markers.hpp>
@@ -31,17 +30,17 @@ private:
     // Variable
     // =============================
     ModelImplement _model;
-    maid_robot_system_interfaces::msg::MrsHitomi _msg_hitomi;
-    maid_robot_system_interfaces::msg::MrsKubi _msg_kubi;
-    maid_robot_system_interfaces::msg::MrsKuchibiru _msg_kuchibiru;
+    maid_robot_system_interfaces::msg::MrsHitomi _msg_oculus;
+    maid_robot_system_interfaces::msg::MrsKubi _msg_neck;
+    maid_robot_system_interfaces::msg::MrsKuchibiru _msg_lip;
 
 private:
     // =============================
     // ROS : publisher
     // =============================
-    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsHitomi>::SharedPtr _pub_hitomi;
-    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKubi>::SharedPtr _pub_kubi;
-    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKuchibiru>::SharedPtr _pub_kuchibiru;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsHitomi>::SharedPtr _pub_oculus;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKubi>::SharedPtr _pub_neck;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsKuchibiru>::SharedPtr _pub_lip;
 
 private:
     // =============================
@@ -64,9 +63,7 @@ private:
     // ROS : parameter
     // =============================
     void callback_param();
-    std::shared_ptr<rclcpp::ParameterEventHandler> _sub_parameter;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> _handle_param1;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> _handle_param2;
+    OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
     // =============================
@@ -88,9 +85,29 @@ private:
     const std::string MRS_TOPIC_IN_AR_LEFT    = "in/ar/left";
     const std::string MRS_TOPIC_IN_AR_RIGHT   = "in/ar/left";
     const std::string MRS_TOPIC_IN_VOICE      = "in/voice";
-    const std::string MRS_TOPIC_OUT_HITOMI    = "out/hitomi";
-    const std::string MRS_TOPIC_OUT_KUBI      = "out/kubi";
-    const std::string MRS_TOPIC_OUT_KUCHIBIRU = "out/kuchibiru";
+    const std::string MRS_TOPIC_OUT_OCULUS    = "out/oculus";
+    const std::string MRS_TOPIC_OUT_NECK      = "out/neck";
+    const std::string MRS_TOPIC_OUT_LIP       = "out/lip";
+
+    const std::string MRS_PARAM_OCULUS_CENTER_X_LEFT    = "oculus/left/center/x";
+    const std::string MRS_PARAM_OCULUS_CENTER_Y_LEFT    = "oculus/left/center/y";
+    const std::string MRS_PARAM_OCULUS_OFFSET_UP_LEFT   = "oculus/left/offset/up";
+    const std::string MRS_PARAM_OCULUS_OFFSET_DOWN_LEFT = "oculus/left/offset/down";
+
+    const std::string MRS_PARAM_OCULUS_CENTER_X_RIGHT    = "oculus/right/center/x";
+    const std::string MRS_PARAM_OCULUS_CENTER_Y_RIGHT    = "oculus/right/center/y";
+    const std::string MRS_PARAM_OCULUS_OFFSET_UP_RIGHT   = "oculus/right/offset/up";
+    const std::string MRS_PARAM_OCULUS_OFFSET_DOWN_RIGHT = "oculus/right/offset/down";
+
+    const std::string MRS_PARAM_NECK_PITCH_MIN = "neck/pitch/min";
+    const std::string MRS_PARAM_NECK_PITCH_MAX = "neck/pitch/max";
+    const std::string MRS_PARAM_NECK_YAW_MIN   = "neck/yaw/min";
+    const std::string MRS_PARAM_NECK_YAW_MAX   = "neck/yaw/max";
+    const std::string MRS_PARAM_NECK_ROLL_MIN  = "neck/roll/min";
+    const std::string MRS_PARAM_NECK_ROLL_MAX  = "neck/roll/max";
+
+    const std::string MRS_PARAM_LIP_MIN = "lip/min";
+    const std::string MRS_PARAM_LIP_MAX = "lip/max";
 };
 
 } // namespace maid_robot_system

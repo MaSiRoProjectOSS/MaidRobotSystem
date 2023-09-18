@@ -14,12 +14,6 @@ setup(
             ['resource/' + package_name]),
         (os.path.join('share', package_name), ['package.xml']),
         # Add sub files.
-        (os.path.join('lib', package_name, 'features', 'mp'), glob(
-            os.path.join(package_name, 'features', 'mp', '*.py'))),
-        (os.path.join('lib', package_name, 'features', 'ros'), glob(
-            os.path.join(package_name, 'features', 'ros', '*.py'))),
-        (os.path.join('lib', package_name, 'features'), glob(
-            os.path.join(package_name, 'features', '*.py'))),
         (os.path.join('lib', package_name, 'utils'), glob(
             os.path.join(package_name, 'utils', '*.py'))),
         # Include all launch files.
@@ -38,8 +32,7 @@ setup(
             'video_capture_node = maid_robot_system_py.video_capture_node:main',
             'detect_ar_node = maid_robot_system_py.detect_ar_node:main',
             'mediapipe_node = maid_robot_system_py.mediapipe_node:main',
-            'mediapipe_ext_node = maid_robot_system_py.mediapipe_ext_node:main',
-            'recognition_in_node = maid_robot_system_py.recognition_in_node:main'
+            'mediapipe_ext_node = maid_robot_system_py.mediapipe_ext_node:main'
         ],
     },
 )

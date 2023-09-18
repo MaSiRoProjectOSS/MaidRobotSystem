@@ -11,7 +11,6 @@
 #define SAMPLE_NODE_NODE_IMPLEMENT_HPP
 
 #include "models/model_implement.hpp"
-#include "parameter.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <maid_robot_system_interfaces/msg/mrs_sample.hpp>
@@ -35,7 +34,7 @@ private:
     // =============================
     // ROS : publisher
     // =============================
-    maid_robot_system_interfaces::msg::MrsSample _convert_msg;
+    maid_robot_system_interfaces::msg::MrsSample _msg_convert;
     rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsSample>::SharedPtr _pub_info;
 
 private:
@@ -51,7 +50,6 @@ private:
     // ROS : parameter
     // =============================
     void callback_param();
-    std::shared_ptr<rclcpp::ParameterEventHandler> _sub_parameter;
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
@@ -69,8 +67,10 @@ private:
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 1000 };
 
-    const std::string MRS_TOPIC_OUTPUT = "out";
-    const std::string MRS_TOPIC_INPUT  = "in";
+    const std::string MRS_TOPIC_OUTPUT            = "out";
+    const std::string MRS_TOPIC_INPUT             = "in";
+    const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
+    const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";
 };
 
 } // namespace maid_robot_system

@@ -11,101 +11,70 @@
 
 namespace maid_robot_system
 {
-bool ModelImplement::calculate(maid_robot_system_interfaces::msg::MrsHitomi &msg_hitomi,
-                               maid_robot_system_interfaces::msg::MrsKubi &msg_kubi,
-                               maid_robot_system_interfaces::msg::MrsKuchibiru &msg_kuchibiru)
+bool ModelImplement::calculate()
 {
-    bool result = false;
-    /*
-    if (human_find_flag == 0 or (human_find_flag == 1 and human_confront_flag == 0)) {
-        if (time.time() - timer_tracking_timeout > TIME_timer_tracking_timeout) {
-            timer_tracking_timeout = time.time() - 0.5;
-            send_eye_target        = Pose2D(x = 0, y = 0);
-            neck_cmd_pose.linear.x = 0;
-            To_face_yaw            = 0;
-        }
+    bool result           = false;
+    double target_angle_x = 0.0;
+    double target_angle_y = 0.0;
+    double target_roll    = 0.0;
+    StTemporary primary;
+    StTemporary secondary;
+    if (true == this->param.priority_to_the_right) {
+        primary   = this->_temp_right;
+        secondary = this->_temp_left;
+    } else {
+        primary   = this->_temp_left;
+        secondary = this->_temp_right;
     }
-    */
-    // TODO
-    /*
-一定時間経過後も人が見つからない場合は、首を中央に戻す
-*/
 
-    /*
-    送信メッセージに格納するように変更する。
-    left/rightでの判定を分ける。
-
-
-get_eye_cmd_angle.linear.x; // 感情
-get_eye_cmd_angle.linear.y;  // 瞳のサイズ
-get_eye_cmd_angle.linear.z;  // 距離
-get_eye_cmd_angle.angular.y; // y 座標
-get_eye_cmd_angle.angular.z; // x 座標
-
-                if (cap_mode == "left"):
-                    offset_x_angle = -40.0
-                    offset_y_angle = 0.0
-                    target_angle_z_R = to_face_yaw + offset_x_angle
-                    target_angle_y_R = to_face_pitch + offset_y_angle
-                if (cap_mode == "right"):
-                    offset_x_angle = -12.0
-                    offset_y_angle = 0.0
-                    target_angle_z_L = to_face_yaw + offset_x_angle
-                    target_angle_y_L = to_face_pitch + offset_y_angle
-
-                target_angle_z = (target_angle_z_L + target_angle_z_R) / 2.0
-                target_angle_y = (target_angle_y_L + target_angle_y_R) / 2.0
-
-                eye_cmd_angle.angular.y = target_angle_y / -2.0
-                eye_cmd_angle.angular.z = target_angle_z / 1.5
-                # eye_size
-                eye_cmd_angle.linear.y = 0.98
-                # eye_cmd_angle.linear.z = 500 - 500 * (abs(target_angle_z_L - target_angle_z_R) /10.0)
-
-                abs(target_angle_z_L - target_angle_z_R)/10.0
-
-                if (human_confront_flag == 1):
-                    neck_cmd_pose.linear.x = 111
-                    neck_cmd_pose.angular.y = target_angle_y / 2.5
-                    neck_cmd_pose.angular.z = target_angle_z / -2.5
-                    neck_cmd_pose.angular.x = target_roll / 4.0
-
-                    # print(neck_cmd_pose.angular.z)
-                    pub_neck_cmd_angle.publish(neck_cmd_pose)
-
-                debug_image = draw_bounding_rect(use_b_rect, debug_image, b_rect)
-
-
-            if (human_find_flag == 0 or (human_find_flag == 1 and human_confront_flag == 0)):
-
-                if (time.time() - timer_tracking_timeout > TIME_timer_tracking_timeout):
-                    timer_tracking_timeout = time.time() - 0.5
-                    send_eye_target = Pose2D(x=0, y=0)
-                    neck_cmd_pose.linear.x = 0
-                    pub_eye_target.publish(send_eye_target)
-                    to_face_yaw = 0
-                    pub_neck_cmd_angle.publish(neck_cmd_pose)
-
-    */
-    /*
-    target_angle_z          = (target_angle_z_L + target_angle_z_R) / 2.0;
-    target_angle_y          = (target_angle_y_L + target_angle_y_R) / 2.0;
-    eye_cmd_angle.angular.y = target_angle_y / -2.0;
-    eye_cmd_angle.angular.z = target_angle_z / 1.5;
-    //# eye_size
-    eye_cmd_angle.linear.y = 0.98;
-    if (human_confront_flag == 1) {
-        neck_cmd_pose.linear.x  = 111;
-        neck_cmd_pose.angular.y = target_angle_y / 2.5;
-        neck_cmd_pose.angular.z = target_angle_z / -2.5;
-        neck_cmd_pose.angular.x = target_roll / 4.0;
+    // The decision formula was changed.
+    // The previous formula was based on the average of two cameras.
+    // The formula is now divided into three parts depending on the detection status.
+    if ((true == primary.detected) && (true == secondary.detected)) {
+        target_angle_x = (primary.x + secondary.y) / 2.0;
+        target_angle_y = (primary.y + secondary.y) / 2.0;
+        target_roll    = (primary.target_roll + secondary.target_roll) / 2.0;
+        result         = true;
+    } else if (true == primary.detected) {
+        target_angle_x = primary.x;
+        target_angle_y = primary.y;
+        target_roll    = primary.target_roll;
+        result         = true;
+    } else if (true == secondary.detected) {
+        target_angle_x = secondary.x;
+        target_angle_y = secondary.y;
+        target_roll    = secondary.target_roll;
+        result         = true;
     }
     if (true == result) {
-        this->_get_value_hitomi(&msg_hitomi);
-        this->_get_value_kubi(&msg_kubi);
-        this->_get_value_kuchibiru(&msg_kuchibiru);
+        this->_msg_oculus.emotions = 0;
+        this->_msg_oculus.size     = 1;
+        this->_msg_oculus.distance = 0.98;
+        this->_msg_oculus.x        = target_angle_x;
+        this->_msg_oculus.y        = target_angle_y;
+
+        // TODO :
+        this->_msg_neck.x = target_angle_x;
+        this->_msg_neck.y = target_angle_y;
+        this->_msg_neck.z = target_roll;
+    } else {
+        if (false) {
+            // TODO :
+            // 一定時間経過しても判定がないならば、
+            // 位置の初期化
+            this->_msg_oculus.emotions = 0;
+            this->_msg_oculus.size     = 1;
+            this->_msg_oculus.distance = 0.98;
+            this->_msg_oculus.x        = 0;
+            this->_msg_oculus.y        = 0;
+            //
+            this->_msg_neck.x = 0;
+            this->_msg_neck.y = 0;
+            this->_msg_neck.z = 0;
+            result            = true;
+        }
     }
-    */
+
     return result;
 }
 // =============================
@@ -142,10 +111,10 @@ bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_
     bool result = false;
     switch (type) {
         case ModelStructure::INPUT_TYPE::POSE_LEFT:
-            result = this->_calculate_pose(msg, this->_eye_left);
+            result = this->_calculate_pose(msg, this->_temp_left);
             break;
         case ModelStructure::INPUT_TYPE::POSE_RIGHT:
-            result = this->_calculate_pose(msg, this->_eye_right);
+            result = this->_calculate_pose(msg, this->_temp_right);
             break;
         default:
             break;
@@ -153,74 +122,90 @@ bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_
     return result;
 }
 
-void ModelImplement::_get_value_hitomi(maid_robot_system_interfaces::msg::MrsHitomi &msg)
+void ModelImplement::get_msg_oculus(maid_robot_system_interfaces::msg::MrsHitomi &msg)
 {
-    msg.emotions = this->_msg_hitomi.emotions;
-    msg.size     = this->_msg_hitomi.size;
-    msg.distance = this->_msg_hitomi.distance;
-    msg.x        = this->_msg_hitomi.x;
-    msg.y        = this->_msg_hitomi.y;
+    msg.emotions = this->_msg_oculus.emotions;
+    msg.size     = this->_msg_oculus.size;
+    msg.distance = this->_msg_oculus.distance;
+    msg.x        = this->_msg_oculus.x;
+    msg.y        = this->_msg_oculus.y;
 }
-void ModelImplement::_get_value_kubi(maid_robot_system_interfaces::msg::MrsKubi &msg)
+void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsKubi &msg)
 {
-    msg.x = this->_msg_kubi.x;
-    msg.y = this->_msg_kubi.y;
-    msg.z = this->_msg_kubi.z;
-    msg.w = this->_msg_kubi.w;
+    //  this->param.neck_pitch_min  = 0;
+    //  this->param. neck_pitch_max = 0;
+    //   this->param.neck_yaw_min    = 0;
+    //   this->param.neck_yaw_max    = 0;
+    //   this->param. neck_roll_min  = 0;
+    //   this->param.neck_roll_max = 0;
+
+    msg.x = this->_msg_neck.x;
+    msg.y = this->_msg_neck.y;
+    msg.z = this->_msg_neck.z;
+    msg.w = this->_msg_neck.w;
 }
-void ModelImplement::_get_value_kuchibiru(maid_robot_system_interfaces::msg::MrsKuchibiru &msg)
+void ModelImplement::get_msg_lip(maid_robot_system_interfaces::msg::MrsKuchibiru &msg)
 {
-    msg.x = this->_msg_kuchibiru.x;
-    msg.y = this->_msg_kuchibiru.y;
-    msg.z = this->_msg_kuchibiru.z;
-    msg.w = this->_msg_kuchibiru.w;
+    msg.percent = std::min(std::max(this->_msg_lip.percent, this->param.lip_min), this->param.lip_max);
 }
-bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::PoseDetection msg, st_eye &data)
+
+// =============================
+// PRIVATE : Function
+// =============================
+bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::PoseDetection msg, StTemporary &temp)
 {
     // ターゲットの位置を決定する。
-    bool result = false;
-    /*
-    data.detected            = msg.human_detected;
-    double target_roll       = 0;
-    double x                 = data.landmark.nose.x;
-    double y                 = data.landmark.nose.y;
-    double z                 = data.landmark.nose.z;
-    bool human_confront_flag = false;
-    if (true == data.detected) {
-        result = true;
+    bool result = msg.human_detected;
+    if (true == result) {
+        double x = msg.landmark.nose.x;
+        double y = msg.landmark.nose.y;
+        double z = msg.landmark.nose.z;
 
-        if (data.landmark.nose.y < data.landmark.left.shoulder.y and data.landmark.nose.y < data.landmark.right.shoulder.y) {
-            if (data.landmark.left.index.exist == 1 and data.landmark.left.shoulder.exist == 1) {
-                if (data.landmark.left.index.y < data.landmark.left.shoulder.y) {
-                    x = data.landmark.left.index.x;
-                    y = data.landmark.left.index.y;
-                    z = data.landmark.left.index.z;
-                }
-            }
-            if (data.landmark.right.index.exist == 1 and data.landmark.right.shoulder.exist == 1) {
-                if (data.landmark.right.index.y < data.landmark.right.shoulder.y) {
-                    x = data.landmark.right.index.x;
-                    y = data.landmark.right.index.y;
-                    z = data.landmark.right.index.z;
-                }
-            }
-
-            // 人が正対するとき 右目ｘ座標は左目ｘ座標より大きい 人が後ろ向きでも目の位置は推定される
-            if (data.landmark.right.eye.exist == 1 and data.landmark.left.eye.exist == 1) {
-                if (data.landmark.right.eye.x > data.landmark.left.eye.x) {
-                    human_confront_flag = true;
-                    // ロール角度を計算
-                    double eye_dx = data.landmark.right.eye.x - data.landmark.left.eye.x;
-                    double eye_dy = data.landmark.right.eye.y - data.landmark.left.eye.y;
-                    target_roll   = (Math.degrees(Math.atan2(eye_dy, eye_dx)));
+        if ((msg.landmark.right.eye.exist == 1) && (msg.landmark.left.eye.exist == 1)) {
+            if (msg.landmark.right.eye.x != 0 and msg.landmark.left.eye.x != 0) {
+                if (msg.landmark.right.eye.x > msg.landmark.left.eye.x) {
+                    float eye_dx     = msg.landmark.right.eye.x - msg.landmark.left.eye.x;
+                    float eye_dy     = msg.landmark.right.eye.y - msg.landmark.left.eye.y;
+                    temp.target_roll = std::atan2(eye_dy, eye_dx);
                 }
             }
         }
-        data.x           = (x - 0.5) + data.offset_x_angle;
-        data.y           = (y - 0.5) + data.offset_y_angle;
-        data.target_roll = target_roll;
+#if 0
+    // TODO:
+    // Formula for following hands while kneeling
+    // Comment out to switch in mode
+    //
+    // [ATTENTION ]There is no kneecap function now.
+    // I would like to make a decision on the knee pillow, including the condition of the legs.
+    if (true == msg.landmark.nose.exist) {
+        if ((true == msg.landmark.left.shoulder.exist) && (true == msg.landmark.left.hand.exist)) {
+            if (get_person_data.nose.y < msg.landmark.left.shoulder.y) {
+                // if (msg.landmark.left.hand.y < msg.landmark.left.shoulder.y) // Deleted because crossed hands are not judged.
+                {
+                    x = data.landmark.left.hand.x;
+                    y = data.landmark.left.hand.y;
+                    z = data.landmark.left.hand.z;
+                }
+            }
+        }
+        if ((true == msg.landmark.right.shoulder.exist) && (true == msg.landmark.right.hand.exist)) {
+            if (get_person_data.nose.y < msg.landmark.right.shoulder.y) {
+                // if (msg.landmark.right.hand.y < msg.landmark.right.shoulder.y) // Deleted because crossed hands are not judged.
+                {
+                    x = data.landmark.right.hand.x;
+                    y = data.landmark.right.hand.y;
+                    z = data.landmark.right.hand.z;
+                }
+            }
+        }
     }
-*/
+#endif
+
+        temp.x = (x - 0.5) * temp.center_x;
+        temp.y = (y - 0.5) * temp.center_y;
+    }
+    temp.detected = result;
+
     return result;
 }
 
@@ -229,10 +214,10 @@ bool ModelImplement::_calculate_pose(const maid_robot_system_interfaces::msg::Po
 // =============================
 ModelImplement::ModelImplement()
 {
-    this->_eye_left.offset_x_angle  = -40.0;
-    this->_eye_left.offset_y_angle  = 0.0;
-    this->_eye_right.offset_x_angle = -12.0;
-    this->_eye_right.offset_y_angle = 0.0;
+    this->_temp_left.offset_x_angle  = -40.0;
+    this->_temp_left.offset_y_angle  = 0.0;
+    this->_temp_right.offset_x_angle = -12.0;
+    this->_temp_right.offset_y_angle = 0.0;
 }
 
 ModelImplement ::~ModelImplement()
