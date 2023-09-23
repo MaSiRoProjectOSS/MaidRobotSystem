@@ -6,15 +6,13 @@
         {
             "label": "ROS2 : maid_robot_system : head_unit : run",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2",
                 "launch",
                 "maid_robot_system",
-                "head_unit.launch.py",
-                "",
-                ""
+                "head_unit.launch.py"
             ]
         }
     ]

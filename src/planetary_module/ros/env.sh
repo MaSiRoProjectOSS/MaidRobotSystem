@@ -7,20 +7,54 @@ function mrs_help {
     ## =======================================
     ## Escape sequence
     local COLOR_ON_GREEN="\e[32m"
+    local COLOR_ON_BLUE="\e[34m"
     local COLOR_ON_RED="\e[31m"
     local COLOR_OFF="\e[m"
     ## =======================================
-    echo -e "mrs_help         : Display command list"
-    echo -e "mrs_build        : Run MRS build"
-    echo -e "mrs_create_node  : Creating a ROS package template"
-    echo -e "mrs_load_config  : "
-    #echo -e "mrs_set_export   : "
-    #echo -e "mrs_default      : "
+    echo -e ${COLOR_ON_GREEN}"./mrs.sh "${COLOR_ON_BLUE}"[--mrs_config=FILE_NAME] ..."${COLOR_OFF}
+    echo -e "  Enables calling functions for MaidRobotSystem."
+    echo -e ${COLOR_ON_BLUE}"    --mrs_config=FILE_NAME  "${COLOR_OFF}": Set json file if you want to replace the config file."
+    echo -e ""
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"mrs_help"${COLOR_OFF}
+    echo -e "  Displays a list of available commands and help."
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"mrs_env_print "${COLOR_ON_BLUE}"MRS_CONFIG"${COLOR_OFF}
+    echo -e "  Outputs the set environment variables."
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"mrs_load_config "${COLOR_ON_BLUE}"[MRS_CONFIG]"${COLOR_OFF}
+    echo -e "  The information in the json file set in MRS_CONFIG is used as the environment setting."
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"mrs_save_config "${COLOR_ON_BLUE}"MRS_CONFIG"${COLOR_OFF}
+    echo -e "  Register config.json."
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"mrs_build "${COLOR_ON_BLUE}"WORK_COMMANDS WORK_BUILD_TYPE WORK_PACKAGES_SELECT WORK_ARG_OPTION"${COLOR_OFF}
+    echo -e ${COLOR_ON_BLUE}"    WORK_COMMANDS        "${COLOR_OFF}": rebuild or build or clean"
+    echo -e ${COLOR_ON_BLUE}"    WORK_BUILD_TYPE      "${COLOR_OFF}": debug or release"
+    echo -e ${COLOR_ON_BLUE}"    WORK_PACKAGES_SELECT "${COLOR_OFF}": (your package name)"
+    echo -e ${COLOR_ON_BLUE}"    WORK_ARG_OPTION      "${COLOR_OFF}": (add option)"
+    echo -e ${COLOR_ON_GREEN}"mrs_create_node "${COLOR_ON_BLUE}"NODE_NAME PACKAGE_NAME ..."${COLOR_OFF}
+    echo -e ${COLOR_ON_BLUE}"    NODE_NAME         "${COLOR_OFF}": name of the empty executable"
+    echo -e ${COLOR_ON_BLUE}"    PACKAGE_NAME      "${COLOR_OFF}": The package name"
+    echo -e "    Please check this command for other options."
+    echo -e "      ros2 pkg create --help"
 
-    echo -e "aros2            : "
-    echo -e "aros2_topic_pub  : "
-    echo -e "aros2_param_list : "
-    #echo -e "aros_default    : "
+    echo -e ""
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"aros2 ..."${COLOR_OFF}
+    echo -e "  Override ros2 command."
+    echo -e "    Please check this command for other options."
+    echo -e "      ros2 --help"
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"aros2_param_list "${COLOR_ON_BLUE}"[NODE_NAME]"${COLOR_OFF}
+    echo -e ${COLOR_ON_BLUE}"    NODE_NAME    "${COLOR_OFF}": name of the empty executable"
+    ## ---------------------------
+    echo -e ${COLOR_ON_GREEN}"aros2_topic_pub "${COLOR_ON_BLUE}"TOPIC_NAME MESSAGE_TYPE YAML_FILE ..."${COLOR_OFF}
+    echo -e ${COLOR_ON_BLUE}"    TOPIC_NAME   "${COLOR_OFF}": Name of the ROS topic to publish to (e.g. '/chatter')${COLOR_OFF}"
+    echo -e ${COLOR_ON_BLUE}"    MESSAGE_TYPE "${COLOR_OFF}": Type of the ROS message (e.g. 'std_msgs/String')${COLOR_OFF}"
+    echo -e ${COLOR_ON_BLUE}"    YAML_FILE    "${COLOR_OFF}": Values to fill the message with in YAML file${COLOR_OFF}"
+    echo -e "    Please check this command for other options."
+    echo -e "      ros2 topic pub --help"
 }
 
 ## =======================================
@@ -57,7 +91,7 @@ function mrs_set_echo {
     IFS=$' \t\n'
 }
 
-function mrs_env {
+function mrs_env_print {
     ## ================================
     ## Escape sequence
     local COLOR_ON_GREEN="\e[32m"
@@ -67,9 +101,17 @@ function mrs_env {
     ## ================================
     export MRS_CONFIG=${1:-${MRS_CONFIG}}
     if [ ! -f "${MRS_CONFIG}" ]; then
-        export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        local CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        if [ -f "${CURRENT_DIR}/config/${MRS_CONFIG}" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/${MRS_CONFIG}
+        elif [ -f "${CURRENT_DIR}/config/default.json" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/default.json
+        else
+            export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        fi
     fi
     if [ -f ${MRS_CONFIG} ]; then
+        echo -e ${COLOR_ON_BLUE}"MRS_CONFIG: ${COLOR_ON_GREEN}${MRS_CONFIG}"${COLOR_OFF}
         local CONFIG_ARRAY=("CAST" "MRS" "ROS_VARIABLES" "BUILD")
         local JSON_DATA=$(cat ${MRS_CONFIG})
         local CONFIG_RAW=""
@@ -90,7 +132,14 @@ function mrs_env {
 function mrs_load_config {
     export MRS_CONFIG=${1:-${MRS_CONFIG}}
     if [ ! -f "${MRS_CONFIG}" ]; then
-        export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        local CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        if [ -f "${CURRENT_DIR}/config/${MRS_CONFIG}" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/${MRS_CONFIG}
+        elif [ -f "${CURRENT_DIR}/config/default.json" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/default.json
+        else
+            export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        fi
     fi
     if [ -f ${MRS_CONFIG} ]; then
         local CONFIG_ARRAY=("CAST" "MRS" "ROS_VARIABLES" "BUILD")
@@ -107,16 +156,38 @@ function mrs_load_config {
 }
 
 function mrs_save_config {
-    export MRS_CONFIG=${1:-/opt/MaidRobotSystem/data/config.json}
-    if [ -z "${MRS_CONFIG}" ]; then
-        export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
-    fi
+    local ret=0
+    ## ================================
+    ## Escape sequence
+    local COLOR_ON_GREEN="\e[32m"
+    local COLOR_ON_BLUE="\e[34m"
+    local COLOR_ON_RED="\e[31m"
+    local COLOR_ON=${COLOR_ON_GREEN}
+    local COLOR_OFF="\e[m"
+    ## ================================
+    local ret=0
+    export MRS_CONFIG=${1:-${MRS_CONFIG}}
     if [ ! -f "${MRS_CONFIG}" ]; then
-        export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        local CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+        if [ -f "${CURRENT_DIR}/config/${MRS_CONFIG}" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/${MRS_CONFIG}
+        elif [ -f "${CURRENT_DIR}/config/default.json" ]; then
+            export MRS_CONFIG=${CURRENT_DIR}/config/default.json
+        else
+            export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
+        fi
+        ret=1
     fi
-    # echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
-    # echo -e "${COLOR_ON_GREEN}MRS CONFIG : ${MRS_CONFIG}.${COLOR_OFF}"
-    # echo -e "${COLOR_ON_GREEN}===============================================================================${COLOR_OFF}"
+    if [ 0 -ne ${ret} ]; then
+        COLOR_ON=${COLOR_ON_RED}
+    fi
+    echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+    echo -e "${COLOR_ON}MRS CONFIG : ${MRS_CONFIG}${COLOR_OFF}"
+    if [ 0 -ne ${ret} ]; then
+    echo -e "${COLOR_ON}  ERROR MESSAGE: Default file specified.${COLOR_OFF}"
+    fi
+    echo -e "${COLOR_ON}===============================================================================${COLOR_OFF}"
+    return "${ret}"
 }
 
 function mrs_default {
@@ -317,7 +388,8 @@ function mrs_build {
                 then
                     if [ "clean" = "${WORK_COMMANDS,,}" ]; then
                         echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
-                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} rm -rf ${MRS_COLCON}"
+                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF}"
+                         echo -e "rm -rf ${MRS_COLCON}"
                         echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
                         rm -rf ${MRS_COLCON}/*
                         history -s ${MRS_COLCON}/*
@@ -336,7 +408,8 @@ function mrs_build {
                         if [ ! -z "${WORK_PACKAGES_SELECT}" ]; then
                             WORK_CMAKE_ARGS=${WORK_CMAKE_ARGS}" --packages-select "${WORK_PACKAGES_SELECT}
                         fi
-                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF} colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
+                        echo -e "${COLOR_ON_BLUE}Command:${COLOR_OFF}"
+                        echo -e "colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}"
                         echo -e "${COLOR_ON_BLUE}===============================================================================${COLOR_OFF}"
                         colcon build ${BUILD_COLCON_OPTION} ${TARGET_FOLDER_ARG} ${WORK_CMAKE_ARGS} ${WORK_ARG_OPTION} ${WORK_COLCON_PARAMETE}
                         ret=$?

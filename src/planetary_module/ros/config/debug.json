@@ -18,7 +18,7 @@
         "MRS_DATA_FOLDER": "/opt/MaidRobotSystem/data",
         "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package",
         "MRS_ROS_OUTPUT_TYPE": "screen",
-        "MRS_ROS_LOG_LEVEL": "INFO",
+        "MRS_ROS_LOG_LEVEL": "DEBUG",
         "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
         "MRS_BUILD_HEAD_UNIT": "ON",
         "MRS_BUILD_ARM_UNIT": "ON",
@@ -34,19 +34,16 @@
         "ROS_LOCALHOST_ONLY": 0,
         "ROS_LOG_DIR": "${HOME}/.ros_log",
         "ROS_HOME": "${MRS_WORKSPACE}",
-        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{time}][{severity}] {message}",
+        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity} {time}] [{name}]: {message} {function_name} at {file_name}:{line_number}",
         "RCUTILS_LOGGING_BUFFERED_STREAM": 1,
         "RCUTILS_COLORIZED_OUTPUT": 1,
         "RCUTILS_LOGGING_USE_STDOUT": 1
     },
     "BUILD": {
-        "BUILD_LOG_LEVEL": "WARNING",
+        "BUILD_LOG_LEVEL": "INFO",
         "BUILD_CMAKE_ARGS": "",
-        "BUILD_TYPE": "RELEASE",
+        "BUILD_TYPE": "DEBUG",
         "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
         "BUILD_COLCON_OPTION": "--symlink-install --parallel-workers ${BUILD_PARALLEL_WORKERS} --allow-overriding maid_robot_system_interfaces"
-    },
-    "backup": {
-        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity} {time}] [{name}]: {message} {function_name} at {file_name}:{line_number}"
     }
 }

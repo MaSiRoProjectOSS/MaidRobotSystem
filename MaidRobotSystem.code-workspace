@@ -35,6 +35,7 @@
 		},
 		"cSpell.words": [
 			"chgrp",
+			"colcon",
 			"doxygen",
 			"endgantt",
 			"gantt",
@@ -44,10 +45,9 @@
 			"usermod"
 		],
 		"forbeslindesay-taskrunner.source": "Workspace",
-		"markdown-preview-enhanced.configPath": "${workspaceFolder}/.mume",
+		"markdown-preview-enhanced.configPath": "./.mume",
 		"[python]": {
 			"editor.defaultFormatter": "ms-python.autopep8"
-		},
-		"python.formatting.provider": "none"
+		}
 	}
 }

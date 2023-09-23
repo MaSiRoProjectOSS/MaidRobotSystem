@@ -32,7 +32,8 @@ setup(
             'video_capture_node = maid_robot_system_py.video_capture_node:main',
             'detect_ar_node = maid_robot_system_py.detect_ar_node:main',
             'mediapipe_node = maid_robot_system_py.mediapipe_node:main',
-            'mediapipe_ext_node = maid_robot_system_py.mediapipe_ext_node:main'
+            'mediapipe_ext_node = maid_robot_system_py.mediapipe_ext_node:main',
+            'photo_to_video_node = maid_robot_system_py.photo_to_video_node:main'
         ],
     },
 )

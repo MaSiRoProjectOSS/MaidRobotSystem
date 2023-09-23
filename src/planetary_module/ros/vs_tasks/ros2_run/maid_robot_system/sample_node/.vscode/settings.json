@@ -1,0 +1,5 @@
+{
+    "maid_robot_system_py": {
+        "config_json": "--mrs_config=${workspaceFolder}/../../../../config.json"
+    }
+}

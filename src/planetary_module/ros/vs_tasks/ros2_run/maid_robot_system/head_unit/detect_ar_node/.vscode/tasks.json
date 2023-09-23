@@ -6,9 +6,9 @@
         {
             "label": "ROS2 : maid_robot_system : detect_ar_node : right : param",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2_param_list",
                 "${MRS_ROS_NAMESPACE}/head_unit/right_detect_ar_node"
             ]
@@ -16,23 +16,21 @@
         {
             "label": "ROS2 : maid_robot_system : detect_ar_node : right : node : info",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2",
                 "node",
                 "info",
-                "${MRS_ROS_NAMESPACE}/head_unit/right_detect_ar_node",
-                "",
-                ""
+                "${MRS_ROS_NAMESPACE}/head_unit/right_detect_ar_node"
             ]
         },
         {
             "label": "ROS2 : maid_robot_system : detect_ar_node : left : param",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2_param_list",
                 "${MRS_ROS_NAMESPACE}/head_unit/left_detect_ar_node"
             ]
@@ -40,29 +38,25 @@
         {
             "label": "ROS2 : maid_robot_system : detect_ar_node : left : node : info",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2",
                 "node",
                 "info",
-                "${MRS_ROS_NAMESPACE}/head_unit/left_detect_ar_node",
-                "",
-                ""
+                "${MRS_ROS_NAMESPACE}/head_unit/left_detect_ar_node"
             ]
         },
         {
             "label": "ROS2 : maid_robot_system : detect_ar_node : run",
             "type": "shell",
-            "command": "${workspaceFolder}/../../../../../script/mrs.sh",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "--mrs_config=${workspaceFolder}/../../../../../script/config.json",
+                "${config:maid_robot_system_py.config_json}",
                 "aros2",
                 "launch",
                 "maid_robot_system_py",
-                "detect_ar_node.launch.py",
-                "",
-                ""
+                "detect_ar_node.launch.py"
             ]
         }
     ]
