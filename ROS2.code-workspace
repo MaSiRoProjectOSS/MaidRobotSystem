@@ -9,7 +9,7 @@
 		"doxdocgen.file.copyrightTag": [
 			"@copyright Copyright (c) MaSiRo Project. {year}-."
 		],
-		"maid_robot_system_py": {
+		"maid_robot_system": {
 			"config_json": ""
 		},
 		"doxdocgen.file.versionTag": "@version 0.23.10",

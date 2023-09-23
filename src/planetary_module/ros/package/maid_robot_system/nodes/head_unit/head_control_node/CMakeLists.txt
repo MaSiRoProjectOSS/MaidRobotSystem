@@ -1,6 +1,6 @@
-# [node] mitumeru_node
+# [node] head_control_node
 
-set(NODE_NAME mitumeru_node)
+set(NODE_NAME head_control_node)
 
 add_definitions(
   -DNODE_NAME="${NODE_NAME}"

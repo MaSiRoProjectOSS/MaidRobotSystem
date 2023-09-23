@@ -101,9 +101,10 @@ find_package(rosidl_default_generators REQUIRED)
 # /////////////////////////////////////////////
 
 if(MRS_BUILD_HEAD_UNIT)
-  add_subdirectory(nodes/head_unit/mitumeru_node)
-  add_subdirectory(nodes/head_unit/hitomi_node)
-  add_subdirectory(nodes/head_unit/kubi_node)
+  add_subdirectory(nodes/head_unit/head_control_node)
+  add_subdirectory(nodes/head_unit/eye_node)
+  add_subdirectory(nodes/head_unit/neck_node)
+  add_subdirectory(nodes/head_unit/lip_node)
   add_subdirectory(nodes/head_unit/voice_recognition_node)
 endif()
 if(MRS_BUILD_ARM_UNIT)

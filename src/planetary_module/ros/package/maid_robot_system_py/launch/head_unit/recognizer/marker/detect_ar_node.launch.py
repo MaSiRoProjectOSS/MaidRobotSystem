@@ -6,8 +6,12 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE'), '/head_unit')
+    _ros_namespace = "{}{}".format(
+        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/head_unit')
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
+    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
+    _res_pawn = {'true': True, 'false': False}[
+        os.getenv('MRS_ROS_SPAWN', 'false')]
 
     left_detect_ar_node = Node(
         namespace=_ros_namespace,
@@ -28,7 +32,8 @@ def generate_launch_description():
             "height": 256,
             "notify/message/verbose": False
         }],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -51,7 +56,8 @@ def generate_launch_description():
             "height": 256,
             "notify/message/verbose": False
         }],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 

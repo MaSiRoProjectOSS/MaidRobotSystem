@@ -1,6 +1,6 @@
-# [node] kubi_node
+# [node] lip_node
 
-set(NODE_NAME kubi_node)
+set(NODE_NAME lip_node)
 
 add_definitions(
   -DNODE_NAME="${NODE_NAME}"

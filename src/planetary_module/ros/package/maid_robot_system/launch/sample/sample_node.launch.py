@@ -6,9 +6,11 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL')
-    _ros_namespace = '/maid_robot_system'
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
+    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
+    _res_pawn = {'true': True, 'false': False}[
+        os.getenv('MRS_ROS_SPAWN', 'false')]
 
     sample_node = Node(
         namespace=_ros_namespace,
@@ -25,8 +27,8 @@ def generate_launch_description():
                 "offset": 3.0
             }
         }],
-        ros_arguments=[ '--log-level', _log_level],
-        respawn=False,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 

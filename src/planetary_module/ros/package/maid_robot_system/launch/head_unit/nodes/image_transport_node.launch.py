@@ -6,9 +6,13 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
-    transport_type = 'compressed'  # 'raw'/'compressed'/'theora'
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
+    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
+    _res_pawn = {'true': True, 'false': False}[
+        os.getenv('MRS_ROS_SPAWN', 'false')]
+
+    _transport_type = 'raw'  # 'raw'/'compressed'/'theora'
 
     image_compressed_left_node = Node(
         namespace=_ros_namespace,
@@ -21,7 +25,8 @@ def generate_launch_description():
             ('in',  _ros_namespace + '/image/left/raw'),
             ('out', _ros_namespace + '/image/left/compressed')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -36,7 +41,8 @@ def generate_launch_description():
             ('in',  _ros_namespace + '/image/right/raw'),
             ('out', _ros_namespace + '/image/right/compressed')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -50,7 +56,8 @@ def generate_launch_description():
         remappings=[
             ('image', _ros_namespace + '/image/left/raw')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -64,7 +71,8 @@ def generate_launch_description():
         remappings=[
             ('image', _ros_namespace + '/image/right/raw')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -79,7 +87,8 @@ def generate_launch_description():
             ('in',  _ros_namespace + '/image/left/raw'),
             ('out', _ros_namespace + '/image/left/transport')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
@@ -94,22 +103,23 @@ def generate_launch_description():
             ('in',  _ros_namespace + '/image/right/raw'),
             ('out', _ros_namespace + '/image/right/transport')
         ],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
-    if 'raw' == transport_type:
-        return LaunchDescription([
-            image_transport_left_node,
-            image_transport_right_node
-        ])
-    elif 'compressed' == transport_type:
+    if 'compressed' == _transport_type:
         return LaunchDescription([
             #   image_compressed_left_node,
             image_compressed_right_node
         ])
-    elif 'theora' == transport_type:
+    elif 'theora' == _transport_type:
         return LaunchDescription([
             image_theora_left_node,
             image_theora_right_node
+        ])
+    else:
+        return LaunchDescription([
+            image_transport_left_node,
+            image_transport_right_node
         ])

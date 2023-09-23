@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "launch",
                 "maid_robot_system_py",

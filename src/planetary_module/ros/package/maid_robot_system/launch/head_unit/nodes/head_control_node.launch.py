@@ -10,13 +10,16 @@ from ament_index_python import get_package_share_directory
 
 
 def generate_launch_description():
-    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
+    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
+    _res_pawn = {'true': True, 'false': False}[
+        os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    mitumeru_node = Node(
+    launch_head_control_node = Node(
         namespace=_ros_namespace,
         package='maid_robot_system',
-        executable='mitumeru_node',
+        executable='head_control_node',
         output=_output_type,
         remappings=[
             ('in/pose/left', _ros_namespace + '/in/pose/left'),
@@ -24,17 +27,18 @@ def generate_launch_description():
             ('in/ar/left', _ros_namespace + '/in/ar/left'),
             ('in/ar/right', _ros_namespace + '/in/ar/right'),
             ('in/voice', _ros_namespace + '/data/voice'),
-            ('out/hitomi', _ros_namespace + '/data/hitomi'),
-            ('out/kubi', _ros_namespace + '/data/kubi'),
-            ('out/kuchibiru', _ros_namespace + '/data/kuchibiru')
+            ('out/eye', _ros_namespace + '/data/eye'),
+            ('out/neck', _ros_namespace + '/data/neck'),
+            ('out/lip', _ros_namespace + '/data/lip')
         ],
         parameters=[{
             "id": -1
         }],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
     return LaunchDescription([
-        mitumeru_node
+        launch_head_control_node
     ])

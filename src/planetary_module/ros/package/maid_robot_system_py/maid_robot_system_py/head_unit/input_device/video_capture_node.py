@@ -363,8 +363,8 @@ class VideoCaptureNodeParam():
         self.device.FORMAT = node.get_parameter('device/settings/FORMAT').get_parameter_value().string_value
         self.device.WIDTH = node.get_parameter('device/settings/WIDTH').get_parameter_value().integer_value
         self.device.HEIGHT = node.get_parameter('device/settings/HEIGHT').get_parameter_value().integer_value
-        self.device.ANGLE_X = node.get_parameter('device/settings/ANGLE').get_parameter_value().integer_value
-        self.device.ANGLE_Y = node.get_parameter('device/settings/ANGLE').get_parameter_value().integer_value
+        self.device.ANGLE_X = node.get_parameter('device/settings/ANGLE_X').get_parameter_value().integer_value
+        self.device.ANGLE_Y = node.get_parameter('device/settings/ANGLE_Y').get_parameter_value().integer_value
         self.device.FPS = node.get_parameter('device/settings/FPS').get_parameter_value().double_value
         self.publisher.INTERVAL_FPS = node.get_parameter('publisher/INTERVAL_FPS').get_parameter_value().double_value
         self.get_parameter(node)

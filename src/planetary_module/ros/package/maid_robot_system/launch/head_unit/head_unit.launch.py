@@ -12,70 +12,86 @@ from launch_ros.actions import PushRosNamespace
 
 
 def generate_launch_description():
-
-    launch_nodes_voice_recognition = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/voice_recognition_node.launch.py'))
-    )
-
-    launch_nodes_hitomi = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/hitomi_node.launch.py'))
-    )
-
-    launch_nodes_mitumeru = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/mitumeru_node.launch.py'))
-    )
-
-    launch_nodes_kubi = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/kubi_node.launch.py'))
-    )
-
-    launch_nodes_video_capture_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/video_capture_node.launch.py'))
-    )
-
-    launch_nodes_detect_ar_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/detect_ar_node.launch.py'))
-    )
-
-    launch_nodes_mediapipe_node = IncludeLaunchDescription(
+    # mediapipe
+    launch_mediapipe_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/mediapipe_node.launch.py'))
     )
-
-    launch_nodes_mediapipe_ext_node = IncludeLaunchDescription(
+    launch_mediapipe_ext_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/mediapipe_ext_node.launch.py'))
     )
+    # video
+    launch_photo_to_video_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/photo_to_video_node.launch.py'))
+    )
+    launch_video_capture_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/video_capture_node.launch.py'))
+    )
+    launch_video_topic_to_service = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/video_topic_to_service.launch.py'))
+    )
+    # voice
+    launch_voice_recognition_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/voice_recognition_node.launch.py'))
+    )
+    # controller
+    launch_head_control_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/head_control_node.launch.py'))
+    )
+    # device driver
+    launch_eye_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/eye_node.launch.py'))
+    )
+    launch_neck_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/neck_node.launch.py'))
+    )
+    launch_lip_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/head_unit/nodes/lip_node.launch.py'))
+    )
 
     return LaunchDescription([
-        launch_nodes_voice_recognition,
-        launch_nodes_hitomi,
-        launch_nodes_mitumeru,
-        launch_nodes_kubi,
-        # launch_nodes_mediapipe_ext_node,
-        # launch_nodes_mediapipe_node,
-        # launch_nodes_detect_ar_node,
-        # launch_nodes_video_capture_node
+        # mediapipe
+        launch_mediapipe_node,
+        launch_mediapipe_ext_node,
+        # video
+        launch_photo_to_video_node,
+        launch_video_capture_node,
+        launch_video_topic_to_service,
+        # voice
+        launch_voice_recognition_node,
+        # controller
+        launch_head_control_node,
+        # device driver
+        launch_eye_node,
+        launch_neck_node,
+        launch_lip_node
     ])

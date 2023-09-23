@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "launch",
                 "/opt/MaidRobotSystem/src/planetary_module/ros/package/maid_robot_system/launch/sample/sample_node.launch.py"
@@ -19,7 +19,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "launch",
                 "maid_robot_system",
@@ -31,7 +31,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "run",
                 "maid_robot_system",
@@ -43,7 +43,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "get",
@@ -56,7 +56,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "get",
@@ -69,7 +69,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "set",
@@ -83,7 +83,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "set",
@@ -97,7 +97,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "set",
@@ -111,7 +111,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "param",
                 "set",
@@ -125,7 +125,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "topic",
                 "info",
@@ -137,7 +137,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "topic",
                 "info",
@@ -149,7 +149,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "topic",
                 "echo",
@@ -161,7 +161,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "topic",
                 "echo",
@@ -174,7 +174,7 @@
             "isBackground": true,
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
@@ -188,7 +188,7 @@
             "isBackground": true,
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
@@ -202,7 +202,7 @@
             "isBackground": true,
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",
@@ -216,7 +216,7 @@
             "isBackground": true,
             "command": "${workspaceFolder}/../../../../mrs.sh",
             "args": [
-                "${config:maid_robot_system_py.config_json}",
+                "${config:maid_robot_system.config_json}",
                 "aros2_topic_pub",
                 "/maid_robot_system/messaging/input",
                 "std_msgs/msg/Float64",

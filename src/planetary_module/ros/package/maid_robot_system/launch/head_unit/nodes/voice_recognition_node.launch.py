@@ -7,10 +7,13 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE')
-    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
+    _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
+    _res_pawn = {'true': True, 'false': False}[
+        os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    voice_recognition_node = Node(
+    launch_voice_recognition_node = Node(
         namespace=_ros_namespace,
         package='maid_robot_system',
         executable='voice_recognition_node',
@@ -21,10 +24,11 @@ def generate_launch_description():
         parameters=[{
             "to": 135.0,
         }],
-        respawn=True,
+        ros_arguments=['--log-level', _log_level],
+        respawn=_res_pawn,
         respawn_delay=2.0
     )
 
     return LaunchDescription([
-        voice_recognition_node
+        launch_voice_recognition_node
     ])
