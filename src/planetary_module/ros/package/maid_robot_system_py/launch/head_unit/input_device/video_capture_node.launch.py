@@ -7,12 +7,11 @@ import maid_robot_system_interfaces.srv as MrsSrv
 
 
 def generate_launch_description():
-    _ros_namespace = "{}{}".format(
-        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/head_unit')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _ros_sub_namespace = '/head_unit' + '/controller' + '/camera'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
     _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
     _mrs_v4l_left_id = int("{}".format(os.environ.get('MRS_V4L_LEFT_ID')))
@@ -21,16 +20,16 @@ def generate_launch_description():
     _save_folder = "{}/tmp/image".format(os.environ.get('MRS_DATA_FOLDER'))
 
     left_video_capture_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='video_capture_node',
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/left/info'),
-            ('save', _ros_namespace + '/video/left/save'),
-            ('out_srv', _ros_namespace + '/video/left/image'),
-            ('out_topic', _ros_namespace + '/image/left/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
+            ('save', _ros_namespace + _ros_sub_namespace + '/video/left/save'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
         ],
         parameters=[{
             "device/TYPE": "v4l",
@@ -62,16 +61,16 @@ def generate_launch_description():
     )
 
     right_video_capture_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='video_capture_node',
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/right/info'),
-            ('save', _ros_namespace + '/video/right/save'),
-            ('out_srv', _ros_namespace + '/video/right/image'),
-            ('out_topic', _ros_namespace + '/image/right/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
+            ('save', _ros_namespace + _ros_sub_namespace + '/video/right/save'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
         ],
         parameters=[{
             "device/TYPE": "v4l",

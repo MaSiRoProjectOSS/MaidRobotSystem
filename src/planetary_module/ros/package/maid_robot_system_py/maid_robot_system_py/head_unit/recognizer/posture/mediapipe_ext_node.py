@@ -217,16 +217,15 @@ class MediapipeExtNode(Node):
     def _create_service_client(self):
         self._client = self.create_client(MrsSrv.MediaPipePoseLandmarkDetection, self._in_srv_name)
         while not self._client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
+            self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
         self._request = MrsSrv.MediaPipePoseLandmarkDetection.Request()
-        self._response = MrsSrv.MediaPipePoseLandmarkDetection.Response()
         self._request_image(self.get_clock().now().nanoseconds)
 
     def _create_publisher(self):
         self._pub_image = self.create_publisher(Image, self._pub_image_name, self._pub_image_queue_size)
 
     def _create_timer(self):
-        self._timer = self.create_timer( float(self._param.INTERVAL_MS) / 1000.0, self._callback_timer)
+        self._timer = self.create_timer(float(self._param.INTERVAL_MS) / 1000.0, self._callback_timer)
     ##################################################################
 
     def _request_image(self, current_ns):
@@ -259,7 +258,7 @@ class MediapipeExtNode(Node):
                 if (self._response.done() is True):
                     msg: MrsSrv.MediaPipePoseLandmarkDetection.Response = self._response.result()
                     if ((msg.image.height != 0) and (msg.image.width != 0)):
-                        pose_landmarks:PoseDetection = msg.data
+                        pose_landmarks: PoseDetection = msg.data
                         cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
                         if (pose_landmarks.human_detected is True):
                             image_height, image_wight = cv_image.shape[:2]

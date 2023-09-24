@@ -7,23 +7,25 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _ros_sub_namespace = '/head_unit' + '/logic'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
+
+    _ros_sub_input = '/head_unit' + '/logic'
 
     _transport_type = 'raw'  # 'raw'/'compressed'/'theora'
 
     image_compressed_left_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='image_transport',
         executable='republish',
         output=_output_type,
         name='image_compressed_left_node',
         arguments=['compressed'],
         remappings=[
-            ('in',  _ros_namespace + '/image/left/raw'),
-            ('out', _ros_namespace + '/image/left/compressed')
+            ('in', _ros_namespace + _ros_sub_input + '/image/left/raw'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/left/compressed')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -31,15 +33,15 @@ def generate_launch_description():
     )
 
     image_compressed_right_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='image_transport',
         executable='republish',
         output=_output_type,
         name='image_compressed_right_node',
         arguments=['compressed'],
         remappings=[
-            ('in',  _ros_namespace + '/image/right/raw'),
-            ('out', _ros_namespace + '/image/right/compressed')
+            ('in', _ros_namespace + _ros_sub_input + '/image/right/raw'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/right/compressed')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -47,14 +49,14 @@ def generate_launch_description():
     )
 
     image_theora_left_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='theora_image_transport',
         executable='ogg_saver',
         output=_output_type,
         name='image_theora_left_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', _ros_namespace + '/image/left/raw')
+            ('image', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -62,14 +64,14 @@ def generate_launch_description():
     )
 
     image_theora_right_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='theora_image_transport',
         executable='ogg_saver',
         output=_output_type,
         name='image_theora_right_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', _ros_namespace + '/image/right/raw')
+            ('image', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -77,15 +79,15 @@ def generate_launch_description():
     )
 
     image_transport_left_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='image_transport',
         executable='republish',
         output=_output_type,
         name='image_transport_left_node',
         arguments=['raw'],
         remappings=[
-            ('in',  _ros_namespace + '/image/left/raw'),
-            ('out', _ros_namespace + '/image/left/transport')
+            ('in', _ros_namespace + _ros_sub_input + '/image/left/raw'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/left/transport')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -93,15 +95,15 @@ def generate_launch_description():
     )
 
     image_transport_right_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='image_transport',
         executable='republish',
         output=_output_type,
         name='image_transport_right_node',
         arguments=['raw'],
         remappings=[
-            ('in',  _ros_namespace + '/image/right/raw'),
-            ('out', _ros_namespace + '/image/right/transport')
+            ('in', _ros_namespace + _ros_sub_input + '/image/right/raw'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/right/transport')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,

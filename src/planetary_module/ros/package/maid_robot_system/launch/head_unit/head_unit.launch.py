@@ -19,30 +19,12 @@ def generate_launch_description():
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/mediapipe_node.launch.py'))
     )
-    launch_mediapipe_ext_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/mediapipe_ext_node.launch.py'))
-    )
     # video
-    launch_photo_to_video_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/photo_to_video_node.launch.py'))
-    )
     launch_video_capture_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/video_capture_node.launch.py'))
-    )
-    launch_video_topic_to_service = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(
-                get_package_share_directory('maid_robot_system_py'),
-                'launch/video_topic_to_service.launch.py'))
     )
     # voice
     launch_voice_recognition_node = IncludeLaunchDescription(
@@ -79,18 +61,15 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        # mediapipe
+        # # mediapipe
         launch_mediapipe_node,
-        launch_mediapipe_ext_node,
-        # video
-        launch_photo_to_video_node,
+        # # video
         launch_video_capture_node,
-        launch_video_topic_to_service,
-        # voice
+        # # voice
         launch_voice_recognition_node,
-        # controller
+        # # controller
         launch_head_control_node,
-        # device driver
+        # # device driver
         launch_eye_node,
         launch_neck_node,
         launch_lip_node

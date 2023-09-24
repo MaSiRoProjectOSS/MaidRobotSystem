@@ -55,7 +55,7 @@ class MediapipeNodeParam():
 
     def update_parameters(self, node: Node):
         new_parameters = [Parameter("confidence/min_detection", Parameter.Type.DOUBLE, self.confidence_min_detection),
-                          Parameter("confidence/min_tracking",Parameter.Type.DOUBLE, self.confidence_min_tracking),
+                          Parameter("confidence/min_tracking", Parameter.Type.DOUBLE, self.confidence_min_tracking),
                           Parameter("confidence/visibility_th", Parameter.Type.DOUBLE, self.confidence_visibility_th),
                           Parameter("area/center_x", Parameter.Type.INTEGER, self.area_center_x),
                           Parameter("area/center_y", Parameter.Type.INTEGER, self.area_center_y),
@@ -170,7 +170,7 @@ class MediapipeNode(Node):
 
     _in_srv_name = 'in_srv'
     _in_srv_name_video = 'in_srv_video'
-    _out_srv_name ='out_srv'
+    _out_srv_name = 'out_srv'
     _out_landmarks_name = 'out'
     _out_landmarks_queue_size = 3
     _timeout_ms = 5000
@@ -215,21 +215,15 @@ class MediapipeNode(Node):
     def _create_service_client(self):
         self._service_data = self.create_service(MrsSrv.MediaPipePoseLandmarkDetection, self._out_srv_name, self._callback_srv_data)
         self._client = self.create_client(VideoCapture, self._in_srv_name)
-        self._video_info = self.create_client(MrsSrv.VideoDeviceInfo, self._in_srv_name_video)
+        self._client_video_info = self.create_client(MrsSrv.VideoDeviceInfo, self._in_srv_name_video)
         while not self._client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
-        while not self._video_info.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
+            self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
+        while not self._client_video_info.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service({}) not available, waiting again...'.format(self._client_video_info.srv_name))
         self._request = VideoCapture.Request()
-        self._response = VideoCapture.Response()
-        self._request_image(self.get_clock().now().nanoseconds)
         request = MrsSrv.VideoDeviceInfo.Request()
-        response = self._client.call_async(request)
-        flag_get_info=False
-        while(flag_get_info is False):
-            if (response is not None):
-                if (response.done() is True):
-                    self._video_info = response.result()
+        self._response_video_info = self._client_video_info.call_async(request)
+        self._request_image(self.get_clock().now().nanoseconds)
 
     def _create_publisher(self):
         self._pub = self.create_publisher(PoseDetection, self._out_landmarks_name, self._out_landmarks_queue_size)
@@ -278,6 +272,10 @@ class MediapipeNode(Node):
 
     def _callback_recognition(self):
         try:
+            if (self._response_video_info is not None):
+                if (self._response_video_info.done() is True):
+                    self._video_info = self._response_video_info.result()
+                    self._response_video_info = None
             current_ns = self.get_clock().now().nanoseconds
             if (self._response is not None):
                 if (self._response.done() is True):
@@ -311,13 +309,14 @@ class MediapipeNode(Node):
                     self._msg.image = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")
                     if pose_landmarks is not None:
                         self._msg.data = self.repackaging(pose_landmarks,
-                                                              self._param.confidence_min_detection,
-                                                              self._param.confidence_min_tracking,
-                                                              self._param.confidence_visibility_th,self._video_info)
+                                                          self._param.confidence_min_detection,
+                                                          self._param.confidence_min_tracking,
+                                                          self._param.confidence_visibility_th,
+                                                          self._video_info)
                         self._pub.publish(self._msg.data)
                         if (self._report_detected is True):
                             if (self._msg.data.human_detected is not self._previous_human_detected):
-                                self.get_logger().info( '[{}] HUMAN_DETECTED'.format(self.get_name()))
+                                self.get_logger().info('[{}] HUMAN_DETECTED'.format(self.get_name()))
                                 self._previous_human_detected = self._msg.data.human_detected
                     else:
                         self._msg.data.human_detected = False
@@ -342,9 +341,9 @@ class MediapipeNode(Node):
     def _callback_output_information(self):
         if (self._param.info_verbose is True):
             self.get_logger().info('[{}/{}] FPS : {:.4g} Elapsed : {} ms'.format(self.get_namespace(),
-                                                                              self.get_name(),
-                                                                              self._display_fps,
-                                                                              round((sum(self._elapsed) / len(self._elapsed)) / (1000.0 * 1000.0), 2)))
+                                                                                 self.get_name(),
+                                                                                 self._display_fps,
+                                                                                 round((sum(self._elapsed) / len(self._elapsed)) / (1000.0 * 1000.0), 2)))
 
     ##################################################################################
 

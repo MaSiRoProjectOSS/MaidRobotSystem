@@ -5,9 +5,9 @@
         "CATION": "This is not allowed in text that '(', ')'"
     },
     "CAST": {
-        "MRS_CAST_NAME": "miko",
+        "MRS_CAST_NAME": "Iris",
         "MRS_CAST_ID": 1000,
-        "MRS_CAST_SKIN": "/opt/MaidRobotSystem/data/skin/${MRS_CAST_NAME}",
+        "MRS_CAST_DATA": "/opt/MaidRobotSystem/data/cast/${MRS_CAST_NAME}/settings.json",
         "MRS_V4L_LEFT_BY_PATH": "",
         "MRS_V4L_LEFT_ID": 1,
         "MRS_V4L_RIGHT_BY_PATH": "",
@@ -21,6 +21,7 @@
         "MRS_ROS_LOG_LEVEL": "INFO",
         "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
         "MRS_ROS_SPAWN": true,
+        "MRS_TYPE_INPUT_VIDEO_DEVICE": "/camera",
         "MRS_BUILD_HEAD_UNIT": "ON",
         "MRS_BUILD_ARM_UNIT": "ON",
         "MRS_BUILD_WAIST_DOWN_UNIT": "ON",

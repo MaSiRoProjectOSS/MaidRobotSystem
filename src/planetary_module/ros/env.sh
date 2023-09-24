@@ -450,7 +450,7 @@ function mrs_build {
         echo -e "${COLOR_ON}  MRS${COLOR_OFF}"
         echo -e "${COLOR_ON}    MRS_CAST_ID               :${COLOR_OFF} ${MRS_CAST_ID}"
         echo -e "${COLOR_ON}    MRS_CAST_NAME             :${COLOR_OFF} ${MRS_CAST_NAME}"
-        echo -e "${COLOR_ON}    MRS_CAST_SKIN             :${COLOR_OFF} ${MRS_CAST_SKIN}"
+        echo -e "${COLOR_ON}    MRS_CAST_DATA             :${COLOR_OFF} ${MRS_CAST_DATA}"
         echo -e "${COLOR_ON}    MRS_ROS_NAMESPACE         :${COLOR_OFF} ${MRS_ROS_NAMESPACE}"
 
         echo -e "${COLOR_ON}BUILD${COLOR_OFF}"

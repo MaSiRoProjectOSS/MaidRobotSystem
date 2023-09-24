@@ -12,8 +12,8 @@
 /* ======================================================================== */
 #include "__generate_config.hpp"
 /* ======================================================================== */
-#ifndef CONFIG_PATH_HOME
-#define CONFIG_PATH_HOME "/opt/MaidRobotSystem/data/skin"
+#ifndef CONFIG_FILE
+#define CONFIG_FILE "/opt/MaidRobotSystem/data/skin"
 #endif
 #ifndef CONFIG_CAST_NAME
 #define CONFIG_CAST_NAME "miko"

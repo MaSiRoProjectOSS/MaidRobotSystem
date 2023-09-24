@@ -7,95 +7,59 @@ import maid_robot_system_interfaces.srv as MrsSrv
 
 
 def generate_launch_description():
-    _ros_namespace = "{}{}".format(
-        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/head_unit')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _ros_sub_namespace = '/head_unit' + '/controller' + '/topic'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _mrs_v4l_left_by_path = str(os.environ.get('MRS_V4L_LEFT_BY_PATH'))
-    _mrs_v4l_left_id = int("{}".format(os.environ.get('MRS_V4L_LEFT_ID')))
-    _mrs_v4l_right_by_path = str(os.environ.get('MRS_V4L_RIGHT_BY_PATH'))
-    _mrs_v4l_right_id = int("{}".format(os.environ.get('MRS_V4L_RIGHT_ID')))
-    _save_folder = "{}/tmp/image".format(os.environ.get('MRS_DATA_FOLDER'))
+    _ros_sub_input_left = _ros_namespace + '/head_unit' + '/controller' + '/topic' + '/video/left'
+    _ros_sub_input_right = _ros_namespace + '/head_unit' + '/controller' + '/topic' + '/video/right'
 
-    left_video_capture_node = Node(
-        namespace=_ros_namespace,
+    left_video_topic_to_service = Node(
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
-        executable='video_capture_node',
-        name='left_video_capture_node',
+        executable='video_topic_to_service',
+        name='left_video_topic_to_service',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/left/info'),
-            ('save', _ros_namespace + '/video/left/save'),
-            ('out_srv', _ros_namespace + '/video/left/image'),
-            ('out_topic', _ros_namespace + '/image/left/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
+            ('in_topic', _ros_sub_input_left),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image')
         ],
         parameters=[{
-            "device/TYPE": "v4l",
-            "device/BY_PATH": _mrs_v4l_left_by_path,
-            "device/ID": _mrs_v4l_left_id,
-            "device/settings/FORMAT": "MJPG",
-            "device/settings/WIDTH": 1280,
-            "device/settings/HEIGHT": 1024,
-            "device/settings/ANGLE_X": 140,
-            "device/settings/ANGLE_Y": 140,
-            "device/settings/FPS": 30.0,
-            "save_folder": _save_folder,
-            "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,
             "settings/area/clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
             "settings/area/center_x": 0,
             "settings/area/center_y": 0,
             "settings/area/width": 0,
-            "settings/area/height": 0,
-            "publisher/INTERVAL_FPS": 10.0,
-            "publisher/resize/width": 640,
-            "publisher/resize/height": 512,
-            "publisher/enable": False
+            "settings/area/height": 0
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
         respawn_delay=2.0
     )
 
-    right_video_capture_node = Node(
-        namespace=_ros_namespace,
+    right_video_topic_to_service = Node(
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
-        executable='video_capture_node',
-        name='right_video_capture_node',
+        executable='video_topic_to_service',
+        name='right_video_topic_to_service',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/right/info'),
-            ('save', _ros_namespace + '/video/right/save'),
-            ('out_srv', _ros_namespace + '/video/right/image'),
-            ('out_topic', _ros_namespace + '/image/right/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
+            ('in_topic', _ros_sub_input_right),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image')
         ],
         parameters=[{
-            "device/TYPE": "v4l",
-            "device/BY_PATH": _mrs_v4l_right_by_path,
-            "device/ID": _mrs_v4l_right_id,
-            "device/settings/FORMAT": "MJPG",
-            "device/settings/WIDTH": 1280,
-            "device/settings/HEIGHT": 1024,
-            "device/settings/ANGLE_X": 140,
-            "device/settings/ANGLE_Y": 140,
-            "device/settings/FPS": 30.0,
-            "save_folder": _save_folder,
-            "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,
             "settings/area/clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
             "settings/area/center_x": 0,
             "settings/area/center_y": 0,
             "settings/area/width": 0,
-            "settings/area/height": 0,
-            "publisher/INTERVAL_FPS": 10.0,
-            "publisher/resize/width": 640,
-            "publisher/resize/height": 512,
-            "publisher/enable": False
+            "settings/area/height": 0
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -103,6 +67,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        left_video_capture_node,
-        right_video_capture_node
+        left_video_topic_to_service,
+        right_video_topic_to_service
     ])

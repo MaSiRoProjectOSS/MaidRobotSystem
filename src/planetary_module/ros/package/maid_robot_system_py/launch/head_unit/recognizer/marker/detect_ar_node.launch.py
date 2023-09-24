@@ -6,22 +6,25 @@ from launch.substitutions import TextSubstitution
 
 
 def generate_launch_description():
-    _ros_namespace = "{}{}".format(
-        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/head_unit')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _ros_sub_namespace = '/head_unit' + '/logic'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
+
+    _ros_sub_input = '/head_unit' + '/controller' + '/photo'
+    # _ros_sub_input = '/head_unit' + '/controller' + '/topic'
+    # _ros_sub_input = '/head_unit' + '/controller' + '/camera'
 
     left_detect_ar_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='detect_ar_node',
         name='left_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + '/video/left/image'),
-            ('out', _ros_namespace + '/data/left/ar')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/video/left/image'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/data/left/ar')
         ],
         parameters=[{
             "INTERVAL_MS": 500,
@@ -38,14 +41,14 @@ def generate_launch_description():
     )
 
     right_detect_ar_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='detect_ar_node',
         name='right_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + '/video/right/image'),
-            ('out', _ros_namespace + '/data/right/ar')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/video/right/image'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/data/right/ar')
         ],
         parameters=[{
             "INTERVAL_MS": 500,

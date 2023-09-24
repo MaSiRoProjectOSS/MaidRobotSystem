@@ -18,12 +18,11 @@ from rcl_interfaces.msg import SetParametersResult
 import maid_robot_system_interfaces.srv as MrsSrv
 
 
-
 class VideoCaptureNodeParam():
     # ############################################
     class ParamDevice():
         def __init__(self):
-            self.img=None
+            self.img = None
             self.path = ''
             self.WIDTH = 1280
             self.HEIGHT = 1024
@@ -62,7 +61,7 @@ class VideoCaptureNodeParam():
         node.get_logger().info(' video: ')
         node.get_logger().info('   width  : ' + str(self.device.WIDTH))
         node.get_logger().info('   height : ' + str(self.device.HEIGHT))
-        node.get_logger().info('   angle  : [{}, {}]'.format(self.device.ANGLE_X,self.device.ANGLE_Y))
+        node.get_logger().info('   angle  : [{}, {}]'.format(self.device.ANGLE_X, self.device.ANGLE_Y))
         node.get_logger().info('   fps    : ' + str(self.device.FPS))
 
         node.get_logger().info(' area: ')
@@ -106,15 +105,15 @@ class VideoCaptureNodeParam():
         self.settings.calc_end_y = end_y
 
     def update_device_info(self, path):
-        result=False
+        result = False
         if os.path.isfile(path):
             self.device.path = path
             self.device.img = cv.imread(path)
             self.device.WIDTH = self.device.img.shape[1]
             self.device.HEIGHT = self.device.img.shape[0]
-            result=True
+            result = True
         else:
-            self.device.path=""
+            self.device.path = ""
             pass
         return result
 
@@ -190,7 +189,7 @@ class VideoCaptureNodeParam():
 
     def _init_param(self, node: Node):
         # device
-        node.declare_parameter('photo',  self.device.path)
+        node.declare_parameter('photo', self.device.path)
         # notify
         node.declare_parameter('notify/message/verbose', self.notify.mess_verbose)
         # settings
@@ -243,7 +242,7 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'info'
+    _service_name_info = 'out_info'
     _service_name_capture = 'out_srv'
     _topic_out_name = 'out_topic'
     _topic_in_name = 'in_topic'
@@ -287,6 +286,9 @@ class VideoCaptureNode(Node):
             # set instance
             self._fps_calc = CvFpsCalc(buffer_len=self._timer_output_information_size)
             self._bridge = CvBridge()
+
+            # blank image
+            self._blank_image = self._set_image(np.zeros((self._param.device.HEIGHT, self._param.device.WIDTH, 3), np.uint8))
 
             # create ros
             self._create_service()
@@ -381,7 +383,7 @@ class VideoCaptureNode(Node):
         response.video_info.angle_y = 0
         response.video_info.width = self._param.device.WIDTH
         response.video_info.height = self._param.device.HEIGHT
-        response.video_info.fps = 0
+        response.video_info.fps = float(0.0)
         ext = os.path.splitext(self._param.device.path)[1][1:]
         response.video_info.format = ext
         return response
@@ -390,12 +392,20 @@ class VideoCaptureNode(Node):
     def _callback_srv_video_capture(self,
                                     request: MrsSrv.VideoCapture.Request,
                                     response: MrsSrv.VideoCapture.Response):
-        with self._lock:
-            image = copy.deepcopy(self._param.device.img)
-        if (image is not None):
-            image = self._resize(image, request.resize_width, request.resize_height)
-        response.image = self._set_image(image)
-        return response
+        try:
+            image = None
+            with self._lock:
+                if (self._param.device.img is not None):
+                    image = copy.deepcopy(self._param.device.img)
+            if (image is not None):
+                image = self._resize(image, request.resize_width, request.resize_height)
+                response.image = self._set_image(image)
+            else:
+                response.image = self._blank_image
+            return response
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_srv_video_capture) : ' + str(exception))
+            return response
 
     # ##
     def _callback_send(self):

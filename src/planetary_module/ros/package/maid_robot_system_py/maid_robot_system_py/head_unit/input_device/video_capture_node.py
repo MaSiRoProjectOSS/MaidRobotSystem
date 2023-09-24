@@ -122,7 +122,7 @@ class VideoCaptureNodeParam():
 
     class ParamSettings():
         def __init__(self):
-            self.save_folder=""
+            self.save_folder = ""
             self.mirror = False
             self.upside_down = False
             self.clockwise = int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK)
@@ -157,7 +157,7 @@ class VideoCaptureNodeParam():
         node.get_logger().info('   format : ' + str(self.device.FORMAT))
         node.get_logger().info('   width  : ' + str(self.device.WIDTH))
         node.get_logger().info('   height : ' + str(self.device.HEIGHT))
-        node.get_logger().info('   angle  : [{}, {}]'.format(self.device.ANGLE_X,self.device.ANGLE_Y))
+        node.get_logger().info('   angle  : [{}, {}]'.format(self.device.ANGLE_X, self.device.ANGLE_Y))
         node.get_logger().info('   fps    : ' + str(self.device.FPS))
 
         node.get_logger().info(' area: ')
@@ -403,7 +403,7 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'info'
+    _service_name_info = 'out_info'
     _service_name_capture = 'out_srv'
     _subscribe_save = 'save'
     _topic_name = 'out_topic'
@@ -621,14 +621,16 @@ class VideoCaptureNode(Node):
                 with self._lock:
                     image = copy.deepcopy(self._image)
                 if (image is not None):
-                    folder = os.path.join(self._param.settings.save_folder, '{:%Y-%m-%d}'.format(datetime.now()))
+                    folder = os.path.join(self._param.settings.save_folder, '{:%Y%m%d}'.format(datetime.now()))
                     if not os.path.exists(folder):
-                        os.makedirs(dir)
-                    if not msg.data :
-                        name = time.strftime("%H%M%S", time.localtime())
-                    else:
-                        name = msg.data
-                    path = os.path.join(folder, name + ".jpg")
+                        os.makedirs(folder)
+                    name = ""
+                    if (msg.data is not None):
+                        if (msg.data is not ""):
+                            name = "_" + msg.data
+                    path = os.path.join(folder, time.strftime(
+                        "%H%M%S", time.localtime()) + name + ".jpg")
+                    self.get_logger().info('Save image' + str(path))
                     cv.imwrite(path, image)
         except Exception as exception:
             self.get_logger().error('Exception (_callback_save) : ' + str(exception))

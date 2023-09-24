@@ -41,7 +41,7 @@ endif()
 message(STATUS "Generate information")
 message(STATUS "  MRS_CAST_NAME  : $ENV{MRS_CAST_NAME}")
 message(STATUS "  MRS_CAST_ID    : $ENV{MRS_CAST_ID}")
-message(STATUS "  MRS_CAST_SKIN  : $ENV{MRS_CAST_SKIN}")
+message(STATUS "  MRS_CAST_DATA  : $ENV{MRS_CAST_DATA}")
 message(STATUS "  BUILD_DATE     : $ENV{BUILD_DATE}")
 message(STATUS "Build target")
 message(STATUS "  MRS_BUILD_HEAD_UNIT       : $ENV{MRS_BUILD_HEAD_UNIT}")
@@ -81,7 +81,7 @@ write_file(${CMAKE_CURRENT_SOURCE_DIR}/include/maid_robot_system/config/__genera
   "#ifndef MAID_ROBOT_SYSTEM_CONFIG_GENERATE_CONFIG_HPP\n"
   "#define MAID_ROBOT_SYSTEM_CONFIG_GENERATE_CONFIG_HPP\n"
   "\n"
-  "#define CONFIG_PATH_HOME   \"$ENV{MRS_CAST_SKIN}\"\n"
+  "#define CONFIG_FILE        \"$ENV{MRS_CAST_DATA}\"\n"
   "#define CONFIG_CAST_NAME   \"$ENV{MRS_CAST_NAME}\"\n"
   "#define CONFIG_CAST_ID     $ENV{MRS_CAST_ID}\n"
   "#define CONFIG_BUILD_DATE  \"$ENV{BUILD_DATE}\"\n"

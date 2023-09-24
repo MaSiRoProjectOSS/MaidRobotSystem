@@ -21,7 +21,7 @@
         "MRS_ROS_LOG_LEVEL": "INFO",
         "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
         "MRS_ROS_SPAWN": false,
-        "MRS_TYPE_INPUT_VIDEO_DEVICE": "/photo",
+        "MRS_TYPE_INPUT_VIDEO_DEVICE": "/camera",
         "MRS_BUILD_HEAD_UNIT": "ON",
         "MRS_BUILD_ARM_UNIT": "ON",
         "MRS_BUILD_WAIST_DOWN_UNIT": "ON",

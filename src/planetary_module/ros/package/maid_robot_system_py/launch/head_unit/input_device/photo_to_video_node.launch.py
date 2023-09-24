@@ -7,26 +7,28 @@ import maid_robot_system_interfaces.srv as MrsSrv
 
 
 def generate_launch_description():
-    _ros_namespace = "{}{}".format(
-        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/head_unit')
+    _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
+    _ros_sub_namespace = '/head_unit' + '/controller' + '/photo'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
+
+    left_photo = ""
+    right_photo = ""
 
     left_photo_to_video_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='photo_to_video_node',
         name='left_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/left/info'),
-            ('out_srv', _ros_namespace + '/video/left/image'),
-            ('out_topic', _ros_namespace + '/image/left/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
         ],
         parameters=[{
-            "photo": "",
+            "photo": left_photo,
             "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,
@@ -46,18 +48,18 @@ def generate_launch_description():
     )
 
     right_photo_to_video_node = Node(
-        namespace=_ros_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace,
         package='maid_robot_system_py',
         executable='photo_to_video_node',
         name='right_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('info', _ros_namespace + '/video/right/info'),
-            ('out_srv', _ros_namespace + '/video/right/image'),
-            ('out_topic', _ros_namespace + '/image/right/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
         ],
         parameters=[{
-            "photo": "",
+            "photo": right_photo,
             "notify/message/verbose": False,
             "settings/area/mirror": False,
             "settings/area/upside_down": False,

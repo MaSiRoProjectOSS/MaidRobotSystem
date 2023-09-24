@@ -4,6 +4,10 @@
         "**/.DS_Store": true,
         "build": true
     },
+    "autopep8.args": [
+        "--max-line-length",
+        "240"
+    ],
     "files.encoding": "utf8",
     "files.eol": "\n",
     "editor.renderWhitespace": "all",

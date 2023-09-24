@@ -1,0 +1,78 @@
+{
+    "path": "/opt/MaidRobotSystem/data/cast/Iris",
+    "eye": {
+        "eyeball": {
+            "normally": "eye/eyeball/eyeball_normally.png"
+        },
+        "eyelid": {
+            "normally": [
+                "eye/eyelid/normally/000.png",
+                "eye/eyelid/normally/001.png",
+                "eye/eyelid/normally/002.png",
+                "eye/eyelid/normally/003.png",
+                "eye/eyelid/normally/004.png",
+                "eye/eyelid/normally/005.png",
+                "eye/eyelid/normally/006.png",
+                "eye/eyelid/normally/007.png",
+                "eye/eyelid/normally/008.png",
+                "eye/eyelid/normally/009.png",
+                "eye/eyelid/normally/010.png",
+                "eye/eyelid/normally/011.png",
+                "eye/eyelid/normally/012.png",
+                "eye/eyelid/normally/013.png",
+                "eye/eyelid/normally/014.png",
+                "eye/eyelid/normally/015.png",
+                "eye/eyelid/normally/016.png",
+                "eye/eyelid/normally/017.png",
+                "eye/eyelid/normally/018.png",
+                "eye/eyelid/normally/019.png",
+                "eye/eyelid/normally/020.png",
+                "eye/eyelid/normally/021.png",
+                "eye/eyelid/normally/022.png",
+                "eye/eyelid/normally/023.png",
+                "eye/eyelid/normally/024.png",
+                "eye/eyelid/normally/025.png",
+                "eye/eyelid/normally/026.png",
+                "eye/eyelid/normally/027.png",
+                "eye/eyelid/normally/028.png",
+                "eye/eyelid/normally/029.png"
+            ],
+            "smile": [
+                "eye/eyelid/smile/000.png",
+                "eye/eyelid/smile/001.png",
+                "eye/eyelid/smile/002.png",
+                "eye/eyelid/smile/003.png",
+                "eye/eyelid/smile/004.png",
+                "eye/eyelid/smile/005.png",
+                "eye/eyelid/smile/006.png",
+                "eye/eyelid/smile/007.png",
+                "eye/eyelid/smile/008.png",
+                "eye/eyelid/smile/009.png",
+                "eye/eyelid/smile/010.png",
+                "eye/eyelid/smile/011.png",
+                "eye/eyelid/smile/012.png",
+                "eye/eyelid/smile/013.png",
+                "eye/eyelid/smile/014.png",
+                "eye/eyelid/smile/015.png",
+                "eye/eyelid/smile/016.png",
+                "eye/eyelid/smile/017.png",
+                "eye/eyelid/smile/018.png",
+                "eye/eyelid/smile/019.png",
+                "eye/eyelid/smile/020.png",
+                "eye/eyelid/smile/021.png",
+                "eye/eyelid/smile/022.png",
+                "eye/eyelid/smile/023.png",
+                "eye/eyelid/smile/024.png",
+                "eye/eyelid/smile/025.png",
+                "eye/eyelid/smile/026.png",
+                "eye/eyelid/smile/027.png",
+                "eye/eyelid/smile/028.png",
+                "eye/eyelid/smile/029.png"
+            ]
+        },
+        "pupil": {
+            "normally": "eye/pupil/pupil_normally.png",
+            "order": "eye/pupil/pupil_order.png"
+        }
+    }
+}

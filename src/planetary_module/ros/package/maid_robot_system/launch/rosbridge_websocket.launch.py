@@ -5,12 +5,10 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    _ros_namespace = "{}{}".format(
-        os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/rosbridge')
+    _ros_namespace = "{}{}".format(os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system'), '/rosbridge')
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
-    _res_pawn = {'true': True, 'false': False}[
-        os.getenv('MRS_ROS_SPAWN', 'false')]
+    _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
     node_rosbridge_server_ws = Node(
         namespace=_ros_namespace,
