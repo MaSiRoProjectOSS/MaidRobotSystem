@@ -589,16 +589,16 @@ class VideoCaptureNode(Node):
     def _callback_srv_video_device_info(self,
                                         request: MrsSrv.VideoDeviceInfo.Request,
                                         response: MrsSrv.VideoDeviceInfo.Response):
-        response.id = self._param.device.ID
-        response.type = str(self._param.device.TYPE)
-        response.by_path_name = str(self._param.device.NAME_BY_PATH)
-        response.path = str(self._param.device.PATH)
-        response.video_info.angle_x = self._param.device.ANGLE_X
-        response.video_info.angle_y = self._param.device.ANGLE_Y
-        response.video_info.width = self._param.device.WIDTH
-        response.video_info.height = self._param.device.HEIGHT
-        response.video_info.fps = self._param.device.FPS
-        response.video_info.format = str(self._param.device.FORMAT)
+        response.data.id = self._param.device.ID
+        response.data.type = str(self._param.device.TYPE)
+        response.data.by_path_name = str(self._param.device.NAME_BY_PATH)
+        response.data.path = str(self._param.device.PATH)
+        response.data.angle_x = self._param.device.ANGLE_X
+        response.data.angle_y = self._param.device.ANGLE_Y
+        response.data.width = self._param.device.WIDTH
+        response.data.height = self._param.device.HEIGHT
+        response.data.fps = self._param.device.FPS
+        response.data.format = str(self._param.device.FORMAT)
         return response
 
     # ## video capture

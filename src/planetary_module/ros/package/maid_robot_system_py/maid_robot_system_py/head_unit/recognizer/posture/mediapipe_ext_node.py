@@ -8,11 +8,8 @@ from cv_bridge import CvBridge
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from rcl_interfaces.msg import SetParametersResult
-from maid_robot_system_interfaces.msg._pose_landmark_model import PoseLandmarkModel
-from maid_robot_system_interfaces.msg._pose_detection import PoseDetection
-from maid_robot_system_interfaces.msg._rect_float import RectFloat
-from maid_robot_system_interfaces.msg._landmark import Landmark
 import maid_robot_system_interfaces.srv as MrsSrv
+import maid_robot_system_interfaces.msg as MrsMsg
 
 
 class MediapipeExtNodeParam():
@@ -71,11 +68,11 @@ class SchematicDiagram():
     def __init__(self):
         pass
 
-    def drawing_point(self, image, w, h, data: Landmark):
+    def drawing_point(self, image, w, h, data: MrsMsg.Landmark):
         if (data.exist is True):
             cv.circle(image, (int(data.x * w), int(data.y * h)), self._radius, self._color_green, self._thickness)
 
-    def drawing_points(self, image, w, h, person_data: PoseLandmarkModel):
+    def drawing_points(self, image, w, h, person_data: MrsMsg.PoseLandmarkModel):
         self.drawing_point(image, w, h, person_data.nose)
         self.drawing_point(image, w, h, person_data.left.eye_inner)
         self.drawing_point(image, w, h, person_data.left.eye)
@@ -110,14 +107,14 @@ class SchematicDiagram():
         self.drawing_point(image, w, h, person_data.left.foot_index)
         self.drawing_point(image, w, h, person_data.right.foot_index)
 
-    def drawing_line(self, image, w, h, start: Landmark, end: Landmark):
+    def drawing_line(self, image, w, h, start: MrsMsg.Landmark, end: MrsMsg.Landmark):
         if ((start.exist is True) and (end.exist is True)):
             cv.line(image,
                     (int(start.x * w), int(start.y * h)),
                     (int(end.x * w), int(end.y * h)),
                     self._color_green, self._thickness)
 
-    def drawing_lines(self, image, w, h, data: PoseLandmarkModel):
+    def drawing_lines(self, image, w, h, data: MrsMsg.PoseLandmarkModel):
         # face line
         self.drawing_line(image, w, h, data.nose, data.left.eye)
         self.drawing_line(image, w, h, data.nose, data.right.eye)
@@ -166,7 +163,7 @@ class SchematicDiagram():
         cv.rectangle(image, (int(x), int(y)), (int(x + w), int(y + h)), self._color_green, self._thickness)
 
     def drawing(self, image, width: float, height:
-                float, person_data: PoseLandmarkModel, area: RectFloat,
+                float, person_data: MrsMsg.PoseLandmarkModel, area: MrsMsg.RectFloat,
                 human_detected: bool, flag_box: bool):
 
         if human_detected is True:
@@ -258,7 +255,7 @@ class MediapipeExtNode(Node):
                 if (self._response.done() is True):
                     msg: MrsSrv.MediaPipePoseLandmarkDetection.Response = self._response.result()
                     if ((msg.image.height != 0) and (msg.image.width != 0)):
-                        pose_landmarks: PoseDetection = msg.data
+                        pose_landmarks: MrsMsg.PoseDetection = msg.data
                         cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
                         if (pose_landmarks.human_detected is True):
                             image_height, image_wight = cv_image.shape[:2]

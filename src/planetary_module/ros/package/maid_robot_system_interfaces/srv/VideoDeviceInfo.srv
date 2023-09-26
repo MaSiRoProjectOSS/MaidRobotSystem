@@ -1,7 +1,3 @@
 
 ---
-int32       id
-string      type
-string      by_path_name
-string      path
-maid_robot_system_interfaces/VideoInfo video_info
+maid_robot_system_interfaces/VideoInfo data

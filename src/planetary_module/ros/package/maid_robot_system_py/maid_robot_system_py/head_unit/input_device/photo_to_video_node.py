@@ -229,6 +229,7 @@ class VideoCaptureNodeParam():
         self._calc_area(self.device.WIDTH, self.device.HEIGHT,
                         self.settings.AREA_CENTER_X, self.settings.AREA_CENTER_Y,
                         self.settings.AREA_WIDTH, self.settings.AREA_HEIGHT)
+        self.update_device_info(self.device.path)
 
     def init(self, node: Node):
         self.device = self.ParamDevice()
@@ -375,17 +376,17 @@ class VideoCaptureNode(Node):
     def _callback_srv_video_device_info(self,
                                         request: MrsSrv.VideoDeviceInfo.Request,
                                         response: MrsSrv.VideoDeviceInfo.Response):
-        response.id = -1
-        response.type = "image"
-        response.by_path_name = ""
-        response.path = str(self._param.device.path)
-        response.video_info.angle_x = 0
-        response.video_info.angle_y = 0
-        response.video_info.width = self._param.device.WIDTH
-        response.video_info.height = self._param.device.HEIGHT
-        response.video_info.fps = float(0.0)
+        response.data.id = -1
+        response.data.type = "image"
+        response.data.by_path_name = ""
+        response.data.path = str(self._param.device.path)
+        response.data.angle_x = 0
+        response.data.angle_y = 0
+        response.data.width = self._param.device.WIDTH
+        response.data.height = self._param.device.HEIGHT
+        response.data.fps = float(0.0)
         ext = os.path.splitext(self._param.device.path)[1][1:]
-        response.video_info.format = ext
+        response.data.format = ext
         return response
 
     # ## video capture

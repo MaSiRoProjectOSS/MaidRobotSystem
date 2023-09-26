@@ -9,8 +9,8 @@ from cv_bridge import CvBridge
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from rcl_interfaces.msg import SetParametersResult
-from maid_robot_system_interfaces.msg._ar_markers import ArMarkers
-from maid_robot_system_interfaces.srv._video_capture import VideoCapture
+import maid_robot_system_interfaces.msg as MrsMsg
+import maid_robot_system_interfaces.srv as MrsSrv
 from utils.cv_fps_calc import CvFpsCalc
 
 
@@ -71,7 +71,7 @@ class DetectARNodeParam():
 class DetectARNode(Node):
     _in_image_name = 'in_srv'
     _out_data_name = 'out'
-    _send_msg = ArMarkers()
+    _send_msg = MrsMsg.ArMarkers()
     _out_data_queue_size = 5
     #################################
     _bridge = None
@@ -79,7 +79,7 @@ class DetectARNode(Node):
     _timer_output_info_time_ms = 5000
     _display_fps = 0
     _detector = None
-    _request = VideoCapture.Request()
+    _request = MrsSrv.VideoCapture.Request()
     _fps_calc = None
     _timer_output_information_size = (5 * 60)
     #################################
@@ -118,14 +118,14 @@ class DetectARNode(Node):
     ##################################################################################
 
     def _create_service_client(self):
-        self._client = self.create_client(VideoCapture, self._in_image_name)
+        self._client = self.create_client(MrsSrv.VideoCapture, self._in_image_name)
         while not self._client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
-        self._request = VideoCapture.Request()
+        self._request = MrsSrv.VideoCapture.Request()
         self._request_image(self.get_clock().now().nanoseconds)
 
     def _create_publisher(self):
-        self._pub = self.create_publisher(ArMarkers, self._out_data_name, self._out_data_queue_size)
+        self._pub = self.create_publisher(MrsMsg.ArMarkers, self._out_data_name, self._out_data_queue_size)
         if (self._debug_mode is True):
             self._pub_image = self.create_publisher(Image, self._debug_pub_name, 2)
 
