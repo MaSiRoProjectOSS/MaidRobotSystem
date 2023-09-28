@@ -13,6 +13,7 @@
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+#include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
 #include <std_msgs/msg/float64.hpp>
 
 namespace maid_robot_system
@@ -40,9 +41,9 @@ private:
     // =============================
     // ROS : subscription
     // =============================
-    void callback_message(const std_msgs::msg::Float64 &msg);
+    void callback_message(const maid_robot_system_interfaces::msg::MrsEye &msg);
 
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsEye>::SharedPtr _sub_value;
 
 private:
     // =============================
@@ -64,12 +65,40 @@ private:
     // =============================
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 1000 };
+    const std::chrono::milliseconds TP_MSEC{ 10 };
 
-    const std::string MRS_TOPIC_OUTPUT            = "out";
-    const std::string MRS_TOPIC_INPUT             = "in";
-    const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
-    const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";
+    const std::string MRS_TOPIC_OUTPUT = "out";
+    const std::string MRS_TOPIC_INPUT  = "in";
+
+    const std::string MRS_PARAMETER_SETTING_FILE = "setting_file";
+    const std::string MRS_PARAMETER_SKIN_NAME    = "skin_name";
+
+    const std::string MRS_PARAMETER_LEFT_WIDTH         = "left/width";
+    const std::string MRS_PARAMETER_LEFT_HEIGHT        = "left/height";
+    const std::string MRS_PARAMETER_LEFT_CENTER_X      = "left/center/x";
+    const std::string MRS_PARAMETER_LEFT_CENTER_Y      = "left/center/y";
+    const std::string MRS_PARAMETER_LEFT_CENTER_ANGLE  = "left/center/angle";
+    const std::string MRS_PARAMETER_LEFT_EYEBALL_X     = "left/eyeball/x";
+    const std::string MRS_PARAMETER_LEFT_EYEBALL_Y     = "left/eyeball/y";
+    const std::string MRS_PARAMETER_LEFT_EYEBALL_ANGLE = "left/eyeball/angle";
+
+    const std::string MRS_PARAMETER_RIGHT_WIDTH         = "right/width";
+    const std::string MRS_PARAMETER_RIGHT_HEIGHT        = "right/height";
+    const std::string MRS_PARAMETER_RIGHT_CENTER_X      = "right/center/x";
+    const std::string MRS_PARAMETER_RIGHT_CENTER_Y      = "right/center/y";
+    const std::string MRS_PARAMETER_RIGHT_CENTER_ANGLE  = "right/center/angle";
+    const std::string MRS_PARAMETER_RIGHT_EYEBALL_X     = "right/eyeball/x";
+    const std::string MRS_PARAMETER_RIGHT_EYEBALL_Y     = "right/eyeball/y";
+    const std::string MRS_PARAMETER_RIGHT_EYEBALL_ANGLE = "right/eyeball/angle";
+
+    const std::string MRS_PARAMETER_EYELID_WIDTH  = "eyelid/width";
+    const std::string MRS_PARAMETER_EYELID_HEIGHT = "eyelid/height";
+
+    const std::string MRS_PARAMETER_BLINK_QUICKLY_MS = "blink_time/quickly_ms";
+    const std::string MRS_PARAMETER_BLINK_MIN_MS     = "blink_time/min_ms";
+    const std::string MRS_PARAMETER_BLINK_MAX_MS     = "blink_time/max_ms";
+    const std::string MRS_PARAMETER_BLINK_LIMIT_MS   = "blink_time/limit_ms";
+    const std::string MRS_PARAMETER_BLINK_OFFSET_MS  = "blink_time/offset_ms";
 };
 
 } // namespace maid_robot_system

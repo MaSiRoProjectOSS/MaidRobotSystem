@@ -39,6 +39,8 @@ public:
     bool set_value_voice(std::string text, int command);
     bool set_value_ar(ModelStructure::INPUT_TYPE type, int id);
     bool set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection msg);
+    bool set_value_tiredness(float data);
+
     void get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg);
     void get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &msg);
     void get_msg_lip(maid_robot_system_interfaces::msg::MrsLip &msg);

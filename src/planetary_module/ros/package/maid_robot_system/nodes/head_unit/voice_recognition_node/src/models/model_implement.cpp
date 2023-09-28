@@ -14,30 +14,15 @@ namespace maid_robot_system
 // =============================
 // PUBLIC : Function
 // =============================
-void ModelImplement::set_times(double value)
+
+bool ModelImplement::is_text()
 {
-    this->_times = value;
-}
-void ModelImplement::set_offset(double value)
-{
-    this->_offset = value;
-}
-void ModelImplement::set_value(double value)
-{
-    this->_value = value;
-}
-double ModelImplement::calculate()
-{
-    return (this->_value * this->_times) + this->_offset;
+    return false;
 }
 
-double ModelImplement::get_times()
+std::string ModelImplement::pop()
 {
-    return this->_times;
-}
-double ModelImplement::get_offset()
-{
-    return this->_offset;
+    return "";
 }
 
 // =============================

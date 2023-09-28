@@ -12,20 +12,46 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
+void NodeImplement::callback_message(const maid_robot_system_interfaces::msg::MrsEye &msg)
 {
-    this->_msg_convert.data = this->_model.calculate(msg.data);
-    // RCLCPP_DEBUG(this->get_logger(), "callback_message() : %f", this->_msg_convert.data);
-    RCLCPP_INFO(this->get_logger(), "callback_message() : %f", this->_msg_convert.data);
-    // RCLCPP_WARN(this->get_logger(), "callback_message() : %f", this->_msg_convert.data);
-    // RCLCPP_ERROR(this->get_logger(), "callback_message() : %f", this->_msg_convert.data);
-    // RCLCPP_FATAL(this->get_logger(), "callback_message() : %f", this->_msg_convert.data);
+    RCLCPP_INFO(this->get_logger(),
+                "callback_message() : emotions[%d] size[%d] distance[%d] x[%d] y[%d]", //
+                msg.emotions,
+                msg.size,     //
+                msg.distance, //
+                msg.x,        //
+                msg.y         //
+    );
 }
 
 void NodeImplement::callback_param()
 {
     // declare_parameter
-    this->declare_parameter(this->MRS_PARAMETER_SAMPLE_OFFSET, this->_model.get_offset());
+    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_SKIN_NAME, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_WIDTH, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_HEIGHT, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_X, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_X, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_WIDTH, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_HEIGHT, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_X, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_X, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_EYELID_WIDTH, 0);
+    this->declare_parameter(this->MRS_PARAMETER_EYELID_HEIGHT, 0);
+    this->declare_parameter(this->MRS_PARAMETER_BLINK_QUICKLY_MS, 0);
+    this->declare_parameter(this->MRS_PARAMETER_BLINK_MIN_MS, 0);
+    this->declare_parameter(this->MRS_PARAMETER_BLINK_MAX_MS, 0);
+    this->declare_parameter(this->MRS_PARAMETER_BLINK_LIMIT_MS, 0);
+    this->declare_parameter(this->MRS_PARAMETER_BLINK_OFFSET_MS, 0);
 
     // make parameter callback
     this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
@@ -37,15 +63,62 @@ void NodeImplement::callback_param()
 
         for (auto &&param : params) {
             switch (param.get_type()) {
-                case rclcpp::PARAMETER_DOUBLE:
-                    if (param.get_name() == this->MRS_PARAMETER_SAMPLE_OFFSET) {
-                        this->_model.set_offset(param.as_double());
-                        this->_msg_convert.data = this->_model.get_offset();
-                        RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_OFFSET.c_str(), this->_model.get_offset());
+                case rclcpp::PARAMETER_INTEGER:
+                    RCLCPP_INFO(this->get_logger(), "  set param : %s[%ld]", param.get_name().c_str(), param.as_int());
+
+                    if (param.get_name() == this->MRS_PARAMETER_SETTING_FILE) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_SKIN_NAME) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_WIDTH) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_HEIGHT) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_CENTER_X) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_CENTER_Y) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_CENTER_ANGLE) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_EYEBALL_X) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_EYEBALL_Y) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_LEFT_EYEBALL_ANGLE) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_WIDTH) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_HEIGHT) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_CENTER_X) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_CENTER_Y) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_CENTER_ANGLE) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_EYEBALL_X) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_EYEBALL_Y) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_RIGHT_EYEBALL_ANGLE) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_EYELID_WIDTH) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_EYELID_HEIGHT) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_BLINK_QUICKLY_MS) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_BLINK_MIN_MS) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_BLINK_MAX_MS) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_BLINK_LIMIT_MS) {
+                        results->successful = true;
+                    } else if (param.get_name() == this->MRS_PARAMETER_BLINK_OFFSET_MS) {
                         results->successful = true;
                     }
                     break;
-                case rclcpp::PARAMETER_INTEGER:
+                case rclcpp::PARAMETER_DOUBLE:
                 case rclcpp::PARAMETER_NOT_SET:
                 case rclcpp::PARAMETER_BOOL:
                 case rclcpp::PARAMETER_STRING:
@@ -66,17 +139,7 @@ void NodeImplement::callback_param()
 
 void NodeImplement::callback_timer()
 {
-    this->_pub_value->publish(this->_msg_convert);
-
-    static double __times  = 0;
-    static double __offset = 0;
-    static double __data   = 0;
-    if ((__times != this->_model.get_times()) || (__offset != this->_model.get_offset()) || (__data != this->_msg_convert.data)) {
-        RCLCPP_INFO(this->get_logger(), "callback_timer : %f = %f * n + %f", this->_msg_convert.data, this->_model.get_times(), this->_model.get_offset());
-        __times  = this->_model.get_times();
-        __offset = this->_model.get_offset();
-        __data   = this->_msg_convert.data;
-    }
+    //
 }
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
@@ -93,10 +156,10 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                     rclcpp::QoS(this->CONFIG_QOS)           //
             );
     // set subscription
-    this->_sub_value =                                         //
-            this->create_subscription<std_msgs::msg::Float64>( //
-                    this->MRS_TOPIC_INPUT,                     //
-                    this->CONFIG_SUBSCRIPTION_SIZE,            //
+    this->_sub_value =                                                            //
+            this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
+                    this->MRS_TOPIC_INPUT,                                        //
+                    this->CONFIG_SUBSCRIPTION_SIZE,                               //
                     std::bind(&NodeImplement::callback_message, this, _1));
 
     this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));

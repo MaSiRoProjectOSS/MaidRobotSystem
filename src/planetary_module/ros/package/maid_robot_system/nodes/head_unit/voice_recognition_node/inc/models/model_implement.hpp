@@ -10,21 +10,17 @@
 #ifndef SAMPLE_NODE_MODEL_IMPLEMENT_HPP
 #define SAMPLE_NODE_MODEL_IMPLEMENT_HPP
 
+#include <string>
+
 namespace maid_robot_system
 {
-
 class ModelImplement {
 public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void set_times(double value);
-    void set_offset(double value);
-    void set_value(double value);
-    double calculate();
-
-    double get_times();
-    double get_offset();
+    bool is_text();
+    std::string pop();
 
 private:
     // =============================
@@ -35,9 +31,6 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    double _offset = 0;
-    double _times  = 1;
-    double _value  = 0;
 
 public:
     // =============================

@@ -1,5 +1,5 @@
 /**
- * @file modeleft.implement.cpp
+ * @file model_implement.cpp
  * @brief
  * @version 0.23.7
  * @date 2023-07-15
@@ -119,6 +119,11 @@ bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_
         default:
             break;
     }
+    return result;
+}
+bool ModelImplement::set_value_tiredness(float data)
+{
+    bool result = false;
     return result;
 }
 

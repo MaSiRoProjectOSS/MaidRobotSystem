@@ -16,6 +16,7 @@
 #include <maid_robot_system_interfaces/msg/ar_markers.hpp>
 #include <maid_robot_system_interfaces/msg/mrs_voice.hpp>
 #include <maid_robot_system_interfaces/msg/pose_detection.hpp>
+#include <std_msgs/msg/float64.hpp>
 
 namespace maid_robot_system
 {
@@ -51,12 +52,14 @@ private:
     void callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg);
     void callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg);
     void callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg);
+    void callback_voltage(const std_msgs::msg::Float64 &msg);
 
     rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_left;
     rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_right;
     rclcpp::Subscription<maid_robot_system_interfaces::msg::ArMarkers>::SharedPtr _sub_ar_left;
     rclcpp::Subscription<maid_robot_system_interfaces::msg::ArMarkers>::SharedPtr _sub_ar_right;
     rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsVoice>::SharedPtr _sub_voice;
+    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_voltage;
 
 private:
     // =============================
@@ -85,6 +88,7 @@ private:
     const std::string MRS_TOPIC_IN_MARKS_LEFT    = "in/marks/left";
     const std::string MRS_TOPIC_IN_MARKS_RIGHT   = "in/marks/right";
     const std::string MRS_TOPIC_IN_VOICE         = "in/voice_text";
+    const std::string MRS_TOPIC_IN_VOLTAGE       = "in/voltage";
     const std::string MRS_TOPIC_OUT_EYE          = "out/eye";
     const std::string MRS_TOPIC_OUT_NECK         = "out/neck";
     const std::string MRS_TOPIC_OUT_LIP          = "out/lip";

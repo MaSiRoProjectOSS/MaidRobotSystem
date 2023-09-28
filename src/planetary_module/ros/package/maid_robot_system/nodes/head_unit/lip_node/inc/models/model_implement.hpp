@@ -17,14 +17,7 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void set_times(double value);
-    void set_offset(double value);
-    void set_value(double value);
-    double calculate();
-
-    double get_times();
-    double get_offset();
-    double get_value();
+    bool calculate(int percent);
 
 private:
     // =============================
@@ -35,9 +28,6 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    double _offset = 200;
-    double _times  = 300;
-    double _value  = 100;
 
 public:
     // =============================

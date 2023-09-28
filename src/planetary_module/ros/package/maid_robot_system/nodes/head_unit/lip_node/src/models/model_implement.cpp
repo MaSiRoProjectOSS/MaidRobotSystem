@@ -14,34 +14,10 @@ namespace maid_robot_system
 // =============================
 // PUBLIC : Function
 // =============================
-void ModelImplement::set_times(double value)
+bool ModelImplement::calculate(int percent)
 {
-    this->_times = value;
-}
-void ModelImplement::set_offset(double value)
-{
-    this->_offset = value;
-}
-void ModelImplement::set_value(double value)
-{
-    this->_value = value;
-}
-double ModelImplement::calculate()
-{
-    return (this->_value * this->_times) + this->_offset;
-}
-
-double ModelImplement::get_times()
-{
-    return this->_times;
-}
-double ModelImplement::get_offset()
-{
-    return this->_offset;
-}
-double ModelImplement::get_value()
-{
-    return this->_value;
+    bool result = true;
+    return result;
 }
 
 // =============================

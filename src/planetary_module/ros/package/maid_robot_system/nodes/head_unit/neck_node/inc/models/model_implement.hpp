@@ -17,12 +17,7 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void set_times(double value);
-    void set_offset(double value);
-    double calculate(double value);
-
-    double get_times();
-    double get_offset();
+    bool calculate(int x, int y, int z, int w);
 
 private:
     // =============================
@@ -33,8 +28,6 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    double _offset = 0;
-    double _times  = 1;
 
 public:
     // =============================

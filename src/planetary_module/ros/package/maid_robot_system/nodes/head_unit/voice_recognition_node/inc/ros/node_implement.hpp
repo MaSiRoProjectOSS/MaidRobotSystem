@@ -14,7 +14,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include <maid_robot_system_interfaces/msg/mrs_sample.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <std_msgs/msg/string.hpp>
 
 namespace maid_robot_system
 {
@@ -34,16 +34,8 @@ private:
     // =============================
     // ROS : publisher
     // =============================
-    maid_robot_system_interfaces::msg::MrsSample _msg_convert;
-    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsSample>::SharedPtr _pub_info;
-
-private:
-    // =============================
-    // ROS : subscription
-    // =============================
-    void callback_message(const std_msgs::msg::Float64 &msg);
-
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
+    std_msgs::msg::String _msg_text;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr _pub_text;
 
 private:
     // =============================
@@ -65,12 +57,10 @@ private:
     // =============================
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 1000 };
+    const std::chrono::milliseconds TP_MSEC{ 100 };
 
-    const std::string MRS_TOPIC_OUTPUT            = "out";
-    const std::string MRS_TOPIC_INPUT             = "in";
-    const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
-    const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";
+    const std::string MRS_OUTPUT_VOICE_TEXT = "voice_text";
+    //const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
 };
 
 } // namespace maid_robot_system

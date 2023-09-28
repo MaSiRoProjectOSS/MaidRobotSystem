@@ -46,6 +46,11 @@ void NodeImplement::callback_voice(const maid_robot_system_interfaces::msg::MrsV
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %d", this->get_name(), msg.command);
     this->_model.set_value_voice(msg.text, msg.command);
 }
+void NodeImplement::callback_voltage(const std_msgs::msg::Float64 &msg)
+{
+    RCLCPP_DEBUG(this->get_logger(), "[%s] : %f", this->get_name(), msg.data);
+    this->_model.set_value_tiredness(msg.data);
+}
 
 // =============================
 // ROS : parameter
@@ -226,6 +231,11 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                     this->MRS_TOPIC_IN_VOICE,                                       //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                 //
                     std::bind(&NodeImplement::callback_voice, this, _1));
+    this->_sub_voltage =                                       //
+            this->create_subscription<std_msgs::msg::Float64>( //
+                    this->MRS_TOPIC_IN_VOLTAGE,                //
+                    this->CONFIG_SUBSCRIPTION_SIZE,            //
+                    std::bind(&NodeImplement::callback_voltage, this, _1));
 
     this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
 }

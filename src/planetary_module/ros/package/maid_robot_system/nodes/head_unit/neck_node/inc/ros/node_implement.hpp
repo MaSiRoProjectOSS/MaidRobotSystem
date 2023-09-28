@@ -13,7 +13,7 @@
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-#include <std_msgs/msg/float64.hpp>
+#include <maid_robot_system_interfaces/msg/mrs_neck.hpp>
 
 namespace maid_robot_system
 {
@@ -28,21 +28,13 @@ private:
     // Variable
     // =============================
     ModelImplement _model;
-    std_msgs::msg::Float64 _msg_convert;
-
-private:
-    // =============================
-    // ROS : publisher
-    // =============================
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr _pub_value;
 
 private:
     // =============================
     // ROS : subscription
     // =============================
-    void callback_message(const std_msgs::msg::Float64 &msg);
-
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
+    void callback_data(const maid_robot_system_interfaces::msg::MrsNeck &msg);
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsNeck>::SharedPtr _sub_neck;
 
 private:
     // =============================
@@ -64,12 +56,9 @@ private:
     // =============================
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 1000 };
+    const std::chrono::milliseconds TP_MSEC{ 25 };
 
-    const std::string MRS_TOPIC_OUTPUT            = "out";
-    const std::string MRS_TOPIC_INPUT             = "in";
-    const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
-    const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";
+    const std::string MRS_TOPIC_INPUT = "in";
 };
 
 } // namespace maid_robot_system

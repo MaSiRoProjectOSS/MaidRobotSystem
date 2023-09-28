@@ -19,6 +19,7 @@ def generate_launch_description():
     _ros_sub_input_posture = '/head_unit' + '/logic' + '/posture'
     _ros_sub_input_ar = '/head_unit' + '/logic' + '/marker'
     _ros_sub_input_voice = '/head_unit' + '/controller' + '/microphone'
+    _ros_sub_input_wattmeter = '/power_unit' + '/controller' + '/wattmeter'
 
     launch_head_control_node = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -31,12 +32,32 @@ def generate_launch_description():
             ('in/marks/left', _ros_namespace + _ros_sub_input_ar + '/ar/left'),
             ('in/marks/right', _ros_namespace + _ros_sub_input_ar + '/ar/right'),
             ('in/voice_text', _ros_namespace + _ros_sub_input_voice + '/voice_text'),
+            ('in/voltage', _ros_namespace + _ros_sub_input_wattmeter + '/voltage'),
             ('out/eye', _ros_namespace + _ros_sub_namespace + '/eye'),
             ('out/neck', _ros_namespace + _ros_sub_namespace + '/neck'),
             ('out/lip', _ros_namespace + _ros_sub_namespace + '/lip')
         ],
         parameters=[{
-            "id": -1
+            "eye/left/center/x": 0,
+            "eye/left/center/y": 0,
+            "eye/left/offset/up": 0,
+            "eye/left/offset/down": 0,
+
+            "eye/right/center/x": 0,
+            "eye/right/center/y": 0,
+            "eye/right/offset/up": 0,
+            "eye/right/offset/down": 0,
+
+            "neck/pitch/min": 0,
+            "neck/pitch/max": 0,
+            "neck/yaw/min": 0,
+            "neck/yaw/max": 0,
+            "neck/roll/min": 0,
+            "neck/roll/max": 0,
+
+            "lip/min": 0,
+            "lip/max": 0,
+            "tiredness": 25
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,

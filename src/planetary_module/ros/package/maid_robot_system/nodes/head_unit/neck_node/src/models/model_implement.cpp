@@ -11,30 +11,13 @@
 
 namespace maid_robot_system
 {
-
 // =============================
 // PUBLIC : Function
 // =============================
-void ModelImplement::set_times(double value)
+bool ModelImplement::calculate(int x, int y, int z, int w)
 {
-    this->_times = value;
-}
-void ModelImplement::set_offset(double value)
-{
-    this->_offset = value;
-}
-double ModelImplement::calculate(double value)
-{
-    return (value * this->_times) + this->_offset;
-}
-
-double ModelImplement::get_times()
-{
-    return this->_times;
-}
-double ModelImplement::get_offset()
-{
-    return this->_offset;
+    bool result = true;
+    return result;
 }
 
 // =============================
