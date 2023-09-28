@@ -7,12 +7,11 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef MRS_NODE_HITOMI_MODEL_IMPLEMENT_HPP
-#define MRS_NODE_HITOMI_MODEL_IMPLEMENT_HPP
+#ifndef MRS_EYE_NODE_MODEL_IMPLEMENT_HPP
+#define MRS_EYE_NODE_MODEL_IMPLEMENT_HPP
 
 namespace maid_robot_system
 {
-
 class ModelImplement {
 public:
     // =============================

@@ -53,15 +53,15 @@ void NodeImplement::callback_voice(const maid_robot_system_interfaces::msg::MrsV
 void NodeImplement::callback_param()
 {
     // declare_parameter
-    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_X_LEFT, this->_model.param.oculus_center_x_left);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_Y_LEFT, this->_model.param.oculus_center_y_left);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_UP_LEFT, this->_model.param.oculus_offset_up_left);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_DOWN_LEFT, this->_model.param.oculus_offset_down_left);
+    this->declare_parameter(this->MRS_PARAM_EYE_CENTER_X_LEFT, this->_model.param.oculus_center_x_left);
+    this->declare_parameter(this->MRS_PARAM_EYE_CENTER_Y_LEFT, this->_model.param.oculus_center_y_left);
+    this->declare_parameter(this->MRS_PARAM_EYE_OFFSET_UP_LEFT, this->_model.param.oculus_offset_up_left);
+    this->declare_parameter(this->MRS_PARAM_EYE_OFFSET_DOWN_LEFT, this->_model.param.oculus_offset_down_left);
 
-    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_X_RIGHT, this->_model.param.oculus_center_x_right);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_CENTER_Y_RIGHT, this->_model.param.oculus_center_y_right);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_UP_RIGHT, this->_model.param.oculus_offset_up_right);
-    this->declare_parameter(this->MRS_PARAM_OCULUS_OFFSET_DOWN_RIGHT, this->_model.param.oculus_offset_down_right);
+    this->declare_parameter(this->MRS_PARAM_EYE_CENTER_X_RIGHT, this->_model.param.oculus_center_x_right);
+    this->declare_parameter(this->MRS_PARAM_EYE_CENTER_Y_RIGHT, this->_model.param.oculus_center_y_right);
+    this->declare_parameter(this->MRS_PARAM_EYE_OFFSET_UP_RIGHT, this->_model.param.oculus_offset_up_right);
+    this->declare_parameter(this->MRS_PARAM_EYE_OFFSET_DOWN_RIGHT, this->_model.param.oculus_offset_down_right);
 
     this->declare_parameter(this->MRS_PARAM_NECK_PITCH_MIN, this->_model.param.neck_pitch_min);
     this->declare_parameter(this->MRS_PARAM_NECK_PITCH_MAX, this->_model.param.neck_pitch_max);
@@ -84,28 +84,28 @@ void NodeImplement::callback_param()
         for (auto &&param : params) {
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:
-                    if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_X_LEFT) {
+                    if (param.get_name() == this->MRS_PARAM_EYE_CENTER_X_LEFT) {
                         this->_model.param.oculus_center_x_left = param.as_double();
                         results->successful                     = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_Y_LEFT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_CENTER_Y_LEFT) {
                         this->_model.param.oculus_center_y_left = param.as_double();
                         results->successful                     = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_UP_LEFT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_OFFSET_UP_LEFT) {
                         this->_model.param.oculus_offset_up_left = param.as_double();
                         results->successful                      = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_DOWN_LEFT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_OFFSET_DOWN_LEFT) {
                         this->_model.param.oculus_offset_down_left = param.as_double();
                         results->successful                        = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_X_RIGHT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_CENTER_X_RIGHT) {
                         this->_model.param.oculus_center_x_right = param.as_double();
                         results->successful                      = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_CENTER_Y_RIGHT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_CENTER_Y_RIGHT) {
                         this->_model.param.oculus_center_y_right = param.as_double();
                         results->successful                      = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_UP_RIGHT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_OFFSET_UP_RIGHT) {
                         this->_model.param.oculus_offset_up_right = param.as_double();
                         results->successful                       = true;
-                    } else if (param.get_name() == this->MRS_PARAM_OCULUS_OFFSET_DOWN_RIGHT) {
+                    } else if (param.get_name() == this->MRS_PARAM_EYE_OFFSET_DOWN_RIGHT) {
                         this->_model.param.oculus_offset_down_right = param.as_double();
                         results->successful                         = true;
                     }
@@ -164,11 +164,11 @@ void NodeImplement::callback_timer()
 {
     bool result = this->_model.calculate();
     if (true == result) {
-        this->_model.get_msg_oculus(this->_msg_oculus);
+        this->_model.get_msg_eye(this->_msg_eye);
         this->_model.get_msg_neck(this->_msg_neck);
         this->_model.get_msg_lip(this->_msg_lip);
     }
-    this->_pub_oculus->publish(this->_msg_oculus);
+    this->_pub_eye->publish(this->_msg_eye);
     this->_pub_neck->publish(this->_msg_neck);
     this->_pub_lip->publish(this->_msg_lip);
 }
@@ -184,41 +184,41 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     this->callback_param();
 
     // set publisher
-    this->_pub_oculus =                                                           //
-            this->create_publisher<maid_robot_system_interfaces::msg::MrsHitomi>( //
-                    this->MRS_TOPIC_OUT_OCULUS,                                   //
-                    rclcpp::QoS(this->CONFIG_QOS)                                 //
+    this->_pub_eye =                                                           //
+            this->create_publisher<maid_robot_system_interfaces::msg::MrsEye>( //
+                    this->MRS_TOPIC_OUT_EYE,                                   //
+                    rclcpp::QoS(this->CONFIG_QOS)                              //
             );
     this->_pub_neck =                                                           //
-            this->create_publisher<maid_robot_system_interfaces::msg::MrsKubi>( //
+            this->create_publisher<maid_robot_system_interfaces::msg::MrsNeck>( //
                     this->MRS_TOPIC_OUT_NECK,                                   //
                     rclcpp::QoS(this->CONFIG_QOS)                               //
             );
-    this->_pub_lip =                                                                 //
-            this->create_publisher<maid_robot_system_interfaces::msg::MrsKuchibiru>( //
-                    this->MRS_TOPIC_OUT_LIP,                                         //
-                    rclcpp::QoS(this->CONFIG_QOS)                                    //
+    this->_pub_lip =                                                           //
+            this->create_publisher<maid_robot_system_interfaces::msg::MrsLip>( //
+                    this->MRS_TOPIC_OUT_LIP,                                   //
+                    rclcpp::QoS(this->CONFIG_QOS)                              //
             );
 
     // set subscription
     this->_sub_pose_left =                                                               //
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
-                    this->MRS_TOPIC_IN_POSE_LEFT,                                        //
+                    this->MRS_TOPIC_IN_POSTURE_LEFT,                                     //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                      //
                     std::bind(&NodeImplement::callback_pose_left, this, _1));
     this->_sub_pose_right =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
-                    this->MRS_TOPIC_IN_POSE_RIGHT,                                       //
+                    this->MRS_TOPIC_IN_POSTURE_RIGHT,                                    //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                      //
                     std::bind(&NodeImplement::callback_pose_right, this, _1));
     this->_sub_ar_left =                                                             //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
-                    this->MRS_TOPIC_IN_AR_LEFT,                                      //
+                    this->MRS_TOPIC_IN_MARKS_LEFT,                                   //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                  //
                     std::bind(&NodeImplement::callback_ar_left, this, _1));
     this->_sub_ar_right =                                                            //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
-                    this->MRS_TOPIC_IN_AR_RIGHT,                                     //
+                    this->MRS_TOPIC_IN_MARKS_RIGHT,                                  //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                  //
                     std::bind(&NodeImplement::callback_ar_right, this, _1));
     this->_sub_voice =                                                              //

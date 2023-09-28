@@ -20,7 +20,7 @@ def generate_launch_description():
         executable='lip_node',
         output=_output_type,
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/data/lip')
+            ('in', _ros_namespace + _ros_sub_input + '/lip')
         ],
         parameters=[{
         }],

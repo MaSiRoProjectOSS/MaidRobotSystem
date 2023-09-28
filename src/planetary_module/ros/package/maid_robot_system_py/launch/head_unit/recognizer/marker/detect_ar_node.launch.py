@@ -7,14 +7,12 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
-    _ros_sub_namespace = '/head_unit' + '/logic'
+    _ros_sub_namespace = '/head_unit' + '/logic' + '/marker'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _ros_sub_input = '/head_unit' + '/controller' + '/photo'
-    # _ros_sub_input = '/head_unit' + '/controller' + '/topic'
-    # _ros_sub_input = '/head_unit' + '/controller' + '/camera'
+    _ros_sub_input = '/head_unit' + '/controller' + os.environ.get('MRS_TYPE_INPUT_VIDEO_DEVICE', '/camera')
 
     left_detect_ar_node = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -23,8 +21,8 @@ def generate_launch_description():
         name='left_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/video/left/image'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/data/left/ar')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/image/inquiry/left'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/ar/left')
         ],
         parameters=[{
             "INTERVAL_MS": 500,
@@ -47,8 +45,8 @@ def generate_launch_description():
         name='right_detect_ar_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/video/right/image'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/data/right/ar')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/image/inquiry/right'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/ar/right')
         ],
         parameters=[{
             "INTERVAL_MS": 500,

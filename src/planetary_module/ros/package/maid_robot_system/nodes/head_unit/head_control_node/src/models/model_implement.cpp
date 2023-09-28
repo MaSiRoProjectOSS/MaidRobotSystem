@@ -47,11 +47,11 @@ bool ModelImplement::calculate()
         result         = true;
     }
     if (true == result) {
-        this->_msg_oculus.emotions = 0;
-        this->_msg_oculus.size     = 1;
-        this->_msg_oculus.distance = 0.98;
-        this->_msg_oculus.x        = target_angle_x;
-        this->_msg_oculus.y        = target_angle_y;
+        this->_msg_eye.emotions = 0;
+        this->_msg_eye.size     = 1;
+        this->_msg_eye.distance = 0.98;
+        this->_msg_eye.x        = target_angle_x;
+        this->_msg_eye.y        = target_angle_y;
 
         // TODO :
         this->_msg_neck.x = target_angle_x;
@@ -62,11 +62,11 @@ bool ModelImplement::calculate()
             // TODO :
             // 一定時間経過しても判定がないならば、
             // 位置の初期化
-            this->_msg_oculus.emotions = 0;
-            this->_msg_oculus.size     = 1;
-            this->_msg_oculus.distance = 0.98;
-            this->_msg_oculus.x        = 0;
-            this->_msg_oculus.y        = 0;
+            this->_msg_eye.emotions = 0;
+            this->_msg_eye.size     = 1;
+            this->_msg_eye.distance = 0.98;
+            this->_msg_eye.x        = 0;
+            this->_msg_eye.y        = 0;
             //
             this->_msg_neck.x = 0;
             this->_msg_neck.y = 0;
@@ -122,15 +122,15 @@ bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_
     return result;
 }
 
-void ModelImplement::get_msg_oculus(maid_robot_system_interfaces::msg::MrsHitomi &msg)
+void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
 {
-    msg.emotions = this->_msg_oculus.emotions;
-    msg.size     = this->_msg_oculus.size;
-    msg.distance = this->_msg_oculus.distance;
-    msg.x        = this->_msg_oculus.x;
-    msg.y        = this->_msg_oculus.y;
+    msg.emotions = this->_msg_eye.emotions;
+    msg.size     = this->_msg_eye.size;
+    msg.distance = this->_msg_eye.distance;
+    msg.x        = this->_msg_eye.x;
+    msg.y        = this->_msg_eye.y;
 }
-void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsKubi &msg)
+void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &msg)
 {
     //  this->param.neck_pitch_min  = 0;
     //  this->param. neck_pitch_max = 0;
@@ -144,7 +144,7 @@ void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsKubi &ms
     msg.z = this->_msg_neck.z;
     msg.w = this->_msg_neck.w;
 }
-void ModelImplement::get_msg_lip(maid_robot_system_interfaces::msg::MrsKuchibiru &msg)
+void ModelImplement::get_msg_lip(maid_robot_system_interfaces::msg::MrsLip &msg)
 {
     msg.percent = std::min(std::max(this->_msg_lip.percent, this->param.lip_min), this->param.lip_max);
 }

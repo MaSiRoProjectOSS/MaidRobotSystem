@@ -7,8 +7,8 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef MRS_NODE_MITUMERU_MODEL_STRUCTURE_HPP
-#define MRS_NODE_MITUMERU_MODEL_STRUCTURE_HPP
+#ifndef MRS_HEAD_CONTROL_NODE_MODEL_STRUCTURE_HPP
+#define MRS_HEAD_CONTROL_NODE_MODEL_STRUCTURE_HPP
 
 namespace maid_robot_system
 {

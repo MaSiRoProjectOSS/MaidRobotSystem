@@ -8,7 +8,7 @@ import maid_robot_system_interfaces.srv as MrsSrv
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
-    _ros_sub_namespace = '/head_unit' + '/logic'
+    _ros_sub_namespace = '/head_unit' + '/logic' + '/posture'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
@@ -22,10 +22,11 @@ def generate_launch_description():
         name='left_mediapipe_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/video/left/image'),
-            ('in_srv_video', _ros_namespace + _ros_sub_input + '/video/left/info'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/mediapipe/left/pose'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/data/left/pose')
+            ('in_service_video_info', _ros_namespace + _ros_sub_input + '/video/info/left'),
+            ('in_service_image', _ros_namespace + _ros_sub_input + '/image/inquiry/left'),
+
+            ('out_service_data', _ros_namespace + _ros_sub_namespace + '/mediapipe/data/left'),
+            ('out_topic_landmarks', _ros_namespace + _ros_sub_namespace + '/mediapipe/landmarks/left')
         ],
         parameters=[{
             "INTERVAL_MS": 100,
@@ -39,7 +40,7 @@ def generate_launch_description():
             "clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
             "mirror": False,
             "upside_down": False,
-            "notify/message/verbose": True
+            "notify/message/verbose": False
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -52,10 +53,11 @@ def generate_launch_description():
         name='right_mediapipe_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/video/right/image'),
-            ('in_srv_video', _ros_namespace + _ros_sub_input + '/video/right/info'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/mediapipe/right/pose'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/data/right/pose')
+            ('in_service_video_info', _ros_namespace + _ros_sub_input + '/video/info/right'),
+            ('in_service_image', _ros_namespace + _ros_sub_input + '/image/inquiry/right'),
+
+            ('out_service_data', _ros_namespace + _ros_sub_namespace + '/mediapipe/data/right'),
+            ('out_topic_landmarks', _ros_namespace + _ros_sub_namespace + '/mediapipe/landmarks/right')
         ],
         parameters=[{
             "INTERVAL_MS": 100,
@@ -69,7 +71,7 @@ def generate_launch_description():
             "clockwise": int(MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK),
             "mirror": False,
             "upside_down": False,
-            "notify/message/verbose": True
+            "notify/message/verbose": False
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,

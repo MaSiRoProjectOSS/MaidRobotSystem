@@ -32,11 +32,15 @@ class MediapipeExtNodeParam():
             if (parameter.name == 'drawing_box'):
                 self.drawing_box = parameter.value
                 result = True
+            if (parameter.name == 'drawing_posture'):
+                self.drawing_posture = parameter.value
+                result = True
         return SetParametersResult(successful=result)
 
     def get_parameter(self, node: Node):
         self.timeout_ms = node.get_parameter('timeout_ms').get_parameter_value().integer_value
         self.drawing_box = node.get_parameter('drawing_box').get_parameter_value().bool_value
+        self.drawing_posture = node.get_parameter('drawing_posture').get_parameter_value().bool_value
         self.width = node.get_parameter('publisher/resize/width').get_parameter_value().integer_value
         self.height = node.get_parameter('publisher/resize/height').get_parameter_value().integer_value
 
@@ -46,6 +50,7 @@ class MediapipeExtNodeParam():
         node.declare_parameter('INTERVAL_MS', self.INTERVAL_MS)
         node.declare_parameter('timeout_ms', self.timeout_ms)
         node.declare_parameter('drawing_box', self.drawing_box)
+        node.declare_parameter('drawing_posture', self.drawing_posture)
         node.declare_parameter('publisher/resize/width', self.width)
         node.declare_parameter('publisher/resize/height', self.height)
         self.INTERVAL_MS = node.get_parameter('INTERVAL_MS').get_parameter_value().integer_value
@@ -58,6 +63,7 @@ class MediapipeExtNodeParam():
         self.width = 640
         self.height = 512
         self.drawing_box = True
+        self.drawing_posture = True
 
 
 class SchematicDiagram():
@@ -164,13 +170,14 @@ class SchematicDiagram():
 
     def drawing(self, image, width: float, height:
                 float, person_data: MrsMsg.PoseLandmarkModel, area: MrsMsg.RectFloat,
-                human_detected: bool, flag_box: bool):
+                human_detected: bool, flag_box: bool, flag_posture: bool):
 
         if human_detected is True:
-            self.drawing_points(image, width, height, person_data)
-            self.drawing_lines(image, width, height, person_data)
+            if (flag_posture is True):
+                self.drawing_points(image, width, height, person_data)
+                self.drawing_lines(image, width, height, person_data)
 
-            if flag_box is True:
+            if (flag_box is True):
                 box_01 = (width * area.x)
                 box_02 = (height * area.y)
                 box_03 = (width * area.width)
@@ -265,7 +272,8 @@ class MediapipeExtNode(Node):
                                                         pose_landmarks.landmark,
                                                         pose_landmarks.detected_area,
                                                         pose_landmarks.human_detected,
-                                                        self._param.drawing_box)
+                                                        self._param.drawing_box,
+                                                        self._param.drawing_posture)
                         #####################################################
                         cv_image = self._resize(cv_image, self._param.width, self._param.height)
                         self._pub_msg = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")

@@ -7,8 +7,8 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef SAMPLE_NODE_NODE_IMPLEMENT_HPP
-#define SAMPLE_NODE_NODE_IMPLEMENT_HPP
+#ifndef SAMPLE_NODE_IMPLEMENT_HPP
+#define SAMPLE_NODE_IMPLEMENT_HPP
 
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"

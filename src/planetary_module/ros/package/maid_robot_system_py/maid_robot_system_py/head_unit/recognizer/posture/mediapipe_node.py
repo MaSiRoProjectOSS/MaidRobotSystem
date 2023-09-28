@@ -166,10 +166,10 @@ class MediapipeNodeParam():
 class MediapipeNode(Node):
     _report_detected = True
 
-    _in_srv_name = 'in_srv'
-    _in_srv_name_video = 'in_srv_video'
-    _out_srv_name = 'out_srv'
-    _out_landmarks_name = 'out'
+    _in_srv_name = 'in_service_image'
+    _in_srv_name_video = 'in_service_video_info'
+    _out_srv_name = 'out_service_data'
+    _out_landmarks_name = 'out_topic_landmarks'
     _out_landmarks_queue_size = 3
     _timeout_ms = 5000
     _request_width = 640

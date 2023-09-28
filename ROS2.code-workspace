@@ -58,18 +58,6 @@
 		"markdown-preview-enhanced.configPath": "./.mume",
 		"[python]": {
 			"editor.defaultFormatter": "ms-python.autopep8"
-		},
-		"python.autoComplete.extraPaths": [
-			"/opt/MaidRobotSystem/.colcon/build/maid_robot_system_py",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_py/lib/python3.8/site-packages",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_interfaces/lib/python3.8/site-packages",
-			"/opt/ros/rolling/lib/python3.8/site-packages"
-		],
-		"python.analysis.extraPaths": [
-			"/opt/MaidRobotSystem/.colcon/build/maid_robot_system_py",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_py/lib/python3.8/site-packages",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_interfaces/lib/python3.8/site-packages",
-			"/opt/ros/rolling/lib/python3.8/site-packages"
-		]
+		}
 	}
 }

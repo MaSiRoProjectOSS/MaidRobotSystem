@@ -4,10 +4,10 @@
     "version": "2.0.0",
     "tasks": [
         //////////////////////////////////////////////////////////////
-        // ROS2 : BUILD : INFO
+        // ROS2 : INFO
         //////////////////////////////////////////////////////////////
         {
-            "label": "ROS2 : BUILD : INFO : node",
+            "label": "ROS2 : INFO : node",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -18,7 +18,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : INFO : topic",
+            "label": "ROS2 : INFO : topic",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -29,7 +29,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : INFO : param",
+            "label": "ROS2 : INFO : param",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -40,7 +40,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : INFO : pkg maid_robot_system",
+            "label": "ROS2 : INFO : pkg maid_robot_system",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -54,10 +54,10 @@
             ]
         },
         //////////////////////////////////////////////////////////////
-        // ROS2 : GENERAL / build
+        // maid_robot_system : BUILD : GENERAL
         //////////////////////////////////////////////////////////////
         {
-            "label": "ROS2 : BUILD : DEBUG",
+            "label": "maid_robot_system : BUILD : DEBUG",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -68,7 +68,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : [ALL] ",
+            "label": "maid_robot_system : BUILD : [ALL] ",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -83,7 +83,7 @@
             }
         },
         {
-            "label": "ROS2 : BUILD : CLEAN",
+            "label": "maid_robot_system : BUILD : CLEAN",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -93,7 +93,7 @@
             ]
         },
         {
-            "label": "ROS2 : BUILD : REBUILD",
+            "label": "maid_robot_system : BUILD : REBUILD",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [
@@ -102,14 +102,14 @@
                 "rebuild"
             ],
             "dependsOn": [
-                "ROS2 : BUILD : CLEAN"
+                "maid_robot_system : BUILD : CLEAN"
             ]
         },
         //////////////////////////////////////////////////////////////
-        // MRS
+        // script
         //////////////////////////////////////////////////////////////
         {
-            "label": "maid_robot_system : MRS : mrs_help",
+            "label": "script : maid_robot_system : mrs_help",
             "type": "shell",
             "hide": true,
             "isBackground": true,
@@ -120,7 +120,7 @@
             ]
         },
         {
-            "label": "maid_robot_system : MRS : mrs_env_print",
+            "label": "script : maid_robot_system : mrs_env_print",
             "type": "shell",
             "hide": true,
             "isBackground": true,

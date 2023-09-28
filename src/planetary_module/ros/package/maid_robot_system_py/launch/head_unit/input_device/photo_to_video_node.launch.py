@@ -23,9 +23,9 @@ def generate_launch_description():
         name='left_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image'),
-            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/left'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/left'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/left')
         ],
         parameters=[{
             "photo": left_photo,
@@ -54,9 +54,9 @@ def generate_launch_description():
         name='right_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image'),
-            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/right'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/right'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/right')
         ],
         parameters=[{
             "photo": right_photo,

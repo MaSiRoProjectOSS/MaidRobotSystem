@@ -26,10 +26,11 @@ def generate_launch_description():
         name='left_video_capture_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
-            ('save', _ros_namespace + _ros_sub_namespace + '/video/left/save'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image'),
-            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
+            ('save', _ros_namespace + _ros_sub_namespace + '/function/save/left'),
+
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/left'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/left'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/left')
         ],
         parameters=[{
             "device/TYPE": "v4l",
@@ -67,10 +68,11 @@ def generate_launch_description():
         name='right_video_capture_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
-            ('save', _ros_namespace + _ros_sub_namespace + '/video/right/save'),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image'),
-            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
+            ('save', _ros_namespace + _ros_sub_namespace + '/function/save/right'),
+
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/right'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/right'),
+            ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/right')
         ],
         parameters=[{
             "device/TYPE": "v4l",

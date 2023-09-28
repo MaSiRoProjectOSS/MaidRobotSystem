@@ -7,12 +7,12 @@ from launch.substitutions import TextSubstitution
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
-    _ros_sub_namespace = '/head_unit' + '/view'
+    _ros_sub_namespace = '/head_unit' + '/logic' + '/posture'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _ros_sub_input = '/head_unit' + '/logic'
+    _ros_sub_input = '/head_unit' + '/logic' + '/posture'
 
     left_mediapipe_ext_node = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -21,13 +21,14 @@ def generate_launch_description():
         name='left_mediapipe_ext_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/mediapipe/left/pose'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/left/pose')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/mediapipe/data/left'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/left')
         ],
         parameters=[{
             "INTERVAL_MS": 500,
             "timeout_ms": 5000,
-            "drawing_box": True,
+            "drawing_box": False,
+            "drawing_posture": True,
             "publisher/resize/width": 640,
             "publisher/resize/height": 512
         }],
@@ -43,13 +44,14 @@ def generate_launch_description():
         name='right_mediapipe_ext_node',
         output=_output_type,
         remappings=[
-            ('in_srv', _ros_namespace + _ros_sub_input + '/mediapipe/right/pose'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/right/pose')
+            ('in_srv', _ros_namespace + _ros_sub_input + '/mediapipe/data/right'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/right')
         ],
         parameters=[{
             "INTERVAL_MS": 500,
             "timeout_ms": 5000,
-            "drawing_box": True,
+            "drawing_box": False,
+            "drawing_posture": True,
             "publisher/resize/width": 640,
             "publisher/resize/height": 512
         }],

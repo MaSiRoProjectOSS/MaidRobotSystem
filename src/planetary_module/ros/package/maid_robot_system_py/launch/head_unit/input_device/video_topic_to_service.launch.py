@@ -8,13 +8,13 @@ import maid_robot_system_interfaces.srv as MrsSrv
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
-    _ros_sub_namespace = '/head_unit' + '/controller' + '/topic'
+    _ros_sub_namespace = '/head_unit' + '/controller' + '/topic_image'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _ros_sub_input_left = _ros_namespace + '/head_unit' + '/controller' + '/topic' + '/video/left'
-    _ros_sub_input_right = _ros_namespace + '/head_unit' + '/controller' + '/topic' + '/video/right'
+    _ros_sub_input_left = os.environ.get('MRS_MSG_TOPIC_IMAGE_LEFT',  _ros_namespace + _ros_sub_namespace + '/image/left')
+    _ros_sub_input_right = os.environ.get('MRS_MSG_TOPIC_IMAGE_RIGHT', _ros_namespace + _ros_sub_namespace + '/image/right')
 
     left_video_topic_to_service = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -23,9 +23,10 @@ def generate_launch_description():
         name='left_video_topic_to_service',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/left/info'),
             ('in_topic', _ros_sub_input_left),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/left/image')
+
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/left'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/left')
         ],
         parameters=[{
             "settings/area/mirror": False,
@@ -48,9 +49,10 @@ def generate_launch_description():
         name='right_video_topic_to_service',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/right/info'),
             ('in_topic', _ros_sub_input_right),
-            ('out_srv', _ros_namespace + _ros_sub_namespace + '/video/right/image')
+
+            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/right'),
+            ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/right')
         ],
         parameters=[{
             "settings/area/mirror": False,

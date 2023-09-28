@@ -85,9 +85,9 @@ set(MSG_ARUCO_FILE
 )
 #   MSG_MRS_FILE
 set(MSG_MRS_FILE
-  msg/mrs/MrsHitomi.msg
-  msg/mrs/MrsKubi.msg
-  msg/mrs/MrsKuchibiru.msg
+  msg/mrs/MrsEye.msg
+  msg/mrs/MrsNeck.msg
+  msg/mrs/MrsLip.msg
   msg/mrs/MrsVoice.msg
 )
 

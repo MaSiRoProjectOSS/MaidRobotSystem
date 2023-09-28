@@ -13,8 +13,8 @@ top to bottom direction
 
 !$topic_hv_left_text = "**/holistic_view/left"
 !$topic_hv_right_text = "**/holistic_view/right"
-!$topic_eye_control_text = "**/mitumeru/eye_control"
-!$topic_neck_control_text = "**/mitumeru/neck_control"
+!$topic_eye_control_text = "**/head_control/eye_control"
+!$topic_neck_control_text = "**/head_control/neck_control"
 
 !$msg_pose_data = "maid_robot_system_interfaces/msg/PoseData"
 !$msg_eye_gaze = "maid_robot_system_interfaces/msg/EyeGaze"
@@ -67,9 +67,9 @@ TOPIC_CAMERA_RAW_LEFT -[hidden]right- TOPIC_CAMERA_RAW_RIGHT
 TOPIC_CAMERA_WRITE_LEFT -[hidden]right- TOPIC_CAMERA_WRITE_RIGHT
 TOPIC_JV_LEFT -[hidden]right- TOPIC_JV_RIGHT
 
-  storage mitumeru_calc_node        #Application {
-    portin mitumeru_port_in_01 as " "
-    portin mitumeru_port_in_02 as " "
+  storage head_control_calc_node        #Application {
+    portin head_control_port_in_01 as " "
+    portin head_control_port_in_02 as " "
     rectangle TOPIC_EYE [
     $topic_eye_control_text
     ----
@@ -83,15 +83,15 @@ TOPIC_JV_LEFT -[hidden]right- TOPIC_JV_RIGHT
 
 
   }
-  storage hitomi_op_node            #Physical
-  storage kubi_op_node              #Physical
+  storage eye_op_node            #Physical
+  storage neck_op_node              #Physical
 }
 
-TOPIC_JV_LEFT ---( mitumeru_port_in_01
-TOPIC_JV_RIGHT ---( mitumeru_port_in_02
+TOPIC_JV_LEFT ---(  head_control_port_in_01
+TOPIC_JV_RIGHT ---( head_control_port_in_02
 
-TOPIC_EYE --(  hitomi_op_node
-TOPIC_NECK --(  kubi_op_node
+TOPIC_EYE --(   eye_op_node
+TOPIC_NECK --(  neck_op_node
 
 TOPIC_EYE -[hidden]down- TOPIC_NECK
 
@@ -106,9 +106,9 @@ TOPIC_EYE -[hidden]down- TOPIC_NECK
 ---
 
 
-### mitumeru_node
+### head_control_node
 
-### kubi_node
+### neck_node
 
 
 ### face_recognition_node

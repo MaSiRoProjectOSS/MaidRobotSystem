@@ -34,9 +34,9 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        # # mediapipe
-        launch_mediapipe_ext_node,
         # # video
         launch_photo_to_video_node,
-        launch_video_topic_to_service
+        launch_video_topic_to_service,
+        # # mediapipe
+        launch_mediapipe_ext_node
     ])

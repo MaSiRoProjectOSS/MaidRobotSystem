@@ -19,7 +19,7 @@ def generate_launch_description():
         executable='voice_recognition_node',
         output=_output_type,
         remappings=[
-            ('out', _ros_namespace + _ros_sub_namespace + '/data/voice')
+            ('out_text', _ros_namespace + _ros_sub_namespace + '/voice_text')
         ],
         parameters=[{
             "to": 135.0,

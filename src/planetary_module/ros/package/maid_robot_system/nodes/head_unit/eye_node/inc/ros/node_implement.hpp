@@ -7,8 +7,8 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef MRS_NODE_HITOMI_NODE_IMPLEMENT_HPP
-#define MRS_NODE_HITOMI_NODE_IMPLEMENT_HPP
+#ifndef MRS_EYE_NODE_IMPLEMENT_HPP
+#define MRS_EYE_NODE_IMPLEMENT_HPP
 
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"

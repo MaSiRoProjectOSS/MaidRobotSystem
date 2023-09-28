@@ -22,7 +22,7 @@ def generate_launch_description():
         executable='eye_node',
         output=_output_type,
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/data/eye')
+            ('in', _ros_namespace + _ros_sub_input + '/eye')
         ],
         parameters=[{
             "skin_name": _skin_name,

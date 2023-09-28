@@ -7,8 +7,8 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef MRS_NODE_KUBI_NODE_IMPLEMENT_HPP
-#define MRS_NODE_KUBI_NODE_IMPLEMENT_HPP
+#ifndef MRS_NECK_NODE_IMPLEMENT_HPP
+#define MRS_NECK_NODE_IMPLEMENT_HPP
 
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -66,7 +66,7 @@ private:
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 1000 };
 
-    const std::string MRS_TOPIC_OUTPUT = "out";
+    const std::string MRS_TOPIC_OUTPUT            = "out";
     const std::string MRS_TOPIC_INPUT             = "in";
     const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
     const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";

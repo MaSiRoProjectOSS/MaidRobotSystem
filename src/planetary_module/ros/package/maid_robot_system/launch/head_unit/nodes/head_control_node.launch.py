@@ -16,8 +16,8 @@ def generate_launch_description():
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _ros_sub_input_pose = '/head_unit' + '/logic'
-    _ros_sub_input_ar = '/head_unit' + '/logic'
+    _ros_sub_input_posture = '/head_unit' + '/logic' + '/posture'
+    _ros_sub_input_ar = '/head_unit' + '/logic' + '/marker'
     _ros_sub_input_voice = '/head_unit' + '/controller' + '/microphone'
 
     launch_head_control_node = Node(
@@ -26,14 +26,14 @@ def generate_launch_description():
         executable='head_control_node',
         output=_output_type,
         remappings=[
-            ('in/pose/left', _ros_namespace + _ros_sub_input_pose + '/in/pose/left'),
-            ('in/pose/right', _ros_namespace + _ros_sub_input_pose + '/in/pose/right'),
-            ('in/ar/left', _ros_namespace + _ros_sub_input_ar + '/in/ar/left'),
-            ('in/ar/right', _ros_namespace + _ros_sub_input_ar + '/in/ar/right'),
-            ('in/voice', _ros_namespace + _ros_sub_input_voice + '/data/voice'),
-            ('out/eye', _ros_namespace + _ros_sub_namespace + '/data/eye'),
-            ('out/neck', _ros_namespace + _ros_sub_namespace + '/data/neck'),
-            ('out/lip', _ros_namespace + _ros_sub_namespace + '/data/lip')
+            ('in/posture/left', _ros_namespace + _ros_sub_input_posture + '/mediapipe/landmarks/left'),
+            ('in/posture/right', _ros_namespace + _ros_sub_input_posture + '/mediapipe/landmarks/right'),
+            ('in/marks/left', _ros_namespace + _ros_sub_input_ar + '/ar/left'),
+            ('in/marks/right', _ros_namespace + _ros_sub_input_ar + '/ar/right'),
+            ('in/voice_text', _ros_namespace + _ros_sub_input_voice + '/voice_text'),
+            ('out/eye', _ros_namespace + _ros_sub_namespace + '/eye'),
+            ('out/neck', _ros_namespace + _ros_sub_namespace + '/neck'),
+            ('out/lip', _ros_namespace + _ros_sub_namespace + '/lip')
         ],
         parameters=[{
             "id": -1

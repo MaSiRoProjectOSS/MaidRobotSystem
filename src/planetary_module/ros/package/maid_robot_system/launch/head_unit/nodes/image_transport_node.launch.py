@@ -14,7 +14,7 @@ def generate_launch_description():
 
     _ros_sub_input = '/head_unit' + '/logic'
 
-    _transport_type = 'raw'  # 'raw'/'compressed'/'theora'
+    _transport_type = 'raw'  # raw, compressed, theora
 
     image_compressed_left_node = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -24,8 +24,8 @@ def generate_launch_description():
         name='image_compressed_left_node',
         arguments=['compressed'],
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/image/left/raw'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/left/compressed')
+            ('in', _ros_namespace + _ros_sub_input + '/image/raw/left'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/compressed/left')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -40,8 +40,8 @@ def generate_launch_description():
         name='image_compressed_right_node',
         arguments=['compressed'],
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/image/right/raw'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/right/compressed')
+            ('in', _ros_namespace + _ros_sub_input + '/image/raw/right'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/compressed/right')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -56,7 +56,7 @@ def generate_launch_description():
         name='image_theora_left_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', _ros_namespace + _ros_sub_namespace + '/image/left/raw')
+            ('image', _ros_namespace + _ros_sub_namespace + '/image/raw/left')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -71,7 +71,7 @@ def generate_launch_description():
         name='image_theora_right_node',
         arguments=['data/streaming_00.ogv'],
         remappings=[
-            ('image', _ros_namespace + _ros_sub_namespace + '/image/right/raw')
+            ('image', _ros_namespace + _ros_sub_namespace + '/image/raw/right')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -86,8 +86,8 @@ def generate_launch_description():
         name='image_transport_left_node',
         arguments=['raw'],
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/image/left/raw'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/left/transport')
+            ('in', _ros_namespace + _ros_sub_input + '/image/raw/left'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/transport/left')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -102,8 +102,8 @@ def generate_launch_description():
         name='image_transport_right_node',
         arguments=['raw'],
         remappings=[
-            ('in', _ros_namespace + _ros_sub_input + '/image/right/raw'),
-            ('out', _ros_namespace + _ros_sub_namespace + '/image/right/transport')
+            ('in', _ros_namespace + _ros_sub_input + '/image/raw/right'),
+            ('out', _ros_namespace + _ros_sub_namespace + '/image/transport/right')
         ],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,
@@ -112,7 +112,7 @@ def generate_launch_description():
 
     if 'compressed' == _transport_type:
         return LaunchDescription([
-            #   image_compressed_left_node,
+            image_compressed_left_node,
             image_compressed_right_node
         ])
     elif 'theora' == _transport_type:
