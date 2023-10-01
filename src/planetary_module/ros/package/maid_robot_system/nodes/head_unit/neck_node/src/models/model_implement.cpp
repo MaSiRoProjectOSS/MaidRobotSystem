@@ -16,7 +16,27 @@ namespace maid_robot_system
 // =============================
 bool ModelImplement::calculate(int x, int y, int z, int w)
 {
-    bool result = true;
+    static int _x = -1;
+    static int _y = -1;
+    static int _z = -1;
+    static int _w = -1;
+    bool result   = false;
+    if (_x != x) {
+        _x     = x;
+        result = true;
+    }
+    if (_y != y) {
+        _y     = y;
+        result = true;
+    }
+    if (_z != z) {
+        _z     = z;
+        result = true;
+    }
+    if (_w != w) {
+        _w     = w;
+        result = true;
+    }
     return result;
 }
 

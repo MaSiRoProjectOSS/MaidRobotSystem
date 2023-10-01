@@ -298,7 +298,7 @@ function aros2_default {
 ## =======================================
 
 function mrs_build {
-    BUILD_DATE=`date +%Y%m%d%H%M%S`
+    export BUILD_DATE=`date +%Y%m%d%H%M%S`
     ############################################################################
     ##
     ## mrs_build WORK_COMMANDS WORK_BUILD_TYPE WORK_PACKAGES_SELECT WORK_ARG_OPTION

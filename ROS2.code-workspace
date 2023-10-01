@@ -37,6 +37,7 @@
 			"**/build": true
 		},
 		"cSpell.words": [
+			"aros",
 			"chgrp",
 			"colcon",
 			"doxygen",

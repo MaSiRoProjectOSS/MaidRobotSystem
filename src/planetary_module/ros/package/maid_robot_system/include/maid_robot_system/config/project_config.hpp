@@ -13,10 +13,10 @@
 #include "__generate_config.hpp"
 /* ======================================================================== */
 #ifndef CONFIG_FILE
-#define CONFIG_FILE "/opt/MaidRobotSystem/data/skin"
+#define CONFIG_FILE "/opt/MaidRobotSystem/data/cast/Iris/settings.json"
 #endif
 #ifndef CONFIG_CAST_NAME
-#define CONFIG_CAST_NAME "miko"
+#define CONFIG_CAST_NAME "Iris"
 #endif
 #ifndef CONFIG_CAST_ID
 #define CONFIG_CAST_ID 1000

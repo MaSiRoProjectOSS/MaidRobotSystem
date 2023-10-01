@@ -243,7 +243,6 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'out_info'
     _service_name_capture = 'out_srv'
     _topic_out_name = 'out_topic'
     _topic_in_name = 'in_topic'
@@ -353,7 +352,6 @@ class VideoCaptureNode(Node):
     ##########################################################################
     # ROS
     def _create_service(self):
-        self._service_info = self.create_service(MrsSrv.VideoDeviceInfo, self._service_name_info, self._callback_srv_video_device_info)
         self._service_capture = self.create_service(MrsSrv.VideoCapture, self._service_name_capture, self._callback_srv_video_capture)
 
     def _create_publisher(self):
@@ -372,23 +370,6 @@ class VideoCaptureNode(Node):
         self._is_running = False
 
     ##########################################################################
-    # ## ROS callback
-    def _callback_srv_video_device_info(self,
-                                        request: MrsSrv.VideoDeviceInfo.Request,
-                                        response: MrsSrv.VideoDeviceInfo.Response):
-        response.data.id = -1
-        response.data.type = "image"
-        response.data.by_path_name = ""
-        response.data.path = str(self._param.device.path)
-        response.data.angle_x = 0
-        response.data.angle_y = 0
-        response.data.width = self._param.device.WIDTH
-        response.data.height = self._param.device.HEIGHT
-        response.data.fps = float(0.0)
-        ext = os.path.splitext(self._param.device.path)[1][1:]
-        response.data.format = ext
-        return response
-
     # ## video capture
     def _callback_srv_video_capture(self,
                                     request: MrsSrv.VideoCapture.Request,

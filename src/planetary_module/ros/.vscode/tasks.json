@@ -68,7 +68,7 @@
             ]
         },
         {
-            "label": "maid_robot_system : BUILD : [ALL] ",
+            "label": "maid_robot_system : BUILD : [ALL]",
             "type": "shell",
             "command": "${workspaceFolder}/mrs.sh",
             "args": [

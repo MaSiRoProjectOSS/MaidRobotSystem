@@ -49,19 +49,18 @@ find_package(rosidl_default_generators REQUIRED)
 #   MRS_BUILD_DEVELOP
 if(MRS_BUILD_DEVELOP)
   set(MSG_DEVELOP_FILE
-    msg/sample/MrsSample.msg
+    msg/develop/MrsSample.msg
   )
 endif()
 ###############################################
-#   MSG_EULER_FILE
-set(MSG_EULER_FILE
-  msg/euler/EulerFloat.msg
-  msg/euler/EulerInt16.msg
-)
-#   MSG_CLASSES_FILE
-set(MSG_CLASSES_FILE
-  msg/classes/Vector3.msg
-  msg/classes/Quaternion.msg
+#   MSG_MATH_FILE
+set(MSG_MATH_FILE
+  msg/math/EulerFloat.msg
+  msg/math/EulerInt16.msg
+  msg/math/Vector3.msg
+  msg/math/Quaternion.msg
+  msg/math/Rect.msg
+  msg/math/RectFloat.msg
 )
 #   MSG_POSE_FILE
 set(MSG_POSE_FILE
@@ -69,15 +68,6 @@ set(MSG_POSE_FILE
   msg/pose/Landmark.msg
   msg/pose/BodySide.msg
   msg/pose/PoseLandmarkModel.msg
-)
-#   MSG_DRAWING_FILE
-set(MSG_DRAWING_FILE
-  msg/drawing/Rect.msg
-  msg/drawing/RectFloat.msg
-)
-#   MSG_FORMAT_FILE
-set(MSG_FORMAT_FILE
-  msg/format/VideoInfo.msg
 )
 #   MSG_ARUCO_FILE
 set(MSG_ARUCO_FILE
@@ -91,23 +81,20 @@ set(MSG_MRS_FILE
   msg/mrs/MrsVoice.msg
 )
 
+#   SRV_FILES
 set(SRV_FILES
   srv/MediaPipePoseLandmarkDetection.srv
   srv/VideoCapture.srv
-  srv/VideoDeviceInfo.srv
 )
 ###############################################
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   ${MSG_DEVELOP_FILE}
-  ${MSG_EULER_FILE}
-  ${MSG_CLASSES_FILE}
+  ${MSG_MATH_FILE}
   ${MSG_POSE_FILE}
-  ${MSG_DRAWING_FILE}
-  ${MSG_FORMAT_FILE}
   ${MSG_ARUCO_FILE}
-  ${SRV_FILES}
   ${MSG_MRS_FILE}
+  ${SRV_FILES}
   DEPENDENCIES std_msgs geometry_msgs sensor_msgs
 )
 

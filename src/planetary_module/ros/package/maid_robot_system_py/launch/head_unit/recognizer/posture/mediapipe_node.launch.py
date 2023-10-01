@@ -22,7 +22,6 @@ def generate_launch_description():
         name='left_mediapipe_node',
         output=_output_type,
         remappings=[
-            ('in_service_video_info', _ros_namespace + _ros_sub_input + '/video/info/left'),
             ('in_service_image', _ros_namespace + _ros_sub_input + '/image/inquiry/left'),
 
             ('out_service_data', _ros_namespace + _ros_sub_namespace + '/mediapipe/data/left'),
@@ -53,7 +52,6 @@ def generate_launch_description():
         name='right_mediapipe_node',
         output=_output_type,
         remappings=[
-            ('in_service_video_info', _ros_namespace + _ros_sub_input + '/video/info/right'),
             ('in_service_image', _ros_namespace + _ros_sub_input + '/image/inquiry/right'),
 
             ('out_service_data', _ros_namespace + _ros_sub_namespace + '/mediapipe/data/right'),

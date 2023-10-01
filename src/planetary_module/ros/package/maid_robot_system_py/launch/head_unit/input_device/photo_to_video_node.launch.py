@@ -13,8 +13,8 @@ def generate_launch_description():
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    left_photo = ""
-    right_photo = ""
+    left_photo = os.environ.get('MRS_PHOTO_LEFT', "")
+    right_photo = os.environ.get('MRS_PHOTO_RIGHT', "")
 
     left_photo_to_video_node = Node(
         namespace=_ros_namespace + _ros_sub_namespace,
@@ -23,7 +23,6 @@ def generate_launch_description():
         name='left_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/left'),
             ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/left'),
             ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/left')
         ],
@@ -54,7 +53,6 @@ def generate_launch_description():
         name='right_photo_to_video_node',
         output=_output_type,
         remappings=[
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/right'),
             ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/right'),
             ('out_topic', _ros_namespace + _ros_sub_namespace + '/image/continuous/right')
         ],

@@ -15,7 +15,7 @@ namespace maid_robot_system
 void NodeImplement::callback_data(const maid_robot_system_interfaces::msg::MrsNeck &msg)
 {
     if (true == this->_model.calculate(msg.x, msg.y, msg.z, msg.w)) {
-        RCLCPP_INFO(this->get_logger(), "callback_message() : %d, %d, %d, %d", msg.x, msg.y, msg.z, msg.w);
+        RCLCPP_INFO(this->get_logger(), "callback_message() : %f, %f, %f, %f", msg.x, msg.y, msg.z, msg.w);
     }
 }
 

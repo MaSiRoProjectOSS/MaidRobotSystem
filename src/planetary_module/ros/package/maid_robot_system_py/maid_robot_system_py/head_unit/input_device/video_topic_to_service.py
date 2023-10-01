@@ -167,7 +167,6 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'out_info'
     _service_name_capture = 'out_srv'
     _topic_in_name = 'in_topic'
     _timeout_ms = 5000
@@ -261,7 +260,6 @@ class VideoCaptureNode(Node):
     ##########################################################################
     # ROS
     def _create_service(self):
-        self._service_info = self.create_service(MrsSrv.VideoDeviceInfo, self._service_name_info, self._callback_srv_video_device_info)
         self._service_capture = self.create_service(MrsSrv.VideoCapture, self._service_name_capture, self._callback_srv_video_capture)
 
     def _create_subscription(self):
@@ -275,21 +273,6 @@ class VideoCaptureNode(Node):
         self._is_running = False
 
     ##########################################################################
-    # ## ROS callback
-    def _callback_srv_video_device_info(self,
-                                        request: MrsSrv.VideoDeviceInfo.Request,
-                                        response: MrsSrv.VideoDeviceInfo.Response):
-        response.data.id = self._param.device.ID
-        response.data.type = str(self._param.device.TYPE)
-        response.data.by_path_name = str(self._param.device.NAME_BY_PATH)
-        response.data.path = str(self._param.device.PATH)
-        response.data.angle_x = self._param.device.ANGLE_X
-        response.data.angle_y = self._param.device.ANGLE_Y
-        response.data.width = self._param.device.WIDTH
-        response.data.height = self._param.device.HEIGHT
-        response.data.fps = self._param.device.FPS
-        response.data.format = str(self._param.device.FORMAT)
-        return response
 
     # ## video capture
     def _callback_srv_video_capture(self,

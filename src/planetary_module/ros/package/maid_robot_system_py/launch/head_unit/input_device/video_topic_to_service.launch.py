@@ -25,7 +25,6 @@ def generate_launch_description():
         remappings=[
             ('in_topic', _ros_sub_input_left),
 
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/left'),
             ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/left')
         ],
         parameters=[{
@@ -51,7 +50,6 @@ def generate_launch_description():
         remappings=[
             ('in_topic', _ros_sub_input_right),
 
-            ('out_info', _ros_namespace + _ros_sub_namespace + '/video/info/right'),
             ('out_srv', _ros_namespace + _ros_sub_namespace + '/image/inquiry/right')
         ],
         parameters=[{

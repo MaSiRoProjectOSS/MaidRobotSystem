@@ -31,33 +31,33 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/voice_recognition_node.launch.py'))
+                'launch/maid_robot_system/head_unit/voice_recognition_node.launch.py'))
     )
     # controller
     launch_head_control_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/head_control_node.launch.py'))
+                'launch/maid_robot_system/head_unit/head_control_node.launch.py'))
     )
     # device driver
     launch_eye_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/eye_node.launch.py'))
+                'launch/maid_robot_system/head_unit/eye_node.launch.py'))
     )
     launch_neck_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/neck_node.launch.py'))
+                'launch/maid_robot_system/head_unit/neck_node.launch.py'))
     )
     launch_lip_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/nodes/lip_node.launch.py'))
+                'launch/maid_robot_system/head_unit/lip_node.launch.py'))
     )
 
     return LaunchDescription([

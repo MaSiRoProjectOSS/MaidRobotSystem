@@ -16,7 +16,7 @@ void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
 {
     this->_model.set_value(msg.data);
     // RCLCPP_DEBUG(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
-    RCLCPP_INFO(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
+    // RCLCPP_INFO(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_WARN(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_ERROR(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_FATAL(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
@@ -25,8 +25,12 @@ void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
 void NodeImplement::callback_param()
 {
     // declare_parameter
-    this->declare_parameter(this->MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
     this->declare_parameter(this->MRS_PARAMETER_SAMPLE_OFFSET, this->_model.get_offset());
+    this->declare_parameter(this->MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
+
+    //set parameter
+    this->_model.set_offset(this->get_parameter(this->MRS_PARAMETER_SAMPLE_OFFSET).get_parameter_value().get<double>());
+    this->_model.set_times(this->get_parameter(this->MRS_PARAMETER_SAMPLE_TIMES).get_parameter_value().get<double>());
 
     // make parameter callback
     this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
@@ -42,12 +46,12 @@ void NodeImplement::callback_param()
                     if (param.get_name() == this->MRS_PARAMETER_SAMPLE_OFFSET) {
                         this->_model.set_offset(param.as_double());
                         this->_msg_convert.offset.data = this->_model.get_offset();
-                        RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]",this-> MRS_PARAMETER_SAMPLE_OFFSET.c_str(), this->_model.get_offset());
+                        RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_OFFSET.c_str(), this->_model.get_offset());
                         results->successful = true;
                     } else if (param.get_name() == this->MRS_PARAMETER_SAMPLE_TIMES) {
                         this->_model.set_times(param.as_double());
                         this->_msg_convert.times.data = this->_model.get_times();
-                        RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_TIMES .c_str(), this->_model.get_times());
+                        RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_TIMES.c_str(), this->_model.get_times());
                         results->successful = true;
                     }
                     break;

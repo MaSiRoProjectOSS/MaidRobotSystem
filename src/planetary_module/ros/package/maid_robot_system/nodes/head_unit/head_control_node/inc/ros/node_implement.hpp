@@ -65,7 +65,7 @@ private:
     // =============================
     // ROS : parameter
     // =============================
-    void callback_param();
+    void _callback_param_init();
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
@@ -93,15 +93,13 @@ private:
     const std::string MRS_TOPIC_OUT_NECK         = "out/neck";
     const std::string MRS_TOPIC_OUT_LIP          = "out/lip";
 
-    const std::string MRS_PARAM_EYE_CENTER_X_LEFT    = "eye/left/center/x";
-    const std::string MRS_PARAM_EYE_CENTER_Y_LEFT    = "eye/left/center/y";
-    const std::string MRS_PARAM_EYE_OFFSET_UP_LEFT   = "eye/left/offset/up";
-    const std::string MRS_PARAM_EYE_OFFSET_DOWN_LEFT = "eye/left/offset/down";
+    const std::string MRS_PARAM_EYE_LEFT_OFFSET_X     = "eye/left/offset/x";
+    const std::string MRS_PARAM_EYE_LEFT_OFFSET_Y     = "eye/left/offset/y";
+    const std::string MRS_PARAM_EYE_LEFT_OFFSET_ANGLE = "eye/left/offset/angle";
 
-    const std::string MRS_PARAM_EYE_CENTER_X_RIGHT    = "eye/right/center/x";
-    const std::string MRS_PARAM_EYE_CENTER_Y_RIGHT    = "eye/right/center/y";
-    const std::string MRS_PARAM_EYE_OFFSET_UP_RIGHT   = "eye/right/offset/up";
-    const std::string MRS_PARAM_EYE_OFFSET_DOWN_RIGHT = "eye/right/offset/down";
+    const std::string MRS_PARAM_EYE_RIGHT_OFFSET_X     = "eye/right/offset/x";
+    const std::string MRS_PARAM_EYE_RIGHT_OFFSET_Y     = "eye/right/offset/y";
+    const std::string MRS_PARAM_EYE_RIGHT_OFFSET_ANGLE = "eye/right/offset/angle";
 
     const std::string MRS_PARAM_NECK_PITCH_MIN = "neck/pitch/min";
     const std::string MRS_PARAM_NECK_PITCH_MAX = "neck/pitch/max";
@@ -112,6 +110,13 @@ private:
 
     const std::string MRS_PARAM_LIP_MIN = "lip/min";
     const std::string MRS_PARAM_LIP_MAX = "lip/max";
+
+    const std::string MRS_PARAM_TIREDNESS = "tiredness";
+
+    const std::string MRS_PARAM_PRIORITY_TO_THE_RIGHT = "priority/right_hand";
+
+    const std::string MRS_PARAM_TIMEOUT_S_RECEIVED = "timeout_s/received";
+    const std::string MRS_PARAM_TIMEOUT_S_CHASED   = "timeout_s/chased";
 };
 
 } // namespace maid_robot_system

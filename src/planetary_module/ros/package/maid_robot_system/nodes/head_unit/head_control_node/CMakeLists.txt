@@ -10,6 +10,11 @@ add_executable(${NODE_NAME}
   src/main.cpp
   src/ros/node_implement.cpp
   src/models/model_implement.cpp
+  src/models/model_implement_eye.cpp
+  src/models/model_implement_voice.cpp
+  src/models/model_implement_neck.cpp
+  src/models/model_implement_lip.cpp
+  src/models/model_implement_marks.cpp
 )
 
 target_include_directories(${NODE_NAME}

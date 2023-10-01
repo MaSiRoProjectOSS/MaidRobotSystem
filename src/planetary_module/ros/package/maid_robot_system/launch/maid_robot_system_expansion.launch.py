@@ -17,7 +17,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
-                'launch/head_unit/head_unit_expansion.launch.py'))
+                'launch/maid_robot_system/head_unit_expansion.launch.py'))
     )
 
     return LaunchDescription([

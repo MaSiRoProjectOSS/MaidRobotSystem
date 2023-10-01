@@ -13,7 +13,6 @@
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-#include <maid_robot_system_interfaces/msg/mrs_sample.hpp>
 #include <std_msgs/msg/string.hpp>
 
 namespace maid_robot_system

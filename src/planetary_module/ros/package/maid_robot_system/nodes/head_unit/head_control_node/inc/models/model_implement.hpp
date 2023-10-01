@@ -23,23 +23,26 @@
 
 namespace maid_robot_system
 {
+#define DEBUG_MODEL_IMPLEMENT 1
+
 class ModelImplement {
 public:
     StParam param;
 
 private:
-    StTemporary _temp_left;
-    StTemporary _temp_right;
+    StTemporaryOverall _temp_overall;
+    StTemporaryEye _temp_left;
+    StTemporaryEye _temp_right;
 
 public:
     // =============================
     // PUBLIC : Function
     // =============================
-    bool calculate();
-    bool set_value_voice(std::string text, int command);
-    bool set_value_ar(ModelStructure::INPUT_TYPE type, int id);
-    bool set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection msg);
-    bool set_value_tiredness(float data);
+    bool calculate(double seconds);
+    bool set_value_voice(std::string text, int command, double seconds);
+    bool set_value_ar(ModelStructure::INPUT_TYPE type, int id, double seconds);
+    bool set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection msg, double seconds);
+    bool set_value_tiredness(float data, double seconds);
 
     void get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg);
     void get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &msg);
@@ -49,7 +52,19 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    bool _calculate_pose(const maid_robot_system_interfaces::msg::PoseDetection msg, StTemporary &temp);
+    bool _set_value_pose(const maid_robot_system_interfaces::msg::PoseDetection msg,
+                         StTemporaryEye &temp,
+                         double offset_x,
+                         double offset_y,
+                         double offset_z,
+                         double offset_angle,
+                         double seconds);
+    bool _msg_clear();
+    bool _tmp_clear();
+    void _output_param();
+
+    void _calculate_eye(double x, double y, double size, double distance);
+    void _calculate_neck(double x, double y, double roll);
 
 private:
     // =============================

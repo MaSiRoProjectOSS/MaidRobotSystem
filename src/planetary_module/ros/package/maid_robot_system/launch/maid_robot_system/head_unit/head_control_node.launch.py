@@ -38,26 +38,31 @@ def generate_launch_description():
             ('out/lip', _ros_namespace + _ros_sub_namespace + '/lip')
         ],
         parameters=[{
-            "eye/left/center/x": 0,
-            "eye/left/center/y": 0,
-            "eye/left/offset/up": 0,
-            "eye/left/offset/down": 0,
+            "eye/left/offset/x": 0.0,
+            "eye/left/offset/y": 0.0,
+            "eye/left/offset/angle": -40.0,
 
-            "eye/right/center/x": 0,
-            "eye/right/center/y": 0,
-            "eye/right/offset/up": 0,
-            "eye/right/offset/down": 0,
+            "eye/right/offset/x": 0.0,
+            "eye/right/offset/y": 0.0,
+            "eye/right/offset/angle": -12.0,
 
-            "neck/pitch/min": 0,
-            "neck/pitch/max": 0,
-            "neck/yaw/min": 0,
-            "neck/yaw/max": 0,
-            "neck/roll/min": 0,
-            "neck/roll/max": 0,
+            "neck/pitch/min": -40,
+            "neck/pitch/max": 40,
+            "neck/yaw/min": -30,
+            "neck/yaw/max": 30,
+            "neck/roll/min": -20,
+            "neck/roll/max": 20,
 
-            "lip/min": 0,
-            "lip/max": 0,
-            "tiredness": 25
+            "lip/min": 10,
+            "lip/max": 90,
+
+            "tiredness": 24.6,
+
+            "timeout_s/received":1.0,
+            "timeout_s/chased":10.0,
+
+            "priority/right_hand":True
+
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,

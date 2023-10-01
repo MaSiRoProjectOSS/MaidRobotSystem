@@ -27,6 +27,20 @@ public:
         this->z = z_axis;
     }
 };
+class Vector4 {
+public:
+    float x;
+    float y;
+    float z;
+    float w;
+    Vector4(float x_axis = 0, float y_axis = 0, float z_axis = 0, float w_axis = 0)
+    {
+        this->x = x_axis;
+        this->y = y_axis;
+        this->z = z_axis;
+        this->w = w_axis;
+    }
+};
 
 class RotationMatrix {
 public:
@@ -432,6 +446,17 @@ static EulerAngle to_EulerAngle(Quaternion q, EulerOrder order)
                           order);
     }
     throw "conversion of quaternion to euler angle is failed.";
+}
+
+static float deg_to_rad(float value)
+{
+    // rad = deg * (PI / 180)
+    return value * (M_PI / 180);
+}
+static float rad_to_deg(float value)
+{
+    //deg = rad ∗ (180 / PI)
+    return value * (180 / M_PI);
 }
 
 } // namespace maid_robot_system

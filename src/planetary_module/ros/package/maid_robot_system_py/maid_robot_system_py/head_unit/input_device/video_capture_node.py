@@ -67,22 +67,6 @@ class VideoDeviceManager():
             self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
             self.cap.set(cv.CAP_PROP_FPS, fps)
 
-    def video_output_video_information(self):
-        result = False
-        ret_txt = ''
-        if (self.cap is not None):
-            fourcc = self.txt_cv_fourcc()
-            width = self.cap.get(cv.CAP_PROP_FRAME_WIDTH)
-            height = self.cap.get(cv.CAP_PROP_FRAME_HEIGHT)
-            fps = self.cap.get(cv.CAP_PROP_FPS)
-            mode = self._video_to_txt_cv_mode(self.cap.get(cv.CAP_PROP_MODE))
-            format = self.cap.get(cv.CAP_PROP_FORMAT)
-
-            ret_txt = "fourcc:{}, fps:{} [{:.4g} ms], width:{}, height:{}, mode:{}, format:{}".format(
-                fourcc, fps, (1 / float(fps)), width, height, mode, format)
-            result = True
-        return result, ret_txt
-
     def txt_cv_fourcc(self, ):
         v = int(self.cap.get(cv.CAP_PROP_FOURCC))
         return "".join([chr((v >> 8 * i) & 0xFF) for i in range(4)])
@@ -403,7 +387,6 @@ class VideoCaptureNodeParam():
 
 
 class VideoCaptureNode(Node):
-    _service_name_info = 'out_info'
     _service_name_capture = 'out_srv'
     _subscribe_save = 'save'
     _topic_name = 'out_topic'
@@ -485,9 +468,6 @@ class VideoCaptureNode(Node):
                             if (self._debug is True):
                                 self._param.print_parameter(self)
                             self.get_logger().info('Open Camera : {} ({})'.format(self._param.device.PATH, self._param.device.NAME_BY_PATH))
-                            ret, text = self._video.video_output_video_information()
-                            if (ret is True):
-                                self.get_logger().info('  {}'.format(text))
                             # create ros
                             self._create_service()
                             self._create_subscription()
@@ -557,7 +537,6 @@ class VideoCaptureNode(Node):
     ##########################################################################
     # ROS
     def _create_service(self):
-        self._service_info = self.create_service(MrsSrv.VideoDeviceInfo, self._service_name_info, self._callback_srv_video_device_info)
         self._service_capture = self.create_service(MrsSrv.VideoCapture, self._service_name_capture, self._callback_srv_video_capture)
 
     def _create_subscription(self):
@@ -585,21 +564,6 @@ class VideoCaptureNode(Node):
         self._is_running = False
 
     ##########################################################################
-    # ## ROS callback
-    def _callback_srv_video_device_info(self,
-                                        request: MrsSrv.VideoDeviceInfo.Request,
-                                        response: MrsSrv.VideoDeviceInfo.Response):
-        response.data.id = self._param.device.ID
-        response.data.type = str(self._param.device.TYPE)
-        response.data.by_path_name = str(self._param.device.NAME_BY_PATH)
-        response.data.path = str(self._param.device.PATH)
-        response.data.angle_x = self._param.device.ANGLE_X
-        response.data.angle_y = self._param.device.ANGLE_Y
-        response.data.width = self._param.device.WIDTH
-        response.data.height = self._param.device.HEIGHT
-        response.data.fps = self._param.device.FPS
-        response.data.format = str(self._param.device.FORMAT)
-        return response
 
     # ## video capture
     def _callback_srv_video_capture(self,

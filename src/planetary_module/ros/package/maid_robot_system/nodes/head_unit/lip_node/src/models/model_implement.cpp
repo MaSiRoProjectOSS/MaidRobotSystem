@@ -16,7 +16,12 @@ namespace maid_robot_system
 // =============================
 bool ModelImplement::calculate(int percent)
 {
-    bool result = true;
+    static int per = -1;
+    bool result    = false;
+    if (per != percent) {
+        per    = percent;
+        result = true;
+    }
     return result;
 }
 

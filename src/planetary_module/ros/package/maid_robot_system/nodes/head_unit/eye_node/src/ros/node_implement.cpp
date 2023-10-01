@@ -14,6 +14,7 @@ namespace maid_robot_system
 {
 void NodeImplement::callback_message(const maid_robot_system_interfaces::msg::MrsEye &msg)
 {
+#if 0
     RCLCPP_INFO(this->get_logger(),
                 "callback_message() : emotions[%d] size[%d] distance[%d] x[%d] y[%d]", //
                 msg.emotions,
@@ -22,29 +23,30 @@ void NodeImplement::callback_message(const maid_robot_system_interfaces::msg::Mr
                 msg.x,        //
                 msg.y         //
     );
+#endif
 }
 
 void NodeImplement::callback_param()
 {
     // declare_parameter
-    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, 0);
-    this->declare_parameter(this->MRS_PARAMETER_SKIN_NAME, 0);
+    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, "");
+    this->declare_parameter(this->MRS_PARAMETER_SKIN_NAME, "");
     this->declare_parameter(this->MRS_PARAMETER_LEFT_WIDTH, 0);
     this->declare_parameter(this->MRS_PARAMETER_LEFT_HEIGHT, 0);
-    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_X, 0);
-    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_X, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_Y, 0.0);
     this->declare_parameter(this->MRS_PARAMETER_LEFT_CENTER_ANGLE, 0);
-    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_X, 0);
-    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_Y, 0);
-    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_X, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_Y, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_LEFT_EYEBALL_ANGLE, 0.0);
     this->declare_parameter(this->MRS_PARAMETER_RIGHT_WIDTH, 0);
     this->declare_parameter(this->MRS_PARAMETER_RIGHT_HEIGHT, 0);
-    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_X, 0);
-    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_Y, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_X, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_Y, 0.0);
     this->declare_parameter(this->MRS_PARAMETER_RIGHT_CENTER_ANGLE, 0);
-    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_X, 0);
-    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_Y, 0);
-    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_ANGLE, 0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_X, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_Y, 0.0);
+    this->declare_parameter(this->MRS_PARAMETER_RIGHT_EYEBALL_ANGLE, 0.0);
     this->declare_parameter(this->MRS_PARAMETER_EYELID_WIDTH, 0);
     this->declare_parameter(this->MRS_PARAMETER_EYELID_HEIGHT, 0);
     this->declare_parameter(this->MRS_PARAMETER_BLINK_QUICKLY_MS, 0);
