@@ -12,7 +12,7 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
+void NodeImplement::_callback_message(const std_msgs::msg::Float64 &msg)
 {
     this->_model.set_value(msg.data);
     // RCLCPP_DEBUG(this->get_logger(), "callback_message() : %f", this->_msg_convert.value.data);
@@ -22,7 +22,7 @@ void NodeImplement::callback_message(const std_msgs::msg::Float64 &msg)
     // RCLCPP_FATAL(this->get_logger(), "callback_message() : %f", this->_msg_convert.value.data);
 }
 
-void NodeImplement::callback_param()
+void NodeImplement::_callback_param_init()
 {
     // declare_parameter
     this->declare_parameter(this->MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
@@ -70,7 +70,7 @@ void NodeImplement::callback_param()
     });
 }
 
-void NodeImplement::callback_timer()
+void NodeImplement::_callback_timer()
 {
     this->_msg_convert.value.data = this->_model.calculate();
     this->_pub_info->publish(this->_msg_convert);
@@ -91,7 +91,7 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
 
     // set parameter
-    this->callback_param();
+    this->_callback_param_init();
 
     // set publisher
     this->_pub_info =                                                             //
@@ -104,9 +104,9 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
             this->create_subscription<std_msgs::msg::Float64>( //
                     MRS_TOPIC_INPUT,                           //
                     this->CONFIG_SUBSCRIPTION_SIZE,            //
-                    std::bind(&NodeImplement::callback_message, this, _1));
+                    std::bind(&NodeImplement::_callback_message, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

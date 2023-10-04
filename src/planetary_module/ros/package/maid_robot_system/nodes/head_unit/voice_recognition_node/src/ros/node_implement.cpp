@@ -12,7 +12,7 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::callback_param()
+void NodeImplement::_callback_param_init()
 {
     // declare_parameter
     //this->declare_parameter(this->MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_offset());
@@ -54,7 +54,7 @@ void NodeImplement::callback_param()
     });
 }
 
-void NodeImplement::callback_timer()
+void NodeImplement::_callback_timer()
 {
     if (true == this->_model.is_text()) {
         this->_msg_text.data = this->_model.pop();
@@ -68,7 +68,7 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
 
     // set parameter
-    this->callback_param();
+    this->_callback_param_init();
 
     // set publisher
     this->_pub_text = this->create_publisher<std_msgs::msg::String>( //
@@ -76,7 +76,7 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
             rclcpp::QoS(this->CONFIG_QOS)                            //
     );
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

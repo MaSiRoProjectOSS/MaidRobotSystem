@@ -27,34 +27,10 @@ def generate_launch_description():
         ],
         parameters=[{
             "setting_file": _setting_file,
-            "skin_name": _skin_name,
-
-            "left/width": 1520,
-            "left/height": 2190,
-            "left/center/x": 135.0,
-            "left/center/y": 455.0,
-            "left/center/angle": 0,
-            "left/eyeball/x": -100.0,
-            "left/eyeball/y": 100.0,
-            "left/eyeball/angle": 0.0,
-
-            "right/width": 1520,
-            "right/height": 2190,
-            "right/center/x": -46.0,
-            "right/center/y": 455.0,
-            "right/center/angle": 0,
-            "right/eyeball/x": 100.0,
-            "right/eyeball/y": 100.0,
-            "right/eyeball/angle": 0.0,
-
-            "eyelid/width": 1520,
-            "eyelid/height": 2190,
-
-            "blink_time/quickly_ms": 150,
-            "blink_time/min_ms": 400,
-            "blink_time/max_ms": 600,
-            "blink_time/limit_ms": 15000,
-            "blink_time/offset_ms": 0
+            "brightness": 100,
+            "color/r": 255,
+            "color/g": 255,
+            "color/b": 255
         }],
         ros_arguments=['--log-level', _log_level],
         respawn=_res_pawn,

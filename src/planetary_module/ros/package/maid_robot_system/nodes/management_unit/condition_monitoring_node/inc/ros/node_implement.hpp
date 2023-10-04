@@ -41,7 +41,7 @@ private:
     // =============================
     // ROS : subscription
     // =============================
-    void callback_message(const std_msgs::msg::Float64 &msg);
+    void _callback_message(const std_msgs::msg::Float64 &msg);
 
     rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
 
@@ -49,14 +49,14 @@ private:
     // =============================
     // ROS : parameter
     // =============================
-    void callback_param();
+    void _callback_param_init();
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
     // =============================
     // ROS : loop function
     // =============================
-    void callback_timer();
+    void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
 private:
@@ -67,8 +67,15 @@ private:
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 1000 };
 
-    const std::string MRS_TOPIC_OUTPUT            = "out";
-    const std::string MRS_TOPIC_INPUT             = "in";
+    // =============================
+    // ROS Topic / Service / Action
+    // =============================
+    const std::string MRS_TOPIC_OUTPUT = "out";
+    const std::string MRS_TOPIC_INPUT  = "in";
+
+    // =============================
+    // ROS PARAMETER
+    // =============================
     const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
     const std::string MRS_PARAMETER_SAMPLE_OFFSET = "param/offset";
 };

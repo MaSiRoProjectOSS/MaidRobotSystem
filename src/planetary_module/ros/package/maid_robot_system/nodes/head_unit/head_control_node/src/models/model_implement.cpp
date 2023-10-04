@@ -252,7 +252,7 @@ ModelImplement::ModelImplement()
     this->_msg_clear();
 }
 
-ModelImplement ::~ModelImplement()
+ModelImplement::~ModelImplement()
 {
 }
 

@@ -84,20 +84,26 @@ void ModelImplement::_calculate_eye(double x, double y, double size, double dist
         this->_msg_eye.emotions = maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_LEFT;
         this->_msg_eye.emotions = maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_RIGHT;
 #endif
-        if (this->_temp_overall.count_continue <= 0) {
+        if (this->_temp_overall.count_continue_eyelid_wink <= 0) {
             this->_temp_overall.flag_eyelid_wink = false;
             printf("<WINK> Clear\n");
         } else {
-            this->_temp_overall.count_continue--;
+            this->_temp_overall.count_continue_eyelid_wink--;
         }
     } else {
         this->_msg_eye.emotions = maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL;
     }
+
     // ===========================================
     // EFFECT
     // ===========================================
-    // this->_msg_eye.pupil_effect        = maid_robot_system_interfaces::msg::MrsEye::PUPIL_EFFECT_ORDER;
-    this->_msg_eye.pupil_effect = maid_robot_system_interfaces::msg::MrsEye::PUPIL_EFFECT_NORMAL;
+    if (this->_temp_overall.count_continue_command <= 0) {
+        this->_temp_overall.flag_eyelid_wink = false;
+        this->_msg_eye.pupil_effect          = maid_robot_system_interfaces::msg::MrsEye::PUPIL_EFFECT_NORMAL;
+    } else {
+        this->_temp_overall.count_continue_command--;
+        this->_msg_eye.pupil_effect = maid_robot_system_interfaces::msg::MrsEye::PUPIL_EFFECT_ORDER;
+    }
 
     // ===========================================
     // Postion and size

@@ -24,6 +24,8 @@
         "MRS_TYPE_INPUT_VIDEO_DEVICE": "/camera",
         "MRS_PHOTO_LEFT": "",
         "MRS_PHOTO_RIGHT": "",
+        "MRS_BUILD_LIB_QT5": "ON",
+        "MRS_BUILD_LIB_QT6": "OFF",
         "MRS_BUILD_HEAD_UNIT": "ON",
         "MRS_BUILD_ARM_UNIT": "ON",
         "MRS_BUILD_WAIST_DOWN_UNIT": "ON",

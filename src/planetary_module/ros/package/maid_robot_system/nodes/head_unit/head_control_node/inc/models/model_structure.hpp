@@ -33,9 +33,11 @@ public:
     bool flag_eyelid_wink  = false;
     bool flag_eyelid_close = false;
     bool flag_eyelid_smile = false;
-    int count_continue     = 0;
 
-    const int COUNT_CONTINUE_MAX      = 3;
+    int count_continue_command     = 0;
+    int count_continue_eyelid_wink = 0;
+
+    const int COUNT_CONTINUE_MAX      = 5;
     const double EYE_DEFAULT_SIZE     = 1.0;
     const double EYE_DEFAULT_DISTANCE = 1.0;
 };

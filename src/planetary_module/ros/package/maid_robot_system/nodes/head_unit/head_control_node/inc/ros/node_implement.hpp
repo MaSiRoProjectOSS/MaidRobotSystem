@@ -47,12 +47,12 @@ private:
     // =============================
     // ROS : subscription
     // =============================
-    void callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg);
-    void callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg);
-    void callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg);
-    void callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg);
-    void callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg);
-    void callback_voltage(const std_msgs::msg::Float64 &msg);
+    void _callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg);
+    void _callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg);
+    void _callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg);
+    void _callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg);
+    void _callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg);
+    void _callback_voltage(const std_msgs::msg::Float64 &msg);
 
     rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_left;
     rclcpp::Subscription<maid_robot_system_interfaces::msg::PoseDetection>::SharedPtr _sub_pose_right;
@@ -72,7 +72,7 @@ private:
     // =============================
     // ROS : loop function
     // =============================
-    void callback_timer();
+    void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
 private:
@@ -83,6 +83,9 @@ private:
     const int CONFIG_SUBSCRIPTION_SIZE = 2;
     const std::chrono::milliseconds TP_MSEC{ 16 };
 
+    // =============================
+    // ROS Topic / Service / Action
+    // =============================
     const std::string MRS_TOPIC_IN_POSTURE_LEFT  = "in/posture/left";
     const std::string MRS_TOPIC_IN_POSTURE_RIGHT = "in/posture/right";
     const std::string MRS_TOPIC_IN_MARKS_LEFT    = "in/marks/left";
@@ -93,14 +96,20 @@ private:
     const std::string MRS_TOPIC_OUT_NECK         = "out/neck";
     const std::string MRS_TOPIC_OUT_LIP          = "out/lip";
 
+    // =============================
+    // ROS PARAMETER
+    // =============================
+    // eye : left
     const std::string MRS_PARAM_EYE_LEFT_OFFSET_X     = "eye/left/offset/x";
     const std::string MRS_PARAM_EYE_LEFT_OFFSET_Y     = "eye/left/offset/y";
     const std::string MRS_PARAM_EYE_LEFT_OFFSET_ANGLE = "eye/left/offset/angle";
 
+    // eye : right
     const std::string MRS_PARAM_EYE_RIGHT_OFFSET_X     = "eye/right/offset/x";
     const std::string MRS_PARAM_EYE_RIGHT_OFFSET_Y     = "eye/right/offset/y";
     const std::string MRS_PARAM_EYE_RIGHT_OFFSET_ANGLE = "eye/right/offset/angle";
 
+    // neck
     const std::string MRS_PARAM_NECK_PITCH_MIN = "neck/pitch/min";
     const std::string MRS_PARAM_NECK_PITCH_MAX = "neck/pitch/max";
     const std::string MRS_PARAM_NECK_YAW_MIN   = "neck/yaw/min";
@@ -108,13 +117,17 @@ private:
     const std::string MRS_PARAM_NECK_ROLL_MIN  = "neck/roll/min";
     const std::string MRS_PARAM_NECK_ROLL_MAX  = "neck/roll/max";
 
+    // lip
     const std::string MRS_PARAM_LIP_MIN = "lip/min";
     const std::string MRS_PARAM_LIP_MAX = "lip/max";
 
+    // tiredness
     const std::string MRS_PARAM_TIREDNESS = "tiredness";
 
+    // priority
     const std::string MRS_PARAM_PRIORITY_TO_THE_RIGHT = "priority/right_hand";
 
+    // timeout_s
     const std::string MRS_PARAM_TIMEOUT_S_RECEIVED = "timeout_s/received";
     const std::string MRS_PARAM_TIMEOUT_S_CHASED   = "timeout_s/chased";
 };

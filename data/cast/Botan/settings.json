@@ -1,10 +1,50 @@
 {
     "path": "/opt/MaidRobotSystem/data/cast/Botan",
-    "eye": {
-        "eyeball": {
-            "normally": "eye/eyeball/eyeball_normally.png"
+    "skin_name": "Botan",
+    "position": {
+        "left": {
+            "width": 1520,
+            "height": 2190,
+            "center": {
+                "x": 135.0,
+                "y": 455.0,
+                "angle": 0
+            },
+            "eyeball": {
+                "x": -100.0,
+                "y": 100.0,
+                "angle": 0.0
+            }
         },
-        "eyelid": {
+        "right": {
+            "width": 1520,
+            "height": 2190,
+            "center": {
+                "x": -46.0,
+                "y": 455.0,
+                "angle": 0
+            },
+            "eyeball": {
+                "x": 100.0,
+                "y": 100.0,
+                "angle": 0.0
+            }
+        }
+    },
+    "blink_time": {
+        "quickly_ms": 150,
+        "min_ms": 400,
+        "max_ms": 600,
+        "limit_ms": 15000,
+        "offset_ms": 0
+    },
+    "eyeball": {
+        "normally": "eye/eyeball/eyeball_normally.png"
+    },
+    "eyelid": {
+        "eyelid/width": 1520,
+        "eyelid/height": 2190,
+        "image": {
             "normally": [
                 "eye/eyelid/normally/000.png",
                 "eye/eyelid/normally/001.png",
@@ -69,8 +109,10 @@
                 "eye/eyelid/smile/028.png",
                 "eye/eyelid/smile/029.png"
             ]
-        },
-        "pupil": {
+        }
+    },
+    "pupil": {
+        "image": {
             "normally": "eye/pupil/pupil_normally.png",
             "order": "eye/pupil/pupil_order.png"
         }

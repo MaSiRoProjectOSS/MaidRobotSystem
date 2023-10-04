@@ -6,10 +6,33 @@ add_definitions(
   -DNODE_NAME="${NODE_NAME}"
 )
 
+if(DEFINED ENV{MRS_BUILD_LIB_QT6})
+  set(BUILD_LIB_QT6 $ENV{MRS_BUILD_LIB_QT6})
+  if(BUILD_LIB_QT6)
+    find_package(Qt6 REQUIRED COMPONENTS OpenGL)
+    target_link_libraries(mytarget PRIVATE Qt6::OpenGL)
+  endif()
+else()
+  set(BUILD_LIB_QT6 OFF)
+endif()
+
+if(DEFINED ENV{MRS_BUILD_LIB_QT5})
+  set(BUILD_LIB_QT5 $ENV{MRS_BUILD_LIB_QT5})
+  if(BUILD_LIB_QT5)
+    find_package(Qt5 REQUIRED COMPONENTS OpenGL)
+    set(QT_LIBRARIES Qt5::Widgets)
+    set(QT_LIBRARIES_GL Qt5::OpenGL)
+    add_definitions(-DQT_NO_KEYWORDS)
+  endif()
+else()
+  set(BUILD_LIB_QT5 OFF)
+endif()
+
 add_executable(${NODE_NAME}
   src/main.cpp
   src/ros/node_implement.cpp
-  src/models/model_implement.cpp
+  src/models/model_public.cpp
+  ## modelsの中身は完全に分離してください。
 )
 
 target_include_directories(${NODE_NAME}

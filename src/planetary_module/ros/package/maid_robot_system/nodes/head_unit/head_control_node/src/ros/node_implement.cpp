@@ -15,17 +15,17 @@ namespace maid_robot_system
 // =============================
 // ROS : subscription
 // =============================
-void NodeImplement::callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg)
+void NodeImplement::_callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
     RCLCPP_DEBUG(this->get_logger(), "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_LEFT);
     this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_LEFT, msg, this->get_clock()->now().seconds());
 }
-void NodeImplement::callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg)
+void NodeImplement::_callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
     RCLCPP_DEBUG(this->get_logger(), "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_RIGHT);
     this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_RIGHT, msg, this->get_clock()->now().seconds());
 }
-void NodeImplement::callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg)
+void NodeImplement::_callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg)
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
@@ -34,7 +34,7 @@ void NodeImplement::callback_ar_left(const maid_robot_system_interfaces::msg::Ar
         }
     }
 }
-void NodeImplement::callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg)
+void NodeImplement::_callback_ar_right(const maid_robot_system_interfaces::msg::ArMarkers &msg)
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
@@ -43,12 +43,12 @@ void NodeImplement::callback_ar_right(const maid_robot_system_interfaces::msg::A
         }
     }
 }
-void NodeImplement::callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg)
+void NodeImplement::_callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg)
 {
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %d", this->get_name(), msg.command);
     this->_model.set_value_voice(msg.text, msg.command, this->get_clock()->now().seconds());
 }
-void NodeImplement::callback_voltage(const std_msgs::msg::Float64 &msg)
+void NodeImplement::_callback_voltage(const std_msgs::msg::Float64 &msg)
 {
     RCLCPP_INFO(this->get_logger(), "[%s] : %f", this->get_name(), msg.data);
     this->_model.set_value_tiredness(msg.data, this->get_clock()->now().seconds());
@@ -210,7 +210,7 @@ void NodeImplement::_callback_param_init()
 // =============================
 // ROS : loop function
 // =============================
-void NodeImplement::callback_timer()
+void NodeImplement::_callback_timer()
 {
     bool result = this->_model.calculate(this->get_clock()->now().seconds());
     if (true == result) {
@@ -255,34 +255,34 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
                     this->MRS_TOPIC_IN_POSTURE_LEFT,                                     //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                      //
-                    std::bind(&NodeImplement::callback_pose_left, this, _1));
+                    std::bind(&NodeImplement::_callback_pose_left, this, _1));
     this->_sub_pose_right =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
                     this->MRS_TOPIC_IN_POSTURE_RIGHT,                                    //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                      //
-                    std::bind(&NodeImplement::callback_pose_right, this, _1));
+                    std::bind(&NodeImplement::_callback_pose_right, this, _1));
     this->_sub_ar_left =                                                             //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
                     this->MRS_TOPIC_IN_MARKS_LEFT,                                   //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                  //
-                    std::bind(&NodeImplement::callback_ar_left, this, _1));
+                    std::bind(&NodeImplement::_callback_ar_left, this, _1));
     this->_sub_ar_right =                                                            //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
                     this->MRS_TOPIC_IN_MARKS_RIGHT,                                  //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                  //
-                    std::bind(&NodeImplement::callback_ar_right, this, _1));
+                    std::bind(&NodeImplement::_callback_ar_right, this, _1));
     this->_sub_voice =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::MrsVoice>( //
                     this->MRS_TOPIC_IN_VOICE,                                       //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                 //
-                    std::bind(&NodeImplement::callback_voice, this, _1));
+                    std::bind(&NodeImplement::_callback_voice, this, _1));
     this->_sub_voltage =                                       //
             this->create_subscription<std_msgs::msg::Float64>( //
                     this->MRS_TOPIC_IN_VOLTAGE,                //
                     this->CONFIG_SUBSCRIPTION_SIZE,            //
-                    std::bind(&NodeImplement::callback_voltage, this, _1));
+                    std::bind(&NodeImplement::_callback_voltage, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

@@ -12,14 +12,14 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::callback_message(const maid_robot_system_interfaces::msg::MrsLip &msg)
+void NodeImplement::_callback_message(const maid_robot_system_interfaces::msg::MrsLip &msg)
 {
     if (true == this->_model.calculate(msg.percent)) {
         RCLCPP_INFO(this->get_logger(), "callback_message() : %d", msg.percent);
     }
 }
 
-void NodeImplement::callback_param()
+void NodeImplement::_callback_param_init()
 {
     // declare_parameter
     // this->declare_parameter(this->MRS_PARAMETER_SAMPLE_TIMES, this->_model.get_times());
@@ -62,7 +62,7 @@ void NodeImplement::callback_param()
     });
 }
 
-void NodeImplement::callback_timer()
+void NodeImplement::_callback_timer()
 {
     //
 }
@@ -72,16 +72,16 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
 
     // set parameter
-    this->callback_param();
+    this->_callback_param_init();
 
     // set subscription
     this->_sub_value =                                                            //
             this->create_subscription<maid_robot_system_interfaces::msg::MrsLip>( //
                     this->MRS_TOPIC_INPUT,                                        //
                     this->CONFIG_SUBSCRIPTION_SIZE,                               //
-                    std::bind(&NodeImplement::callback_message, this, _1));
+                    std::bind(&NodeImplement::_callback_message, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

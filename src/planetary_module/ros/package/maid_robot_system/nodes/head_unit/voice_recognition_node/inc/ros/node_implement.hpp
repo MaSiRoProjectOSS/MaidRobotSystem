@@ -40,14 +40,14 @@ private:
     // =============================
     // ROS : parameter
     // =============================
-    void callback_param();
+    void _callback_param_init();
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:
     // =============================
     // ROS : loop function
     // =============================
-    void callback_timer();
+    void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
 private:
@@ -58,7 +58,14 @@ private:
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 100 };
 
+    // =============================
+    // ROS Topic / Service / Action
+    // =============================
     const std::string MRS_OUTPUT_VOICE_TEXT = "voice_text";
+
+    // =============================
+    // ROS PARAMETER
+    // =============================
     //const std::string MRS_PARAMETER_SAMPLE_TIMES  = "param/times";
 };
 

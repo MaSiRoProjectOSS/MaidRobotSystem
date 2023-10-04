@@ -12,14 +12,14 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::callback_data(const maid_robot_system_interfaces::msg::MrsNeck &msg)
+void NodeImplement::_callback_data(const maid_robot_system_interfaces::msg::MrsNeck &msg)
 {
     if (true == this->_model.calculate(msg.x, msg.y, msg.z, msg.w)) {
         RCLCPP_INFO(this->get_logger(), "callback_message() : %f, %f, %f, %f", msg.x, msg.y, msg.z, msg.w);
     }
 }
 
-void NodeImplement::callback_param()
+void NodeImplement::_callback_param_init()
 {
     // declare_parameter
     // this->declare_parameter(this->MRS_PARAMETER_SAMPLE_OFFSET, this->_model.get_offset());
@@ -61,7 +61,7 @@ void NodeImplement::callback_param()
     });
 }
 
-void NodeImplement::callback_timer()
+void NodeImplement::_callback_timer()
 {
     //
 }
@@ -71,16 +71,16 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
 
     // set parameter
-    this->callback_param();
+    this->_callback_param_init();
 
     // set subscription
     this->_sub_neck =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::MrsNeck>( //
                     this->MRS_TOPIC_INPUT,                                         //
                     this->CONFIG_SUBSCRIPTION_SIZE,                                //
-                    std::bind(&NodeImplement::callback_data, this, _1));
+                    std::bind(&NodeImplement::_callback_data, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()
