@@ -16,6 +16,7 @@
 #include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
 #include <std_msgs/msg/float64.hpp>
 
+#define DEBUG_OUTPUT_FPS 1
 namespace maid_robot_system
 {
 class NodeImplement : public rclcpp::Node {
@@ -28,7 +29,6 @@ private:
     // =============================
     // Variable
     // =============================
-    ModelImplement _model;
 
 private:
     // =============================
@@ -51,6 +51,11 @@ private:
     void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
 
+#if DEBUG_OUTPUT_FPS
+    void _callback_output_state();
+    rclcpp::TimerBase::SharedPtr _ros_output_state;
+#endif
+
 private:
     // =============================
     // CONST
@@ -58,7 +63,9 @@ private:
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 10 };
-
+#if DEBUG_OUTPUT_FPS
+    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ 5000 };
+#endif
     // =============================
     // ROS Topic / Service / Action
     // =============================

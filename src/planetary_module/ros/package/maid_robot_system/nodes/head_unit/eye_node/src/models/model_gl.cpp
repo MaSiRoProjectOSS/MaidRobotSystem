@@ -1,17 +1,26 @@
 /**
- * @file CtrlHitomi_GL.cpp
+ * @file model_gl.cpp
  * @brief
  * @date 2020-03-28
  *
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "CtrlHitomi.h"
+#include "models/model_implement.hpp"
 
-#if SET_GLWIDGET
-void CtrlHitomi::initializeGL() {}
+namespace maid_robot_system
+{
+bool ModelImplement::event(QEvent *e)
+{
+    return true;
+}
 
-void CtrlHitomi::resizeGL(int w, int h) {}
+void ModelImplement::paintEvent(QPaintEvent *event)
+{
+}
 
-void CtrlHitomi::paintGL() {}
-#endif
+void ModelImplement::resizeEvent(QResizeEvent *event)
+{
+}
+
+} // namespace maid_robot_system

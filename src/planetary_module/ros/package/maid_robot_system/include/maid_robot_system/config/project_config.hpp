@@ -13,10 +13,10 @@
 #include "__generate_config.hpp"
 /* ======================================================================== */
 #ifndef CONFIG_FILE
-#define CONFIG_FILE "/opt/MaidRobotSystem/data/cast/Iris/settings.json"
+#define CONFIG_FILE "/opt/MaidRobotSystem/data/cast/Ayame/settings.json"
 #endif
 #ifndef CONFIG_CAST_NAME
-#define CONFIG_CAST_NAME "Iris"
+#define CONFIG_CAST_NAME "Ayame"
 #endif
 #ifndef CONFIG_CAST_ID
 #define CONFIG_CAST_ID 1000

@@ -8,15 +8,18 @@
  *
  */
 #include "models/model_implement.hpp"
+#include "models/widgets/eye_widget.hpp"
 
 #include <filesystem>
 
 namespace maid_robot_system
 {
+EyeWidget *g_widget;
+
 // =============================
 // PUBLIC : Function
 // =============================
-void ModelImplement::set_msg_eye(int emotions,
+void ModelImplement::set_msg_eye(int emotions, //
                                  int pupil_effect,
                                  float size,
                                  float distance,
@@ -26,6 +29,12 @@ void ModelImplement::set_msg_eye(int emotions,
                                  float right_y)
 {
 }
+
+std::string ModelImplement::get_lap_time()
+{
+    return "";
+}
+
 int ModelImplement::get_brightness()
 {
     return this->_param.brightness;
@@ -85,11 +94,25 @@ bool ModelImplement::set_setting_file(std::string value)
 bool ModelImplement::calculate()
 {
     bool result = true;
+    // g_widget ->UpdateScreen();
+    this->app->processEvents();
     return result;
 }
 
-void ModelImplement::init(int argc, char **argv)
+void ModelImplement::open(int argc, char **argv)
 {
+    this->app = new QApplication(argc, argv);
+    QCursor::setPos(0, 0);
+    QCursor cursor(Qt::BlankCursor);
+    this->app->setOverrideCursor(cursor);
+    this->app->changeOverrideCursor(cursor);
+    // g_widget = new EyeWidget();
+}
+
+void ModelImplement::closing()
+{
+    this->app->closeAllWindows();
+    // g_widget   ->Closing();
 }
 
 // =============================
@@ -98,8 +121,7 @@ void ModelImplement::init(int argc, char **argv)
 ModelImplement::ModelImplement()
 {
 }
-
-ModelImplement ::~ModelImplement()
+ModelImplement::~ModelImplement()
 {
 }
 

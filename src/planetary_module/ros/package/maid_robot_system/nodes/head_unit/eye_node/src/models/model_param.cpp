@@ -13,10 +13,10 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <sstream>
+
 namespace maid_robot_system
 {
 #define DEBUG_OUTPUT 1
-//using json = nlohmann::json;
 
 std::string ModelImplement::_read_file(const std::string &path)
 {
@@ -57,6 +57,7 @@ bool ModelImplement::_set_param(std::string json_file)
     } catch (...) {
         result = false;
     }
+
 #if DEBUG_OUTPUT
     if (true == result) {
         printf("%s%s\n", "path: ", this->_param.path.c_str());

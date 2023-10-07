@@ -12,8 +12,8 @@ def generate_launch_description():
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
-    _skin_name = os.environ.get('MRS_CAST_NAME', 'Iris')
-    _setting_file = os.environ.get('MRS_CAST_DATA', '/opt/MaidRobotSystem/data/cast/Iris/settings.json')
+    _skin_name = os.environ.get('MRS_CAST_NAME', 'Ayame')
+    _setting_file = os.environ.get('MRS_CAST_DATA', '/opt/MaidRobotSystem/data/cast/Ayame/settings.json')
 
     _ros_sub_input = '/head_unit' + '/logic'
 
