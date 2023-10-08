@@ -75,15 +75,7 @@ public:
     } blink_type;
     /* ============================================= */
     PartsEyelid();
-    void loadSkin(QString skin_name,
-                  double eyelid_size_x,
-                  double eyelid_size_y,
-                  double calibration_r_angle,
-                  double calibration_l_angle,
-                  float calibration_eye_blink_time_quickly,
-                  float calibration_eye_blink_time_min,
-                  float calibration_eye_blink_time_max,
-                  float calibration_eye_blink_time_limit);
+    void loadSkin(StParameter param);
     void setup(float param_calibration_eye_blink_time_offset);
     /* ============================================= */
     QPixmap get_eye_id(ENUM_TARGET_EYE target);

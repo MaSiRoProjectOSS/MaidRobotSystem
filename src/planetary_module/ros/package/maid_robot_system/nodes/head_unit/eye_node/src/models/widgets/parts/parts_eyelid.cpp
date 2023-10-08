@@ -354,20 +354,12 @@ void PartsEyelid::set_cycle(uint elapsed)
  *
  * @param skin_name
  */
-void PartsEyelid::loadSkin(QString skin_name,
-                           double eyelid_size_x,
-                           double eyelid_size_y,
-                           double calibration_r_angle,
-                           double calibration_l_angle,
-                           float calibration_eye_blink_time_quickly,
-                           float calibration_eye_blink_time_min,
-                           float calibration_eye_blink_time_max,
-                           float calibration_eye_blink_time_limit)
+void PartsEyelid::loadSkin(StParameter param)
 {
-    this->eye_blink_time_quickly      = calibration_eye_blink_time_quickly;
-    this->eye_blink_time_min          = calibration_eye_blink_time_min;   // ms
-    this->eye_blink_time_max          = calibration_eye_blink_time_max;   // ms
-    this->eye_blink_time_limit        = calibration_eye_blink_time_limit; // ms
+    this->eye_blink_time_quickly      = param.eye_blink_time_quickly;
+    this->eye_blink_time_min          = param.eye_blink_time_min;   // ms
+    this->eye_blink_time_max          = param.eye_blink_time_max;   // ms
+    this->eye_blink_time_limit        = param.eye_blink_time_limit; // ms
     Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
     imageFlag                         = Qt::OrderedAlphaDither;
     /* ============================================= */
@@ -380,7 +372,7 @@ void PartsEyelid::loadSkin(QString skin_name,
     for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
         ss.str("");
         ss.clear();
-        ss << WORKSPACECONFIG_PATH_IMG_EYE << skin_name.toStdString() << "eyelid/default/"
+        ss << WORKSPACECONFIG_PATH_IMG_EYE << param.name << "eyelid/default/"
            << "Scene1_" << buf_c << ".png";
         f_name = ss.str();
         QPixmap buff(f_name.c_str(), nullptr, imageFlag);
@@ -388,16 +380,16 @@ void PartsEyelid::loadSkin(QString skin_name,
         rotate_angle_eyelid.rotate(-90);
         // left
         QMatrix rotate_angle_eyelid_l;
-        rotate_angle_eyelid_l.rotate(-calibration_l_angle);
+        rotate_angle_eyelid_l.rotate(-param.l_angle);
         this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-        this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(eyelid_size_x, eyelid_size_y, Qt::IgnoreAspectRatio);
+        this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
         this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
         // right
         QMatrix rotate_angle_eyelid_r;
-        rotate_angle_eyelid_r.rotate(-calibration_r_angle);
+        rotate_angle_eyelid_r.rotate(-param.r_angle);
         this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
         this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
-        this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(eyelid_size_x, eyelid_size_y, Qt::IgnoreAspectRatio);
+        this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
         this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(rotate_angle_eyelid_r);
     }
 
@@ -409,7 +401,7 @@ void PartsEyelid::loadSkin(QString skin_name,
     for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
         ss.str("");
         ss.clear();
-        ss << WORKSPACECONFIG_PATH_IMG_EYE << skin_name.toStdString() << "eyelid/smile/"
+        ss << WORKSPACECONFIG_PATH_IMG_EYE << param.name << "eyelid/smile/"
            << "eye_smile1_" << buf_c << ".png";
         f_name = ss.str();
         QPixmap buff(f_name.c_str(), nullptr, imageFlag);
@@ -417,16 +409,16 @@ void PartsEyelid::loadSkin(QString skin_name,
         rotate_angle_smile_lid.rotate(-90);
         // left
         QMatrix rotate_angle_smile_lid_l;
-        rotate_angle_smile_lid_l.rotate(-calibration_l_angle);
+        rotate_angle_smile_lid_l.rotate(-param.l_angle);
         this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-        this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(eyelid_size_x, eyelid_size_y, Qt::IgnoreAspectRatio);
+        this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
         this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
         // right
         QMatrix rotate_angle_smile_lid_r;
-        rotate_angle_smile_lid_r.rotate(-calibration_r_angle);
+        rotate_angle_smile_lid_r.rotate(-param.r_angle);
         this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
         this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
-        this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(eyelid_size_x, eyelid_size_y, Qt::IgnoreAspectRatio);
+        this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
         this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(rotate_angle_smile_lid_r);
     }
 }

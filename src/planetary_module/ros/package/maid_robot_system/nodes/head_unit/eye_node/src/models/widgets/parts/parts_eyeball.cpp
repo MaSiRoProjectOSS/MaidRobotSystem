@@ -111,7 +111,7 @@ void PartsEyeball::set_state_pupil(PupilState state)
  *
  * @param skin_name
  */
-void PartsEyeball::loadPupil(QString skin_name, Qt::ImageConversionFlag imageFlag)
+void PartsEyeball::loadPupil(std::string skin_name, Qt::ImageConversionFlag imageFlag)
 {
 #if DRAW_PUPIL_INSIDE || DRAW_PUPIL_OUTSIDE
     printf("  ---- LOAD [Pupil] ----\n");

@@ -8,6 +8,10 @@
  *
  */
 #include "ros/node_implement.hpp"
+
+#include <exception>
+#include <stdexcept>
+
 using std::placeholders::_1;
 
 namespace maid_robot_system
@@ -107,26 +111,31 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
 
-    this->_msg_convert.offset.data = this->_model.get_offset();
-    this->_msg_convert.times.data  = this->_model.get_times();
-    this->_msg_convert.value.data  = this->_model.calculate();
-    // set parameter
-    this->_callback_param_init();
+    if (true) {
+        this->_msg_convert.offset.data = this->_model.get_offset();
+        this->_msg_convert.times.data  = this->_model.get_times();
+        this->_msg_convert.value.data  = this->_model.calculate();
+        // set parameter
+        this->_callback_param_init();
 
-    // set publisher
-    this->_pub_info =                                                             //
-            this->create_publisher<maid_robot_system_interfaces::msg::MrsSample>( //
-                    this->MRS_TOPIC_OUTPUT,                                       //
-                    rclcpp::QoS(this->CONFIG_QOS)                                 //
-            );
-    // set subscription
-    this->_sub_value =                                         //
-            this->create_subscription<std_msgs::msg::Float64>( //
-                    this->MRS_TOPIC_INPUT,                     //
-                    this->CONFIG_SUBSCRIPTION_SIZE,            //
-                    std::bind(&NodeImplement::_callback_message, this, _1));
+        // set publisher
+        this->_pub_info =                                                             //
+                this->create_publisher<maid_robot_system_interfaces::msg::MrsSample>( //
+                        this->MRS_TOPIC_OUTPUT,                                       //
+                        rclcpp::QoS(this->CONFIG_QOS)                                 //
+                );
+        // set subscription
+        this->_sub_value =                                         //
+                this->create_subscription<std_msgs::msg::Float64>( //
+                        this->MRS_TOPIC_INPUT,                     //
+                        this->CONFIG_SUBSCRIPTION_SIZE,            //
+                        std::bind(&NodeImplement::_callback_message, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open.");
+        throw new std::runtime_error("Failed to open.");
+    }
 }
 
 NodeImplement::~NodeImplement()

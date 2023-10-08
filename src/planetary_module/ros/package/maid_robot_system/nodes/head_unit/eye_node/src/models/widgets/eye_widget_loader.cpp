@@ -16,15 +16,9 @@ namespace maid_robot_system
  @param parent
 */
 
-#if SET_GLWIDGET
-EyeWidget::EyeWidget(QWidget *parent) : QGLWidget(parent), eyeball(), eyelid(), logger()
+EyeWidget::EyeWidget(QWidget *parent) : QOpenGLWidget(parent), eyeball(), eyelid(), logger()
 {
 }
-#else
-EyeWidget::EyeWidget(QWidget *parent) : QWidget(parent), eyeball(), eyelid(), logger()
-{
-}
-#endif
 EyeWidget::~EyeWidget()
 {
 }
@@ -34,50 +28,14 @@ EyeWidget::~EyeWidget()
  *
  * @param value
  */
-void EyeWidget::loadSkin(QString skin_name,
-                         double param_calibration_l_x,
-                         double param_calibration_l_y,
-                         double param_calibration_l_angle,
-                         double param_calibration_r_x,
-                         double param_calibration_r_y,
-                         double param_calibration_r_angle,
-                         int param_calibration_eyelid_size_x,
-                         int param_calibration_eyelid_size_y,
-                         double param_calibration_eyeball_position_l_x,
-                         double param_calibration_eyeball_position_l_y,
-                         double param_calibration_eyeball_position_r_x,
-                         double param_calibration_eyeball_position_r_y,
-                         double param_calibration_eyeball_angle,
-                         float param_calibration_eye_blink_time_quickly,
-                         float param_calibration_eye_blink_time_min,
-                         float param_calibration_eye_blink_time_max,
-                         float param_calibration_eye_blink_time_limit)
+void EyeWidget::loadSkin(StParameter param)
 {
     printf("  ---- LOAD [Skin] ----\n");
     printf("    register - ROS\n");
-    printf("        SKIN NAME : %s\n", skin_name.toStdString().c_str());
-    this->eyeball.loadPupil(skin_name + "/", this->imageFlag);
-    this->loadEyelid(skin_name + "/",
-                     param_calibration_l_x,
-                     param_calibration_l_y,
-                     param_calibration_l_angle,
-                     param_calibration_r_x,
-                     param_calibration_r_y,
-                     param_calibration_r_angle,
-                     param_calibration_eyelid_size_x,
-                     param_calibration_eyelid_size_y,
-                     param_calibration_eye_blink_time_quickly,
-                     param_calibration_eye_blink_time_min,
-                     param_calibration_eye_blink_time_max,
-                     param_calibration_eye_blink_time_limit);
-    this->loadEyeball(skin_name + "/",
-                      param_calibration_l_angle,
-                      param_calibration_r_angle,
-                      param_calibration_eyeball_position_l_x,
-                      param_calibration_eyeball_position_l_y,
-                      param_calibration_eyeball_position_r_x,
-                      param_calibration_eyeball_position_r_y,
-                      param_calibration_eyeball_angle);
+    printf("        SKIN NAME : %s\n", param.name.c_str());
+    this->eyeball.loadPupil(param.name, this->imageFlag);
+    this->loadEyelid(param);
+    this->loadEyeball(param);
 }
 
 /**
@@ -85,33 +43,18 @@ void EyeWidget::loadSkin(QString skin_name,
  *
  * @param skin_name
  */
-void EyeWidget::loadEyelid(QString skin_name,
-                           double param_calibration_l_x,
-                           double param_calibration_l_y,
-                           double param_calibration_l_angle,
-                           double param_calibration_r_x,
-                           double param_calibration_r_y,
-                           double param_calibration_r_angle,
-                           int param_calibration_eyelid_size_x,
-                           int param_calibration_eyelid_size_y,
-                           float param_calibration_eye_blink_time_quickly,
-                           float param_calibration_eye_blink_time_min,
-                           float param_calibration_eye_blink_time_max,
-                           float param_calibration_eye_blink_time_limit)
+void EyeWidget::loadEyelid(StParameter param)
 {
     printf("  ---- LOAD [Eyelid] ----\n");
-    this->eyelid.loadSkin(skin_name,
-                          param_calibration_eyelid_size_x,
-                          param_calibration_eyelid_size_y,
-                          param_calibration_r_angle,
-                          param_calibration_l_angle,
-                          param_calibration_eye_blink_time_quickly,
-                          param_calibration_eye_blink_time_min,
-                          param_calibration_eye_blink_time_max,
-                          param_calibration_eye_blink_time_limit);
-    StVector calibration_right = StVector(param_calibration_r_x, param_calibration_r_y);
-    StVector calibration_left  = StVector(param_calibration_l_x, param_calibration_l_y);
-    this->eyelid.setting(this->window_size_x, this->window_size_y, param_calibration_eyelid_size_x, param_calibration_eyelid_size_y, calibration_right, calibration_left);
+    this->eyelid.loadSkin(param);
+    StVector calibration_right = StVector(param.r_x, param.r_y);
+    StVector calibration_left  = StVector(param.l_x, param.l_y);
+    this->eyelid.setting(this->window_size_x,
+                         this->window_size_y, //
+                         param.eyelid_size_x,
+                         param.eyelid_size_y,
+                         calibration_right,
+                         calibration_left);
 #if DEBUG_PRINT
     printf("=============== Eyelid Postion ==============\n");
     printf(" Right (x,y) = (%f,%f)\n", this->eyelid.right.pos.x, this->eyelid.right.pos.y);
@@ -131,35 +74,28 @@ void EyeWidget::Setup(float param_calibration_eye_blink_time_offset)
  *
  * @param skin_name
  */
-void EyeWidget::loadEyeball(QString skin_name,
-                            double param_calibration_l_angle,
-                            double param_calibration_r_angle,
-                            double param_calibration_eyeball_position_l_x,
-                            double param_calibration_eyeball_position_l_y,
-                            double param_calibration_eyeball_position_r_x,
-                            double param_calibration_eyeball_position_r_y,
-                            double param_calibration_eyeball_angle)
+void EyeWidget::loadEyeball(StParameter param)
 {
     printf("  ---- LOAD [Eyeball] ----\n");
     const QString str_eyeball_origin = "eyeball/eye_all.png";
     ////////////////
     // eyeball_origin_l
     QMatrix matrix_eyeball_l;
-    matrix_eyeball_l.rotate(-param_calibration_l_angle - param_calibration_eyeball_angle);
+    matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
     eyeball.eyeball_origin_l = QPixmap(str_eyeball_origin, nullptr, imageFlag);
     eyeball.eyeball_origin_l = eyeball.eyeball_origin_l.scaled(this->eyeball_size_x, this->eyeball_size_y, Qt::IgnoreAspectRatio);
     eyeball.eyeball_origin_l = eyeball.eyeball_origin_l.transformed(matrix_eyeball_l);
     // eyeball_origin
     QMatrix matrix_eyeball_r;
-    matrix_eyeball_r.rotate(-param_calibration_r_angle + param_calibration_eyeball_angle);
+    matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
     eyeball.eyeball_origin_r = QPixmap(str_eyeball_origin, nullptr, imageFlag);
     eyeball.eyeball_origin_r = eyeball.eyeball_origin_r.scaled(this->eyeball_size_x, this->eyeball_size_y, Qt::IgnoreAspectRatio);
     eyeball.eyeball_origin_r = eyeball.eyeball_origin_r.transformed(matrix_eyeball_r);
     ////////////////
-    StVector eyeball_center_left
-            = StVector(this->eyelid.left.pos_center.x + param_calibration_eyeball_position_l_x, this->eyelid.left.pos_center.y + param_calibration_eyeball_position_l_y);
-    StVector eyeball_center_right
-            = StVector(this->eyelid.right.pos_center.x + param_calibration_eyeball_position_r_x, this->eyelid.right.pos_center.y + param_calibration_eyeball_position_r_y);
+    StVector eyeball_center_left  = StVector(this->eyelid.left.pos_center.x + param.eyeball_position_l_x, //
+                                            this->eyelid.left.pos_center.y + param.eyeball_position_l_y);
+    StVector eyeball_center_right = StVector(this->eyelid.right.pos_center.x + param.eyeball_position_r_x, //
+                                             this->eyelid.right.pos_center.y + param.eyeball_position_r_y);
     //////////////////////////////
     //////////////////////////////
     eyeball.right.setting(this->eyeball_size_x, this->eyeball_size_y, eyeball_center_right);
@@ -171,50 +107,26 @@ void EyeWidget::loadEyeball(QString skin_name,
     printf("=============================================\n");
     printf("------------ Calibration Postion ------------\n");
     printf(" Size (x,y) = (%d,%d)\n", this->calibration_eyelid_size_x, this->calibration_eyelid_size_y);
-    printf(" Pos r(x,y) = (%f,%f)\n", param_calibration_eyeball_position_l_x, param_calibration_eyeball_position_l_y);
-    printf(" Pos l(x,y) = (%f,%f)\n", param_calibration_eyeball_position_r_x, param_calibration_eyeball_position_r_y);
+    printf(" Pos r(x,y) = (%f,%f)\n", param.eyeball_position_l_x, param.eyeball_position_l_y);
+    printf(" Pos l(x,y) = (%f,%f)\n", param.eyeball_position_r_x, param.eyeball_position_r_y);
     printf("---------------------------------------------\n");
 #endif
     /* ============================================= */
 }
 
-/**
- * @brief 初期化関数。起動時に使用する画像を読み込む
- *
- * @param param_calibration_l_x
- * @param param_calibration_l_y
- * @param param_calibration_r_x
- * @param param_calibration_r_y
- * @param param_eyeball_position_x
- * @param param_eyeball_position_y
- */
-void EyeWidget::Initialize(QString skin_name,
-                           double param_calibration_l_x,
-                           double param_calibration_l_y,
-                           double param_calibration_l_angle,
-                           double param_calibration_r_x,
-                           double param_calibration_r_y,
-                           double param_calibration_r_angle,
-                           int param_calibration_eyelid_size_x,
-                           int param_calibration_eyelid_size_y,
-                           double param_calibration_eyeball_position_l_x,
-                           double param_calibration_eyeball_position_l_y,
-                           double param_calibration_eyeball_position_r_x,
-                           double param_calibration_eyeball_position_r_y,
-                           double param_calibration_eyeball_angle,
-                           float param_calibration_eye_blink_time_quickly,
-                           float param_calibration_eye_blink_time_min,
-                           float param_calibration_eye_blink_time_max,
-                           float param_calibration_eye_blink_time_limit,
-                           float param_calibration_eye_blink_time_offset)
+void EyeWidget::set_param(StParameter param)
+{
+}
+
+void EyeWidget::initialize(StParameter param)
 {
     /* --------------------------------------------------- */
     // register[START]
     printf("==== register[START] ====\n");
     /* --------------------------------------------------- */
-    this->calibration_eyelid_size_x = param_calibration_eyelid_size_x;
-    this->calibration_eyelid_size_y = param_calibration_eyelid_size_y;
-    this->eyeball.Initialize(param_calibration_l_angle - param_calibration_eyeball_angle, param_calibration_r_angle + param_calibration_eyeball_angle);
+    this->calibration_eyelid_size_x = param.eyelid_size_x;
+    this->calibration_eyelid_size_y = param.eyelid_size_y;
+    this->eyeball.Initialize(param.l_angle - param.eyeball_angle, param.r_angle + param.eyeball_angle);
     /* ============================================= */
     // set timer
     printf("    register - Timer\n");
@@ -227,25 +139,8 @@ void EyeWidget::Initialize(QString skin_name,
     // Initial position
     printf("    register - Initial position\n");
     /* ============================================= */
-    this->Setup(param_calibration_eye_blink_time_offset);
-    this->loadSkin(skin_name,
-                   param_calibration_l_x,
-                   param_calibration_l_y,
-                   param_calibration_l_angle,
-                   param_calibration_r_x,
-                   param_calibration_r_y,
-                   param_calibration_r_angle,
-                   param_calibration_eyelid_size_x,
-                   param_calibration_eyelid_size_y,
-                   param_calibration_eyeball_position_l_x,
-                   param_calibration_eyeball_position_l_y,
-                   param_calibration_eyeball_position_r_x,
-                   param_calibration_eyeball_position_r_y,
-                   param_calibration_eyeball_angle,
-                   param_calibration_eye_blink_time_quickly,
-                   param_calibration_eye_blink_time_min,
-                   param_calibration_eye_blink_time_max,
-                   param_calibration_eye_blink_time_limit);
+    this->Setup(param.eye_blink_time_offset);
+    this->loadSkin(param);
     //////////////
     // smile anime pre load///////////////////////////////////////////////
     printf("    register - Buffering image for other\n");

@@ -34,8 +34,9 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void open(int argc, char **argv);
-    void closing();
+    bool open(int argc, char **argv);
+    bool exec();
+    bool closing();
 
     bool calculate();
     void set_msg_eye(int emotions,

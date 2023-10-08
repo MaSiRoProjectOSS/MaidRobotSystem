@@ -11,6 +11,9 @@
 
 #include "models/model_implement.hpp"
 
+#include <exception>
+#include <stdexcept>
+
 using std::placeholders::_1;
 
 namespace maid_robot_system
@@ -105,6 +108,7 @@ void NodeImplement::_callback_param_init()
 
 void NodeImplement::_callback_timer()
 {
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "calculate");
     (void)g_model->calculate();
 }
 
@@ -121,22 +125,26 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
     g_model = new ModelImplement();
-    g_model->open(argc, argv);
+    if (true == g_model->open(argc, argv)) {
+        // set parameter
+        this->_callback_param_init();
 
-    // set parameter
-    this->_callback_param_init();
+        // set subscription
+        this->_sub_mrs_eye =                                                          //
+                this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
+                        this->MRS_TOPIC_INPUT,                                        //
+                        this->CONFIG_SUBSCRIPTION_SIZE,                               //
+                        std::bind(&NodeImplement::_callback_msg_mrs_eye, this, _1));
 
-    // set subscription
-    this->_sub_mrs_eye =                                                          //
-            this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
-                    this->MRS_TOPIC_INPUT,                                        //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                               //
-                    std::bind(&NodeImplement::_callback_msg_mrs_eye, this, _1));
-
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 #if DEBUG_OUTPUT_FPS
-    this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&NodeImplement::_callback_output_state, this));
+        this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&NodeImplement::_callback_output_state, this));
 #endif
+        g_model->exec();
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open.");
+        throw new std::runtime_error("Failed to open.");
+    }
 }
 
 NodeImplement::~NodeImplement()
