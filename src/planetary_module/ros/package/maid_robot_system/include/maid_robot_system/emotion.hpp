@@ -1,13 +1,13 @@
 /**
- * @file masiro_emotion.h
+ * @file emotion.hpp
  * @brief
  * @date 2021-11-08
  *
  * @copyright Copyright (c) MaSiRo Project. 2021-.
  *
  */
-#ifndef MASIRO_INTERFACES_MASIRO_EMOTION_H
-#define MASIRO_INTERFACES_MASIRO_EMOTION_H
+#ifndef MAID_ROBOT_SYSTEM_EMOTION_HPP
+#define MAID_ROBOT_SYSTEM_EMOTION_HPP
 
 namespace maid_robot_system
 {

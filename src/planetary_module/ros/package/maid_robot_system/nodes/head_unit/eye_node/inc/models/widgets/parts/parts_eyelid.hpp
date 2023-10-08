@@ -8,20 +8,18 @@
  */
 #ifndef MRS_EYE_NODE_MODELS_PARTS_EYELID_HPP
 #define MRS_EYE_NODE_MODELS_PARTS_EYELID_HPP
-/* ============================================= */
-#include "emotion.hpp"
+
 #include "maid_robot_system/common_structure.hpp"
+#include "maid_robot_system/emotion.hpp"
 #include "math.h"
 #include "models/calibration.hpp"
 #include "models/data_structure.hpp"
 
-/* ============================================= */
 #include <QPixmap>
 #include <sstream>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
-/* ============================================= */
 
 namespace maid_robot_system
 {

@@ -8,6 +8,9 @@
  *
  */
 #include "ros/node_implement.hpp"
+
+#include "models/model_implement.hpp"
+
 using std::placeholders::_1;
 
 namespace maid_robot_system
@@ -16,6 +19,9 @@ ModelImplement *g_model;
 
 void NodeImplement::_callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg)
 {
+#if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
+#endif
     (void)g_model->set_msg_eye(msg.emotions,
                                msg.pupil_effect,
 
@@ -42,23 +48,30 @@ void NodeImplement::_callback_param_init()
     g_model->set_color_r(this->get_parameter(this->MRS_PARAMETER_COLOR_R).as_int());
     g_model->set_color_g(this->get_parameter(this->MRS_PARAMETER_COLOR_G).as_int());
     g_model->set_color_b(this->get_parameter(this->MRS_PARAMETER_COLOR_B).as_int());
-    g_model->set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
-
+    bool flag_load_file = g_model->set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
+    if (false == flag_load_file) {
+        RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
+    }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // make parameter callback
     this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
         auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
-        RCLCPP_DEBUG(this->get_logger(), "callback param");
 
         results->successful = false;
         results->reason     = "";
 
         for (auto &&param : params) {
+#if LOGGER_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name());
+#endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_STRING:
                     if (param.get_name() == this->MRS_PARAMETER_SETTING_FILE) {
                         results->successful = g_model->set_setting_file(param.as_string());
+                        if (false == results->successful) {
+                            RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", param.as_string().c_str());
+                        }
                     }
                     break;
                 case rclcpp::PARAMETER_INTEGER:
@@ -98,13 +111,17 @@ void NodeImplement::_callback_timer()
 #if DEBUG_OUTPUT_FPS
 void NodeImplement::_callback_output_state()
 {
-    RCLCPP_INFO(this->get_logger(), "\n%s", g_model->get_lap_time().c_str());
+    RCLCPP_INFO(this->get_logger(), "%s", g_model->get_lap_time().c_str());
 }
 #endif
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#endif
+    g_model = new ModelImplement();
+    g_model->open(argc, argv);
 
     // set parameter
     this->_callback_param_init();
@@ -120,14 +137,13 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 #if DEBUG_OUTPUT_FPS
     this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&NodeImplement::_callback_output_state, this));
 #endif
-
-    g_model = new ModelImplement();
-    g_model->open(argc, argv);
 }
 
 NodeImplement::~NodeImplement()
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#endif
 }
 
 } // namespace maid_robot_system

@@ -17,19 +17,19 @@ namespace maid_robot_system
 // =============================
 void NodeImplement::_callback_pose_left(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_LEFT);
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_LEFT);
     this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_LEFT, msg, this->get_clock()->now().seconds());
 }
 void NodeImplement::_callback_pose_right(const maid_robot_system_interfaces::msg::PoseDetection &msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_RIGHT);
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s](%d)", this->get_name(), (int)ModelStructure::INPUT_TYPE::POSE_RIGHT);
     this->_model.set_value_pose(ModelStructure::INPUT_TYPE::POSE_RIGHT, msg, this->get_clock()->now().seconds());
 }
 void NodeImplement::_callback_ar_left(const maid_robot_system_interfaces::msg::ArMarkers &msg)
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
-            RCLCPP_DEBUG(this->get_logger(), "[%s] : %ld", this->get_name(), msg.ids[i]);
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s] : %ld", this->get_name(), msg.ids[i]);
             this->_model.set_value_ar(ModelStructure::INPUT_TYPE::AR_LEFT, msg.ids[i], this->get_clock()->now().seconds());
         }
     }
@@ -38,19 +38,19 @@ void NodeImplement::_callback_ar_right(const maid_robot_system_interfaces::msg::
 {
     for (long unsigned int i = 0; i < msg.ids.size(); i++) {
         if (0 != msg.ids[i]) {
-            RCLCPP_DEBUG(this->get_logger(), "[%s] : %ld", this->get_name(), msg.ids[i]);
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s] : %ld", this->get_name(), msg.ids[i]);
             this->_model.set_value_ar(ModelStructure::INPUT_TYPE::AR_RIGHT, msg.ids[i], this->get_clock()->now().seconds());
         }
     }
 }
 void NodeImplement::_callback_voice(const maid_robot_system_interfaces::msg::MrsVoice &msg)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %d", this->get_name(), msg.command);
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s] : %d", this->get_name(), msg.command);
     this->_model.set_value_voice(msg.text, msg.command, this->get_clock()->now().seconds());
 }
 void NodeImplement::_callback_voltage(const std_msgs::msg::Float64 &msg)
 {
-    RCLCPP_INFO(this->get_logger(), "[%s] : %f", this->get_name(), msg.data);
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "[%s] : %f", this->get_name(), msg.data);
     this->_model.set_value_tiredness(msg.data, this->get_clock()->now().seconds());
 }
 
@@ -113,13 +113,14 @@ void NodeImplement::_callback_param_init()
 
     // make parameter callback
     this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
-        auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
-        RCLCPP_DEBUG(this->get_logger(), "callback param");
-
+        auto results        = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
         results->successful = false;
         results->reason     = "";
 
         for (auto &&param : params) {
+#if LOGGER_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name());
+#endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:
                     // left
@@ -228,7 +229,9 @@ void NodeImplement::_callback_timer()
 // =============================
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#endif
 
     // set parameter
     this->_callback_param_init();
@@ -287,7 +290,9 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 
 NodeImplement::~NodeImplement()
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#endif
 }
 
 } // namespace maid_robot_system

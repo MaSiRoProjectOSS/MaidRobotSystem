@@ -1,6 +1,6 @@
 {
     "path": "/opt/MaidRobotSystem/data/cast/Botan",
-    "skin_name": "Botan",
+    "name": "Botan",
     "position": {
         "left": {
             "width": 1520,

@@ -15,6 +15,16 @@
 
 #include <std_msgs/msg/string.hpp>
 
+#ifndef LOGGER_INFO_CALL_FUNCTION
+#define LOGGER_INFO_CALL_FUNCTION 0
+#endif
+#ifndef LOGGER_INFO_PARAMETER
+#define LOGGER_INFO_PARAMETER 0
+#endif
+#ifndef LOGGER_INFO_TIMER
+#define LOGGER_INFO_TIMER 0
+#endif
+
 namespace maid_robot_system
 {
 class NodeImplement : public rclcpp::Node {

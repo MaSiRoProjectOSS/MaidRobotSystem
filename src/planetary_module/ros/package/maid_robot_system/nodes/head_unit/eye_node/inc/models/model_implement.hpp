@@ -10,31 +10,15 @@
 #ifndef MRS_EYE_NODE_MODEL_IMPLEMENT_HPP
 #define MRS_EYE_NODE_MODEL_IMPLEMENT_HPP
 
-#include "logger/log_store.hpp"
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
-#include "math.h"
 #include "models/calibration.hpp"
 #include "models/data_structure.hpp"
 
 #include <QApplication>
-#include <QGLWidget>
-#include <QImage>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPixmap>
-#include <QTime>
-#include <QTimer>
-#include <QWidget>
-#include <functional>
-#include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
-#include <mutex>
-#include <sstream>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
 
 using namespace std;
-using namespace maid_robot_system;
 
 namespace maid_robot_system
 {
@@ -45,14 +29,6 @@ public:
     // =============================
     ModelImplement();
     ~ModelImplement();
-
-protected:
-    // =============================
-    // PUBLIC : OpenGL fuction
-    // =============================
-    bool event(QEvent *e);
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
 
 public:
     // =============================
@@ -74,6 +50,15 @@ public:
                      float right_y);
 
     // =============================
+    // PUBLIC : Setter
+    // =============================
+    bool set_setting_file(std::string value);
+    bool set_brightness(int value);
+    bool set_color_r(int value);
+    bool set_color_g(int value);
+    bool set_color_b(int value);
+
+    // =============================
     // PUBLIC : Getter
     // =============================
     std::string get_setting_file();
@@ -82,15 +67,6 @@ public:
     int get_color_g();
     int get_color_b();
     std::string get_lap_time();
-
-    // =============================
-    // PUBLIC : Setter
-    // =============================
-    bool set_setting_file(std::string value);
-    bool set_brightness(int value);
-    bool set_color_r(int value);
-    bool set_color_g(int value);
-    bool set_color_b(int value);
 
 private:
     // =============================

@@ -9,7 +9,7 @@
 #ifndef MRS_EYE_NODE_MODELS_CALIBRATION_HPP
 #define MRS_EYE_NODE_MODELS_CALIBRATION_HPP
 
-#include "../emotion.hpp"
+#include "maid_robot_system/emotion.hpp"
 
 /* ============================================= */
 #define MASIRO_HITOMI_DISPLAY_FPS 60

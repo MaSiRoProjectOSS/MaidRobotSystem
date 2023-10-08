@@ -10,13 +10,11 @@
 #ifndef MRS_EYE_NODE_IMPLEMENT_HPP
 #define MRS_EYE_NODE_IMPLEMENT_HPP
 
-#include "models/model_implement.hpp"
+#include "eye_node_settings.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
-#include <std_msgs/msg/float64.hpp>
 
-#define DEBUG_OUTPUT_FPS 1
 namespace maid_robot_system
 {
 class NodeImplement : public rclcpp::Node {

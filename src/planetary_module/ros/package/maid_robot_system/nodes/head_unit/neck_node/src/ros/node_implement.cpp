@@ -15,7 +15,7 @@ namespace maid_robot_system
 void NodeImplement::_callback_data(const maid_robot_system_interfaces::msg::MrsNeck &msg)
 {
     if (true == this->_model.calculate(msg.x, msg.y, msg.z, msg.w)) {
-        RCLCPP_INFO(this->get_logger(), "callback_message() : %f, %f, %f, %f", msg.x, msg.y, msg.z, msg.w);
+        RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "callback_message() : %f, %f, %f, %f", msg.x, msg.y, msg.z, msg.w);
     }
 }
 
@@ -26,13 +26,14 @@ void NodeImplement::_callback_param_init()
 
     // make parameter callback
     this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
-        auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
-        RCLCPP_DEBUG(this->get_logger(), "callback param");
-
+        auto results        = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
         results->successful = false;
         results->reason     = "";
 
         for (auto &&param : params) {
+#if LOGGER_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name());
+#endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:
                     // if (param.get_name() == this->MRS_PARAMETER_SAMPLE_OFFSET) {
@@ -68,7 +69,9 @@ void NodeImplement::_callback_timer()
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#endif
 
     // set parameter
     this->_callback_param_init();
@@ -85,7 +88,9 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 
 NodeImplement::~NodeImplement()
 {
-    RCLCPP_DEBUG(this->get_logger(), "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#endif
 }
 
 } // namespace maid_robot_system

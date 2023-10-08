@@ -8,7 +8,7 @@
  */
 #ifndef MRS_EYE_NODE_MODELS_PARTS_EYEBALL_HPP
 #define MRS_EYE_NODE_MODELS_PARTS_EYEBALL_HPP
-/* ============================================= */
+
 #include "maid_robot_system/common_structure.hpp"
 #include "math.h"
 #include "models/calibration.hpp"

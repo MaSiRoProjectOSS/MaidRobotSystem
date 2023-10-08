@@ -53,10 +53,8 @@ add_executable(${NODE_NAME}
   src/models/widgets/parts/parts_eyeball.cpp
   src/models/widgets/parts/parts_eyelid.cpp
 
+  src/models/model_public_setter_getter.cpp
   src/models/model_public.cpp
-  src/models/model_common_function.cpp
-  src/models/model_drawing.cpp
-  src/models/model_gl.cpp
   src/models/model_param.cpp
 
   src/models/widgets/eye_widget_common.cpp
@@ -64,7 +62,7 @@ add_executable(${NODE_NAME}
   src/models/widgets/eye_widget_log.cpp
   src/models/widgets/eye_widget_paint.cpp
   src/models/widgets/eye_widget_public.cpp
-  src/models/widgets/eye_widget.cpp
+  src/models/widgets/eye_widget_loader.cpp
 
 
 )

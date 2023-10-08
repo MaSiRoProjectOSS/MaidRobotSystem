@@ -1,6 +1,6 @@
 {
-    "path": "/opt/MaidRobotSystem/data/cast/Iris",
-    "skin_name": "Iris",
+    "path": "/opt/MaidRobotSystem/data/cast/Ayame",
+    "name": "Ayame",
     "position": {
         "left": {
             "width": 1520,
