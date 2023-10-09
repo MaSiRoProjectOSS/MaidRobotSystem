@@ -9,6 +9,7 @@
 #ifndef MRS_EYE_NODE_MODELS_EYE_WIDGET_HPP
 #define MRS_EYE_NODE_MODELS_EYE_WIDGET_HPP
 
+#include "eye_node_settings.hpp"
 #include "logger/log_store.hpp"
 #include "maid_robot_system/common_structure.hpp"
 #include "math.h"
@@ -30,7 +31,6 @@
 #include <QVector>
 #include <QWidget>
 #include <functional>
-#include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
 #include <mutex>
 #include <nlohmann/json.hpp>
 #include <sstream>
@@ -43,9 +43,7 @@ using namespace std;
 namespace maid_robot_system
 {
 class EyeWidget : public QOpenGLWidget, protected QOpenGLFunctions {
-public:
-    EyeWidget(QWidget *parent = nullptr);
-    ~EyeWidget();
+private:
     /* ============================================= */
     GLuint m_program;
 
@@ -65,27 +63,44 @@ public:
                               "color = vec4(1.0,1.0,1.0,1.0);\n"
                               "}\n";
     /* ============================================= */
+public:
+    EyeWidget(QWidget *parent = nullptr);
+    ~EyeWidget();
 
+    // =============================
+    // QT fuction
+    // =============================
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-
+    //
     void initialize(StParameter param);
     void set_param(StParameter param);
     void Setup(float param_calibration_eye_blink_time_offset);
     void Closing();
     void UpdateScreen();
-
     /* ============================================= */
     void CMD_voiceId();
-    void CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye msg);
+    void CMD_eye_input(int emotions,
+                       int pupil_effect,
+                       float size,
+                       float distance,
+
+                       float left_x,
+                       float left_y,
+
+                       float right_x,
+                       float right_y);
 
     /* ============================================= */
 protected:
+    // =============================
+    // QT fuction
+    // =============================
     void paintEvent(QPaintEvent *event) override;
-    bool eventFilter(QObject *obj, QEvent *event);
     bool event(QEvent *e) override;
     void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event);
     /* ============================================= */
 private:
     /* ============================================= */

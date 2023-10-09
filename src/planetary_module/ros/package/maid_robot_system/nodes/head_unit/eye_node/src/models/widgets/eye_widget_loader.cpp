@@ -55,7 +55,7 @@ void EyeWidget::loadEyelid(StParameter param)
                          param.eyelid_size_y,
                          calibration_right,
                          calibration_left);
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
     printf(" Right (x,y) = (%f,%f)\n", this->eyelid.right.pos.x, this->eyelid.right.pos.y);
     printf(" Left (x,y) = (%f,%f)\n", this->eyelid.left.pos.x, this->eyelid.left.pos.y);
@@ -100,7 +100,7 @@ void EyeWidget::loadEyeball(StParameter param)
     //////////////////////////////
     eyeball.right.setting(this->eyeball_size_x, this->eyeball_size_y, eyeball_center_right);
     eyeball.left.setting(this->eyeball_size_x, this->eyeball_size_y, eyeball_center_left);
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
     printf("============== Eyeball center ===============\n");
     printf(" Right (x,y) = (%f,%f)\n", eyeball_center_right.x, eyeball_center_right.y);
     printf(" Left (x,y) = (%f,%f)\n", eyeball_center_left.x, eyeball_center_left.y);

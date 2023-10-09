@@ -108,11 +108,11 @@ void NodeImplement::_callback_param_init()
 
 void NodeImplement::_callback_timer()
 {
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "calculate");
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
     (void)g_model->calculate();
 }
 
-#if DEBUG_OUTPUT_FPS
+#if DEBUG_OUTPUT_REPORT > 0
 void NodeImplement::_callback_output_state()
 {
     RCLCPP_INFO(this->get_logger(), "%s", g_model->get_lap_time().c_str());
@@ -137,7 +137,7 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                         std::bind(&NodeImplement::_callback_msg_mrs_eye, this, _1));
 
         this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
-#if DEBUG_OUTPUT_FPS
+#if DEBUG_OUTPUT_REPORT > 0
         this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&NodeImplement::_callback_output_state, this));
 #endif
         g_model->exec();
@@ -152,6 +152,7 @@ NodeImplement::~NodeImplement()
 #if LOGGER_INFO_CALL_FUNCTION
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
+    g_model->closing();
 }
 
 } // namespace maid_robot_system

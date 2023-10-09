@@ -76,9 +76,7 @@ void EyeWidget::make_image()
 {
     //********************************************************************************//
     int current = current_time.elapsed();
-#if DEBUG_PRINT
-    int buf = current;
-#endif
+    int buf     = current;
     //********************************************************************************//
     /* ============================================= */
     // Pre-calculation
@@ -87,23 +85,15 @@ void EyeWidget::make_image()
     this->eyeball.calc_draw_pixel(current, this->eyelid.send_animation);
     //********************************************************************************//
 #if DRAW_PUPIL_OUTSIDE
-#if DEBUG_PRINT
     buf = current_time.elapsed();
-#endif
     this->eyeball.draw_outside();
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_MAKE_PUPIL_OUTSIDE, current_time.elapsed() - buf);
-#endif
 #endif
     //********************************************************************************//
 #if DRAW_PUPIL_INSIDE
-#if DEBUG_PRINT
     buf = current_time.elapsed();
-#endif
     this->eyeball.draw_inside();
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_MAKE_PUPIL_INSIDE, current_time.elapsed() - buf);
-#endif
 #endif
 }
 
@@ -116,9 +106,7 @@ void EyeWidget::paintEvent(QPaintEvent *event)
 {
     //********************************************************************************//
     int current = current_time.elapsed();
-#if DEBUG_PRINT
-    int buf = current;
-#endif
+    int buf     = current;
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
     //********************************************************************************//
     /* ============================================= */
@@ -136,9 +124,7 @@ void EyeWidget::paintEvent(QPaintEvent *event)
     painter.scale(1920 / WINDOW_SIZE_X, 1920 / WINDOW_SIZE_X);
 #endif
     //********************************************************************************//
-#if DEBUG_PRINT
     buf = current_time.elapsed();
-#endif
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
     //********************************************************************************//
     //eye draw
@@ -153,10 +139,8 @@ void EyeWidget::paintEvent(QPaintEvent *event)
                        this->eyeball.left.draw_postion.height,
                        this->eyeball.eyeball_origin_l);
     //********************************************************************************//
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_DRAW_EYEBALL, current_time.elapsed() - buf);
     buf = current_time.elapsed();
-#endif
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 #if DRAW_PUPIL_OUTSIDE
     //********************************************************************************//
@@ -164,10 +148,8 @@ void EyeWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(this->eyeball.right.draw_pupil_anime.x, this->eyeball.right.draw_pupil_anime.y, this->eyeball.pupil_outside);
     painter.drawPixmap(this->eyeball.left.draw_pupil_anime.x, this->eyeball.left.draw_pupil_anime.y, this->eyeball.pupil_outside);
     //********************************************************************************//
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_DRAW_PUPIL_OUTSIDE, current_time.elapsed() - buf);
     buf = current_time.elapsed();
-#endif
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 #endif
 #if DRAW_PUPIL_INSIDE
@@ -176,17 +158,15 @@ void EyeWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(this->eyeball.right.draw_pupil_anime2.x, this->eyeball.right.draw_pupil_anime2.y, this->eyeball.pupil_inside);
     painter.drawPixmap(this->eyeball.left.draw_pupil_anime2.x, this->eyeball.left.draw_pupil_anime2.y, this->eyeball.pupil_inside);
     //********************************************************************************//
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_DRAW_PUPIL_INSIDE, current_time.elapsed() - buf);
     buf = current_time.elapsed();
-#endif
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
 #endif
     //********************************************************************************//
     // eyelid
     painter.drawPixmap(this->eyelid.right.pos.x, this->eyelid.right.pos.y, this->eyelid.get_eye_id(TARGET_EYE_RIGHT));
     painter.drawPixmap(this->eyelid.left.pos.x, this->eyelid.left.pos.y, this->eyelid.get_eye_id(TARGET_EYE_LEFT));
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
     static int buf_a   = -1;
     static int buf_cnt = 0;
 
@@ -202,9 +182,7 @@ void EyeWidget::paintEvent(QPaintEvent *event)
 
 #endif
     //********************************************************************************//
-#if DEBUG_PRINT
     logger.set_index(logger.ST_INDEX_DRAW_EYELID, current_time.elapsed() - buf);
-#endif
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
     //********************************************************************************//
     //painter.endNativePainting();

@@ -25,11 +25,6 @@ public:
 
 private:
     // =============================
-    // Variable
-    // =============================
-
-private:
-    // =============================
     // ROS : subscription
     // =============================
     void _callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg);
@@ -48,8 +43,7 @@ private:
     // =============================
     void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
-
-#if DEBUG_OUTPUT_FPS
+#if DEBUG_OUTPUT_REPORT > 0
     void _callback_output_state();
     rclcpp::TimerBase::SharedPtr _ros_output_state;
 #endif
@@ -61,16 +55,15 @@ private:
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 10 };
-#if DEBUG_OUTPUT_FPS
-    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ 5000 };
+#if DEBUG_OUTPUT_REPORT > 0
+    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ DEBUG_OUTPUT_REPORT };
 #endif
     // =============================
-    // ROS Topic / Service / Action
+    // CONST: ROS Topic / Service / Action
     // =============================
     const std::string MRS_TOPIC_INPUT = "in";
-
     // =============================
-    // ROS PARAMETER
+    // CONST: ROS PARAMETER
     // =============================
     const std::string MRS_PARAMETER_SETTING_FILE = "setting_file";
     const std::string MRS_PARAMETER_BRIGHTNESS   = "brightness";

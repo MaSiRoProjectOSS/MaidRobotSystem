@@ -62,12 +62,12 @@ public:
     // =============================
     // PUBLIC : Getter
     // =============================
+    std::string get_lap_time();
     std::string get_setting_file();
     int get_brightness();
     int get_color_r();
     int get_color_g();
     int get_color_b();
-    std::string get_lap_time();
 
 private:
     // =============================
@@ -75,9 +75,6 @@ private:
     // =============================
     bool _set_param(std::string json_file);
     std::string _read_file(const std::string &path);
-    // =============================
-    // PRIVATE : Function
-    // =============================
 
 private:
     // =============================

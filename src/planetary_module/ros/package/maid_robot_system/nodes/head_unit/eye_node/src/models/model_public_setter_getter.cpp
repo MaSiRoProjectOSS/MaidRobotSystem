@@ -28,11 +28,6 @@ void ModelImplement::set_msg_eye(int emotions, //
 {
 }
 
-std::string ModelImplement::get_lap_time()
-{
-    return "";
-}
-
 int ModelImplement::get_brightness()
 {
     return this->_param.brightness;

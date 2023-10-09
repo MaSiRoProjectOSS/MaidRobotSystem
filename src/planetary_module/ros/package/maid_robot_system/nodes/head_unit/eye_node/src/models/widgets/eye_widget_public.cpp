@@ -26,7 +26,16 @@ void EyeWidget::CMD_voiceId()
  * @brief
  * @param get_eye_cmd_angle
 */
-void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye msg)
+void EyeWidget::CMD_eye_input(int emotions,
+                              int pupil_effect,
+                              float size,
+                              float distance,
+
+                              float left_x,
+                              float left_y,
+
+                              float right_x,
+                              float right_y)
 {
     if (false == flag_first_request) {
         flag_first_request = true;
@@ -34,16 +43,16 @@ void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye ms
     const int limit_y = 190;
     // printf("eye_cmd_input");
     /* 感情の設定*/
-    this->eyelid.set_emotion((MIENS)((int)msg.emotions));
+    this->eyelid.set_emotion((MIENS)(emotions));
     /* 瞳の大きさ */
-    this->eyeball.set_dimensions(msg.size);
+    this->eyeball.set_dimensions(size);
     /* ============================================= */
-    float get_target_y = ((msg.left_y / 200.0) * this->calibration_eyelid_size_x);
-    float get_target_x = ((-msg.left_x / 230.0) * this->calibration_eyelid_size_x);
+    float get_target_y = ((left_y / 200.0) * this->calibration_eyelid_size_x);
+    float get_target_x = ((-left_x / 230.0) * this->calibration_eyelid_size_x);
     /* ============================================= */
     const int min_per_eye_distance = 8;
     /* 近くなるほど寄り目になる */
-    float distance_change = min_per_eye_distance - ((msg.distance / 1500) * min_per_eye_distance);
+    float distance_change = min_per_eye_distance - ((distance / 1500) * min_per_eye_distance);
 
     if (distance_change < 0) {
         distance_change = 0;
@@ -63,7 +72,7 @@ void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye ms
     }
 
     /* ============================================= */
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
     printf("eyeball POS: %5.3f, %5.3f / %5.3f", get_target_x, get_target_y, distance_change);
 #endif
 
@@ -73,7 +82,7 @@ void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye ms
             case control_state::STATE_NOT_ACCEPTED:
                 if (this->thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->thinking_flag_notAccepted = control_state::STATE_FREE;
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : FREE\n");
 #endif
                 }
@@ -86,7 +95,7 @@ void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye ms
                     this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
                     this->thinking_next_time_notAccepted
                             = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : NOT ACCEPTED\n");
 #endif
                     break;
@@ -100,7 +109,7 @@ void EyeWidget::CMD_eye_input(const maid_robot_system_interfaces::msg::MrsEye ms
                     if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
                         this->thinking_next_time_notAccepted
                                 = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
-#if DEBUG_PRINT
+#if DEBUG_OUTPUT_WIDGET
                         printf("Thinking blink : ACCEPTED\n");
 #endif
                     }

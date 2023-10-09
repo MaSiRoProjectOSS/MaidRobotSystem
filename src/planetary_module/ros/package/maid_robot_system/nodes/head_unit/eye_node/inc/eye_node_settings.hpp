@@ -12,11 +12,15 @@
 
 namespace maid_robot_system
 {
-#define DEBUG_OUTPUT_FPS 0
+#define DEBUG_OUTPUT_REPORT (1000 * 10)
 
-#define LOGGER_INFO_CALL_FUNCTION        1
+#define DEBUG_OUTPUT_OPEN_GL 1
+#define DEBUG_OUTPUT_WIDGET  1
+
+#define LOGGER_INFO_DETAIL               0
 #define LOGGER_INFO_PARAMETER            0
 #define LOGGER_INFO_SUBSCRIPTION_MRS_EYE 0
+#define LOGGER_INFO_CALL_FUNCTION        0
 
 } // namespace maid_robot_system
 

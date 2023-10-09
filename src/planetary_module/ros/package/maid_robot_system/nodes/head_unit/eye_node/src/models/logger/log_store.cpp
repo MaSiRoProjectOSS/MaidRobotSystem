@@ -50,7 +50,7 @@ void LogStore::print(int eye_emotion, double total_spent_msec, double current_ti
             p_spent_time_list[i] = spent_time_list[i] / p_count;
         }
 
-        clear();
+        this->clear();
 #if DEBUG_PRINT
         //********************************************************************************//
         printf("======================\n"

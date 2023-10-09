@@ -12,6 +12,7 @@ namespace maid_robot_system
 {
 void EyeWidget::initializeGL()
 {
+    printf(" * initializeGL\n");
     //   QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     //  f->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -52,16 +53,52 @@ void EyeWidget::initializeGL()
 
 void EyeWidget::resizeGL(int w, int h)
 {
+    printf(" * resizeGL\n");
     //m_projection.setToIdentity();
     //m_projection.perspective(45.0f, w / float(h), 0.01f, 100.0f);
 }
 
 void EyeWidget::paintGL()
 {
+    printf(" * paintGL\n");
+
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(m_program);
     //glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, m_vertices.size() / 3); //ドローコール
+}
+
+bool EyeWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    printf(" * eventFilter\n");
+    bool flag_close = false;
+
+    switch (event->type()) {
+        case QEvent::MouseButtonDblClick:
+#if DEBUG_VIEW
+            flag_close = true;
+#endif
+            break;
+        case QEvent::KeyPress:
+        case QEvent::MouseButtonPress:
+        default:
+            break;
+    }
+
+    if (true == flag_close) {
+        Closing();
+    }
+
+    return false;
+}
+bool EyeWidget::event(QEvent *e)
+{
+    printf(" * event\n");
+    return true;
+}
+void EyeWidget::resizeEvent(QResizeEvent *event)
+{
+    printf(" * resizeEvent\n");
 }
 
 } // namespace maid_robot_system
