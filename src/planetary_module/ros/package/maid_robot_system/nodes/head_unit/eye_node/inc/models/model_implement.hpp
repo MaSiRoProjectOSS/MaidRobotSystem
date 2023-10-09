@@ -73,7 +73,8 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    bool _set_param(std::string json_file);
+    bool _set_param();
+    bool _parse_param(std::string json_file);
     std::string _read_file(const std::string &path);
 
 private:

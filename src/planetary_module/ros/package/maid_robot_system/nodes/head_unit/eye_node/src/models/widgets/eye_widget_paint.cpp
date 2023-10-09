@@ -14,7 +14,7 @@ namespace maid_robot_system
  * @brief
  *
  */
-void EyeWidget::UpdateScreen()
+void EyeWidget::update_screen()
 {
     static bool drawing = false; /* 読みだし元は一つだし、一定周期なのでmutex使うまでもなく*/
 

@@ -14,7 +14,7 @@ namespace maid_robot_system
  * @brief voiceIDの受信
  *
  */
-void EyeWidget::CMD_voiceId()
+void EyeWidget::cmd_voice_id()
 {
     this->eyeball.set_state_pupil(PartsEyeball::PupilState::Receiving);
 
@@ -26,7 +26,7 @@ void EyeWidget::CMD_voiceId()
  * @brief
  * @param get_eye_cmd_angle
 */
-void EyeWidget::CMD_eye_input(int emotions,
+void EyeWidget::cmd_eye_input(int emotions,
                               int pupil_effect,
                               float size,
                               float distance,

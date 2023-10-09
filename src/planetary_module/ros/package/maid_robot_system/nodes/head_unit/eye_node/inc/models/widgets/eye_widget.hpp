@@ -77,11 +77,11 @@ public:
     void initialize(StParameter param);
     void set_param(StParameter param);
     void Setup(float param_calibration_eye_blink_time_offset);
-    void Closing();
-    void UpdateScreen();
+    void closing();
+    void update_screen();
     /* ============================================= */
-    void CMD_voiceId();
-    void CMD_eye_input(int emotions,
+    void cmd_voice_id();
+    void cmd_eye_input(int emotions,
                        int pupil_effect,
                        float size,
                        float distance,
@@ -131,9 +131,9 @@ private:
     /* ============================================= */
     void make_image();
     void log();
-    void loadSkin(StParameter param);
-    void loadEyelid(StParameter param);
-    void loadEyeball(StParameter param);
+    void load_skin(StParameter param);
+    void load_eyelid(StParameter param);
+    void load_eyeball(StParameter param);
 
     /* ============================================= */
     PartsEyeball eyeball;

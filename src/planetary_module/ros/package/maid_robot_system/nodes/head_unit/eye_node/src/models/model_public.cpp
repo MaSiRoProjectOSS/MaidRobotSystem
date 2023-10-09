@@ -31,15 +31,25 @@ namespace maid_robot_system
 {
 EyeWidget *g_widget;
 
+bool ModelImplement::_set_param()
+{
+    return g_widget->set_param(this->_param);
+}
+
 std::string ModelImplement::get_lap_time()
 {
     return "";
 }
 
+void ModelImplement::set_msg_eye(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y)
+{
+    g_widget->cmd_eye_input(emotions, pupil_effect, size, distance, left_x, left_y, right_x, right_y);
+}
+
 bool ModelImplement::calculate()
 {
     bool result = true;
-    g_widget->UpdateScreen();
+    g_widget->update_screen();
     this->app->processEvents();
     return result;
 }
@@ -94,14 +104,14 @@ bool ModelImplement::open(int argc, char **argv)
 bool ModelImplement::exec()
 {
     g_widget->showFullScreen();
-    // return this->app->exec();
+    // this->app->exec();
     return true;
 }
 
 bool ModelImplement::closing()
 {
     bool result = true;
-    // g_widget   ->Closing();
+    g_widget->closing();
     this->app->closeAllWindows();
     return result;
 }

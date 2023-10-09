@@ -74,10 +74,14 @@ public:
 
     } blink_type;
     /* ============================================= */
+
+public:
     PartsEyelid();
-    void loadSkin(StParameter param);
+
+public:
+    void load_skin(StParameter param);
     void setup(float param_calibration_eye_blink_time_offset);
-    /* ============================================= */
+
     QPixmap get_eye_id(ENUM_TARGET_EYE target);
 
     double set_eye_blink_time(blink_type type);

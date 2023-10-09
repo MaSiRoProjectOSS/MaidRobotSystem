@@ -86,7 +86,7 @@ bool EyeWidget::eventFilter(QObject *obj, QEvent *event)
     }
 
     if (true == flag_close) {
-        Closing();
+        this->closing();
     }
 
     return false;

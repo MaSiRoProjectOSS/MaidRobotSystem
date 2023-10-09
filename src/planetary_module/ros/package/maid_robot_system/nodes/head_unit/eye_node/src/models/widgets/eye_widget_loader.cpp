@@ -28,14 +28,14 @@ EyeWidget::~EyeWidget()
  *
  * @param value
  */
-void EyeWidget::loadSkin(StParameter param)
+void EyeWidget::load_skin(StParameter param)
 {
     printf("  ---- LOAD [Skin] ----\n");
     printf("    register - ROS\n");
     printf("        SKIN NAME : %s\n", param.name.c_str());
-    this->eyeball.loadPupil(param.name, this->imageFlag);
-    this->loadEyelid(param);
-    this->loadEyeball(param);
+    this->eyeball.load_pupil(param.name, this->imageFlag);
+    this->load_eyelid(param);
+    this->load_eyeball(param);
 }
 
 /**
@@ -43,10 +43,10 @@ void EyeWidget::loadSkin(StParameter param)
  *
  * @param skin_name
  */
-void EyeWidget::loadEyelid(StParameter param)
+void EyeWidget::load_eyelid(StParameter param)
 {
     printf("  ---- LOAD [Eyelid] ----\n");
-    this->eyelid.loadSkin(param);
+    this->eyelid.load_skin(param);
     StVector calibration_right = StVector(param.r_x, param.r_y);
     StVector calibration_left  = StVector(param.l_x, param.l_y);
     this->eyelid.setting(this->window_size_x,
@@ -74,7 +74,7 @@ void EyeWidget::Setup(float param_calibration_eye_blink_time_offset)
  *
  * @param skin_name
  */
-void EyeWidget::loadEyeball(StParameter param)
+void EyeWidget::load_eyeball(StParameter param)
 {
     printf("  ---- LOAD [Eyeball] ----\n");
     const QString str_eyeball_origin = "eyeball/eye_all.png";
@@ -140,7 +140,7 @@ void EyeWidget::initialize(StParameter param)
     printf("    register - Initial position\n");
     /* ============================================= */
     this->Setup(param.eye_blink_time_offset);
-    this->loadSkin(param);
+    this->load_skin(param);
     //////////////
     // smile anime pre load///////////////////////////////////////////////
     printf("    register - Buffering image for other\n");
@@ -172,16 +172,9 @@ void EyeWidget::initialize(StParameter param)
     /* --------------------------------------------------- */
 }
 
-/**
- * @brief 終了処理
- *
- */
-void EyeWidget::Closing()
+void EyeWidget::closing()
 {
     printf("\n==============\n CLOSE APP.\n==============\n");
-
-    // close();
-    exit(0);
 }
 
 } // namespace maid_robot_system

@@ -30,7 +30,7 @@ std::string ModelImplement::_read_file(const std::string &path)
     return ss.str();
 }
 
-bool ModelImplement::_set_param(std::string json_file)
+bool ModelImplement::_parse_param(std::string json_file)
 {
     bool result = false;
     try {

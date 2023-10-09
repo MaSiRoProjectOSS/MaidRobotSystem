@@ -116,7 +116,7 @@ public:
     void set_dimensions(float value);
     /* ============================================= */
     void set_state_pupil(PupilState state);
-    void loadPupil(std::string skin_name, Qt::ImageConversionFlag imageFlag);
+    void load_pupil(std::string skin_name, Qt::ImageConversionFlag imageFlag);
 
     StEyeball left;
     StEyeball right;

@@ -53,7 +53,8 @@ add_executable(${NODE_NAME}
   src/models/widgets/parts/parts_eyeball.cpp
   src/models/widgets/parts/parts_eyelid.cpp
 
-  src/models/model_public_setter_getter.cpp
+  src/models/model_public_setter.cpp
+  src/models/model_public_getter.cpp
   src/models/model_public.cpp
   src/models/model_param.cpp
 
@@ -63,8 +64,6 @@ add_executable(${NODE_NAME}
   src/models/widgets/eye_widget_paint.cpp
   src/models/widgets/eye_widget_public.cpp
   src/models/widgets/eye_widget_loader.cpp
-
-
 )
 
 target_include_directories(${NODE_NAME}

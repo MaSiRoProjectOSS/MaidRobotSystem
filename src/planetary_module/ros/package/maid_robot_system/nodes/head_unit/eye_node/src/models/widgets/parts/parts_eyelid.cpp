@@ -354,7 +354,7 @@ void PartsEyelid::set_cycle(uint elapsed)
  *
  * @param skin_name
  */
-void PartsEyelid::loadSkin(StParameter param)
+void PartsEyelid::load_skin(StParameter param)
 {
     this->eye_blink_time_quickly      = param.eye_blink_time_quickly;
     this->eye_blink_time_min          = param.eye_blink_time_min;   // ms
