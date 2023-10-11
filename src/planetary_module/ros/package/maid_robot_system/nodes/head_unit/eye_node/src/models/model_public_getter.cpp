@@ -16,23 +16,23 @@ namespace maid_robot_system
 {
 std::string ModelImplement::get_setting_file()
 {
-    return this->_param.setting_file;
+    return this->_widget->param.setting_file;
 }
 int ModelImplement::get_brightness()
 {
-    return this->_param.brightness;
+    return this->_widget->param.brightness;
 }
 int ModelImplement::get_color_r()
 {
-    return this->_param.color_r;
+    return this->_widget->param.color_r;
 }
 int ModelImplement::get_color_g()
 {
-    return this->_param.color_g;
+    return this->_widget->param.color_g;
 }
 int ModelImplement::get_color_b()
 {
-    return this->_param.color_b;
+    return this->_widget->param.color_b;
 }
 
 } // namespace maid_robot_system

@@ -25,6 +25,15 @@ void NodeImplement::_callback_msg_mrs_eye(const maid_robot_system_interfaces::ms
 #if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
 #endif
+    switch (msg.pupil_effect) {
+        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_ORDER:
+            (void)g_model->effect_pupil_order();
+            break;
+
+        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_NORMAL:
+        default:
+            break;
+    }
     (void)g_model->set_msg_eye(msg.emotions,
                                msg.pupil_effect,
 
@@ -115,7 +124,7 @@ void NodeImplement::_callback_timer()
 #if DEBUG_OUTPUT_REPORT > 0
 void NodeImplement::_callback_output_state()
 {
-    RCLCPP_INFO(this->get_logger(), "%s", g_model->get_lap_time().c_str());
+    RCLCPP_INFO(this->get_logger(), "%s", g_model->output_message().c_str());
 }
 #endif
 

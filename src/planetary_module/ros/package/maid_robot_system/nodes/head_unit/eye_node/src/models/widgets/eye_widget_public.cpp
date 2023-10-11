@@ -10,45 +10,35 @@
 
 namespace maid_robot_system
 {
-/**
- * @brief voiceIDの受信
- *
- */
-void EyeWidget::cmd_voice_id()
+bool EyeWidget::set_param(StParameter param)
+{
+    bool result = true;
+    this->eyeball.set_param(param);
+    this->eyelid.set_param(param);
+    return result;
+}
+
+void EyeWidget::pupil_order()
 {
     this->eyeball.set_state_pupil(PartsEyeball::PupilState::Receiving);
 
-    last_voiceId_time = current_time.elapsed();
-    flag_voiceId      = true;
+    this->last_voiceId_time = current_time.elapsed();
+    this->flag_voice_id     = true;
 }
 
-/**
- * @brief
- * @param get_eye_cmd_angle
-*/
-void EyeWidget::cmd_eye_input(int emotions,
-                              int pupil_effect,
-                              float size,
-                              float distance,
-
-                              float left_x,
-                              float left_y,
-
-                              float right_x,
-                              float right_y)
+void EyeWidget::cmd_eye_input(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y)
 {
     if (false == flag_first_request) {
         flag_first_request = true;
     }
     const int limit_y = 190;
-    // printf("eye_cmd_input");
     /* 感情の設定*/
     this->eyelid.set_emotion((MIENS)(emotions));
     /* 瞳の大きさ */
     this->eyeball.set_dimensions(size);
     /* ============================================= */
-    float get_target_y = ((left_y / 200.0) * this->calibration_eyelid_size_x);
-    float get_target_x = ((-left_x / 230.0) * this->calibration_eyelid_size_x);
+    float get_target_y = ((left_y / 200.0) * param.calibration_eyelid_size_x);
+    float get_target_x = ((-left_x / 230.0) * param.calibration_eyelid_size_x);
     /* ============================================= */
     const int min_per_eye_distance = 8;
     /* 近くなるほど寄り目になる */
@@ -80,7 +70,7 @@ void EyeWidget::cmd_eye_input(int emotions,
     if (abs(get_target_x) < 500 && abs(get_target_y) < 400) {
         switch (this->thinking_flag_notAccepted) {
             case control_state::STATE_NOT_ACCEPTED:
-                if (this->thinking_next_time_notAccepted < current_time.elapsed()) {
+                if (param.thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->thinking_flag_notAccepted = control_state::STATE_FREE;
 #if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : FREE\n");
@@ -90,10 +80,10 @@ void EyeWidget::cmd_eye_input(int emotions,
                 break;
 
             case control_state::STATE_ACCEPTED:
-                if (this->thinking_next_time_notAccepted < current_time.elapsed()) {
+                if (param.thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
                     this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
-                    this->thinking_next_time_notAccepted
+                    param.thinking_next_time_notAccepted
                             = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : NOT ACCEPTED\n");
@@ -107,7 +97,7 @@ void EyeWidget::cmd_eye_input(int emotions,
                     this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
 
                     if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
-                        this->thinking_next_time_notAccepted
+                        param.thinking_next_time_notAccepted
                                 = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                         printf("Thinking blink : ACCEPTED\n");
@@ -121,8 +111,8 @@ void EyeWidget::cmd_eye_input(int emotions,
         }
 
         if (abs(this->eyeball.right.target.x - get_target_x) > 0) {
-            this->eyeball.right.target.x = get_target_x + ((this->eyeball_size_x * distance_change) / 100.0);
-            this->eyeball.left.target.x  = get_target_x - ((this->eyeball_size_x * distance_change) / 100.0);
+            this->eyeball.right.target.x = get_target_x + ((param.eyeball_size_x * distance_change) / 100.0);
+            this->eyeball.left.target.x  = get_target_x - ((param.eyeball_size_x * distance_change) / 100.0);
         }
 
         if (abs(this->eyeball.right.target.y - get_target_y) > 0) {
@@ -133,6 +123,16 @@ void EyeWidget::cmd_eye_input(int emotions,
 
     /* ============================================= */
     last_ros_msg_time = current_time.elapsed();
+}
+
+// =============================
+// Constructor
+// =============================
+EyeWidget::EyeWidget(QWidget *parent) : QOpenGLWidget(parent), eyeball(), eyelid(), logger()
+{
+}
+EyeWidget::~EyeWidget()
+{
 }
 
 } // namespace maid_robot_system

@@ -48,7 +48,7 @@ find_package(nlohmann_json REQUIRED)
 add_executable(${NODE_NAME}
   src/main.cpp
   src/ros/node_implement.cpp
-  src/models/logger/log_store.cpp
+  src/models/log_store.cpp
 
   src/models/widgets/parts/parts_eyeball.cpp
   src/models/widgets/parts/parts_eyelid.cpp
@@ -58,10 +58,10 @@ add_executable(${NODE_NAME}
   src/models/model_public.cpp
   src/models/model_param.cpp
 
-  src/models/widgets/eye_widget_common.cpp
-  src/models/widgets/eye_widget_gl.cpp
+  src/models/widgets/eye_widget_gl_events.cpp
   src/models/widgets/eye_widget_log.cpp
   src/models/widgets/eye_widget_paint.cpp
+  src/models/widgets/eye_widget_private.cpp
   src/models/widgets/eye_widget_public.cpp
   src/models/widgets/eye_widget_loader.cpp
 )

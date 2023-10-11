@@ -12,6 +12,7 @@
 
 #include "calibration.hpp"
 
+#include <Qt>
 #include <string>
 
 namespace maid_robot_system
@@ -35,6 +36,18 @@ public:
     int color_r              = 255;
     int color_g              = 255;
     int color_b              = 255;
+
+public:
+    int calibration_eyelid_size_x = CALIBRATION_EYELID_SIZE_X;
+    int calibration_eyelid_size_y = CALIBRATION_EYELID_SIZE_Y;
+
+    double eyeball_size_x              = EYEBALL_SIZE_X;
+    double eyeball_size_y              = EYEBALL_SIZE_Y;
+    int thinking_next_time_notAccepted = 0;
+    // Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
+    Qt::ImageConversionFlag imageFlag = Qt::OrderedAlphaDither;
+    StVector eyeball_center_left;
+    StVector eyeball_center_right;
 
 public:
     double l_x                   = CALIBRATION_L_X;

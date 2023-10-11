@@ -80,7 +80,8 @@ public:
 
 public:
     void load_skin(StParameter param);
-    void setup(float param_calibration_eye_blink_time_offset);
+    void load_eyelid(StParameter param, StRectangle screen_size);
+    void set_param(StParameter param);
 
     QPixmap get_eye_id(ENUM_TARGET_EYE target);
 

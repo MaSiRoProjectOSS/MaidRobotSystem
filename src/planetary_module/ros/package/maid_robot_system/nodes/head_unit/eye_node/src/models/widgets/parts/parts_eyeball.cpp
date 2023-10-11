@@ -106,11 +106,46 @@ void PartsEyeball::set_state_pupil(PupilState state)
     this->request_pupil_state = state;
 }
 
-/**
- * @brief
- *
- * @param skin_name
- */
+void PartsEyeball::set_param(StParameter param)
+{
+}
+
+void PartsEyeball::load_eyeball(StParameter param, StRectangle screen_size)
+{
+    this->load_pupil(param.name, param.imageFlag);
+    // TODO
+    printf("  ---- LOAD [Eyeball] ----\n");
+    const QString str_eyeball_origin = "eyeball/eye_all.png";
+    ////////////////
+    // eyeball_origin_l
+    QMatrix matrix_eyeball_l;
+    matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
+    eyeball_origin_l = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
+    eyeball_origin_l = eyeball_origin_l.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+    eyeball_origin_l = eyeball_origin_l.transformed(matrix_eyeball_l);
+    // eyeball_origin
+    QMatrix matrix_eyeball_r;
+    matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
+    eyeball_origin_r = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
+    eyeball_origin_r = eyeball_origin_r.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+    eyeball_origin_r = eyeball_origin_r.transformed(matrix_eyeball_r);
+    //////////////////////////////
+    //////////////////////////////
+    right.setting(param.eyeball_size_x, param.eyeball_size_y, param.eyeball_center_right);
+    left.setting(param.eyeball_size_x, param.eyeball_size_y, param.eyeball_center_left);
+#if DEBUG_OUTPUT_WIDGET
+    printf("============== Eyeball center ===============\n");
+    printf(" Right (x,y) = (%f,%f)\n", param.eyeball_center_right.x, param.eyeball_center_right.y);
+    printf(" Left (x,y) = (%f,%f)\n", param.eyeball_center_left.x, param.eyeball_center_left.y);
+    printf("=============================================\n");
+    printf("------------ Calibration Postion ------------\n");
+    printf(" Size (x,y) = (%d,%d)\n", param.calibration_eyelid_size_x, param.calibration_eyelid_size_y);
+    printf(" Pos r(x,y) = (%f,%f)\n", param.eyeball_position_l_x, param.eyeball_position_l_y);
+    printf(" Pos l(x,y) = (%f,%f)\n", param.eyeball_position_r_x, param.eyeball_position_r_y);
+    printf("---------------------------------------------\n");
+#endif
+    /* ============================================= */
+}
 void PartsEyeball::load_pupil(std::string skin_name, Qt::ImageConversionFlag imageFlag)
 {
 #if DRAW_PUPIL_INSIDE || DRAW_PUPIL_OUTSIDE

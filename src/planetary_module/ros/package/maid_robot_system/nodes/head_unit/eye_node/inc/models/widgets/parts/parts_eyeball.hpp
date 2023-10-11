@@ -117,6 +117,8 @@ public:
     /* ============================================= */
     void set_state_pupil(PupilState state);
     void load_pupil(std::string skin_name, Qt::ImageConversionFlag imageFlag);
+    void load_eyeball(StParameter param, StRectangle screen_size);
+    void set_param(StParameter param);
 
     StEyeball left;
     StEyeball right;

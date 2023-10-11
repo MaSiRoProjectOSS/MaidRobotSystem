@@ -349,11 +349,27 @@ void PartsEyelid::set_cycle(uint elapsed)
 {
 }
 
-/**
- * @brief
- *
- * @param skin_name
- */
+void PartsEyelid::load_eyelid(StParameter param, StRectangle screen_size)
+{
+    // TODO
+    printf("  ---- LOAD [Eyelid] ----\n");
+    this->load_skin(param);
+    StVector calibration_right = StVector(param.r_x, param.r_y);
+    StVector calibration_left  = StVector(param.l_x, param.l_y);
+    this->setting(screen_size.width,
+                  screen_size.height, //
+                  param.eyelid_size_x,
+                  param.eyelid_size_y,
+                  calibration_right,
+                  calibration_left);
+#if DEBUG_OUTPUT_WIDGET
+    printf("=============== Eyelid Postion ==============\n");
+    printf(" Right (x,y) = (%f,%f)\n", this->right.pos.x, this->right.pos.y);
+    printf(" Left (x,y) = (%f,%f)\n", this->left.pos.x, this->left.pos.y);
+    printf("=============================================\n");
+#endif
+    ////////////////
+}
 void PartsEyelid::load_skin(StParameter param)
 {
     this->eye_blink_time_quickly      = param.eye_blink_time_quickly;
@@ -423,9 +439,9 @@ void PartsEyelid::load_skin(StParameter param)
     }
 }
 
-void PartsEyelid::setup(float param_calibration_eye_blink_time_offset)
+void PartsEyelid::set_param(StParameter param)
 {
-    this->eye_blink_time_offset = param_calibration_eye_blink_time_offset;
+    this->eye_blink_time_offset = param.eye_blink_time_offset;
     this->elapsed_next          = 0;
 }
 /**

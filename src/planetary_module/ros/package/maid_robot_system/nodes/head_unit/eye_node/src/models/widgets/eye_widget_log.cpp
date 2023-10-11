@@ -10,18 +10,22 @@
 
 namespace maid_robot_system
 {
-void EyeWidget::log()
+std::string EyeWidget::output_message()
 {
-    int current = current_time.elapsed();
-    int elapsed = (current - log_timer);
+    static int span = (int)(1000.0 * 60);
 
-    if ((CTRL_HITOMI_LOG_FPS * 1000.0) < elapsed) {
+    static int log_timer = current_time.elapsed();
+    int current          = current_time.elapsed();
+    int elapsed          = (current - log_timer);
+
+    if (span < elapsed) {
         logger.print((int)eyelid.eye_emotion, elapsed, current);
         log_timer = current;
     }
     if (0 > elapsed) {
         log_timer = current;
     }
+    return "std::string EyeWidget::output_message";
 }
 
 } // namespace maid_robot_system

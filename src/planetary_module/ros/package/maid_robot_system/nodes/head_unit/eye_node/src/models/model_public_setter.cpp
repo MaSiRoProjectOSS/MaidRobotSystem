@@ -28,22 +28,22 @@ bool ModelImplement::set_setting_file(std::string value)
 }
 bool ModelImplement::set_brightness(int value)
 {
-    this->_param.brightness = value;
+    this->_widget->param.brightness = value;
     return true;
 }
 bool ModelImplement::set_color_r(int value)
 {
-    this->_param.color_r = value;
+    this->_widget->param.color_r = value;
     return true;
 }
 bool ModelImplement::set_color_g(int value)
 {
-    this->_param.color_g = value;
+    this->_widget->param.color_g = value;
     return true;
 }
 bool ModelImplement::set_color_b(int value)
 {
-    this->_param.color_b = value;
+    this->_widget->param.color_b = value;
     return true;
 }
 

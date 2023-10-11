@@ -14,6 +14,7 @@
 #include "maid_robot_system/common_structure.hpp"
 #include "models/calibration.hpp"
 #include "models/data_structure.hpp"
+#include "models/widgets/eye_widget.hpp"
 
 #include <QApplication>
 #include <string>
@@ -49,6 +50,7 @@ public:
 
                      float right_x,
                      float right_y);
+    void effect_pupil_order();
 
     // =============================
     // PUBLIC : Setter
@@ -62,7 +64,7 @@ public:
     // =============================
     // PUBLIC : Getter
     // =============================
-    std::string get_lap_time();
+    std::string output_message();
     std::string get_setting_file();
     int get_brightness();
     int get_color_r();
@@ -81,8 +83,8 @@ private:
     // =============================
     // PRIVATE : parameter
     // =============================
-    StParameter _param;
     QApplication *app;
+    EyeWidget *_widget = nullptr;
 
     // =============================
     // PRIVATE : Variable

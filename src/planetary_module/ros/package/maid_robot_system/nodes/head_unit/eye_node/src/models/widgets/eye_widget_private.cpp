@@ -1,5 +1,5 @@
 /**
- * @file eye_widget_common.cpp
+ * @file eye_widget_private.cpp
  * @brief
  * @date 2020-03-28
  *
@@ -10,13 +10,4 @@
 
 namespace maid_robot_system
 {
-/**
- * @brief
- *
- * @param obj
- * @param event
- * @return true
- * @return false
- */
-
 } // namespace maid_robot_system

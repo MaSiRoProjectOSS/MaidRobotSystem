@@ -20,11 +20,6 @@
 
 /* ============================================= */
 
-#if DEBUG_PRINT
-#define CTRL_HITOMI_LOG_FPS 10.0
-#else
-#define CTRL_HITOMI_LOG_FPS 600.0
-#endif
 #define CTRL_HITOMI_CMD_VOICE_CLEAR 3.0
 /* ============================================= */
 

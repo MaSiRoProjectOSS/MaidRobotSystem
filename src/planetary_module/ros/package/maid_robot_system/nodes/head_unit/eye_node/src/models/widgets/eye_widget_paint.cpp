@@ -10,23 +10,17 @@
 
 namespace maid_robot_system
 {
-/**
- * @brief
- *
- */
 void EyeWidget::update_screen()
 {
+    // TODO
     static bool drawing = false; /* 読みだし元は一つだし、一定周期なのでmutex使うまでもなく*/
 
     if (false == drawing) {
-        mtx_.lock(); /* ロックを取得する */
         drawing = true;
 
         //********************************************************************************//
-        if ((0 != this->eyeball.right.target.x)    //
-            || (0 != this->eyeball.right.target.y) //
-            || (0 != this->eyeball.left.target.x)  //
-            || (0 != this->eyeball.left.target.y)  //
+        if ((0 != this->eyeball.right.target.x) || (0 != this->eyeball.right.target.y)  //
+            || (0 != this->eyeball.left.target.x) || (0 != this->eyeball.left.target.y) //
             || (false == flag_first_request)) {
             int elapsed_times = (current_time.elapsed() - last_ros_msg_time);
 
@@ -45,16 +39,14 @@ void EyeWidget::update_screen()
         }
 
         this->make_image();
-        mtx_.unlock(); /* ロックを手放す */
-        update();
         //********************************************************************************//
         drawing = false;
     }
-    if (true == flag_voiceId) {
+    if (true == this->flag_voice_id) {
         int current      = current_time.elapsed();
         int voiceId_time = (current - last_voiceId_time);
         if ((CTRL_HITOMI_CMD_VOICE_CLEAR * 1000) < voiceId_time) {
-            flag_voiceId = false;
+            this->flag_voice_id = false;
             // サークルの色解除
             this->eyeball.set_state_pupil(PartsEyeball::PupilState::Normal);
         }
@@ -62,18 +54,12 @@ void EyeWidget::update_screen()
             voiceId_time = current;
         }
     }
-    this->log();
     logger.set_index(logger.ST_INDEX_TOTAL, 1);
 }
 
-///============================== main loop =======================================================================================
-
-/**
- * @brief
- *
- */
 void EyeWidget::make_image()
 {
+    // TODO
     //********************************************************************************//
     int current = current_time.elapsed();
     int buf     = current;
@@ -95,18 +81,11 @@ void EyeWidget::make_image()
     this->eyeball.draw_inside();
     logger.set_index(logger.ST_INDEX_MAKE_PUPIL_INSIDE, current_time.elapsed() - buf);
 #endif
-}
 
-/**
- * @brief
- *
- * @param event
- */
-void EyeWidget::paintEvent(QPaintEvent *event)
-{
+    // TODO
     //********************************************************************************//
-    int current = current_time.elapsed();
-    int buf     = current;
+    current = current_time.elapsed();
+    buf     = current;
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
     //********************************************************************************//
     /* ============================================= */

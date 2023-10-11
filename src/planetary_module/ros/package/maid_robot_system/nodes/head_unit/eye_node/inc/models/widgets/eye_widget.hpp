@@ -10,11 +10,11 @@
 #define MRS_EYE_NODE_MODELS_EYE_WIDGET_HPP
 
 #include "eye_node_settings.hpp"
-#include "logger/log_store.hpp"
 #include "maid_robot_system/common_structure.hpp"
 #include "math.h"
 #include "models/calibration.hpp"
 #include "models/data_structure.hpp"
+#include "models/log_store.hpp"
 #include "parts/parts_eyeball.hpp"
 #include "parts/parts_eyelid.hpp"
 
@@ -44,6 +44,79 @@ namespace maid_robot_system
 {
 class EyeWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 private:
+    typedef enum ENUM_CONTROL_STATE
+    {
+        STATE_FREE,         //!< 瞬き制御の未制御区間
+        STATE_ACCEPTED,     //!< 瞬き制御の許可区間
+        STATE_NOT_ACCEPTED, //!< 瞬き制御の不許可区間
+
+    } control_state;
+
+public:
+    // =============================
+    // Constructor
+    // =============================
+    EyeWidget(QWidget *parent = nullptr);
+    ~EyeWidget();
+
+    StParameter param;
+
+public:
+    // =============================
+    // PUBLIC : Function
+    // =============================
+    void initialize(StParameter param);
+    bool set_param(StParameter param);
+    void closing();
+    // =============================
+    // PUBLIC :
+    // =============================
+    void update_screen();
+    void pupil_order();
+    void cmd_eye_input(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y);
+
+    std::string output_message();
+
+public:
+    // =============================
+    // QT fuction
+    // =============================
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
+
+private:
+    // =============================
+    // PRIVATE : Function
+    // =============================
+    void make_image();
+    void reload_parameter(StParameter param, StRectangle screen_size);
+
+private:
+    // =============================
+    // PRIVATE : Variable
+    // =============================
+    StRectangle screen_size{ 0.0, 0.0, 640.0, 480.0 };
+
+    PartsEyeball eyeball;
+    PartsEyelid eyelid;
+    LogStore logger;
+
+    QTime current_time;
+    int last_ros_msg_time;
+    int last_voiceId_time;
+
+    bool flag_first_request                 = false;
+    bool flag_voice_id                      = false;
+    control_state thinking_flag_notAccepted = control_state::STATE_FREE;
+
+private:
+    // =============================
+    // CONST
+    // =============================
+
+#if 1
+private:
     /* ============================================= */
     GLuint m_program;
 
@@ -63,93 +136,7 @@ private:
                               "color = vec4(1.0,1.0,1.0,1.0);\n"
                               "}\n";
     /* ============================================= */
-public:
-    EyeWidget(QWidget *parent = nullptr);
-    ~EyeWidget();
-
-    // =============================
-    // QT fuction
-    // =============================
-    void initializeGL() override;
-    void resizeGL(int w, int h) override;
-    void paintGL() override;
-    //
-    void initialize(StParameter param);
-    void set_param(StParameter param);
-    void Setup(float param_calibration_eye_blink_time_offset);
-    void closing();
-    void update_screen();
-    /* ============================================= */
-    void cmd_voice_id();
-    void cmd_eye_input(int emotions,
-                       int pupil_effect,
-                       float size,
-                       float distance,
-
-                       float left_x,
-                       float left_y,
-
-                       float right_x,
-                       float right_y);
-
-    /* ============================================= */
-protected:
-    // =============================
-    // QT fuction
-    // =============================
-    void paintEvent(QPaintEvent *event) override;
-    bool event(QEvent *e) override;
-    void resizeEvent(QResizeEvent *event) override;
-    bool eventFilter(QObject *obj, QEvent *event);
-    /* ============================================= */
-private:
-    /* ============================================= */
-    typedef enum ENUM_CONTROL_STATE
-    {
-        STATE_FREE,         //!< 瞬き制御の未制御区間
-        STATE_ACCEPTED,     //!< 瞬き制御の許可区間
-        STATE_NOT_ACCEPTED, //!< 瞬き制御の不許可区間
-
-    } control_state;
-    /* ============================================= */
-    // for convenience
-    using json = nlohmann::json;
-    std::mutex mtx_;
-    /* ============================================= */
-    int calibration_eyelid_size_x = CALIBRATION_EYELID_SIZE_X;
-    int calibration_eyelid_size_y = CALIBRATION_EYELID_SIZE_Y;
-
-    double window_size_x = WINDOW_SIZE_X;
-    double window_size_y = WINDOW_SIZE_Y;
-
-    double eyeball_size_x              = EYEBALL_SIZE_X;
-    double eyeball_size_y              = EYEBALL_SIZE_Y;
-    int thinking_next_time_notAccepted = 0;
-    /* ============================================= */
-    // Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
-    Qt::ImageConversionFlag imageFlag = Qt::OrderedAlphaDither;
-    /* ============================================= */
-    void make_image();
-    void log();
-    void load_skin(StParameter param);
-    void load_eyelid(StParameter param);
-    void load_eyeball(StParameter param);
-
-    /* ============================================= */
-    PartsEyeball eyeball;
-    PartsEyelid eyelid;
-    LogStore logger;
-
-    QTime current_time;
-    int log_timer;
-    int last_ros_msg_time;
-    int last_voiceId_time;
-
-    /* ============================================= */
-    bool flag_first_request                 = false;
-    bool flag_voiceId                       = false;
-    control_state thinking_flag_notAccepted = control_state::STATE_FREE;
-    /* ============================================= */
+#endif
 };
 
 } // namespace maid_robot_system

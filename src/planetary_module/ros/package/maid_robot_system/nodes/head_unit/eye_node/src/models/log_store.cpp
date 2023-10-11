@@ -6,7 +6,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "logger/log_store.hpp"
+#include "models/log_store.hpp"
 
 namespace maid_robot_system
 {
