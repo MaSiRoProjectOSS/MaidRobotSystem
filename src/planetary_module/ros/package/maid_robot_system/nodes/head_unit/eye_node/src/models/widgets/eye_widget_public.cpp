@@ -10,11 +10,15 @@
 
 namespace maid_robot_system
 {
-bool EyeWidget::set_param(StParameter param)
+bool EyeWidget::reload_param()
 {
     bool result = true;
-    this->eyeball.set_param(param);
-    this->eyelid.set_param(param);
+    this->eyelid.set_param(this->param);
+    this->param.eyeball_center_left.x  = this->eyelid.left.pos_center.x + this->param.eyeball_position_l_x;
+    this->param.eyeball_center_left.y  = this->eyelid.left.pos_center.y + this->param.eyeball_position_l_y;
+    this->param.eyeball_center_right.x = this->eyelid.right.pos_center.x + this->param.eyeball_position_r_x;
+    this->param.eyeball_center_right.y = this->eyelid.right.pos_center.y + this->param.eyeball_position_r_y;
+    this->eyeball.set_param(this->param);
     return result;
 }
 

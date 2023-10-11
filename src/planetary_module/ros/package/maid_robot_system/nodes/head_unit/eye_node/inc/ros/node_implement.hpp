@@ -52,6 +52,7 @@ private:
     // =============================
     // CONST
     // =============================
+    const int WAITING_FOR_MESSAGE_MS   = (1000 * 5);
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 10 };

@@ -11,6 +11,7 @@
 #define MRS_EYE_NODE_DATA_STRUCTURE_HPP
 
 #include "calibration.hpp"
+#include "maid_robot_system/common_structure.hpp"
 
 #include <Qt>
 #include <string>
@@ -48,6 +49,8 @@ public:
     Qt::ImageConversionFlag imageFlag = Qt::OrderedAlphaDither;
     StVector eyeball_center_left;
     StVector eyeball_center_right;
+
+    StRectangle screen_size{ 0.0, 0.0, 640.0, 480.0 };
 
 public:
     double l_x                   = CALIBRATION_L_X;

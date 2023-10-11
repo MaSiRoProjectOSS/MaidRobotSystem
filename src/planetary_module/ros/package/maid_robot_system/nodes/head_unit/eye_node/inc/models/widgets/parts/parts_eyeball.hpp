@@ -116,8 +116,6 @@ public:
     void set_dimensions(float value);
     /* ============================================= */
     void set_state_pupil(PupilState state);
-    void load_pupil(std::string skin_name, Qt::ImageConversionFlag imageFlag);
-    void load_eyeball(StParameter param, StRectangle screen_size);
     void set_param(StParameter param);
 
     StEyeball left;
@@ -129,6 +127,10 @@ public:
     void set_default();
     void Initialize(double param_calibration_l_angle, double param_calibration_r_angle);
 
+private:
+    void _set_image(StParameter param);
+
+public:
     /* ============================================= */
     // QMatrix matrix_eyeball;
     QPixmap eyeball_origin_l;

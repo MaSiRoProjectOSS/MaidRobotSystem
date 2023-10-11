@@ -108,29 +108,8 @@ void PartsEyeball::set_state_pupil(PupilState state)
 
 void PartsEyeball::set_param(StParameter param)
 {
-}
-
-void PartsEyeball::load_eyeball(StParameter param, StRectangle screen_size)
-{
-    this->load_pupil(param.name, param.imageFlag);
+    this->_set_image(param);
     // TODO
-    printf("  ---- LOAD [Eyeball] ----\n");
-    const QString str_eyeball_origin = "eyeball/eye_all.png";
-    ////////////////
-    // eyeball_origin_l
-    QMatrix matrix_eyeball_l;
-    matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
-    eyeball_origin_l = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
-    eyeball_origin_l = eyeball_origin_l.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
-    eyeball_origin_l = eyeball_origin_l.transformed(matrix_eyeball_l);
-    // eyeball_origin
-    QMatrix matrix_eyeball_r;
-    matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
-    eyeball_origin_r = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
-    eyeball_origin_r = eyeball_origin_r.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
-    eyeball_origin_r = eyeball_origin_r.transformed(matrix_eyeball_r);
-    //////////////////////////////
-    //////////////////////////////
     right.setting(param.eyeball_size_x, param.eyeball_size_y, param.eyeball_center_right);
     left.setting(param.eyeball_size_x, param.eyeball_size_y, param.eyeball_center_left);
 #if DEBUG_OUTPUT_WIDGET
@@ -146,8 +125,24 @@ void PartsEyeball::load_eyeball(StParameter param, StRectangle screen_size)
 #endif
     /* ============================================= */
 }
-void PartsEyeball::load_pupil(std::string skin_name, Qt::ImageConversionFlag imageFlag)
+void PartsEyeball::_set_image(StParameter param)
 {
+    printf("  ---- LOAD [Eyeball] ----\n");
+    const QString str_eyeball_origin = "eyeball/eye_all.png";
+    ////////////////
+    // eyeball_origin_l
+    QMatrix matrix_eyeball_l;
+    matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
+    eyeball_origin_l = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
+    eyeball_origin_l = eyeball_origin_l.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+    eyeball_origin_l = eyeball_origin_l.transformed(matrix_eyeball_l);
+    // eyeball_origin
+    QMatrix matrix_eyeball_r;
+    matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
+    eyeball_origin_r = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
+    eyeball_origin_r = eyeball_origin_r.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+    eyeball_origin_r = eyeball_origin_r.transformed(matrix_eyeball_r);
+
 #if DRAW_PUPIL_INSIDE || DRAW_PUPIL_OUTSIDE
     printf("  ---- LOAD [Pupil] ----\n");
 #endif
@@ -159,11 +154,11 @@ void PartsEyeball::load_pupil(std::string skin_name, Qt::ImageConversionFlag ima
     for (int i = 0; i < 2; i++) {
         switch (i) {
             case 1:
-                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, imageFlag);
+                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, param.imageFlag);
                 break;
 
             default:
-                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, imageFlag);
+                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, param.imageFlag);
                 break;
         }
 
@@ -180,11 +175,11 @@ void PartsEyeball::load_pupil(std::string skin_name, Qt::ImageConversionFlag ima
     for (int i = 0; i < 2; i++) {
         switch (i) {
             case 1:
-                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, imageFlag);
+                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, param.imageFlag);
                 break;
 
             default:
-                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, imageFlag);
+                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, param.imageFlag);
                 break;
         }
 

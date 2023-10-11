@@ -28,49 +28,6 @@
 
 namespace maid_robot_system
 {
-bool ModelImplement::_set_param()
-{
-    if (nullptr != this->_widget) {
-        return this->_widget->set_param(this->_widget->param);
-    } else {
-        return false;
-    }
-}
-
-void ModelImplement::effect_pupil_order()
-{
-    if (nullptr != this->_widget) {
-        this->_widget->pupil_order();
-    }
-}
-
-std::string ModelImplement::output_message()
-{
-    if (nullptr != this->_widget) {
-        return this->_widget->output_message();
-    } else {
-        return "";
-    }
-}
-
-void ModelImplement::set_msg_eye(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y)
-{
-    if (nullptr != this->_widget) {
-        this->_widget->cmd_eye_input(emotions, pupil_effect, size, distance, left_x, left_y, right_x, right_y);
-    }
-}
-
-bool ModelImplement::calculate()
-{
-    bool result = false;
-    if (nullptr != this->_widget) {
-        this->_widget->update();
-        this->app->processEvents();
-        result = true;
-    }
-    return result;
-}
-
 bool ModelImplement::open(int argc, char **argv)
 {
     bool result = false;
@@ -118,11 +75,23 @@ bool ModelImplement::open(int argc, char **argv)
 
     return result;
 }
+
 bool ModelImplement::exec()
 {
     bool result = false;
     if (nullptr != this->_widget) {
         this->_widget->showFullScreen();
+        result = true;
+    }
+    return result;
+}
+
+bool ModelImplement::calculate()
+{
+    bool result = false;
+    if (nullptr != this->_widget) {
+        this->_widget->update();
+        this->app->processEvents();
         result = true;
     }
     return result;

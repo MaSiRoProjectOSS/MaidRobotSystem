@@ -10,17 +10,6 @@
 
 namespace maid_robot_system
 {
-void EyeWidget::reload_parameter(StParameter param, StRectangle screen_size)
-{
-    this->eyelid.load_eyelid(param, screen_size);
-
-    param.eyeball_center_left.x  = this->eyelid.left.pos_center.x + param.eyeball_position_l_x;
-    param.eyeball_center_left.y  = this->eyelid.left.pos_center.y + param.eyeball_position_l_y;
-    param.eyeball_center_right.x = this->eyelid.right.pos_center.x + param.eyeball_position_r_x;
-    param.eyeball_center_right.y = this->eyelid.right.pos_center.y + param.eyeball_position_r_y;
-
-    this->eyeball.load_eyeball(param, screen_size);
-}
 
 
 void EyeWidget::initialize(StParameter param)
@@ -41,14 +30,13 @@ void EyeWidget::initialize(StParameter param)
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1);
     qApp->installEventFilter(this);
-    this->set_param(param);
-    this->reload_parameter(param, screen_size);
+    this->reload_param();
     current_time.start();
     this->eyelid.set_emotion(miens_close);
     this->eyelid.calc_animation(EYE_BLINK_TIME_MILLISECOND_DEFAULT * -2);
     this->eyelid.calc_animation(0);
     this->eyelid.calc_animation(EYE_BLINK_TIME_MILLISECOND_DEFAULT);
-    this->resize(screen_size.width, screen_size.height);
+    this->resize(param.screen_size.width, param.screen_size.height);
     last_ros_msg_time = current_time.elapsed();
     this->eyelid.calc_animation(current_time.elapsed());
 }

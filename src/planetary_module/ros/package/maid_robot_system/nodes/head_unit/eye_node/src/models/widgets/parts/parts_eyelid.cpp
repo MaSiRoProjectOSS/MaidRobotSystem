@@ -130,17 +130,7 @@ bool PartsEyelid::enable_motion()
     }
 }
 
-/**
- * @brief
- *
- * @param window_size_x
- * @param window_size_y
- * @param size_x
- * @param size_y
- * @param right_axis
- * @param left_axis
- */
-void PartsEyelid::setting(double window_size_x, double window_size_y, int size_x, int size_y, StVector right_axis, StVector left_axis)
+void PartsEyelid::_reset_position(StParameter param)
 {
     /**
      *  設定する値は下図に示すように描画位置の左上座標
@@ -176,13 +166,13 @@ void PartsEyelid::setting(double window_size_x, double window_size_y, int size_x
      *  Lの位置計算 = (ウィンドウサイズ * ( 3.0 / 4.0 ) ) - (eyelidのイメージサイズ / 2.0)
      */
     /* eyelid の中心座標 */
-    right.pos_center.set((window_size_x * 0.25) + right_axis.x, (window_size_y * 0.25) + right_axis.y);
-    left.pos_center.set((window_size_x * 0.75) + left_axis.x, (window_size_y * 0.25) + left_axis.y);
+    right.pos_center.set((param.screen_size.width * 0.25) + param.r_x, (param.screen_size.height * 0.25) + param.r_y);
+    left.pos_center.set((param.screen_size.width * 0.75) + param.l_x, (param.screen_size.height * 0.25) + param.l_y);
     /* eyelid の描画開始座標 */
-    right.pos.set(right.pos_center.x - (size_x * 0.5),  // R_x: -86.000000
-                  right.pos_center.y - (size_y * 0.5)); // R_y: -280.000000
-    left.pos.set(left.pos_center.x - (size_x * 0.5),    // L_x: 1535.000000
-                 left.pos_center.y - (size_y * 0.5));   // L_y: -270.000000
+    right.pos.set(right.pos_center.x - (param.eyelid_size_x * 0.5),  // R_x: -86.000000
+                  right.pos_center.y - (param.eyelid_size_y * 0.5)); // R_y: -280.000000
+    left.pos.set(left.pos_center.x - (param.eyelid_size_x * 0.5),    // L_x: 1535.000000
+                 left.pos_center.y - (param.eyelid_size_y * 0.5));   // L_y: -270.000000
 }
 
 /**
@@ -349,19 +339,15 @@ void PartsEyelid::set_cycle(uint elapsed)
 {
 }
 
-void PartsEyelid::load_eyelid(StParameter param, StRectangle screen_size)
+void PartsEyelid::set_param(StParameter param)
 {
+    this->eye_blink_time_offset = param.eye_blink_time_offset;
+    this->elapsed_next          = 0;
+
     // TODO
     printf("  ---- LOAD [Eyelid] ----\n");
-    this->load_skin(param);
-    StVector calibration_right = StVector(param.r_x, param.r_y);
-    StVector calibration_left  = StVector(param.l_x, param.l_y);
-    this->setting(screen_size.width,
-                  screen_size.height, //
-                  param.eyelid_size_x,
-                  param.eyelid_size_y,
-                  calibration_right,
-                  calibration_left);
+    this->_set_image(param);
+    this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
     printf(" Right (x,y) = (%f,%f)\n", this->right.pos.x, this->right.pos.y);
@@ -370,7 +356,7 @@ void PartsEyelid::load_eyelid(StParameter param, StRectangle screen_size)
 #endif
     ////////////////
 }
-void PartsEyelid::load_skin(StParameter param)
+void PartsEyelid::_set_image(StParameter param)
 {
     this->eye_blink_time_quickly      = param.eye_blink_time_quickly;
     this->eye_blink_time_min          = param.eye_blink_time_min;   // ms
@@ -439,11 +425,6 @@ void PartsEyelid::load_skin(StParameter param)
     }
 }
 
-void PartsEyelid::set_param(StParameter param)
-{
-    this->eye_blink_time_offset = param.eye_blink_time_offset;
-    this->elapsed_next          = 0;
-}
 /**
  * @brief Construct a new Ctrl Eyelid:: Ctrl Eyelid object
  *

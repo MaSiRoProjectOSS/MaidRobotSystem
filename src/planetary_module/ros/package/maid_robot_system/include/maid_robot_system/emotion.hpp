@@ -16,7 +16,7 @@ namespace maid_robot_system
  */
 typedef enum miens_t
 {
-    miens_normal,      //! ノーマル
+    miens_normal = 0,  //! ノーマル
     miens_smile,       //! スマイル
     miens_wink_left,   //! 左目ウィンク（ウィンク後、ノーマルへ）
     miens_wink_right,  //! 右目ウィンク（ウィンク後、ノーマルへ）

@@ -13,6 +13,8 @@
 
 #include <exception>
 #include <stdexcept>
+#include <stdio.h>
+#include <unistd.h>
 
 using std::placeholders::_1;
 
@@ -32,6 +34,30 @@ void NodeImplement::_callback_msg_mrs_eye(const maid_robot_system_interfaces::ms
 
         case maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_NORMAL:
         default:
+            break;
+    }
+    switch (msg.emotions) {
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE:
+            g_model->emotion(MIENS::miens_close);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_SMILE:
+            g_model->emotion(MIENS::miens_smile);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_LEFT:
+            g_model->emotion(MIENS::miens_close_left);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_RIGHT:
+            g_model->emotion(MIENS::miens_close_right);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_LEFT:
+            g_model->emotion(MIENS::miens_wink_left);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_RIGHT:
+            g_model->emotion(MIENS::miens_wink_right);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL:
+        default:
+            g_model->emotion(MIENS::miens_normal);
             break;
     }
     (void)g_model->set_msg_eye(msg.emotions,
@@ -135,8 +161,14 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 #endif
     g_model = new ModelImplement();
     if (true == g_model->open(argc, argv)) {
+        g_model->emotion(MIENS::miens_close);
         // set parameter
         this->_callback_param_init();
+        g_model->exec();
+
+        usleep(this->WAITING_FOR_MESSAGE_MS * 1000);
+
+        RCLCPP_INFO(this->get_logger(), "%s", "Start receiving messages.");
 
         // set subscription
         this->_sub_mrs_eye =                                                          //
@@ -149,7 +181,6 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 #if DEBUG_OUTPUT_REPORT > 0
         this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&NodeImplement::_callback_output_state, this));
 #endif
-        g_model->exec();
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");
         throw new std::runtime_error("Failed to open.");

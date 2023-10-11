@@ -59,14 +59,24 @@ public:
     EyeWidget(QWidget *parent = nullptr);
     ~EyeWidget();
 
+    // =============================
+    // PUBLIC : Variable
+    // =============================
     StParameter param;
+
+public:
+    // =============================
+    // QT fuction
+    // =============================
+    void initializeGL() override;
+    void resizeGL(int w, int h) override;
+    void paintGL() override;
 
 public:
     // =============================
     // PUBLIC : Function
     // =============================
     void initialize(StParameter param);
-    bool set_param(StParameter param);
     void closing();
     // =============================
     // PUBLIC :
@@ -77,27 +87,22 @@ public:
 
     std::string output_message();
 
-public:
     // =============================
-    // QT fuction
-    // =============================
-    void initializeGL() override;
-    void resizeGL(int w, int h) override;
-    void paintGL() override;
+    bool reload_param();
+    bool set_setting_file(std::string value);
 
 private:
     // =============================
     // PRIVATE : Function
     // =============================
     void make_image();
-    void reload_parameter(StParameter param, StRectangle screen_size);
+
+    std::string _read_file(const std::string &path);
 
 private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    StRectangle screen_size{ 0.0, 0.0, 640.0, 480.0 };
-
     PartsEyeball eyeball;
     PartsEyelid eyelid;
     LogStore logger;

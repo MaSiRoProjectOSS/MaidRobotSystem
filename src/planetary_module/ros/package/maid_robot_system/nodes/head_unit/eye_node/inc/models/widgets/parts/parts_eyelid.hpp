@@ -79,8 +79,6 @@ public:
     PartsEyelid();
 
 public:
-    void load_skin(StParameter param);
-    void load_eyelid(StParameter param, StRectangle screen_size);
     void set_param(StParameter param);
 
     QPixmap get_eye_id(ENUM_TARGET_EYE target);
@@ -95,9 +93,13 @@ public:
 
     bool enable_motion();
 
-    void setting(double window_size_x, double window_size_y, int size_x, int size_y, StVector right_axis, StVector left_axis);
-
     uint get_ms_time(int time_current, int time_check, int add_Value);
+
+private:
+    void _set_image(StParameter param);
+    void _reset_position(StParameter param);
+
+public:
     /* ============================================= */
     StEyelid left;
     StEyelid right;

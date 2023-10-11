@@ -51,6 +51,7 @@ public:
                      float right_x,
                      float right_y);
     void effect_pupil_order();
+    void emotion(MIENS value);
 
     // =============================
     // PUBLIC : Setter
@@ -75,9 +76,6 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    bool _set_param();
-    bool _parse_param(std::string json_file);
-    std::string _read_file(const std::string &path);
 
 private:
     // =============================
