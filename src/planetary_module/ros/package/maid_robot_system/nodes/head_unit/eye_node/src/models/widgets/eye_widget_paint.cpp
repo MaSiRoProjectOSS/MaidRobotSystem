@@ -10,6 +10,8 @@
 
 namespace maid_robot_system
 {
+#define DEBUG_VIEW 1
+
 void EyeWidget::calculate()
 {
     int current = current_time.elapsed();
@@ -87,9 +89,10 @@ void EyeWidget::_update_screen()
 
 #endif
 
-    /* ============================================= */
-    // Make pupil outside
-    /* ============================================= */
+/* ============================================= */
+// Make pupil outside
+/* ============================================= */
+#if 0
     start_time = current_time.elapsed();
     painter.fillRect(param.screen_size.x, //
                      param.screen_size.y,
@@ -97,16 +100,27 @@ void EyeWidget::_update_screen()
                      param.screen_size.height,
                      Qt::white);
     logger.set_index(logger.ST_INDEX_DRAW_BACKGROUND, current_time.elapsed() - start_time);
+#endif
 
     /* ============================================= */
     // Draw : eye
     /* ============================================= */
     start_time = current_time.elapsed();
+    painter.fillRect((int)this->eyelid.right.pos.x, //
+                     (int)this->eyelid.right.pos.y,
+                     this->param.eyelid_size_x,
+                     this->param.eyelid_size_y,
+                     Qt::white);
     painter.drawPixmap(this->eyeball.right.draw_postion.x,
                        this->eyeball.right.draw_postion.y,
                        this->eyeball.right.draw_postion.width,
                        this->eyeball.right.draw_postion.height,
                        this->eyeball.eyeball_origin_r);
+    painter.fillRect((int)this->eyelid.left.pos.x, //
+                     (int)this->eyelid.left.pos.y,
+                     this->param.eyelid_size_x,
+                     this->param.eyelid_size_y,
+                     Qt::white);
     painter.drawPixmap(this->eyeball.left.draw_postion.x,
                        this->eyeball.left.draw_postion.y,
                        this->eyeball.left.draw_postion.width,

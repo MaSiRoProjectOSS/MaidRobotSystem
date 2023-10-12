@@ -45,7 +45,7 @@ public:
     void set_elapsed(uint current_time);
     bool enable_motion();
     /* ============================================= */
-    StVector pos;
+    StRectangle pos;
     StVector pos_center;
     /* ============================================= */
 

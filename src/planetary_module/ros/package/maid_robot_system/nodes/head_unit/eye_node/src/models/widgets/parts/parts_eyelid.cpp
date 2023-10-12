@@ -175,9 +175,9 @@ void PartsEyelid::_reset_position(StParameter param)
     right.pos_center.set((param.screen_size.width * 0.25) + param.r_x, (param.screen_size.height * 0.25) + param.r_y);
     left.pos_center.set((param.screen_size.width * 0.75) + param.l_x, (param.screen_size.height * 0.25) + param.l_y);
     /* eyelid の描画開始座標 */
-    right.pos.set(right.pos_center.x - (param.eyelid_size_x * 0.5),  // R_x: -86.000000
-                  right.pos_center.y - (param.eyelid_size_y * 0.5)); // R_y: -280.000000
-    left.pos.set(left.pos_center.x - (param.eyelid_size_x * 0.5),    // L_x: 1535.000000
+    right.pos.set_axis(right.pos_center.x - (param.eyelid_size_x * 0.5),  // R_x: -86.000000
+                       right.pos_center.y - (param.eyelid_size_y * 0.5)); // R_y: -280.000000
+    left.pos.set_axis(left.pos_center.x - (param.eyelid_size_x * 0.5),    // L_x: 1535.000000
                  left.pos_center.y - (param.eyelid_size_y * 0.5));   // L_y: -270.000000
 }
 
