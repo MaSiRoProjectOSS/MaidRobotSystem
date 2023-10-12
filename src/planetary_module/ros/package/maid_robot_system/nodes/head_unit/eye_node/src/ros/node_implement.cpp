@@ -60,10 +60,7 @@ void NodeImplement::_callback_msg_mrs_eye(const maid_robot_system_interfaces::ms
             g_model->emotion(MIENS::miens_normal);
             break;
     }
-    (void)g_model->set_msg_eye(msg.emotions,
-                               msg.pupil_effect,
-
-                               msg.size,
+    (void)g_model->set_msg_eye(msg.size,
                                msg.distance,
 
                                msg.left_x,
@@ -161,14 +158,9 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 #endif
     g_model = new ModelImplement();
     if (true == g_model->open(argc, argv)) {
-        g_model->emotion(MIENS::miens_close);
         // set parameter
         this->_callback_param_init();
         g_model->exec();
-
-        usleep(this->WAITING_FOR_MESSAGE_MS * 1000);
-
-        RCLCPP_INFO(this->get_logger(), "%s", "Start receiving messages.");
 
         // set subscription
         this->_sub_mrs_eye =                                                          //

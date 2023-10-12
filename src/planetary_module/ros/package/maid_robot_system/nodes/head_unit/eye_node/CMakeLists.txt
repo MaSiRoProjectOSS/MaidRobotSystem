@@ -61,7 +61,6 @@ add_executable(${NODE_NAME}
   src/models/widgets/eye_widget_loader.cpp
   src/models/widgets/eye_widget_log.cpp
   src/models/widgets/eye_widget_paint.cpp
-  src/models/widgets/eye_widget_param.cpp
   src/models/widgets/eye_widget_private.cpp
   src/models/widgets/eye_widget_public.cpp
 )

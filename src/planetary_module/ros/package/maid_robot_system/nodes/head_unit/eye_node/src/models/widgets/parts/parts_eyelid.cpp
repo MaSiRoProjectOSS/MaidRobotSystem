@@ -8,6 +8,12 @@
  */
 #include "models/widgets/parts/parts_eyelid.hpp"
 
+#include <filesystem>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 namespace maid_robot_system
 {
 /**
@@ -330,11 +336,7 @@ void PartsEyelid::set_emotion(MIENS eye_emotion)
         printf("Emotion = %s\n", text_emotion);
     }
 }
-/**
- * @brief
- *
- * @param elapsed
- */
+
 void PartsEyelid::set_cycle(uint elapsed)
 {
 }
@@ -345,7 +347,6 @@ void PartsEyelid::set_param(StParameter param)
     this->elapsed_next          = 0;
 
     // TODO
-    printf("  ---- LOAD [Eyelid] ----\n");
     this->_set_image(param);
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
@@ -354,7 +355,6 @@ void PartsEyelid::set_param(StParameter param)
     printf(" Left (x,y) = (%f,%f)\n", this->left.pos.x, this->left.pos.y);
     printf("=============================================\n");
 #endif
-    ////////////////
 }
 void PartsEyelid::_set_image(StParameter param)
 {
@@ -366,62 +366,63 @@ void PartsEyelid::_set_image(StParameter param)
     imageFlag                         = Qt::OrderedAlphaDither;
     /* ============================================= */
     // wink anime  pre load///////////////////////////////////////////////
-    printf("    register - %s\n", "Buffering image for eyelid");
     /* ============================================= */
     std::stringstream ss;
     std::string f_name;
+    if (true == std::filesystem::is_directory(param.path)) {
+        printf("  ---- LOAD [Eyelid] ----\n");
+        for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
+            ss.str("");
+            ss.clear();
+            ss << param.path << "/"
+               << "eye/eyelid/normally/" << std::setfill('0') << std::right << std::setw(3) << buf_c << ".png";
+            f_name = ss.str();
+            if (true == std::filesystem::exists(f_name)) {
+                QPixmap buff(f_name.c_str(), nullptr, imageFlag);
+                QMatrix rotate_angle_eyelid;
+                rotate_angle_eyelid.rotate(-90);
+                // left
+                QMatrix rotate_angle_eyelid_l;
+                rotate_angle_eyelid_l.rotate(-param.l_angle);
+                this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
+                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
+                // right
+                QMatrix rotate_angle_eyelid_r;
+                rotate_angle_eyelid_r.rotate(-param.r_angle);
+                this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
+                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
+                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(rotate_angle_eyelid_r);
+            }
+        }
 
-    for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
-        ss.str("");
-        ss.clear();
-        ss << WORKSPACECONFIG_PATH_IMG_EYE << param.name << "eyelid/default/"
-           << "Scene1_" << buf_c << ".png";
-        f_name = ss.str();
-        QPixmap buff(f_name.c_str(), nullptr, imageFlag);
-        QMatrix rotate_angle_eyelid;
-        rotate_angle_eyelid.rotate(-90);
-        // left
-        QMatrix rotate_angle_eyelid_l;
-        rotate_angle_eyelid_l.rotate(-param.l_angle);
-        this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-        this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
-        this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
-        // right
-        QMatrix rotate_angle_eyelid_r;
-        rotate_angle_eyelid_r.rotate(-param.r_angle);
-        this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-        this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
-        this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
-        this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(rotate_angle_eyelid_r);
-    }
-
-    /* ============================================= */
-    // smile anime  pre load///////////////////////////////////////////////
-    printf("    register - %s\n", "Buffering image for eyelid with smile");
-
-    /* ============================================= */
-    for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
-        ss.str("");
-        ss.clear();
-        ss << WORKSPACECONFIG_PATH_IMG_EYE << param.name << "eyelid/smile/"
-           << "eye_smile1_" << buf_c << ".png";
-        f_name = ss.str();
-        QPixmap buff(f_name.c_str(), nullptr, imageFlag);
-        QMatrix rotate_angle_smile_lid;
-        rotate_angle_smile_lid.rotate(-90);
-        // left
-        QMatrix rotate_angle_smile_lid_l;
-        rotate_angle_smile_lid_l.rotate(-param.l_angle);
-        this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-        this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
-        this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
-        // right
-        QMatrix rotate_angle_smile_lid_r;
-        rotate_angle_smile_lid_r.rotate(-param.r_angle);
-        this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-        this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
-        this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
-        this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(rotate_angle_smile_lid_r);
+        /* ============================================= */
+        for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
+            ss.str("");
+            ss.clear();
+            ss << param.path << "/"
+               << "eye/eyelid/smile/" << std::setfill('0') << std::right << std::setw(3) << buf_c << ".png";
+            f_name = ss.str();
+            QPixmap buff(f_name.c_str(), nullptr, imageFlag);
+            if (true == std::filesystem::exists(f_name)) {
+                QMatrix rotate_angle_smile_lid;
+                rotate_angle_smile_lid.rotate(-90);
+                // left
+                QMatrix rotate_angle_smile_lid_l;
+                rotate_angle_smile_lid_l.rotate(-param.l_angle);
+                this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
+                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
+                // right
+                QMatrix rotate_angle_smile_lid_r;
+                rotate_angle_smile_lid_r.rotate(-param.r_angle);
+                this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
+                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
+                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(rotate_angle_smile_lid_r);
+            }
+        }
     }
 }
 
@@ -432,18 +433,6 @@ void PartsEyelid::_set_image(StParameter param)
 PartsEyelid::PartsEyelid()
 {
 }
-
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
-/* ============================================= */
 
 /**
  * @brief

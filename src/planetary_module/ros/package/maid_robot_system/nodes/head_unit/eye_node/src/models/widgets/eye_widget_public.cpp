@@ -12,13 +12,19 @@ namespace maid_robot_system
 {
 bool EyeWidget::reload_param()
 {
-    bool result = true;
-    this->eyelid.set_param(this->param);
-    this->param.eyeball_center_left.x  = this->eyelid.left.pos_center.x + this->param.eyeball_position_l_x;
-    this->param.eyeball_center_left.y  = this->eyelid.left.pos_center.y + this->param.eyeball_position_l_y;
-    this->param.eyeball_center_right.x = this->eyelid.right.pos_center.x + this->param.eyeball_position_r_x;
-    this->param.eyeball_center_right.y = this->eyelid.right.pos_center.y + this->param.eyeball_position_r_y;
-    this->eyeball.set_param(this->param);
+    bool result = false;
+    if (true == this->_flag_initialized) {
+#if DEBUG_OUTPUT_WIDGET
+        printf("  ---- reload_param ----\n");
+#endif
+        this->eyelid.set_param(this->param);
+        this->param.eyeball_center_left.x  = this->eyelid.left.pos_center.x + this->param.eyeball_position_l_x;
+        this->param.eyeball_center_left.y  = this->eyelid.left.pos_center.y + this->param.eyeball_position_l_y;
+        this->param.eyeball_center_right.x = this->eyelid.right.pos_center.x + this->param.eyeball_position_r_x;
+        this->param.eyeball_center_right.y = this->eyelid.right.pos_center.y + this->param.eyeball_position_r_y;
+        this->eyeball.set_param(this->param);
+        result = true;
+    }
     return result;
 }
 
@@ -30,19 +36,22 @@ void EyeWidget::pupil_order()
     this->flag_voice_id     = true;
 }
 
-void EyeWidget::cmd_eye_input(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y)
+void EyeWidget::emotion(MIENS value)
+{
+    this->eyelid.set_emotion(value);
+}
+
+void EyeWidget::stare(float size, float distance, float left_x, float left_y, float right_x, float right_y)
 {
     if (false == flag_first_request) {
         flag_first_request = true;
     }
     const int limit_y = 190;
-    /* 感情の設定*/
-    this->eyelid.set_emotion((MIENS)(emotions));
     /* 瞳の大きさ */
     this->eyeball.set_dimensions(size);
     /* ============================================= */
-    float get_target_y = ((left_y / 200.0) * param.calibration_eyelid_size_x);
-    float get_target_x = ((-left_x / 230.0) * param.calibration_eyelid_size_x);
+    float get_target_y = ((left_y / 200.0) * param.eyelid_size_x);
+    float get_target_x = ((-left_x / 230.0) * param.eyelid_size_y);
     /* ============================================= */
     const int min_per_eye_distance = 8;
     /* 近くなるほど寄り目になる */
@@ -80,9 +89,7 @@ void EyeWidget::cmd_eye_input(int emotions, int pupil_effect, float size, float 
                     printf("Thinking blink : FREE\n");
 #endif
                 }
-
                 break;
-
             case control_state::STATE_ACCEPTED:
                 if (param.thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
@@ -94,7 +101,6 @@ void EyeWidget::cmd_eye_input(int emotions, int pupil_effect, float size, float 
 #endif
                     break;
                 }
-
             case control_state::STATE_FREE:
             default:
                 if (abs(this->eyeball.right.target.y - get_target_y) > 150 || abs(this->eyeball.right.target.x - get_target_x) > 150) {
@@ -126,7 +132,7 @@ void EyeWidget::cmd_eye_input(int emotions, int pupil_effect, float size, float 
     }
 
     /* ============================================= */
-    last_ros_msg_time = current_time.elapsed();
+    this->last_ros_msg_time = current_time.elapsed();
 }
 
 // =============================

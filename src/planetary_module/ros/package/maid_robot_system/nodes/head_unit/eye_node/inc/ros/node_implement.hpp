@@ -52,10 +52,9 @@ private:
     // =============================
     // CONST
     // =============================
-    const int WAITING_FOR_MESSAGE_MS   = (1000 * 5);
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 10 };
+    const std::chrono::milliseconds TP_MSEC{ 1000 / DRAWING_MAX_FPS };
 #if DEBUG_OUTPUT_REPORT > 0
     const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ DEBUG_OUTPUT_REPORT };
 #endif

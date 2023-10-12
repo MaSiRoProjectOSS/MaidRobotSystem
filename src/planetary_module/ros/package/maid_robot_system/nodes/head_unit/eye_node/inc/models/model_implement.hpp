@@ -40,9 +40,7 @@ public:
     bool closing();
 
     bool calculate();
-    void set_msg_eye(int emotions,
-                     int pupil_effect,
-                     float size,
+    void set_msg_eye(float size,
                      float distance,
 
                      float left_x,

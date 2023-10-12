@@ -9,15 +9,6 @@
 #ifndef MRS_EYE_NODE_MODELS_CALIBRATION_DEFAULT_HPP
 #define MRS_EYE_NODE_MODELS_CALIBRATION_DEFAULT_HPP
 
-/**
- * @brief Image path of eyes data
- *
- */
-#define WORKSPACECONFIG_PATH_IMG_EYE "/skin/"
-#ifndef WORKSPACECONFIG_PATH_IMG_EYE
-#define WORKSPACECONFIG_PATH_IMG_EYE
-#endif
-
 /* ============================================= */
 
 #define CTRL_HITOMI_CMD_VOICE_CLEAR 3.0

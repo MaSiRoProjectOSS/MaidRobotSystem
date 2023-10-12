@@ -24,15 +24,15 @@ int ModelImplement::get_brightness()
 }
 int ModelImplement::get_color_r()
 {
-    return this->_widget->param.color_r;
+    return this->_widget->param.color.r;
 }
 int ModelImplement::get_color_g()
 {
-    return this->_widget->param.color_g;
+    return this->_widget->param.color.g;
 }
 int ModelImplement::get_color_b()
 {
-    return this->_widget->param.color_b;
+    return this->_widget->param.color.b;
 }
 
 } // namespace maid_robot_system

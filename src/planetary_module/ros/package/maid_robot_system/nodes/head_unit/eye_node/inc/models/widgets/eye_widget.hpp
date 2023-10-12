@@ -76,14 +76,16 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void initialize(StParameter param);
+    bool exec();
+    void calculate();
     void closing();
+
     // =============================
     // PUBLIC :
     // =============================
-    void update_screen();
     void pupil_order();
-    void cmd_eye_input(int emotions, int pupil_effect, float size, float distance, float left_x, float left_y, float right_x, float right_y);
+    void emotion(MIENS value);
+    void stare(float size, float distance, float left_x, float left_y, float right_x, float right_y);
 
     std::string output_message();
 
@@ -95,14 +97,16 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    void make_image();
-
+    void _init();
+    void _update_screen();
     std::string _read_file(const std::string &path);
+    std::string _miens_text(MIENS value);
 
 private:
     // =============================
     // PRIVATE : Variable
     // =============================
+    bool _flag_initialized = false;
     PartsEyeball eyeball;
     PartsEyelid eyelid;
     LogStore logger;

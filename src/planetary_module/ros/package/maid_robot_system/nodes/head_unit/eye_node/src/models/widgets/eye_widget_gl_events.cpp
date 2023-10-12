@@ -15,7 +15,12 @@ void EyeWidget::initializeGL()
 #if DEBUG_OUTPUT_WIDGET
     printf(" * initializeGL\n");
 #endif
+    // initializeOpenGLFunctions();
     //  connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &EyeWidget::cleanup);
+
+#if DEBUG_OUTPUT_WIDGET
+    printf(" * initializeGL end\n");
+#endif
 }
 
 void EyeWidget::resizeGL(int w, int h)
@@ -30,7 +35,9 @@ void EyeWidget::resizeGL(int w, int h)
 
 void EyeWidget::paintGL()
 {
-    this->update_screen();
+    int current = current_time.elapsed();
+    this->_update_screen();
+    logger.set_index(logger.ST_INDEX_TOTAL, current_time.elapsed() - current);
 }
 
 } // namespace maid_robot_system

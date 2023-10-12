@@ -10,22 +10,42 @@
 
 namespace maid_robot_system
 {
+std::string EyeWidget::_miens_text(MIENS value)
+{
+    std::string result = "";
+    switch (value) {
+        case MIENS::miens_smile:
+            result = "smile";
+            break;
+        case MIENS::miens_close_left:
+            result = "lose_left";
+            break;
+        case MIENS::miens_close_right:
+            result = "close_right";
+            break;
+        case MIENS::miens_close:
+            result = "close";
+            break;
+        case MIENS::miens_normal:
+            result = "normal";
+            break;
+        case MIENS::miens_wink_left:
+            result = "wink_left";
+            break;
+        case MIENS::miens_wink_right:
+            result = "wink_right";
+            break;
+        default:
+            result = "unknow";
+            break;
+    }
+
+    return result;
+}
+
 std::string EyeWidget::output_message()
 {
-    static int span = (int)(1000.0 * 60);
-
-    static int log_timer = current_time.elapsed();
-    int current          = current_time.elapsed();
-    int elapsed          = (current - log_timer);
-
-    if (span < elapsed) {
-        logger.print((int)eyelid.eye_emotion, elapsed, current);
-        log_timer = current;
-    }
-    if (0 > elapsed) {
-        log_timer = current;
-    }
-    return "std::string EyeWidget::output_message";
+    return logger.get_message(this->_miens_text(eyelid.eye_emotion), current_time.elapsed());
 }
 
 } // namespace maid_robot_system

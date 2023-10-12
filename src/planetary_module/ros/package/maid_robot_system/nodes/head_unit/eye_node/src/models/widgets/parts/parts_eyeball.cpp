@@ -8,6 +8,8 @@
  */
 #include "models/widgets/parts/parts_eyeball.hpp"
 
+#include <filesystem>
+
 namespace maid_robot_system
 {
 #ifndef M_PI
@@ -118,7 +120,7 @@ void PartsEyeball::set_param(StParameter param)
     printf(" Left (x,y) = (%f,%f)\n", param.eyeball_center_left.x, param.eyeball_center_left.y);
     printf("=============================================\n");
     printf("------------ Calibration Postion ------------\n");
-    printf(" Size (x,y) = (%d,%d)\n", param.calibration_eyelid_size_x, param.calibration_eyelid_size_y);
+    printf(" Size (x,y) = (%d,%d)\n", param.eyelid_size_x, param.eyelid_size_y);
     printf(" Pos r(x,y) = (%f,%f)\n", param.eyeball_position_l_x, param.eyeball_position_l_y);
     printf(" Pos l(x,y) = (%f,%f)\n", param.eyeball_position_r_x, param.eyeball_position_r_y);
     printf("---------------------------------------------\n");
@@ -127,67 +129,83 @@ void PartsEyeball::set_param(StParameter param)
 }
 void PartsEyeball::_set_image(StParameter param)
 {
-    printf("  ---- LOAD [Eyeball] ----\n");
-    const QString str_eyeball_origin = "eyeball/eye_all.png";
-    ////////////////
-    // eyeball_origin_l
-    QMatrix matrix_eyeball_l;
-    matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
-    eyeball_origin_l = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
-    eyeball_origin_l = eyeball_origin_l.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
-    eyeball_origin_l = eyeball_origin_l.transformed(matrix_eyeball_l);
-    // eyeball_origin
-    QMatrix matrix_eyeball_r;
-    matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
-    eyeball_origin_r = QPixmap(str_eyeball_origin, nullptr, param.imageFlag);
-    eyeball_origin_r = eyeball_origin_r.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
-    eyeball_origin_r = eyeball_origin_r.transformed(matrix_eyeball_r);
-
-#if DRAW_PUPIL_INSIDE || DRAW_PUPIL_OUTSIDE
-    printf("  ---- LOAD [Pupil] ----\n");
-#endif
-#if DRAW_PUPIL_OUTSIDE
-    printf("    register - %s\n", "Outside");
-    // pupil_outside_origin
-    this->matrix_pupil_outside.rotate(0);
-
-    for (int i = 0; i < 2; i++) {
-        switch (i) {
-            case 1:
-                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, param.imageFlag);
-                break;
-
-            default:
-                this->pupil_outside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, param.imageFlag);
-                break;
+    if (true == std::filesystem::is_directory(param.path)) {
+        char buffer_path[255];
+        printf("  ---- LOAD [Eyeball] ----\n");
+        ////////////////
+        // eyeball_origin left
+        sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/eyeball/eyeball_normally.png");
+        if (true == std::filesystem::exists(buffer_path)) {
+            QMatrix matrix_eyeball_l;
+            matrix_eyeball_l.rotate(-param.l_angle - param.eyeball_angle);
+            this->eyeball_origin_l = QPixmap(buffer_path, nullptr, param.imageFlag);
+            this->eyeball_origin_l = this->eyeball_origin_l.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+            this->eyeball_origin_l = this->eyeball_origin_l.transformed(matrix_eyeball_l);
+        }
+        // eyeball_origin right
+        sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/eyeball/eyeball_normally.png");
+        if (true == std::filesystem::exists(buffer_path)) {
+            QMatrix matrix_eyeball_r;
+            matrix_eyeball_r.rotate(-param.r_angle + param.eyeball_angle);
+            this->eyeball_origin_r = QPixmap(buffer_path, nullptr, param.imageFlag);
+            this->eyeball_origin_r = this->eyeball_origin_r.scaled(param.eyeball_size_x, param.eyeball_size_y, Qt::IgnoreAspectRatio);
+            this->eyeball_origin_r = this->eyeball_origin_r.transformed(matrix_eyeball_r);
         }
 
-        this->pupil_outside_origin[i] = this->pupil_outside_origin[i].scaled(this->pupil_ling_size_outside, this->pupil_ling_size_outside, Qt::IgnoreAspectRatio);
-        this->pupil_outside_origin[i] = this->pupil_outside_origin[i].transformed(this->matrix_pupil_outside);
-    }
+#if DRAW_PUPIL_OUTSIDE
+        printf("  ---- LOAD [Pupil-outside] ----\n");
+        // pupil_outside_origin
+        this->matrix_pupil_outside.rotate(0);
+
+        for (int i = 0; i < 2; i++) {
+            switch (i) {
+                case 1:
+                    sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/pupil/pupil_order.png");
+                    if (true == std::filesystem::exists(buffer_path)) {
+                        this->pupil_outside_origin[i] = QPixmap(buffer_path, nullptr, param.imageFlag);
+                    }
+                    break;
+
+                default:
+                    sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/pupil/pupil_normally.png");
+                    if (true == std::filesystem::exists(buffer_path)) {
+                        this->pupil_outside_origin[i] = QPixmap(buffer_path, nullptr, param.imageFlag);
+                    }
+                    break;
+            }
+
+            this->pupil_outside_origin[i] = this->pupil_outside_origin[i].scaled(this->pupil_ling_size_outside, this->pupil_ling_size_outside, Qt::IgnoreAspectRatio);
+            this->pupil_outside_origin[i] = this->pupil_outside_origin[i].transformed(this->matrix_pupil_outside);
+        }
 
 #endif
 #if DRAW_PUPIL_INSIDE
-    printf("    register - %s\n", "Inside");
-    // pupil_inside_origin
-    this->matrix_pupil_inside.rotate(0);
+        printf("  ---- LOAD [Pupil-inside] ----\n");
+        // pupil_inside_origin
+        this->matrix_pupil_inside.rotate(0);
 
-    for (int i = 0; i < 2; i++) {
-        switch (i) {
-            case 1:
-                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_Receive.png", nullptr, param.imageFlag);
-                break;
+        for (int i = 0; i < 2; i++) {
+            switch (i) {
+                case 1:
+                    sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/pupil/pupil_order.png");
+                    if (true == std::filesystem::exists(buffer_path)) {
+                        this->pupil_inside_origin[i] = QPixmap(buffer_path, nullptr, param.imageFlag);
+                    }
+                    break;
 
-            default:
-                this->pupil_inside_origin[i] = QPixmap("pupil/pupil_anime.png", nullptr, param.imageFlag);
-                break;
+                default:
+                    sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/pupil/pupil_normally.png");
+                    if (true == std::filesystem::exists(buffer_path)) {
+                        this->pupil_inside_origin[i] = QPixmap(buffer_path, nullptr, param.imageFlag);
+                    }
+                    break;
+            }
+
+            this->pupil_inside_origin[i] = this->pupil_inside_origin[i].scaled(this->pupil_ling_size_inside, this->pupil_ling_size_inside, Qt::IgnoreAspectRatio);
+            this->pupil_inside_origin[i] = this->pupil_inside_origin[i].transformed(this->matrix_pupil_inside);
         }
-
-        this->pupil_inside_origin[i] = this->pupil_inside_origin[i].scaled(this->pupil_ling_size_inside, this->pupil_ling_size_inside, Qt::IgnoreAspectRatio);
-        this->pupil_inside_origin[i] = this->pupil_inside_origin[i].transformed(this->matrix_pupil_inside);
-    }
-
 #endif
+    }
 }
 
 /**

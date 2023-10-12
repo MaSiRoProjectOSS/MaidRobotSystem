@@ -34,31 +34,28 @@ public:
 
     std::string setting_file = "";
     int brightness           = 100;
-    int color_r              = 255;
-    int color_g              = 255;
-    int color_b              = 255;
+    StColor color{ 255, 255, 255 };
 
 public:
-    int calibration_eyelid_size_x = CALIBRATION_EYELID_SIZE_X;
-    int calibration_eyelid_size_y = CALIBRATION_EYELID_SIZE_Y;
-
     double eyeball_size_x              = EYEBALL_SIZE_X;
     double eyeball_size_y              = EYEBALL_SIZE_Y;
     int thinking_next_time_notAccepted = 0;
     // Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
     Qt::ImageConversionFlag imageFlag = Qt::OrderedAlphaDither;
-    StVector eyeball_center_left;
-    StVector eyeball_center_right;
+    StVector eyeball_center_left{};
+    StVector eyeball_center_right{};
 
     StRectangle screen_size{ 0.0, 0.0, 640.0, 480.0 };
 
 public:
-    double l_x                   = CALIBRATION_L_X;
-    double l_y                   = CALIBRATION_L_Y;
-    double r_x                   = CALIBRATION_R_X;
-    double r_y                   = CALIBRATION_R_Y;
-    double r_angle               = CALIBRATION_R_DISP_ANGLE;
-    double l_angle               = CALIBRATION_L_DISP_ANGLE;
+    double l_x     = CALIBRATION_L_X;
+    double l_y     = CALIBRATION_L_Y;
+    double r_x     = CALIBRATION_R_X;
+    double r_y     = CALIBRATION_R_Y;
+    double r_angle = CALIBRATION_R_DISP_ANGLE;
+    double l_angle = CALIBRATION_L_DISP_ANGLE;
+    // St2DPostion eyeball_right{ CALIBRATION_EYEBALL_X, CALIBRATION_EYEBALL_Y, CALIBRATION_EYEBALL_ANGLE };
+    // St2DPostion eyeball_left{ CALIBRATION_EYEBALL_X, CALIBRATION_EYEBALL_Y, CALIBRATION_EYEBALL_ANGLE };
     double eyeball_position_r_x  = CALIBRATION_EYEBALL_X;
     double eyeball_position_r_y  = CALIBRATION_EYEBALL_Y;
     double eyeball_position_l_x  = CALIBRATION_EYEBALL_X;

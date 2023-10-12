@@ -30,31 +30,29 @@ public:
     /* ============================================= */
     typedef enum
     {
-        ST_INDEX_START,
+        ST_INDEX_INIT,
+        ST_INDEX_PRE_CALCULATION,
         ST_INDEX_MAKE_PUPIL_INSIDE,
         ST_INDEX_MAKE_PUPIL_OUTSIDE,
-        /* ======== */
+        ST_INDEX_DRAW_BACKGROUND,
         ST_INDEX_DRAW_EYEBALL,
         ST_INDEX_DRAW_PUPIL_INSIDE,
         ST_INDEX_DRAW_PUPIL_OUTSIDE,
         ST_INDEX_DRAW_EYELID,
-        ST_INDEX_END,
-        ST_INDEX_FPS,
-        ST_INDEX_TOTAL,
+        ST_INDEX_FIN,
         /* ======== */
-
+        ST_INDEX_TOTAL,
         ST_INDEX_LOG_MAX
     } ST_INDEX_LOG;
 
     void set_index(ST_INDEX_LOG index, int spent_time);
-    void print(int eye_emotion, double total_spent_msec, double current_time_msec);
+    std::string get_message(std::string miens_text, double current_time_msec);
 
 private:
     /* ============================================= */
-    void clear();
-    int spent_time_list[ST_INDEX_LOG_MAX];
-    int count       = 0;
-    int count_total = 0;
+    void _clear();
+    int _spent_time_list[ST_INDEX_LOG_MAX];
+    int _count = 0;
 };
 
 } // namespace maid_robot_system

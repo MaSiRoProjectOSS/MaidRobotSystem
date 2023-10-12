@@ -32,6 +32,9 @@ bool ModelImplement::open(int argc, char **argv)
 {
     bool result = false;
     try {
+        if (nullptr != this->app) {
+            this->closing();
+        }
         this->app = new QApplication(argc, argv);
         // format
         QSurfaceFormat format;
@@ -80,8 +83,7 @@ bool ModelImplement::exec()
 {
     bool result = false;
     if (nullptr != this->_widget) {
-        this->_widget->showFullScreen();
-        result = true;
+        result = this->_widget->exec();
     }
     return result;
 }
@@ -90,7 +92,7 @@ bool ModelImplement::calculate()
 {
     bool result = false;
     if (nullptr != this->_widget) {
-        this->_widget->update();
+        this->_widget->calculate();
         this->app->processEvents();
         result = true;
     }

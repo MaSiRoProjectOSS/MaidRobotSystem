@@ -12,10 +12,12 @@
 
 namespace maid_robot_system
 {
+#define DRAWING_MAX_FPS     (40)
 #define DEBUG_OUTPUT_REPORT (1000 * 10)
 
-#define DEBUG_OUTPUT_OPEN_GL 1
-#define DEBUG_OUTPUT_WIDGET  1
+#define DEBUG_OUTPUT_OPEN_GL     1
+#define DEBUG_OUTPUT_WIDGET      1
+#define DEBUG_OUTPUT_FPS_VERBOSE 0
 
 #define LOGGER_INFO_DETAIL               0
 #define LOGGER_INFO_PARAMETER            0
