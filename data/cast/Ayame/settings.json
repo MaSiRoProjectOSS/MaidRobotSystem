@@ -1,5 +1,15 @@
 {
-    "description": "eye_nodeの設定ファイルです。\nrightはキャストの右目/leftはキャストの左目です。\n貴方からみた右側、左側ではありません。",
+    "TODO": [
+        "displayの縦横比率によって表示が切り替わる。実装するか？"
+    ],
+    "description": [
+        "eye_nodeの設定ファイルです",
+        "rightはキャストの右目/leftはキャストの左目です。貴方からみた右側、左側ではありません。",
+        "座標はキャスト座標（ROS座標/正面がX軸の右手系)",
+        "Offsetは、+yにすると左手側へ/+zすると上へ移動する"
+    ],
+    "url": "",
+    "version": "0.23",
     "path": "/opt/MaidRobotSystem/data/cast/Ayame",
     "name": "Ayame",
     "display": {
@@ -13,8 +23,8 @@
                     "height": 1.0
                 },
                 "offset": {
-                    "x": 0,
                     "y": 0,
+                    "z": 0,
                     "angle": 0.0
                 }
             },
@@ -24,8 +34,8 @@
                     "height": 1
                 },
                 "offset": {
-                    "x": 0,
                     "y": 0,
+                    "z": 0,
                     "angle": 0.0
                 }
             },
@@ -49,8 +59,8 @@
                     "height": 1.0
                 },
                 "offset": {
-                    "x": 0,
                     "y": 0,
+                    "z": 0,
                     "angle": 0.0
                 }
             },
@@ -60,8 +70,8 @@
                     "height": 1
                 },
                 "offset": {
-                    "x": 0,
                     "y": 0,
+                    "z": 0,
                     "angle": 0.0
                 }
             },

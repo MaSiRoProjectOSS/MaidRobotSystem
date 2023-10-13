@@ -179,9 +179,9 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.left_eye.eyelid_scale.y = settings["rectangle"]["left"]["eyelid"]["size_rate"].value("height", this->param.left_eye.eyelid_scale.y);
                         }
                         if (true == settings["rectangle"]["left"]["eyelid"].contains("offset")) {
-                            this->param.left_eye.eyelid.x     = settings["rectangle"]["left"]["eyelid"]["offset"].value("x", this->param.left_eye.eyelid.x);
-                            this->param.left_eye.eyelid.y     = settings["rectangle"]["left"]["eyelid"]["offset"].value("y", this->param.left_eye.eyelid.y);
-                            this->param.left_eye.eyelid.angle = settings["rectangle"]["left"]["eyelid"]["offset"].value("angle", this->param.left_eye.eyelid.angle);
+                            this->param.left_eye.eyelid.x     = settings["rectangle"]["left"]["eyelid"]["offset"].value("y", this->param.left_eye.eyelid.x);
+                            this->param.left_eye.eyelid.y     = -settings["rectangle"]["left"]["eyelid"]["offset"].value("z", this->param.left_eye.eyelid.y);
+                            this->param.left_eye.eyelid.angle = -settings["rectangle"]["left"]["eyelid"]["offset"].value("angle", this->param.left_eye.eyelid.angle);
                         }
                     }
                     if (true == settings["rectangle"]["left"].contains("eyeball")) {
@@ -190,9 +190,9 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.left_eye.eyeball_scale.y = settings["rectangle"]["left"]["eyeball"]["size_rate"].value("height", this->param.left_eye.eyeball_scale.y);
                         }
                         if (true == settings["rectangle"]["left"]["eyeball"].contains("offset")) {
-                            this->param.left_eye.eyeball.x     = settings["rectangle"]["left"]["eyeball"]["offset"].value("x", this->param.left_eye.eyeball.x);
-                            this->param.left_eye.eyeball.y     = settings["rectangle"]["left"]["eyeball"]["offset"].value("y", this->param.left_eye.eyeball.y);
-                            this->param.left_eye.eyeball.angle = settings["rectangle"]["left"]["eyeball"]["offset"].value("angle", this->param.left_eye.eyeball.angle);
+                            this->param.left_eye.eyeball.x     = settings["rectangle"]["left"]["eyeball"]["offset"].value("y", this->param.left_eye.eyeball.x);
+                            this->param.left_eye.eyeball.y     = -settings["rectangle"]["left"]["eyeball"]["offset"].value("z", this->param.left_eye.eyeball.y);
+                            this->param.left_eye.eyeball.angle = -settings["rectangle"]["left"]["eyeball"]["offset"].value("angle", this->param.left_eye.eyeball.angle);
                         }
                     }
                     if (true == settings["rectangle"]["left"].contains("cornea")) {
@@ -224,9 +224,9 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.right_eye.eyelid_scale.y = settings["rectangle"]["right"]["eyelid"]["size_rate"].value("height", this->param.right_eye.eyelid_scale.y);
                         }
                         if (true == settings["rectangle"]["right"]["eyelid"].contains("offset")) {
-                            this->param.right_eye.eyelid.x     = settings["rectangle"]["right"]["eyelid"]["offset"].value("x", this->param.right_eye.eyelid.x);
-                            this->param.right_eye.eyelid.y     = settings["rectangle"]["right"]["eyelid"]["offset"].value("y", this->param.right_eye.eyelid.y);
-                            this->param.right_eye.eyelid.angle = settings["rectangle"]["right"]["eyelid"]["offset"].value("angle", this->param.right_eye.eyelid.angle);
+                            this->param.right_eye.eyelid.x     = settings["rectangle"]["right"]["eyelid"]["offset"].value("y", this->param.right_eye.eyelid.x);
+                            this->param.right_eye.eyelid.y     = -settings["rectangle"]["right"]["eyelid"]["offset"].value("z", this->param.right_eye.eyelid.y);
+                            this->param.right_eye.eyelid.angle = -settings["rectangle"]["right"]["eyelid"]["offset"].value("angle", this->param.right_eye.eyelid.angle);
                         }
                     }
                     if (true == settings["rectangle"]["right"].contains("eyeball")) {
@@ -235,9 +235,9 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.right_eye.eyeball_scale.y = settings["rectangle"]["right"]["eyeball"]["size_rate"].value("height", this->param.right_eye.eyeball_scale.y);
                         }
                         if (true == settings["rectangle"]["right"]["eyeball"].contains("offset")) {
-                            this->param.right_eye.eyeball.x     = settings["rectangle"]["right"]["eyeball"]["offset"].value("x", this->param.right_eye.eyeball.x);
-                            this->param.right_eye.eyeball.y     = settings["rectangle"]["right"]["eyeball"]["offset"].value("y", this->param.right_eye.eyeball.y);
-                            this->param.right_eye.eyeball.angle = settings["rectangle"]["right"]["eyeball"]["offset"].value("angle", this->param.right_eye.eyeball.angle);
+                            this->param.right_eye.eyeball.x     = settings["rectangle"]["right"]["eyeball"]["offset"].value("y", this->param.right_eye.eyeball.x);
+                            this->param.right_eye.eyeball.y     = -settings["rectangle"]["right"]["eyeball"]["offset"].value("z", this->param.right_eye.eyeball.y);
+                            this->param.right_eye.eyeball.angle = -settings["rectangle"]["right"]["eyeball"]["offset"].value("angle", this->param.right_eye.eyeball.angle);
                         }
                     }
                     if (true == settings["rectangle"]["right"].contains("cornea")) {
