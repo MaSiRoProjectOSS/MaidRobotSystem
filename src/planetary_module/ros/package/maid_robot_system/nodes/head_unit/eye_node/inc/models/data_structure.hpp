@@ -52,7 +52,7 @@ public:
         // Settings : Screen
         this->brightness = 100;
         this->eyelid_color.set(255, 255, 255, 255);
-        this->ciliary_color.set(255, 255, 255, 255);
+        this->ciliary_color.set(231, 183, 147, 255);
         this->screen_size.set(0, 0, 640, 480, 0);
         this->screen_scale = 1.0;
         // blink time

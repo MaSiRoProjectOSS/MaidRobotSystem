@@ -80,6 +80,7 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
+    bool _within_range(int value, int min = 0, int max = 255);
 
 private:
     // =============================

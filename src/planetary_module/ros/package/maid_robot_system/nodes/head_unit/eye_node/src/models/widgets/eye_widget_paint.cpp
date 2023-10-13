@@ -58,7 +58,7 @@ void EyeWidget::_update_screen()
     }
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    //painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
+    // painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
     painter.scale(this->param.screen_scale, this->param.screen_scale);
 
     logger.set_index(logger.ST_INDEX_INIT, current_time.elapsed() - start_time);
@@ -93,24 +93,22 @@ void EyeWidget::_update_screen()
     // Make cornea outside
     /* ============================================= */
     start_time = current_time.elapsed();
-#if 0
-    painter.fillRect(param.screen_size.x, //
-                     param.screen_size.y,
-                     param.screen_size.width,
-                     param.screen_size.height,
-                     Qt::white);
-#else
+    painter.fillRect(this->param.screen_size.x, //
+                     this->param.screen_size.y,
+                     this->param.screen_size.width,
+                     this->param.screen_size.height,
+                     this->_ciliary_color);
+
     painter.fillRect((int)this->eyelid.left_eye.pos.x, //
                      (int)this->eyelid.left_eye.pos.y,
                      this->param.left_eye.eyelid.width,
                      this->param.left_eye.eyelid.height,
-                     Qt::white);
+                     this->eyelid.color);
     painter.fillRect((int)this->eyelid.right_eye.pos.x, //
                      (int)this->eyelid.right_eye.pos.y,
                      this->param.right_eye.eyelid.width,
                      this->param.right_eye.eyelid.height,
-                     Qt::white);
-#endif
+                     this->eyelid.color);
     logger.set_index(logger.ST_INDEX_DRAW_BACKGROUND, current_time.elapsed() - start_time);
 
     /* ============================================= */
@@ -134,20 +132,26 @@ void EyeWidget::_update_screen()
     // Draw : cornea outside
     /* ============================================= */
     start_time = current_time.elapsed();
-    painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime.x, this->eyeball.right_eye.draw_cornea_anime.y, this->eyeball.cornea_outside);
-    painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime.x, this->eyeball.left_eye.draw_cornea_anime.y, this->eyeball.cornea_outside);
+    if (true == this->param.right_eye.cornea_outside.enable) {
+        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime.x, this->eyeball.right_eye.draw_cornea_anime.y, this->eyeball.cornea_outside);
+    }
+    if (true == this->param.left_eye.cornea_outside.enable) {
+        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime.x, this->eyeball.left_eye.draw_cornea_anime.y, this->eyeball.cornea_outside);
+    }
     logger.set_index(logger.ST_INDEX_DRAW_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
-
 #endif
 #if DRAW_CORNEA_INSIDE
     /* ============================================= */
     // Draw : cornea inside
     /* ============================================= */
     start_time = current_time.elapsed();
-    painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime2.x, this->eyeball.right_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside);
-    painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime2.x, this->eyeball.left_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside);
+    if (true == this->param.right_eye.cornea_inside.enable) {
+        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime2.x, this->eyeball.right_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside);
+    }
+    if (true == this->param.left_eye.cornea_inside.enable) {
+        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime2.x, this->eyeball.left_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside);
+    }
     logger.set_index(logger.ST_INDEX_DRAW_CORNEA_INSIDE, current_time.elapsed() - start_time);
-
 #endif
     /* ============================================= */
     // Draw : eyelid

@@ -348,10 +348,11 @@ void PartsEyelid::load(StParameter param)
 
 void PartsEyelid::set_param(StParameter param)
 {
+    // TODO
     this->eye_blink_time_offset = param.blink_time_offset;
     this->elapsed_next          = 0;
 
-    // TODO
+    this->color.setRgb(param.eyelid_color.r, param.eyelid_color.g, param.eyelid_color.b);
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");

@@ -121,6 +121,7 @@ private:
     control_state thinking_flag_notAccepted = control_state::STATE_FREE;
 
     int _thinking_next_time_notAccepted = 0;
+    QColor _ciliary_color;
 
 private:
     // =============================

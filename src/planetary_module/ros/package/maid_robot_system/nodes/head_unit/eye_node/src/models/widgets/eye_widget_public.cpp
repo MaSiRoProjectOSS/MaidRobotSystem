@@ -22,6 +22,8 @@ bool EyeWidget::reload_param()
 {
     bool result = false;
     if (true == this->_flag_initialized) {
+        this->_ciliary_color.setRgb(this->param.ciliary_color.r, this->param.ciliary_color.g, this->param.ciliary_color.b);
+
 #if DEBUG_OUTPUT_WIDGET
         printf("  ---- reload_param ----\n");
 #endif

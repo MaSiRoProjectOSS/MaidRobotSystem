@@ -28,9 +28,9 @@ def generate_launch_description():
         parameters=[{
             "setting_file": _setting_file,
             "brightness": 100,
-            "ciliary/color/r": 255,
-            "ciliary/color/g": 255,
-            "ciliary/color/b": 255,
+            "ciliary/color/r": 231,
+            "ciliary/color/g": 183,
+            "ciliary/color/b": 147,
             "eyelid/color/r": 255,
             "eyelid/color/g": 255,
             "eyelid/color/b": 255

@@ -78,6 +78,9 @@ public:
     PartsEyelid();
 
 public:
+    QColor color;
+
+public:
     void load(StParameter param);
     void set_param(StParameter param);
 
