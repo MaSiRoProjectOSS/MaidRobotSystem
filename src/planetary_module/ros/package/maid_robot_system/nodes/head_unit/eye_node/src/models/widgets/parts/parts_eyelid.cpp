@@ -38,8 +38,8 @@ void PartsEyelid::calc_animation(int elapsed)
 {
     static MIENS previous_emotion = NEXT_EMOTION_INIT;
     static bool start_animation   = false;
-    left.set_elapsed(elapsed);
-    right.set_elapsed(elapsed);
+    this->left_eye.set_elapsed(elapsed);
+    this->right_eye.set_elapsed(elapsed);
 
     if (this->lib_animation == 0) {
         switch (next_eye_emotion) {
@@ -50,7 +50,7 @@ void PartsEyelid::calc_animation(int elapsed)
                     start_animation  = true;
                     eye_emotion      = next_eye_emotion;
                     previous_emotion = eye_emotion;
-                    set_onTheWay();
+                    this->set_on_the_way();
                 }
 
                 break;
@@ -62,7 +62,7 @@ void PartsEyelid::calc_animation(int elapsed)
                     start_animation  = true;
                     eye_emotion      = next_eye_emotion;
                     previous_emotion = eye_emotion;
-                    set_onTheWay();
+                    this->set_on_the_way();
                 }
 
                 break;
@@ -75,8 +75,8 @@ void PartsEyelid::calc_animation(int elapsed)
 
         if (true == thinking) {
             eye_blink_time = this->set_eye_blink_time(blink_type::BLINK_TYPE_MIN_MAX);
-            left.wink(eye_blink_time);
-            right.wink(eye_blink_time);
+            this->left_eye.wink(eye_blink_time);
+            this->right_eye.wink(eye_blink_time);
             thinking = false;
         } else {
             if (this->elapsed_next <= elapsed) {
@@ -129,7 +129,7 @@ void PartsEyelid::calc_animation(int elapsed)
  */
 bool PartsEyelid::enable_motion()
 {
-    if ((true == left.enable_motion()) && (true == right.enable_motion())) {
+    if ((true == this->left_eye.enable_motion()) && (true == this->right_eye.enable_motion())) {
         return true;
     } else {
         return false;
@@ -172,20 +172,20 @@ void PartsEyelid::_reset_position(StParameter param)
      *  Lの位置計算 = (ウィンドウサイズ * ( 3.0 / 4.0 ) ) - (eyelidのイメージサイズ / 2.0)
      */
     /* eyelid の中心座標 */
-    right.pos_center.set((param.screen_size.width * 0.25) + param.r_x, (param.screen_size.height * 0.25) + param.r_y);
-    left.pos_center.set((param.screen_size.width * 0.75) + param.l_x, (param.screen_size.height * 0.25) + param.l_y);
+    this->left_eye.pos_center.set((param.screen_size.width * 0.75) + param.left_eye.eyelid.x, (param.screen_size.height * 0.25) + param.left_eye.eyelid.y, 0);
+    this->right_eye.pos_center.set((param.screen_size.width * 0.25) + param.right_eye.eyelid.x, (param.screen_size.height * 0.25) + param.right_eye.eyelid.y, 0);
     /* eyelid の描画開始座標 */
-    right.pos.set_axis(right.pos_center.x - (param.eyelid_size_x * 0.5),  // R_x: -86.000000
-                       right.pos_center.y - (param.eyelid_size_y * 0.5)); // R_y: -280.000000
-    left.pos.set_axis(left.pos_center.x - (param.eyelid_size_x * 0.5),    // L_x: 1535.000000
-                 left.pos_center.y - (param.eyelid_size_y * 0.5));   // L_y: -270.000000
+    this->right_eye.pos.set_axis(this->right_eye.pos_center.x - (param.right_eye.eyelid.width * 0.5),   // R_x: -86.000000
+                                 this->right_eye.pos_center.y - (param.right_eye.eyelid.height * 0.5)); // R_y: -280.000000
+    this->left_eye.pos.set_axis(this->left_eye.pos_center.x - (param.left_eye.eyelid.width * 0.5),      // L_x: 1535.000000
+                                this->left_eye.pos_center.y - (param.left_eye.eyelid.height * 0.5));    // L_y: -270.000000
 }
 
 /**
  * @brief
  *
  */
-void PartsEyelid::set_onTheWay()
+void PartsEyelid::set_on_the_way()
 {
     winkValue = func_rand(3.0, 4.1);
     winkValue = func_rand(3.0, 4.1);
@@ -341,27 +341,31 @@ void PartsEyelid::set_cycle(uint elapsed)
 {
 }
 
+void PartsEyelid::load(StParameter param)
+{
+    this->_set_image(param);
+}
+
 void PartsEyelid::set_param(StParameter param)
 {
-    this->eye_blink_time_offset = param.eye_blink_time_offset;
+    this->eye_blink_time_offset = param.blink_time_offset;
     this->elapsed_next          = 0;
 
     // TODO
-    this->_set_image(param);
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
-    printf(" Right (x,y) = (%f,%f)\n", this->right.pos.x, this->right.pos.y);
-    printf(" Left (x,y) = (%f,%f)\n", this->left.pos.x, this->left.pos.y);
+    printf(" Right (x,y) = (%f,%f)\n", this->right_eye.pos.x, this->right_eye.pos.y);
+    printf(" Left (x,y) = (%f,%f)\n", this->left_eye.pos.x, this->left_eye.pos.y);
     printf("=============================================\n");
 #endif
 }
 void PartsEyelid::_set_image(StParameter param)
 {
-    this->eye_blink_time_quickly      = param.eye_blink_time_quickly;
-    this->eye_blink_time_min          = param.eye_blink_time_min;   // ms
-    this->eye_blink_time_max          = param.eye_blink_time_max;   // ms
-    this->eye_blink_time_limit        = param.eye_blink_time_limit; // ms
+    this->eye_blink_time_quickly      = param.blink_time_quickly;
+    this->eye_blink_time_min          = param.blink_time_min;   // ms
+    this->eye_blink_time_max          = param.blink_time_max;   // ms
+    this->eye_blink_time_limit        = param.blink_time_limit; // ms
     Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
     imageFlag                         = Qt::OrderedAlphaDither;
     /* ============================================= */
@@ -383,16 +387,16 @@ void PartsEyelid::_set_image(StParameter param)
                 rotate_angle_eyelid.rotate(-90);
                 // left
                 QMatrix rotate_angle_eyelid_l;
-                rotate_angle_eyelid_l.rotate(-param.l_angle);
+                rotate_angle_eyelid_l.rotate(param.left_eye.eyeball.angle);
                 this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
                 // right
                 QMatrix rotate_angle_eyelid_r;
-                rotate_angle_eyelid_r.rotate(-param.r_angle);
+                rotate_angle_eyelid_r.rotate(param.right_eye.eyeball.angle);
                 this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
                 this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
-                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(rotate_angle_eyelid_r);
             }
         }
@@ -410,16 +414,16 @@ void PartsEyelid::_set_image(StParameter param)
                 rotate_angle_smile_lid.rotate(-90);
                 // left
                 QMatrix rotate_angle_smile_lid_l;
-                rotate_angle_smile_lid_l.rotate(-param.l_angle);
+                rotate_angle_smile_lid_l.rotate(param.left_eye.eyeball.angle);
                 this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
                 // right
                 QMatrix rotate_angle_smile_lid_r;
-                rotate_angle_smile_lid_r.rotate(-param.r_angle);
+                rotate_angle_smile_lid_r.rotate(param.right_eye.eyeball.angle);
                 this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
                 this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
-                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.eyelid_size_x, param.eyelid_size_y, Qt::IgnoreAspectRatio);
+                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(rotate_angle_smile_lid_r);
             }
         }
@@ -434,14 +438,6 @@ PartsEyelid::PartsEyelid()
 {
 }
 
-/**
- * @brief
- *
- * @param current_time
- */
-void StEyelid::debug_old_calc(uint current_time)
-{
-}
 /**
  * @brief
  *
@@ -514,7 +510,7 @@ void StEyelid::wink(uint wink_time_millisecond)
 void StEyelid::set_elapsed(uint current_time)
 {
 #if 1
-    debug_old_calc(current_time);
+
 #else
     int elapsedIndex = _elapsedIndex;
     _current_time    = current_time;
@@ -554,8 +550,8 @@ void PartsEyelid::set_eye_blink(blink_type eye_emotion, bool start_flag)
     this->lib_animation++;
 
     if (true == start_flag) {
-        this->left.wink(this->eye_blink_time);
-        this->right.wink(this->eye_blink_time);
+        this->left_eye.wink(this->eye_blink_time);
+        this->right_eye.wink(this->eye_blink_time);
         this->thinking = true;
     }
 }

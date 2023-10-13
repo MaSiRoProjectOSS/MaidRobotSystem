@@ -59,24 +59,24 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
             result.append(buffer);
 
             sprintf(buffer,
-                    "  Init                 [%7.3f ms]\n"
-                    "  Calculate            [%7.3f ms]\n"
-                    "  ROUTE- pupil_outside [%7.3f ms]\n"
-                    "  ROUTE- pupil_inside  [%7.3f ms]\n"
-                    "  DRAW - background    [%7.3f ms]\n"
-                    "  DRAW - eyeball       [%7.3f ms]\n"
-                    "  DRAW - pupil outside [%7.3f ms]\n"
-                    "  DRAW - pupil inside  [%7.3f ms]\n"
-                    "  DRAW - eyelid        [%7.3f ms]\n"
-                    "  FIN                  [%7.3f ms]\n",
+                    "  Init                  [%7.3f ms]\n"
+                    "  Calculate             [%7.3f ms]\n"
+                    "  ROUTE- cornea_outside [%7.3f ms]\n"
+                    "  ROUTE- cornea_inside  [%7.3f ms]\n"
+                    "  DRAW - background     [%7.3f ms]\n"
+                    "  DRAW - eyeball        [%7.3f ms]\n"
+                    "  DRAW - cornea outside [%7.3f ms]\n"
+                    "  DRAW - cornea inside  [%7.3f ms]\n"
+                    "  DRAW - eyelid         [%7.3f ms]\n"
+                    "  FIN                   [%7.3f ms]\n",
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_INIT],
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_PRE_CALCULATION],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_MAKE_PUPIL_OUTSIDE],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_MAKE_PUPIL_INSIDE],
+                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_MAKE_CORNEA_OUTSIDE],
+                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_MAKE_CORNEA_INSIDE],
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_BACKGROUND],
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYEBALL],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_PUPIL_INSIDE],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_PUPIL_OUTSIDE],
+                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_INSIDE],
+                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_OUTSIDE],
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYELID],
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_FIN]);
             result.append(buffer);

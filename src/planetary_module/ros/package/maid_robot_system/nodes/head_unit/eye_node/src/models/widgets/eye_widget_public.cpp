@@ -10,6 +10,14 @@
 
 namespace maid_robot_system
 {
+bool EyeWidget::load()
+{
+    bool result = false;
+    this->eyelid.load(this->param);
+    this->eyeball.load(this->param);
+    return result;
+}
+
 bool EyeWidget::reload_param()
 {
     bool result = false;
@@ -18,19 +26,19 @@ bool EyeWidget::reload_param()
         printf("  ---- reload_param ----\n");
 #endif
         this->eyelid.set_param(this->param);
-        this->param.eyeball_center_left.x  = this->eyelid.left.pos_center.x + this->param.eyeball_position_l_x;
-        this->param.eyeball_center_left.y  = this->eyelid.left.pos_center.y + this->param.eyeball_position_l_y;
-        this->param.eyeball_center_right.x = this->eyelid.right.pos_center.x + this->param.eyeball_position_r_x;
-        this->param.eyeball_center_right.y = this->eyelid.right.pos_center.y + this->param.eyeball_position_r_y;
+        this->param.left_eye.eyeball_center.x  = this->eyelid.left_eye.pos_center.x + this->param.left_eye.eyeball.x;
+        this->param.left_eye.eyeball_center.y  = this->eyelid.left_eye.pos_center.y + this->param.left_eye.eyeball.y;
+        this->param.right_eye.eyeball_center.x = this->eyelid.right_eye.pos_center.x + this->param.right_eye.eyeball.x;
+        this->param.right_eye.eyeball_center.y = this->eyelid.right_eye.pos_center.y + this->param.right_eye.eyeball.y;
         this->eyeball.set_param(this->param);
         result = true;
     }
     return result;
 }
 
-void EyeWidget::pupil_order()
+void EyeWidget::cornea_order()
 {
-    this->eyeball.set_state_pupil(PartsEyeball::PupilState::Receiving);
+    this->eyeball.set_state_cornea(PartsEyeball::CorneaState::Receiving);
 
     this->last_voiceId_time = current_time.elapsed();
     this->flag_voice_id     = true;
@@ -50,8 +58,8 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
     /* 瞳の大きさ */
     this->eyeball.set_dimensions(size);
     /* ============================================= */
-    float get_target_y = ((left_y / 200.0) * param.eyelid_size_x);
-    float get_target_x = ((-left_x / 230.0) * param.eyelid_size_y);
+    float get_target_y = ((left_y / 200.0) * param.left_eye.eyelid.height);
+    float get_target_x = ((-left_x / 230.0) * param.left_eye.eyelid.width);
     /* ============================================= */
     const int min_per_eye_distance = 8;
     /* 近くなるほど寄り目になる */
@@ -83,7 +91,7 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
     if (abs(get_target_x) < 500 && abs(get_target_y) < 400) {
         switch (this->thinking_flag_notAccepted) {
             case control_state::STATE_NOT_ACCEPTED:
-                if (param.thinking_next_time_notAccepted < current_time.elapsed()) {
+                if (this->_thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->thinking_flag_notAccepted = control_state::STATE_FREE;
 #if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : FREE\n");
@@ -91,10 +99,10 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 }
                 break;
             case control_state::STATE_ACCEPTED:
-                if (param.thinking_next_time_notAccepted < current_time.elapsed()) {
+                if (this->_thinking_next_time_notAccepted < current_time.elapsed()) {
                     this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
                     this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
-                    param.thinking_next_time_notAccepted
+                    this->_thinking_next_time_notAccepted
                             = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                     printf("Thinking blink : NOT ACCEPTED\n");
@@ -103,11 +111,11 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 }
             case control_state::STATE_FREE:
             default:
-                if (abs(this->eyeball.right.target.y - get_target_y) > 150 || abs(this->eyeball.right.target.x - get_target_x) > 150) {
+                if (abs(this->eyeball.right_eye.target.y - get_target_y) > 150 || abs(this->eyeball.right_eye.target.x - get_target_x) > 150) {
                     this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
 
                     if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
-                        param.thinking_next_time_notAccepted
+                        this->_thinking_next_time_notAccepted
                                 = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                         printf("Thinking blink : ACCEPTED\n");
@@ -120,14 +128,14 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 break;
         }
 
-        if (abs(this->eyeball.right.target.x - get_target_x) > 0) {
-            this->eyeball.right.target.x = get_target_x + ((param.eyeball_size_x * distance_change) / 100.0);
-            this->eyeball.left.target.x  = get_target_x - ((param.eyeball_size_x * distance_change) / 100.0);
+        if (abs(this->eyeball.right_eye.target.x - get_target_x) > 0) {
+            this->eyeball.left_eye.target.x  = get_target_x - ((param.left_eye.eyeball.width * distance_change) / 100.0);
+            this->eyeball.right_eye.target.x = get_target_x + ((param.right_eye.eyeball.width * distance_change) / 100.0);
         }
 
-        if (abs(this->eyeball.right.target.y - get_target_y) > 0) {
-            this->eyeball.right.target.y = get_target_y;
-            this->eyeball.left.target.y  = get_target_y;
+        if (abs(this->eyeball.right_eye.target.y - get_target_y) > 0) {
+            this->eyeball.right_eye.target.y = get_target_y;
+            this->eyeball.left_eye.target.y  = get_target_y;
         }
     }
 

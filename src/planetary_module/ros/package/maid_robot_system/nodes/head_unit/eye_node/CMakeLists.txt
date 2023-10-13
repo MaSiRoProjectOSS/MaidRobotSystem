@@ -47,15 +47,16 @@ find_package(nlohmann_json REQUIRED)
 
 add_executable(${NODE_NAME}
   src/main.cpp
-  src/ros/node_implement.cpp
+  src/ros/interaction_node.cpp
+  src/ros/widget_node_setter.cpp
+  src/ros/widget_node_getter.cpp
+  src/ros/widget_node.cpp
+
   src/models/log_store.cpp
 
   src/models/widgets/parts/parts_eyeball.cpp
   src/models/widgets/parts/parts_eyelid.cpp
 
-  src/models/model_public_setter.cpp
-  src/models/model_public_getter.cpp
-  src/models/model_public.cpp
 
   src/models/widgets/eye_widget_gl_events.cpp
   src/models/widgets/eye_widget_loader.cpp

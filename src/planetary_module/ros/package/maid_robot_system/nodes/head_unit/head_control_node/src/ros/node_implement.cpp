@@ -8,6 +8,7 @@
  *
  */
 #include "ros/node_implement.hpp"
+
 using std::placeholders::_1;
 
 namespace maid_robot_system
@@ -119,7 +120,7 @@ void NodeImplement::_callback_param_init()
 
         for (auto &&param : params) {
 #if LOGGER_INFO_PARAMETER
-            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name());
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
 #endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:

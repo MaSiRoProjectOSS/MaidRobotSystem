@@ -106,8 +106,8 @@ bool ModelImplement::_msg_clear()
 {
     // _msg_eye
     this->_calculate_eye(0, 0, this->_temp_overall.EYE_DEFAULT_SIZE, this->_temp_overall.EYE_DEFAULT_DISTANCE);
-    this->_msg_eye.emotions     = maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL;
-    this->_msg_eye.pupil_effect = maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_NORMAL;
+    this->_msg_eye.emotions      = maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL;
+    this->_msg_eye.cornea_effect = maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL;
 
     // _msg_neck
     this->_calculate_neck(0, 0, 0);

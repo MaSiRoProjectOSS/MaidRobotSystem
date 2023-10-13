@@ -32,35 +32,37 @@ public:
 
     StVector(double input_x = 0.0, double input_y = 0.0, double input_z = 0.0)
     {
-        set(input_x, input_y, input_z);
+        this->set(input_x, input_y, input_z);
     }
 
-    void set(double input_x = 0.0, double input_y = 0.0, double input_z = 0.0)
+    void set(double input_x, double input_y, double input_z)
     {
-        x = input_x;
-        y = input_y;
-        z = input_z;
+        this->x = input_x;
+        this->y = input_y;
+        this->z = input_z;
     }
 };
 
-class St2DPostion {
+class St2DRectangle {
 public:
-    double x     = 0; //!< x-axis
-    double y     = 0; //!< y-axis
+    int x        = 0; //!< x-axis
+    int y        = 0; //!< y-axis
+    int width    = 0;
+    int height   = 0;
     double angle = 0;
-    double size  = 0;
 
-    St2DPostion(double input_x = 0.0, double input_y = 0.0, double input_angle = 0.0, double input_size = 0.0)
+    St2DRectangle(int input_x = 0, int input_y = 0, int input_width = 0, int input_height = 0, double input_angle = 0.0)
     {
-        set(input_x, input_y, input_angle, input_size);
+        this->set(input_x, input_y, input_width, input_height, input_angle);
     }
 
-    void set(double input_x = 0.0, double input_y = 0.0, double input_angle = 0.0, double input_size = 0.0)
+    void set(int input_x, int input_y, int input_width, int input_height, double input_angle)
     {
-        this->x     = input_x;
-        this->y     = input_y;
-        this->angle = input_angle;
-        this->size  = input_size;
+        this->x      = input_x;
+        this->y      = input_y;
+        this->width  = input_width;
+        this->height = input_height;
+        this->angle  = input_angle;
     }
 };
 
@@ -73,10 +75,10 @@ public:
 
     StColor(int input_r = 0, int input_g = 0, int input_b = 0, int input_alpha = 0)
     {
-        set(input_r, input_g, input_b, input_alpha);
+        this->set(input_r, input_g, input_b, input_alpha);
     }
 
-    void set(int input_r = 0, int input_g = 0, int input_b = 0, int input_alpha = 0)
+    void set(int input_r, int input_g, int input_b, int input_alpha)
     {
         this->r     = input_r;
         this->g     = input_g;
@@ -84,6 +86,7 @@ public:
         this->alpha = input_alpha;
     }
 };
+
 class StRectangle {
 public:
     double x      = 0;
@@ -93,25 +96,25 @@ public:
 
     StRectangle(double input_x = 0.0, double input_y = 0.0, double input_width = 0.0, double input_height = 0.0)
     {
-        set(input_x, input_y, input_width, input_height);
+        this->set(input_x, input_y, input_width, input_height);
     }
 
     void set_size(double input_width, double input_height)
     {
-        width  = input_width;
-        height = input_height;
+        this->width  = input_width;
+        this->height = input_height;
     }
 
     void set_axis(double input_x, double input_y)
     {
-        x = input_x;
-        y = input_y;
+        this->x = input_x;
+        this->y = input_y;
     }
 
     void set(double input_x, double input_y, double input_width, double input_height)
     {
-        set_axis(input_x, input_y);
-        set_size(input_width, input_height);
+        this->set_axis(input_x, input_y);
+        this->set_size(input_width, input_height);
     }
 };
 

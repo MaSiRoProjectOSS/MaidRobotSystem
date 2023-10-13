@@ -10,12 +10,12 @@ int32 EMOTION_CLOSE_RIGHT   = 4
 int32 EMOTION_WINK_LEFT     = 5
 int32 EMOTION_WINK_RIGHT    = 6
 
-int32 EFFECT_PUPIL_NORMAL = 0
-int32 EFFECT_PUPIL_ORDER  = 1
+int32 EFFECT_CORNEA_NORMAL = 0
+int32 EFFECT_CORNEA_ORDER  = 1
 
 
 int32       emotions
-int32       pupil_effect
+int32       cornea_effect
 float32     size
 float32     distance
 

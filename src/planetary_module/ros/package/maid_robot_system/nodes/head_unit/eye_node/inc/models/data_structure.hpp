@@ -20,121 +20,102 @@ namespace maid_robot_system
 {
 class StParameter {
 public:
-    class StPostion {
+    class StCornea {
     public:
-        int width  = 0;
-        int height = 0;
+        bool enable  = true;
+        double speed = 1.0;
+        double scale = 1.0;
+        void set(bool in_enable, double in_speed, double in_scale)
+        {
+            this->enable = in_enable;
+            this->speed  = in_speed;
+            this->scale  = in_scale;
+        }
     };
 
-public:
-    std::string path = "--";
-    std::string name = "--";
-    StPostion left;
-    StPostion right;
-
-    std::string setting_file = "";
-    int brightness           = 100;
-    StColor color{ 255, 255, 255 };
-
-public:
-    double eyeball_size_x              = EYEBALL_SIZE_X;
-    double eyeball_size_y              = EYEBALL_SIZE_Y;
-    int thinking_next_time_notAccepted = 0;
-    // Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
-    Qt::ImageConversionFlag imageFlag = Qt::OrderedAlphaDither;
-    StVector eyeball_center_left{};
-    StVector eyeball_center_right{};
-
-    StRectangle screen_size{ 0.0, 0.0, 640.0, 480.0 };
-
-public:
-    double l_x     = CALIBRATION_L_X;
-    double l_y     = CALIBRATION_L_Y;
-    double r_x     = CALIBRATION_R_X;
-    double r_y     = CALIBRATION_R_Y;
-    double r_angle = CALIBRATION_R_DISP_ANGLE;
-    double l_angle = CALIBRATION_L_DISP_ANGLE;
-    // St2DPostion eyeball_right{ CALIBRATION_EYEBALL_X, CALIBRATION_EYEBALL_Y, CALIBRATION_EYEBALL_ANGLE };
-    // St2DPostion eyeball_left{ CALIBRATION_EYEBALL_X, CALIBRATION_EYEBALL_Y, CALIBRATION_EYEBALL_ANGLE };
-    double eyeball_position_r_x  = CALIBRATION_EYEBALL_X;
-    double eyeball_position_r_y  = CALIBRATION_EYEBALL_Y;
-    double eyeball_position_l_x  = CALIBRATION_EYEBALL_X;
-    double eyeball_position_l_y  = CALIBRATION_EYEBALL_Y;
-    double eyeball_angle         = CALIBRATION_EYEBALL_ANGLE;
-    int eyelid_size_x            = CALIBRATION_EYELID_SIZE_X;
-    int eyelid_size_y            = CALIBRATION_EYELID_SIZE_Y;
-    float eye_blink_time_quickly = EYE_BLINK_TIME_MILLISECOND_DEFAULT_QUICKLY;
-    float eye_blink_time_min     = EYE_BLINK_TIME_MILLISECOND_DEFAULT_MIN;
-    float eye_blink_time_max     = EYE_BLINK_TIME_MILLISECOND_DEFAULT_MAX;
-    float eye_blink_time_limit   = EYE_BLINK_TIME_MILLISECOND_DEFAULT_LIMITED;
-    float eye_blink_time_offset  = EYE_BLINK_TIME_MILLISECOND_DEFAULT_OFFSET;
-
-    // TODO
-    // delete function
-    void skin_a()
+    class StEyeSettings {
+    public:
+        StCornea cornea_outside;
+        StCornea cornea_inside;
+        St2DRectangle eyelid;
+        St2DRectangle eyeball;
+        StVector eyeball_center;
+    };
+    StParameter()
     {
-        this->l_x                    = 135.0;
-        this->l_y                    = 455.0;
-        this->r_x                    = -46.0;
-        this->r_y                    = 455.0;
-        this->r_angle                = 0.0;
-        this->l_angle                = 0.0;
-        this->eyeball_position_l_x   = -100.0;
-        this->eyeball_position_l_y   = 100.0;
-        this->eyeball_position_r_x   = 100.0;
-        this->eyeball_position_r_y   = 100.0;
-        this->eyeball_angle          = 0.0;
-        this->eyelid_size_x          = 1520;
-        this->eyelid_size_y          = 2190;
-        this->eye_blink_time_quickly = 150;
-        this->eye_blink_time_min     = 400;
-        this->eye_blink_time_max     = 600;
-        this->eye_blink_time_limit   = 15000;
-        this->eye_blink_time_offset  = 0;
-    }
-    void skin_b()
-    {
-        this->l_x                    = 120.0;
-        this->l_y                    = 305.0;
-        this->r_x                    = -95.0;
-        this->r_y                    = 517.0;
-        this->r_angle                = 0.0;
-        this->l_angle                = 0.0;
-        this->eyeball_position_l_x   = -45.0;
-        this->eyeball_position_l_y   = 95.0;
-        this->eyeball_position_r_x   = 45.0;
-        this->eyeball_position_r_y   = 95.0;
-        this->eyeball_angle          = 0.0;
-        this->eyelid_size_x          = 1480;
-        this->eyelid_size_y          = 1350;
-        this->eye_blink_time_quickly = 50;
-        this->eye_blink_time_min     = 500;
-        this->eye_blink_time_max     = 700;
-        this->eye_blink_time_limit   = 15000;
-        this->eye_blink_time_offset  = 0;
+        // File information
+        this->setting_file = "";
+        this->path         = "--";
+        this->name         = "--";
+        // Settings : Image
+        this->imageFlag = Qt::OrderedAlphaDither;
+        // Settings : Screen
+        this->brightness = 100;
+        this->eyelid_color.set(255, 255, 255, 255);
+        this->ciliary_color.set(255, 255, 255, 255);
+        this->screen_size.set(0, 0, 640, 480, 0);
+        this->screen_scale = 1.0;
+        // blink time
+        this->blink_time_quickly = 150.0f;
+        this->blink_time_min     = (500.0f - 100.0f);
+        this->blink_time_max     = (500.0f + 100.0f);
+        this->blink_time_limit   = 15000.0f;
+        this->blink_time_offset  = 0.0f;
+
+        // Settings : Parts : eyelid
+        this->left_eye.eyelid.set(400, 80, 160, 160, 0);
+        this->right_eye.eyelid.set(80, 80, 160, 160, 0);
+
+        // Settings : Parts : eyeball
+        this->left_eye.eyeball.set(0, 320, 320, 480, 0);
+
+        this->right_eye.eyeball.set(0, 0, 320, 480, 0);
+        this->left_eye.eyeball_center.set(0, 0, 0);
+        this->right_eye.eyeball_center.set(0, 0, 0);
+
+        // Settings : Parts : cornea
+        this->left_eye.cornea_outside.set(true, 1.0, 1.0);
+        this->left_eye.cornea_inside.set(true, 1.0, 0.8);
+
+        this->right_eye.cornea_outside.set(true, 1.0, 1.0);
+        this->right_eye.cornea_inside.set(true, 1.0, 0.8);
     }
 
-    void skin_c()
-    {
-        this->l_x                    = 145.0;
-        this->l_y                    = 265.0;
-        this->r_x                    = -186.0;
-        this->r_y                    = 261.0;
-        this->r_angle                = -5.3;
-        this->l_angle                = -2;
-        this->eyeball_position_l_x   = -25.0;
-        this->eyeball_position_l_y   = 145.0;
-        this->eyeball_position_r_x   = 110.0;
-        this->eyeball_position_r_y   = 185.0;
-        this->eyeball_angle          = 0.0;
-        this->eyelid_size_x          = 1480;
-        this->eyelid_size_y          = 1350;
-        this->eye_blink_time_quickly = 150;
-        this->eye_blink_time_min     = 450;
-        this->eye_blink_time_max     = 550;
-        this->eye_blink_time_limit   = 15000;
-        this->eye_blink_time_offset  = 0;
-    }
+public:
+    // ----------------------------------- //
+    // File information
+    // ----------------------------------- //
+    std::string setting_file;
+    std::string path;
+    std::string name;
+    // ----------------------------------- //
+    // Settings : Image
+    // ----------------------------------- //
+    Qt::ImageConversionFlag imageFlag;
+
+    // ----------------------------------- //
+    // Settings : Screen
+    // ----------------------------------- //
+    int brightness;
+    St2DRectangle screen_size;
+    double screen_scale;
+
+    // ----------------------------------- //
+    // Settings
+    // ----------------------------------- //
+    StColor eyelid_color;
+    StColor ciliary_color;
+    StEyeSettings left_eye;
+    StEyeSettings right_eye;
+
+    // ----------------------------------- //
+    // blink time
+    // ----------------------------------- //
+    float blink_time_quickly = 150.0f;
+    float blink_time_min     = (500.0f - 100.0f);
+    float blink_time_max     = (500.0f + 100.0f);
+    float blink_time_limit   = 15000.0f;
+    float blink_time_offset  = 0.0f;
 };
 
 } // namespace maid_robot_system

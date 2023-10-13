@@ -1,5 +1,5 @@
 /**
- * @file  node_implement.hpp
+ * @file  interaction_node.hpp
  * @brief
  * @version 0.23.7
  * @date 2023-07-15
@@ -7,8 +7,8 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#ifndef MRS_EYE_NODE_IMPLEMENT_HPP
-#define MRS_EYE_NODE_IMPLEMENT_HPP
+#ifndef MRS_EYE_NODE_INTERACTION_NODE_HPP
+#define MRS_EYE_NODE_INTERACTION_NODE_HPP
 
 #include "eye_node_settings.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -17,11 +17,11 @@
 
 namespace maid_robot_system
 {
-class NodeImplement : public rclcpp::Node {
+class InteractionNode : public rclcpp::Node {
 private:
 public:
-    NodeImplement(std::string node_name, int argc, char **argv);
-    ~NodeImplement();
+    InteractionNode(std::string node_name, int argc, char **argv);
+    ~InteractionNode();
 
 private:
     // =============================
@@ -65,11 +65,14 @@ private:
     // =============================
     // CONST: ROS PARAMETER
     // =============================
-    const std::string MRS_PARAMETER_SETTING_FILE = "setting_file";
-    const std::string MRS_PARAMETER_BRIGHTNESS   = "brightness";
-    const std::string MRS_PARAMETER_COLOR_R      = "color/r";
-    const std::string MRS_PARAMETER_COLOR_G      = "color/g";
-    const std::string MRS_PARAMETER_COLOR_B      = "color/b";
+    const std::string MRS_PARAMETER_SETTING_FILE    = "setting_file";
+    const std::string MRS_PARAMETER_BRIGHTNESS      = "brightness";
+    const std::string MRS_PARAMETER_CILIARY_COLOR_R = "ciliary/color/r";
+    const std::string MRS_PARAMETER_CILIARY_COLOR_G = "ciliary/color/g";
+    const std::string MRS_PARAMETER_CILIARY_COLOR_B = "ciliary/color/b";
+    const std::string MRS_PARAMETER_EYELID_COLOR_R  = "eyelid/color/r";
+    const std::string MRS_PARAMETER_EYELID_COLOR_G  = "eyelid/color/g";
+    const std::string MRS_PARAMETER_EYELID_COLOR_B  = "eyelid/color/b";
 };
 
 } // namespace maid_robot_system

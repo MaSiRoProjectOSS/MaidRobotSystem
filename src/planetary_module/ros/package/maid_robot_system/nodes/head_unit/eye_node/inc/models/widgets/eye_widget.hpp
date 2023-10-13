@@ -76,20 +76,21 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    bool exec();
+    bool start_exec();
     void calculate();
     void closing();
 
     // =============================
     // PUBLIC :
     // =============================
-    void pupil_order();
+    void cornea_order();
     void emotion(MIENS value);
     void stare(float size, float distance, float left_x, float left_y, float right_x, float right_y);
 
     std::string output_message();
 
     // =============================
+    bool load();
     bool reload_param();
     bool set_setting_file(std::string value);
 
@@ -118,6 +119,8 @@ private:
     bool flag_first_request                 = false;
     bool flag_voice_id                      = false;
     control_state thinking_flag_notAccepted = control_state::STATE_FREE;
+
+    int _thinking_next_time_notAccepted = 0;
 
 private:
     // =============================

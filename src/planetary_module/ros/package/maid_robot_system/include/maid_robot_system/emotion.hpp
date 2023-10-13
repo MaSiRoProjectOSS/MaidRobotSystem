@@ -28,12 +28,12 @@ typedef enum miens_t
 /**
  * @brief 瞳のエフェクト
  */
-typedef enum pupil_variation_t
+typedef enum cornea_variation_t
 {
-    pupil_variation_normal, //! 通常
-    pupil_variation_order,  //! オーダー受付
-    PUPIL_VARIATION_MAX,
-} PUPIL_VARIATION;
+    cornea_variation_normal, //! 通常
+    cornea_variation_order,  //! オーダー受付
+    CORNEA_VARIATION_MAX,
+} CORNEA_VARIATION;
 
 /**
  * @brief 状態

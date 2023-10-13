@@ -1,5 +1,5 @@
 /**
- * @file model_implement.cpp
+ * @file widget_node.cpp
  * @brief
  * @version 0.23.7
  * @date 2023-07-15
@@ -7,7 +7,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#include "models/model_implement.hpp"
+#include "ros/widget_node.hpp"
 
 #include <QPair>
 #include <filesystem>
@@ -28,7 +28,7 @@
 
 namespace maid_robot_system
 {
-bool ModelImplement::open(int argc, char **argv)
+bool WidgetNode::open(int argc, char **argv)
 {
     bool result = false;
     try {
@@ -79,16 +79,16 @@ bool ModelImplement::open(int argc, char **argv)
     return result;
 }
 
-bool ModelImplement::exec()
+bool WidgetNode::start_exec()
 {
     bool result = false;
     if (nullptr != this->_widget) {
-        result = this->_widget->exec();
+        result = this->_widget->start_exec();
     }
     return result;
 }
 
-bool ModelImplement::calculate()
+bool WidgetNode::calculate()
 {
     bool result = false;
     if (nullptr != this->_widget) {
@@ -99,7 +99,7 @@ bool ModelImplement::calculate()
     return result;
 }
 
-bool ModelImplement::closing()
+bool WidgetNode::closing()
 {
     bool result = false;
     if (nullptr != this->_widget) {
@@ -113,10 +113,10 @@ bool ModelImplement::closing()
 // =============================
 // Constructor
 // =============================
-ModelImplement::ModelImplement()
+WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
 {
 }
-ModelImplement::~ModelImplement()
+WidgetNode::~WidgetNode()
 {
 }
 

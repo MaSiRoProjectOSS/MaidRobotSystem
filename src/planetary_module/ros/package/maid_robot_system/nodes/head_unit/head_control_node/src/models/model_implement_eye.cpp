@@ -99,10 +99,10 @@ void ModelImplement::_calculate_eye(double x, double y, double size, double dist
     // ===========================================
     if (this->_temp_overall.count_continue_command <= 0) {
         this->_temp_overall.flag_eyelid_wink = false;
-        this->_msg_eye.pupil_effect          = maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_NORMAL;
+        this->_msg_eye.cornea_effect         = maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL;
     } else {
         this->_temp_overall.count_continue_command--;
-        this->_msg_eye.pupil_effect = maid_robot_system_interfaces::msg::MrsEye::EFFECT_PUPIL_ORDER;
+        this->_msg_eye.cornea_effect = maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_ORDER;
     }
 
     // ===========================================

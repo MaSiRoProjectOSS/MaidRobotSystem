@@ -33,7 +33,6 @@ class StEyelid {
     /* ============================================= */
 public:
     /* ============================================= */
-    void debug_old_calc(uint current_time);
 
     StEyelid();
     uint get_elapsed();
@@ -79,6 +78,7 @@ public:
     PartsEyelid();
 
 public:
+    void load(StParameter param);
     void set_param(StParameter param);
 
     QPixmap get_eye_id(ENUM_TARGET_EYE target);
@@ -88,7 +88,7 @@ public:
     void set_emotion(MIENS eye_emotion);
     void set_cycle(uint elapsed);
 
-    void set_onTheWay();
+    void set_on_the_way();
     void cycle();
 
     bool enable_motion();
@@ -101,8 +101,8 @@ private:
 
 public:
     /* ============================================= */
-    StEyelid left;
-    StEyelid right;
+    StEyelid left_eye;
+    StEyelid right_eye;
 
     int send_animation     = 0;
     int lib_animation      = 0;
@@ -116,7 +116,7 @@ public:
     MIENS next_eye_emotion = miens_close;
     void calc_animation(int elapsed);
 
-    float eye_blink_time = EYE_BLINK_TIME_MILLISECOND_DEFAULT_MAX; // ms
+    float eye_blink_time = (500.0f + 100.0f); // ms
 private:
     /* ============================================= */
     typedef enum
@@ -125,11 +125,11 @@ private:
         INDEX_LIP_SMILE,
     } INDEX_LIP_IMAGE;
     /* ============================================= */
-    float eye_blink_time_quickly = EYE_BLINK_TIME_MILLISECOND_DEFAULT_QUICKLY; // ms
-    float eye_blink_time_min     = EYE_BLINK_TIME_MILLISECOND_DEFAULT_MIN;     // ms
-    float eye_blink_time_max     = EYE_BLINK_TIME_MILLISECOND_DEFAULT_MAX;     // ms
-    float eye_blink_time_limit   = EYE_BLINK_TIME_MILLISECOND_DEFAULT_LIMITED; // ms
-    float eye_blink_time_offset  = EYE_BLINK_TIME_MILLISECOND_DEFAULT_OFFSET;
+    float eye_blink_time_quickly = 150.0f;            // ms
+    float eye_blink_time_min     = (500.0f - 100.0f); // ms
+    float eye_blink_time_max     = (500.0f + 100.0f); // ms
+    float eye_blink_time_limit   = 15000.0f;          // ms
+    float eye_blink_time_offset  = 0.0f;
     /* ============================================= */
     int elapsed_next = 0;
     /* ============================================= */

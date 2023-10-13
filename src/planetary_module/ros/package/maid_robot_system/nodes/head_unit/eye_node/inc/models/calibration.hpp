@@ -12,21 +12,31 @@
 #include "maid_robot_system/emotion.hpp"
 
 /* ============================================= */
-#define DRAW_PUPIL_INSIDE  1
-#define DRAW_PUPIL_OUTSIDE 1
-#define NEXT_EMOTION_INIT  MIENS::miens_normal
+#define DRAW_CORNEA_INSIDE  (1)
+#define DRAW_CORNEA_OUTSIDE (1)
+#define NEXT_EMOTION_INIT   (MIENS::miens_normal)
 /* ============================================= */
-/**
- * @brief ROSメッセージ喪失後に前を見るタイムアウト時間
- */
-#define LOST_ROS_MSG_TIMEOUT_SECONDS 1.5
+
+/* ============================================= */
+
+#define EYEBALL_DIMENSIONS_MIN      (0.5f)
+#define EYEBALL_DIMENSIONS_MAX      (1.5f)
+#define EYEBALL_DIMENSIONS_DEFAULT  (1.0f)
+#define EYEBALL_DIMENSIONS_INCREASE (0.015f)
+
+#define EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER     (1000.0)
+#define EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER     (2500.0)
+#define EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER (3000.0)
+#define EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER (6000.0)
+/* ============================================= */
+
+#define LOST_ROS_MSG_TIMEOUT_SECONDS (1.5)
+#define EYE_BLINK_TIME_START_TIME_MS (1000 * 10)
+#define VOICE_MESSAGE_TIMEOUT_MS     (1000 * 3)
+/* ============================================= */
 
 namespace maid_robot_system
 {
-/**
- * @brief 操作対象の目
- *
- */
 typedef enum
 {
     TARGET_EYE_LEFT,
@@ -35,7 +45,5 @@ typedef enum
 } ENUM_TARGET_EYE;
 
 } // namespace maid_robot_system
-
-#include "calibration_default.hpp"
 
 #endif

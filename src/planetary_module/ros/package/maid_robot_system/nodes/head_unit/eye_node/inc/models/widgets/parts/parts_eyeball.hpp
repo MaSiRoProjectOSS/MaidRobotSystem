@@ -33,28 +33,28 @@ struct StEyeball {
     StVector target;
     StVector center;
     StVector size;
-    StVector pupil;
+    StVector cornea;
 
     int ini_rotation;
 
-    StVector draw_pupil_anime;
-    StVector draw_pupil_anime2;
-    StVector size_pupil_anime;
-    StVector size_pupil_anime2;
-    int pupil_outside_angle = 0;
-    int pupil_inside_angle  = 0;
+    StVector draw_cornea_anime;
+    StVector draw_cornea_anime2;
+    StVector size_cornea_anime;
+    StVector size_cornea_anime2;
+    int cornea_outside_angle = 0;
+    int cornea_inside_angle  = 0;
 
     int wink_eye_up = 0;
 
     StRectangle draw_postion;
     void setting(int size_x, int size_y, StVector axis)
     {
-        now.set(0, 0);
-        target.set(0, 0);
-        center.set(axis.x, axis.y);
-        size.set(size_x, size_y);
+        now.set(0, 0, 0);
+        target.set(0, 0, 0);
+        center.set(axis.x, axis.y, 0);
+        size.set(size_x, size_y, 0);
         draw_postion.set_size(size_x, size_y);
-        size_pupil_anime.set(550, 550);
+        size_cornea_anime.set(550, 550, 0);
     }
 
     void set_draw_pixel(int send_animation, double dimensions, double calibration_angle_cos, double calibration_angle_sin)
@@ -63,7 +63,7 @@ struct StEyeball {
         double size_width  = dimensions * (size.x * (1.0 - (abs(now.x) / (size.x * 1.3))));
         double size_height = dimensions * (size.y * (1.0 - (abs(now.y) / (size.y * 1.3))));
         draw_postion.set_size(size_width * calibration_angle_cos + size_height * calibration_angle_sin, size_width * calibration_angle_sin + size_height * calibration_angle_cos);
-        pupil.set(center.x + now.x, center.y + now.y);
+        cornea.set(center.x + now.x, center.y + now.y, 0);
         draw_postion.set_axis(center.x + now.x - (draw_postion.width / 2.0), center.y + now.y - (draw_postion.height / 2.0) - wink_eye_up);
         eye_p_drive();
     }
@@ -78,26 +78,26 @@ struct StEyeball {
             now.y += (target.y - now.y) * 0.4;
         }
 
-        // pupil_outside_angle
-        pupil_outside_angle++;
+        // cornea_outside_angle
+        cornea_outside_angle++;
 
-        if (360 <= pupil_outside_angle) {
-            pupil_outside_angle = pupil_outside_angle - 360;
+        if (360 <= cornea_outside_angle) {
+            cornea_outside_angle = cornea_outside_angle - 360;
         }
 
-        if (0 > pupil_outside_angle) {
-            pupil_outside_angle = pupil_outside_angle + 360;
+        if (0 > cornea_outside_angle) {
+            cornea_outside_angle = cornea_outside_angle + 360;
         }
 
-        // pupil_inside_angle
-        pupil_inside_angle -= func_rand(1, 3);
+        // cornea_inside_angle
+        cornea_inside_angle -= func_rand(1, 3);
 
-        if (360 <= pupil_inside_angle) {
-            pupil_inside_angle = pupil_inside_angle - 360;
+        if (360 <= cornea_inside_angle) {
+            cornea_inside_angle = cornea_inside_angle - 360;
         }
 
-        if (0 > pupil_inside_angle) {
-            pupil_inside_angle = pupil_inside_angle + 360;
+        if (0 > cornea_inside_angle) {
+            cornea_inside_angle = cornea_inside_angle + 360;
         }
     }
 };
@@ -109,23 +109,24 @@ public:
         Normal,
         Receiving,
 
-    } PupilState;
+    } CorneaState;
 
     /* ============================================= */
     PartsEyeball();
     void set_dimensions(float value);
     /* ============================================= */
-    void set_state_pupil(PupilState state);
+    void set_state_cornea(CorneaState state);
+    void load(StParameter param);
     void set_param(StParameter param);
 
-    StEyeball left;
-    StEyeball right;
+    StEyeball left_eye;
+    StEyeball right_eye;
     void calc_draw_pixel(int elapsed, int send_animation);
     void draw_outside();
     void draw_inside();
 
     void set_default();
-    void Initialize(double param_calibration_l_angle, double param_calibration_r_angle);
+    void initialize(double param_calibration_l_angle, double param_calibration_r_angle);
 
 private:
     void _set_image(StParameter param);
@@ -135,31 +136,31 @@ public:
     // QMatrix matrix_eyeball;
     QPixmap eyeball_origin_l;
     QPixmap eyeball_origin_r;
-#if DRAW_PUPIL_OUTSIDE
-    QPixmap pupil_outside;
+#if DRAW_CORNEA_OUTSIDE
+    QPixmap cornea_outside;
 #endif
-#if DRAW_PUPIL_INSIDE
-    QPixmap pupil_inside;
+#if DRAW_CORNEA_INSIDE
+    QPixmap cornea_inside;
 #endif
     /* ============================================= */
 private:
     /* ============================================= */
-#if DRAW_PUPIL_OUTSIDE
-    QMatrix matrix_pupil_outside;
-    QPixmap pupil_outside_origin[2];
-    // int pupil_outside_select = 0;
-    double pupil_ling_size_outside = PUPIL_LING_SIZE_OUTSIDE;
+#if DRAW_CORNEA_OUTSIDE
+    QMatrix matrix_cornea_outside;
+    QPixmap cornea_outside_origin[2];
+    // int cornea_outside_select = 0;
+    double cornea_ling_size_outside = 750;
 #endif
-#if DRAW_PUPIL_INSIDE
-    QMatrix matrix_pupil_inside;
-    QPixmap pupil_inside_origin[2];
-    // int pupil_inside_select = 0;
-    double pupil_ling_size_inside = PUPIL_LING_SIZE_INSIDE;
+#if DRAW_CORNEA_INSIDE
+    QMatrix matrix_cornea_inside;
+    QPixmap cornea_inside_origin[2];
+    // int cornea_inside_select = 0;
+    double cornea_ling_size_inside = 550;
 #endif
     /* ============================================= */
     int get_index();
-    ENUM_STATE current_pupil_state;
-    ENUM_STATE request_pupil_state;
+    ENUM_STATE current_cornea_state;
+    ENUM_STATE request_cornea_state;
     double calibration_l_angle     = 0.0;
     double calibration_r_angle     = 0.0;
     double calibration_l_angle_cos = 0.0;

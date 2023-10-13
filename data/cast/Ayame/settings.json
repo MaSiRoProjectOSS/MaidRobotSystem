@@ -1,33 +1,83 @@
 {
+    "description": "eye_nodeの設定ファイルです。\nrightはキャストの右目/leftはキャストの左目です。\n貴方からみた右側、左側ではありません。",
     "path": "/opt/MaidRobotSystem/data/cast/Ayame",
     "name": "Ayame",
-    "position": {
+    "display": {
+        "width": 1920,
+        "height": 1080,
+        "scale": 1.0
+    },
+    "rectangle": {
         "left": {
-            "width": 1520,
-            "height": 2190,
-            "center": {
-                "x": 135.0,
-                "y": 455.0,
-                "angle": 0
+            "eyelid": {
+                "size_rate": {
+                    "width": 0.5,
+                    "height": 0.5
+                },
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0.0
+                }
             },
             "eyeball": {
-                "x": -100.0,
-                "y": 100.0,
-                "angle": 0.0
+                "size_rate": {
+                    "width": 0.25,
+                    "height": 0.33
+                },
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0.0
+                }
+            },
+            "pupil": {
+                "outside": {
+                    "enable": true,
+                    "scale": 1.0,
+                    "speed": 1.0
+                },
+                "inside": {
+                    "enable": true,
+                    "scale": 1.0,
+                    "speed": 1.0
+                }
             }
         },
         "right": {
-            "width": 1520,
-            "height": 2190,
-            "center": {
-                "x": -46.0,
-                "y": 455.0,
-                "angle": 0
+            "eyelid": {
+                "size_rate": {
+                    "width": 0.5,
+                    "height": 0.5
+                },
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0.0
+                }
             },
             "eyeball": {
-                "x": 100.0,
-                "y": 100.0,
-                "angle": 0.0
+                "size_rate": {
+                    "width": 0.25,
+                    "height": 0.33
+                },
+                "offset": {
+                    "x": 0,
+                    "y": 0,
+                    "angle": 0.0
+                }
+            },
+            "pupil": {
+                "outside": {
+                    "enable": true,
+                    "scale": 1.0,
+                    "speed": 1.0
+                },
+                "inside": {
+                    "enable": true,
+                    "scale": 1.0,
+                    "speed": 1.0
+                }
             }
         }
     },
@@ -38,83 +88,113 @@
         "limit_ms": 15000,
         "offset_ms": 0
     },
-    "eyeball": {
-        "normally": "eye/eyeball/eyeball_normally.png"
-    },
-    "eyelid": {
-        "eyelid/width": 1520,
-        "eyelid/height": 2190,
-        "image": {
-            "normally": [
-                "eye/eyelid/normally/000.png",
-                "eye/eyelid/normally/001.png",
-                "eye/eyelid/normally/002.png",
-                "eye/eyelid/normally/003.png",
-                "eye/eyelid/normally/004.png",
-                "eye/eyelid/normally/005.png",
-                "eye/eyelid/normally/006.png",
-                "eye/eyelid/normally/007.png",
-                "eye/eyelid/normally/008.png",
-                "eye/eyelid/normally/009.png",
-                "eye/eyelid/normally/010.png",
-                "eye/eyelid/normally/011.png",
-                "eye/eyelid/normally/012.png",
-                "eye/eyelid/normally/013.png",
-                "eye/eyelid/normally/014.png",
-                "eye/eyelid/normally/015.png",
-                "eye/eyelid/normally/016.png",
-                "eye/eyelid/normally/017.png",
-                "eye/eyelid/normally/018.png",
-                "eye/eyelid/normally/019.png",
-                "eye/eyelid/normally/020.png",
-                "eye/eyelid/normally/021.png",
-                "eye/eyelid/normally/022.png",
-                "eye/eyelid/normally/023.png",
-                "eye/eyelid/normally/024.png",
-                "eye/eyelid/normally/025.png",
-                "eye/eyelid/normally/026.png",
-                "eye/eyelid/normally/027.png",
-                "eye/eyelid/normally/028.png",
-                "eye/eyelid/normally/029.png"
+    "image": {
+        "eyelid": [
+            {
+                "index": 0,
+                "name": "normally",
+                "file": [
+                    "eye/eyelid/normally/000.png",
+                    "eye/eyelid/normally/001.png",
+                    "eye/eyelid/normally/002.png",
+                    "eye/eyelid/normally/003.png",
+                    "eye/eyelid/normally/004.png",
+                    "eye/eyelid/normally/005.png",
+                    "eye/eyelid/normally/006.png",
+                    "eye/eyelid/normally/007.png",
+                    "eye/eyelid/normally/008.png",
+                    "eye/eyelid/normally/009.png",
+                    "eye/eyelid/normally/010.png",
+                    "eye/eyelid/normally/011.png",
+                    "eye/eyelid/normally/012.png",
+                    "eye/eyelid/normally/013.png",
+                    "eye/eyelid/normally/014.png",
+                    "eye/eyelid/normally/015.png",
+                    "eye/eyelid/normally/016.png",
+                    "eye/eyelid/normally/017.png",
+                    "eye/eyelid/normally/018.png",
+                    "eye/eyelid/normally/019.png",
+                    "eye/eyelid/normally/020.png",
+                    "eye/eyelid/normally/021.png",
+                    "eye/eyelid/normally/022.png",
+                    "eye/eyelid/normally/023.png",
+                    "eye/eyelid/normally/024.png",
+                    "eye/eyelid/normally/025.png",
+                    "eye/eyelid/normally/026.png",
+                    "eye/eyelid/normally/027.png",
+                    "eye/eyelid/normally/028.png",
+                    "eye/eyelid/normally/029.png"
+                ]
+            },
+            {
+                "index": 1,
+                "name": "order",
+                "file": [
+                    "eye/eyelid/smile/000.png",
+                    "eye/eyelid/smile/001.png",
+                    "eye/eyelid/smile/002.png",
+                    "eye/eyelid/smile/003.png",
+                    "eye/eyelid/smile/004.png",
+                    "eye/eyelid/smile/005.png",
+                    "eye/eyelid/smile/006.png",
+                    "eye/eyelid/smile/007.png",
+                    "eye/eyelid/smile/008.png",
+                    "eye/eyelid/smile/009.png",
+                    "eye/eyelid/smile/010.png",
+                    "eye/eyelid/smile/011.png",
+                    "eye/eyelid/smile/012.png",
+                    "eye/eyelid/smile/013.png",
+                    "eye/eyelid/smile/014.png",
+                    "eye/eyelid/smile/015.png",
+                    "eye/eyelid/smile/016.png",
+                    "eye/eyelid/smile/017.png",
+                    "eye/eyelid/smile/018.png",
+                    "eye/eyelid/smile/019.png",
+                    "eye/eyelid/smile/020.png",
+                    "eye/eyelid/smile/021.png",
+                    "eye/eyelid/smile/022.png",
+                    "eye/eyelid/smile/023.png",
+                    "eye/eyelid/smile/024.png",
+                    "eye/eyelid/smile/025.png",
+                    "eye/eyelid/smile/026.png",
+                    "eye/eyelid/smile/027.png",
+                    "eye/eyelid/smile/028.png",
+                    "eye/eyelid/smile/029.png"
+                ]
+            }
+        ],
+        "eyeball": [
+            {
+                "index": 0,
+                "name": "normally",
+                "file": "eye/eyeball/eyeball_normally.png"
+            }
+        ],
+        "pupil": {
+            "outside": [
+                {
+                    "index": 0,
+                    "name": "normally",
+                    "file": "eye/pupil/pupil_normally.png"
+                },
+                {
+                    "index": 1,
+                    "name": "order",
+                    "file": "eye/pupil/pupil_order.png"
+                }
             ],
-            "smile": [
-                "eye/eyelid/smile/000.png",
-                "eye/eyelid/smile/001.png",
-                "eye/eyelid/smile/002.png",
-                "eye/eyelid/smile/003.png",
-                "eye/eyelid/smile/004.png",
-                "eye/eyelid/smile/005.png",
-                "eye/eyelid/smile/006.png",
-                "eye/eyelid/smile/007.png",
-                "eye/eyelid/smile/008.png",
-                "eye/eyelid/smile/009.png",
-                "eye/eyelid/smile/010.png",
-                "eye/eyelid/smile/011.png",
-                "eye/eyelid/smile/012.png",
-                "eye/eyelid/smile/013.png",
-                "eye/eyelid/smile/014.png",
-                "eye/eyelid/smile/015.png",
-                "eye/eyelid/smile/016.png",
-                "eye/eyelid/smile/017.png",
-                "eye/eyelid/smile/018.png",
-                "eye/eyelid/smile/019.png",
-                "eye/eyelid/smile/020.png",
-                "eye/eyelid/smile/021.png",
-                "eye/eyelid/smile/022.png",
-                "eye/eyelid/smile/023.png",
-                "eye/eyelid/smile/024.png",
-                "eye/eyelid/smile/025.png",
-                "eye/eyelid/smile/026.png",
-                "eye/eyelid/smile/027.png",
-                "eye/eyelid/smile/028.png",
-                "eye/eyelid/smile/029.png"
+            "inside": [
+                {
+                    "index": 0,
+                    "name": "normally",
+                    "file": "eye/pupil/pupil_normally.png"
+                },
+                {
+                    "index": 1,
+                    "name": "order",
+                    "file": "eye/pupil/pupil_order.png"
+                }
             ]
-        }
-    },
-    "pupil": {
-        "image": {
-            "normally": "eye/pupil/pupil_normally.png",
-            "order": "eye/pupil/pupil_order.png"
         }
     }
 }
