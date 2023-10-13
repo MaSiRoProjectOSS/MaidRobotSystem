@@ -6,9 +6,9 @@
         "Offsetは、+yにすると左手側へ/+zすると上へ移動する"
     ],
     "url": "",
-    "version": "0.23",
-    "path": "/opt/MaidRobotSystem/data/cast/Botan",
+    "version": "0.23.x",
     "name": "Botan",
+    "path": "/opt/MaidRobotSystem/data/cast/Botan",
     "display": {
         "resolution": 1.0
     },

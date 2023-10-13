@@ -142,7 +142,7 @@ void PartsEyeball::_set_image(StParameter param)
         sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/eyeball/eyeball_normally.png");
         if (true == std::filesystem::exists(buffer_path)) {
             QMatrix matrix_eyeball_l;
-            matrix_eyeball_l.rotate(param.left_eye.eyeball.angle);
+            matrix_eyeball_l.rotate(param.left_eye.eyeball.angle + param.left_eye.eyelid.angle);
             this->eyeball_origin_l = QPixmap(buffer_path, nullptr, param.imageFlag);
             this->eyeball_origin_l = this->eyeball_origin_l.scaled(param.left_eye.eyeball.width, param.left_eye.eyeball.height, Qt::IgnoreAspectRatio);
             this->eyeball_origin_l = this->eyeball_origin_l.transformed(matrix_eyeball_l);
@@ -151,7 +151,7 @@ void PartsEyeball::_set_image(StParameter param)
         sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/eyeball/eyeball_normally.png");
         if (true == std::filesystem::exists(buffer_path)) {
             QMatrix matrix_eyeball_r;
-            matrix_eyeball_r.rotate(param.right_eye.eyeball.angle);
+            matrix_eyeball_r.rotate(param.right_eye.eyeball.angle + param.right_eye.eyelid.angle);
             this->eyeball_origin_r = QPixmap(buffer_path, nullptr, param.imageFlag);
             this->eyeball_origin_r = this->eyeball_origin_r.scaled(param.right_eye.eyeball.width, param.right_eye.eyeball.height, Qt::IgnoreAspectRatio);
             this->eyeball_origin_r = this->eyeball_origin_r.transformed(matrix_eyeball_r);

@@ -1,17 +1,27 @@
 {
     "TODO": [
-        "displayの縦横比率によって表示が切り替わる。実装するか？"
+        "白目部分の回転が出来てない（肌を削除する関係上、必須）",
+        "  * 白目は、毎回書いているけど、image化する？viewpointで対応？",
+        "回転すると瞳の大きさも変わる。描画範囲で指定しているからと思われる",
+        "  * eyeball の回転対応が悪い。（拡大してない）",
+        "corneaが未サポート",
+        "blink timeのテスト方法は？",
+        "image取得対応をする",
+        "ROSの呼び出しが遅いためFPSが出ない。マルチスレッド化を検討する",
+        "OpenGL ES対応が不十分",
+        ""
     ],
     "description": [
         "eye_nodeの設定ファイルです",
         "rightはキャストの右目/leftはキャストの左目です。貴方からみた右側、左側ではありません。",
         "座標はキャスト座標（ROS座標/正面がX軸の右手系)",
-        "Offsetは、+yにすると左手側へ/+zすると上へ移動する"
+        "Offsetは、+yにすると左手側へ/+zすると上へ移動する",
+        "イメージはpathに格納されているrootを設定する。それぞれはrootからのパスを指定する"
     ],
     "url": "",
-    "version": "0.23",
-    "path": "/opt/MaidRobotSystem/data/cast/Ayame",
+    "version": "0.23.x",
     "name": "Ayame",
+    "path": "/opt/MaidRobotSystem/data/cast/Ayame",
     "display": {
         "resolution": 1.0
     },

@@ -388,13 +388,13 @@ void PartsEyelid::_set_image(StParameter param)
                 rotate_angle_eyelid.rotate(-90);
                 // left
                 QMatrix rotate_angle_eyelid_l;
-                rotate_angle_eyelid_l.rotate(param.left_eye.eyeball.angle);
+                rotate_angle_eyelid_l.rotate(param.left_eye.eyelid.angle);
                 this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
                 this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
                 // right
                 QMatrix rotate_angle_eyelid_r;
-                rotate_angle_eyelid_r.rotate(param.right_eye.eyeball.angle);
+                rotate_angle_eyelid_r.rotate(param.right_eye.eyelid.angle);
                 this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
                 this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
                 this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
@@ -415,13 +415,13 @@ void PartsEyelid::_set_image(StParameter param)
                 rotate_angle_smile_lid.rotate(-90);
                 // left
                 QMatrix rotate_angle_smile_lid_l;
-                rotate_angle_smile_lid_l.rotate(param.left_eye.eyeball.angle);
+                rotate_angle_smile_lid_l.rotate(param.left_eye.eyelid.angle);
                 this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
                 this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
                 this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
                 // right
                 QMatrix rotate_angle_smile_lid_r;
-                rotate_angle_smile_lid_r.rotate(param.right_eye.eyeball.angle);
+                rotate_angle_smile_lid_r.rotate(param.right_eye.eyelid.angle);
                 this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
                 this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
                 this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);

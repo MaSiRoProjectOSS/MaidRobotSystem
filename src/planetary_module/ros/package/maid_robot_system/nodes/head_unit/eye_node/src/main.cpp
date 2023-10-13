@@ -15,8 +15,8 @@
 int main(int argc, char **argv)
 {
     std::string node_name = NODE_NAME;
-    rclcpp::init(argc, argv);
     try {
+        rclcpp::init(argc, argv);
         rclcpp::spin(std::make_shared<maid_robot_system::InteractionNode>( //
                 node_name,
                 argc,

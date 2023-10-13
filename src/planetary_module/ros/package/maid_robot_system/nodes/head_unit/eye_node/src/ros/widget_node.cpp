@@ -32,9 +32,6 @@ bool WidgetNode::open(int argc, char **argv)
 {
     bool result = false;
     try {
-        if (nullptr != this->app) {
-            this->closing();
-        }
         this->app = new QApplication(argc, argv);
         // format
         QSurfaceFormat format;
