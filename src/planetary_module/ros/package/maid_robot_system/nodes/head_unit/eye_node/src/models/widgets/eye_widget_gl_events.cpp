@@ -25,12 +25,13 @@ void EyeWidget::initializeGL()
 
 void EyeWidget::resizeGL(int w, int h)
 {
-    this->param.screen_size.width  = (double)w;
-    this->param.screen_size.height = (double)h;
+    this->param.view_size.width  = (double)(w);
+    this->param.view_size.height = (double)(h);
 #if DEBUG_OUTPUT_WIDGET
-    printf(" * resizeGL [%d, %d]\n", this->param.screen_size.width, this->param.screen_size.height);
+    printf(" * resizeGL [%d, %d]\n", this->param.view_size.width, this->param.view_size.height);
 #endif
     this->reload_param();
+    this->load();
 }
 
 void EyeWidget::paintGL()

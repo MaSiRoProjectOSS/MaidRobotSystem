@@ -10,34 +10,6 @@
 
 namespace maid_robot_system
 {
-bool EyeWidget::load()
-{
-    bool result = false;
-    this->eyelid.load(this->param);
-    this->eyeball.load(this->param);
-    return result;
-}
-
-bool EyeWidget::reload_param()
-{
-    bool result = false;
-    if (true == this->_flag_initialized) {
-        this->_ciliary_color.setRgb(this->param.ciliary_color.r, this->param.ciliary_color.g, this->param.ciliary_color.b);
-
-#if DEBUG_OUTPUT_WIDGET
-        printf("  ---- reload_param ----\n");
-#endif
-        this->eyelid.set_param(this->param);
-        this->param.left_eye.eyeball_center.x  = this->eyelid.left_eye.pos_center.x + this->param.left_eye.eyeball.x;
-        this->param.left_eye.eyeball_center.y  = this->eyelid.left_eye.pos_center.y + this->param.left_eye.eyeball.y;
-        this->param.right_eye.eyeball_center.x = this->eyelid.right_eye.pos_center.x + this->param.right_eye.eyeball.x;
-        this->param.right_eye.eyeball_center.y = this->eyelid.right_eye.pos_center.y + this->param.right_eye.eyeball.y;
-        this->eyeball.set_param(this->param);
-        result = true;
-    }
-    return result;
-}
-
 void EyeWidget::cornea_order()
 {
     this->eyeball.set_state_cornea(PartsEyeball::CorneaState::Receiving);

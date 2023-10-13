@@ -35,10 +35,15 @@ public:
 
     class StEyeSettings {
     public:
+        // cornea
         StCornea cornea_outside;
         StCornea cornea_inside;
+        // eyelid
         St2DRectangle eyelid;
+        StVector eyelid_scale;
+        // eyeball
         St2DRectangle eyeball;
+        StVector eyeball_scale;
         StVector eyeball_center;
     };
     StParameter()
@@ -54,7 +59,8 @@ public:
         this->eyelid_color.set(255, 255, 255, 255);
         this->ciliary_color.set(231, 183, 147, 255);
         this->screen_size.set(0, 0, 640, 480, 0);
-        this->screen_scale = 1.0;
+        this->view_size.set(0, 0, 640, 480, 0);
+        this->screen_resolution = 1.0;
         // blink time
         this->blink_time_quickly = 150.0f;
         this->blink_time_min     = (500.0f - 100.0f);
@@ -98,7 +104,8 @@ public:
     // ----------------------------------- //
     int brightness;
     St2DRectangle screen_size;
-    double screen_scale;
+    St2DRectangle view_size;
+    double screen_resolution;
 
     // ----------------------------------- //
     // Settings

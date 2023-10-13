@@ -16,58 +16,183 @@
 
 namespace maid_robot_system
 {
-#define DEBUG_OUTPUT 1
+#define DEBUG_OUTPUT  1
+#define DEBUG_OUTPUT2 0
+#define DEBUG_OUTPUT3 0
+
+bool EyeWidget::load()
+{
+    bool result = false;
+    this->eyelid.load(this->param);
+    this->eyeball.load(this->param);
+    return result;
+}
+
+bool EyeWidget::reload_param()
+{
+    bool result = false;
+    if (true == this->_flag_initialized) {
+        StVector eye_size;
+        this->param.screen_size.width  = (double)(this->param.view_size.width / this->param.screen_resolution);
+        this->param.screen_size.height = (double)(this->param.view_size.height / this->param.screen_resolution);
+        eye_size.x                     = this->param.screen_size.width * 0.5;
+        eye_size.y                     = this->param.screen_size.height;
+#if DEBUG_OUTPUT_WIDGET
+        printf("  ---- reload_param ----\n");
+#endif
+        // calculate
+        this->param.left_eye.eyelid.width   = (int)std::max(1.0, eye_size.x * this->param.left_eye.eyelid_scale.x);
+        this->param.left_eye.eyelid.height  = (int)std::max(1.0, eye_size.y * this->param.left_eye.eyelid_scale.y);
+        this->param.right_eye.eyelid.width  = (int)std::max(1.0, eye_size.x * this->param.right_eye.eyelid_scale.x);
+        this->param.right_eye.eyelid.height = (int)std::max(1.0, eye_size.y * this->param.right_eye.eyelid_scale.y);
+
+        this->param.left_eye.eyeball.width   = (int)std::max(1.0, eye_size.x * this->param.left_eye.eyeball_scale.x);
+        this->param.left_eye.eyeball.height  = (int)std::max(1.0, eye_size.y * this->param.left_eye.eyeball_scale.y);
+        this->param.right_eye.eyeball.width  = (int)std::max(1.0, eye_size.x * this->param.right_eye.eyeball_scale.x);
+        this->param.right_eye.eyeball.height = (int)std::max(1.0, eye_size.y * this->param.right_eye.eyeball_scale.y);
+
+        // set
+        this->_ciliary_color.setRgb(this->param.ciliary_color.r, this->param.ciliary_color.g, this->param.ciliary_color.b);
+        this->eyelid.set_param(this->param);
+        this->param.left_eye.eyeball_center.x  = this->eyelid.left_eye.pos_center.x + this->param.left_eye.eyeball.x;
+        this->param.left_eye.eyeball_center.y  = this->eyelid.left_eye.pos_center.y + this->param.left_eye.eyeball.y;
+        this->param.right_eye.eyeball_center.x = this->eyelid.right_eye.pos_center.x + this->param.right_eye.eyeball.x;
+        this->param.right_eye.eyeball_center.y = this->eyelid.right_eye.pos_center.y + this->param.right_eye.eyeball.y;
+        this->eyeball.set_param(this->param);
+
+#if DEBUG_OUTPUT
+        printf("=========================================================\n");
+        printf("file: %s\n", this->param.setting_file.c_str());
+        printf("path: %s\n", this->param.path.c_str());
+        printf("name: %s\n", this->param.name.c_str());
+
+        printf("eyelid:\n");
+#if DEBUG_OUTPUT3
+        printf("  color:\n");
+        printf("    r: %d\n", this->param.eyelid_color.r);
+        printf("    g: %d\n", this->param.eyelid_color.g);
+        printf("    b: %d\n", this->param.eyelid_color.b);
+#endif
+        printf("  left_eye:\n");
+        printf("    x: %d\n", this->param.left_eye.eyelid.x);
+        printf("    y: %d\n", this->param.left_eye.eyelid.y);
+        printf("    width: %d\n", this->param.left_eye.eyelid.width);
+        printf("    height: %d\n", this->param.left_eye.eyelid.height);
+        printf("    angle: %3.1f\n", this->param.left_eye.eyelid.angle);
+        printf("  right_eye:\n");
+        printf("    x: %d\n", this->param.right_eye.eyelid.x);
+        printf("    y: %d\n", this->param.right_eye.eyelid.y);
+        printf("    width: %d\n", this->param.right_eye.eyelid.width);
+        printf("    height: %d\n", this->param.right_eye.eyelid.height);
+        printf("    angle: %3.1f\n", this->param.right_eye.eyelid.angle);
+
+        printf("eyeball:\n");
+        printf("  left_eye:\n");
+        printf("    x: %d\n", this->param.left_eye.eyeball.x);
+        printf("    y: %d\n", this->param.left_eye.eyeball.y);
+        printf("    width: %d\n", this->param.left_eye.eyeball.width);
+        printf("    height: %d\n", this->param.left_eye.eyeball.height);
+        printf("    angle: %3.1f\n", this->param.left_eye.eyeball.angle);
+        printf("    center:\n");
+        printf("      x: %3.1f\n", this->param.left_eye.eyeball_center.x);
+        printf("      y: %3.1f\n", this->param.left_eye.eyeball_center.y);
+        printf("  right_eye:\n");
+        printf("    x: %d\n", this->param.right_eye.eyeball.x);
+        printf("    y: %d\n", this->param.right_eye.eyeball.y);
+        printf("    width: %d\n", this->param.right_eye.eyeball.width);
+        printf("    height: %d\n", this->param.right_eye.eyeball.height);
+        printf("    angle: %3.1f\n", this->param.right_eye.eyeball.angle);
+        printf("    center:\n");
+        printf("      x: %3.1f\n", this->param.right_eye.eyeball_center.x);
+        printf("      y: %3.1f\n", this->param.right_eye.eyeball_center.y);
+
+#if DEBUG_OUTPUT2
+        printf("cornea:\n");
+        printf("  left_eye:\n");
+        printf("    outside:\n");
+        printf("      enable: %s\n", this->param.left_eye.cornea_outside.enable ? "True" : "False");
+        printf("      speed: %3.1f\n", this->param.left_eye.cornea_outside.speed);
+        printf("      scale: %3.1f\n", this->param.left_eye.cornea_outside.scale);
+        printf("    inside:\n");
+        printf("      enable: %s\n", this->param.left_eye.cornea_inside.enable ? "True" : "False");
+        printf("      speed: %3.1f\n", this->param.left_eye.cornea_inside.speed);
+        printf("      scale: %3.1f\n", this->param.left_eye.cornea_inside.scale);
+        printf("  right_eye:\n");
+        printf("    outside:\n");
+        printf("      enable: %s\n", this->param.right_eye.cornea_outside.enable ? "True" : "False");
+        printf("      speed: %3.1f\n", this->param.right_eye.cornea_outside.speed);
+        printf("      scale: %3.1f\n", this->param.right_eye.cornea_outside.scale);
+        printf("    inside:\n");
+        printf("      enable: %s\n", this->param.right_eye.cornea_inside.enable ? "True" : "False");
+        printf("      speed: %3.1f\n", this->param.right_eye.cornea_inside.speed);
+        printf("      scale: %3.1f\n", this->param.right_eye.cornea_inside.scale);
+#endif
+
+#if DEBUG_OUTPUT3
+        printf("ciliary:\n");
+        printf("  color:\n");
+        printf("    r: %d\n", this->param.ciliary_color.r);
+        printf("    g: %d\n", this->param.ciliary_color.g);
+        printf("    b: %d\n", this->param.ciliary_color.b);
+#endif
+
+#if DEBUG_OUTPUT2
+        printf("eye_blink:\n");
+        printf("  quickly: %3.1f\n", this->param.blink_time_quickly);
+        printf("  min: %3.1f\n", this->param.blink_time_min);
+        printf("  max: %3.1f\n", this->param.blink_time_max);
+        printf("  limit: %3.1f\n", this->param.blink_time_limit);
+        printf("  offset: %3.1f\n", this->param.blink_time_offset);
+#endif
+
+        printf("display:\n");
+        printf("  brightness: %d\n", this->param.brightness);
+        printf("  width: %d\n", this->param.screen_size.width);
+        printf("  height: %d\n", this->param.screen_size.height);
+        printf("  resolution: %3.3f\n", (1.0 / this->param.screen_resolution));
+        printf("=========================================================\n");
+#endif
+        result = true;
+    }
+    return result;
+}
 
 bool EyeWidget::set_setting_file(std::string json_file)
 {
     bool result = false;
     try {
-        StVector left_eye_center;
-        StVector right_eye_center;
-        StVector eye_size;
         if (true == std::filesystem::exists(json_file)) {
             nlohmann::json settings = nlohmann::json::parse(this->_read_file(json_file));
             this->param.path        = settings.value("path", this->param.path);
             this->param.name        = settings.value("name", this->param.name);
             if (true == settings.contains("display")) {
-                this->param.screen_scale = settings["display"].value("scale", this->param.screen_scale);
+                double resolution             = settings["display"].value("resolution", this->param.screen_resolution);
+                this->param.screen_resolution = 1.0 / std::max(0.001, resolution);
             }
-            right_eye_center.x = this->param.screen_size.width * 0.25;
-            right_eye_center.y = this->param.screen_size.height * 0.5;
-            left_eye_center.x  = this->param.screen_size.width * 0.75;
-            left_eye_center.y  = this->param.screen_size.height * 0.5;
-            eye_size.x         = this->param.screen_size.width * 0.5;
-            eye_size.y         = this->param.screen_size.height;
 
             if (true == settings.contains("rectangle")) {
                 ////////// left
                 if (true == settings["rectangle"].contains("left")) {
                     if (true == settings["rectangle"]["left"].contains("eyelid")) {
                         if (true == settings["rectangle"]["left"]["eyelid"].contains("size_rate")) {
-                            this->param.left_eye.eyelid.width = //
-                                    (int)(eye_size.x * settings["rectangle"]["left"]["eyelid"]["size_rate"].value("width", (double)this->param.left_eye.eyelid.width));
-                            this->param.left_eye.eyelid.height = //
-                                    (int)(eye_size.y * settings["rectangle"]["left"]["eyelid"]["size_rate"].value("height", (double)this->param.left_eye.eyelid.height));
+                            this->param.left_eye.eyelid_scale.x = settings["rectangle"]["left"]["eyelid"]["size_rate"].value("width", this->param.left_eye.eyelid_scale.x);
+                            this->param.left_eye.eyelid_scale.y = settings["rectangle"]["left"]["eyelid"]["size_rate"].value("height", this->param.left_eye.eyelid_scale.y);
                         }
                         if (true == settings["rectangle"]["left"]["eyelid"].contains("offset")) {
-                            this->param.left_eye.eyelid.x     = (int)(left_eye_center.x - (this->param.left_eye.eyelid.width / 2.0)
-                                                                  + settings["rectangle"]["left"]["eyelid"]["offset"].value("x", this->param.left_eye.eyelid.x));
-                            this->param.left_eye.eyelid.y     = (int)(left_eye_center.y - (this->param.left_eye.eyelid.height / 2.0)
-                                                                  + settings["rectangle"]["left"]["eyelid"]["offset"].value("y", this->param.left_eye.eyelid.y));
-                            this->param.left_eye.eyelid.angle = (int)(settings["rectangle"]["left"]["eyelid"]["offset"].value("angle", this->param.left_eye.eyelid.angle));
+                            this->param.left_eye.eyelid.x     = settings["rectangle"]["left"]["eyelid"]["offset"].value("x", this->param.left_eye.eyelid.x);
+                            this->param.left_eye.eyelid.y     = settings["rectangle"]["left"]["eyelid"]["offset"].value("y", this->param.left_eye.eyelid.y);
+                            this->param.left_eye.eyelid.angle = settings["rectangle"]["left"]["eyelid"]["offset"].value("angle", this->param.left_eye.eyelid.angle);
                         }
                     }
                     if (true == settings["rectangle"]["left"].contains("eyeball")) {
                         if (true == settings["rectangle"]["left"]["eyeball"].contains("size_rate")) {
-                            this->param.left_eye.eyeball.width = //
-                                    (int)(eye_size.x * settings["rectangle"]["left"]["eyeball"]["size_rate"].value("width", (double)this->param.left_eye.eyeball.width));
-                            this->param.left_eye.eyeball.height = //
-                                    (int)(eye_size.y * settings["rectangle"]["left"]["eyeball"]["size_rate"].value("height", (double)this->param.left_eye.eyeball.height));
+                            this->param.left_eye.eyeball_scale.x = settings["rectangle"]["left"]["eyeball"]["size_rate"].value("width", this->param.left_eye.eyeball_scale.x);
+                            this->param.left_eye.eyeball_scale.y = settings["rectangle"]["left"]["eyeball"]["size_rate"].value("height", this->param.left_eye.eyeball_scale.y);
                         }
                         if (true == settings["rectangle"]["left"]["eyeball"].contains("offset")) {
-                            this->param.left_eye.eyeball.x     = (int)(settings["rectangle"]["left"]["eyeball"]["offset"].value("x", this->param.left_eye.eyeball.x));
-                            this->param.left_eye.eyeball.y     = (int)(settings["rectangle"]["left"]["eyeball"]["offset"].value("y", this->param.left_eye.eyeball.y));
-                            this->param.left_eye.eyeball.angle = (int)(settings["rectangle"]["left"]["eyeball"]["offset"].value("angle", this->param.left_eye.eyeball.angle));
+                            this->param.left_eye.eyeball.x     = settings["rectangle"]["left"]["eyeball"]["offset"].value("x", this->param.left_eye.eyeball.x);
+                            this->param.left_eye.eyeball.y     = settings["rectangle"]["left"]["eyeball"]["offset"].value("y", this->param.left_eye.eyeball.y);
+                            this->param.left_eye.eyeball.angle = settings["rectangle"]["left"]["eyeball"]["offset"].value("angle", this->param.left_eye.eyeball.angle);
                         }
                     }
                     if (true == settings["rectangle"]["left"].contains("cornea")) {
@@ -95,30 +220,24 @@ bool EyeWidget::set_setting_file(std::string json_file)
                 if (true == settings["rectangle"].contains("right")) {
                     if (true == settings["rectangle"]["right"].contains("eyelid")) {
                         if (true == settings["rectangle"]["right"]["eyelid"].contains("size_rate")) {
-                            this->param.right_eye.eyelid.width = //
-                                    (int)(eye_size.x * settings["rectangle"]["right"]["eyelid"]["size_rate"].value("width", (double)this->param.right_eye.eyelid.width));
-                            this->param.right_eye.eyelid.height = //
-                                    (int)(eye_size.y * settings["rectangle"]["right"]["eyelid"]["size_rate"].value("height", (double)this->param.right_eye.eyelid.height));
+                            this->param.right_eye.eyelid_scale.x = settings["rectangle"]["right"]["eyelid"]["size_rate"].value("width", this->param.right_eye.eyelid_scale.x);
+                            this->param.right_eye.eyelid_scale.y = settings["rectangle"]["right"]["eyelid"]["size_rate"].value("height", this->param.right_eye.eyelid_scale.y);
                         }
                         if (true == settings["rectangle"]["right"]["eyelid"].contains("offset")) {
-                            this->param.right_eye.eyelid.x     = (int)(right_eye_center.x - (this->param.right_eye.eyelid.width / 2.0)
-                                                                   + settings["rectangle"]["right"]["eyelid"]["offset"].value("x", this->param.right_eye.eyelid.x));
-                            this->param.right_eye.eyelid.y     = (int)(right_eye_center.y - (this->param.right_eye.eyelid.height / 2.0)
-                                                                   + settings["rectangle"]["right"]["eyelid"]["offset"].value("y", this->param.right_eye.eyelid.y));
-                            this->param.right_eye.eyelid.angle = (int)(settings["rectangle"]["right"]["eyelid"]["offset"].value("angle", this->param.right_eye.eyelid.angle));
+                            this->param.right_eye.eyelid.x     = settings["rectangle"]["right"]["eyelid"]["offset"].value("x", this->param.right_eye.eyelid.x);
+                            this->param.right_eye.eyelid.y     = settings["rectangle"]["right"]["eyelid"]["offset"].value("y", this->param.right_eye.eyelid.y);
+                            this->param.right_eye.eyelid.angle = settings["rectangle"]["right"]["eyelid"]["offset"].value("angle", this->param.right_eye.eyelid.angle);
                         }
                     }
                     if (true == settings["rectangle"]["right"].contains("eyeball")) {
                         if (true == settings["rectangle"]["right"]["eyeball"].contains("size_rate")) {
-                            this->param.right_eye.eyeball.width = //
-                                    (int)(eye_size.x * settings["rectangle"]["right"]["eyeball"]["size_rate"].value("width", (double)this->param.right_eye.eyeball.width));
-                            this->param.right_eye.eyeball.height = //
-                                    (int)(eye_size.y * settings["rectangle"]["right"]["eyeball"]["size_rate"].value("height", (double)this->param.right_eye.eyeball.height));
+                            this->param.right_eye.eyeball_scale.x = settings["rectangle"]["right"]["eyeball"]["size_rate"].value("width", this->param.right_eye.eyeball_scale.x);
+                            this->param.right_eye.eyeball_scale.y = settings["rectangle"]["right"]["eyeball"]["size_rate"].value("height", this->param.right_eye.eyeball_scale.y);
                         }
                         if (true == settings["rectangle"]["right"]["eyeball"].contains("offset")) {
-                            this->param.right_eye.eyeball.x     = (int)(settings["rectangle"]["right"]["eyeball"]["offset"].value("x", this->param.right_eye.eyeball.x));
-                            this->param.right_eye.eyeball.y     = (int)(settings["rectangle"]["right"]["eyeball"]["offset"].value("y", this->param.right_eye.eyeball.y));
-                            this->param.right_eye.eyeball.angle = (int)(settings["rectangle"]["right"]["eyeball"]["offset"].value("angle", this->param.right_eye.eyeball.angle));
+                            this->param.right_eye.eyeball.x     = settings["rectangle"]["right"]["eyeball"]["offset"].value("x", this->param.right_eye.eyeball.x);
+                            this->param.right_eye.eyeball.y     = settings["rectangle"]["right"]["eyeball"]["offset"].value("y", this->param.right_eye.eyeball.y);
+                            this->param.right_eye.eyeball.angle = settings["rectangle"]["right"]["eyeball"]["offset"].value("angle", this->param.right_eye.eyeball.angle);
                         }
                     }
                     if (true == settings["rectangle"]["right"].contains("cornea")) {
@@ -158,92 +277,8 @@ bool EyeWidget::set_setting_file(std::string json_file)
     }
 
     if (true == result) {
-        this->load();
         this->reload_param();
-#if DEBUG_OUTPUT
-        printf("=========================================================\n");
-        printf("file: %s\n", this->param.setting_file.c_str());
-        printf("path: %s\n", this->param.path.c_str());
-        printf("name: %s\n", this->param.name.c_str());
-
-        printf("eyelid:\n");
-        printf("  color:\n");
-        printf("    r: %d\n", this->param.eyelid_color.r);
-        printf("    g: %d\n", this->param.eyelid_color.g);
-        printf("    b: %d\n", this->param.eyelid_color.b);
-        printf("  left_eye:\n");
-        printf("    x: %d\n", this->param.left_eye.eyelid.x);
-        printf("    y: %d\n", this->param.left_eye.eyelid.y);
-        printf("    width: %d\n", this->param.left_eye.eyelid.width);
-        printf("    height: %d\n", this->param.left_eye.eyelid.height);
-        printf("    angle: %3.1f\n", this->param.left_eye.eyelid.angle);
-        printf("  right_eye:\n");
-        printf("    x: %d\n", this->param.right_eye.eyelid.x);
-        printf("    y: %d\n", this->param.right_eye.eyelid.y);
-        printf("    width: %d\n", this->param.right_eye.eyelid.width);
-        printf("    height: %d\n", this->param.right_eye.eyelid.height);
-        printf("    angle: %3.1f\n", this->param.right_eye.eyelid.angle);
-
-        printf("eyeball:\n");
-        printf("  left_eye:\n");
-        printf("    x: %d\n", this->param.left_eye.eyeball.x);
-        printf("    y: %d\n", this->param.left_eye.eyeball.y);
-        printf("    width: %d\n", this->param.left_eye.eyeball.width);
-        printf("    height: %d\n", this->param.left_eye.eyeball.height);
-        printf("    angle: %3.1f\n", this->param.left_eye.eyeball.angle);
-        printf("    center:\n");
-        printf("      x: %3.1f\n", this->param.left_eye.eyeball_center.x);
-        printf("      y: %3.1f\n", this->param.left_eye.eyeball_center.y);
-        printf("  right_eye:\n");
-        printf("    x: %d\n", this->param.right_eye.eyeball.x);
-        printf("    y: %d\n", this->param.right_eye.eyeball.y);
-        printf("    width: %d\n", this->param.right_eye.eyeball.width);
-        printf("    height: %d\n", this->param.right_eye.eyeball.height);
-        printf("    angle: %3.1f\n", this->param.right_eye.eyeball.angle);
-        printf("    center:\n");
-        printf("      x: %3.1f\n", this->param.right_eye.eyeball_center.x);
-        printf("      y: %3.1f\n", this->param.right_eye.eyeball_center.y);
-
-        printf("cornea:\n");
-        printf("  left_eye:\n");
-        printf("    outside:\n");
-        printf("      enable: %s\n", this->param.left_eye.cornea_outside.enable ? "True" : "False");
-        printf("      speed: %3.1f\n", this->param.left_eye.cornea_outside.speed);
-        printf("      scale: %3.1f\n", this->param.left_eye.cornea_outside.scale);
-        printf("    inside:\n");
-        printf("      enable: %s\n", this->param.left_eye.cornea_inside.enable ? "True" : "False");
-        printf("      speed: %3.1f\n", this->param.left_eye.cornea_inside.speed);
-        printf("      scale: %3.1f\n", this->param.left_eye.cornea_inside.scale);
-        printf("  right_eye:\n");
-        printf("    outside:\n");
-        printf("      enable: %s\n", this->param.right_eye.cornea_outside.enable ? "True" : "False");
-        printf("      speed: %3.1f\n", this->param.right_eye.cornea_outside.speed);
-        printf("      scale: %3.1f\n", this->param.right_eye.cornea_outside.scale);
-        printf("    inside:\n");
-        printf("      enable: %s\n", this->param.right_eye.cornea_inside.enable ? "True" : "False");
-        printf("      speed: %3.1f\n", this->param.right_eye.cornea_inside.speed);
-        printf("      scale: %3.1f\n", this->param.right_eye.cornea_inside.scale);
-
-        printf("ciliary:\n");
-        printf("  color:\n");
-        printf("    r: %d\n", this->param.ciliary_color.r);
-        printf("    g: %d\n", this->param.ciliary_color.g);
-        printf("    b: %d\n", this->param.ciliary_color.b);
-
-        printf("eye_blink:\n");
-        printf("  quickly: %3.1f\n", this->param.blink_time_quickly);
-        printf("  min: %3.1f\n", this->param.blink_time_min);
-        printf("  max: %3.1f\n", this->param.blink_time_max);
-        printf("  limit: %3.1f\n", this->param.blink_time_limit);
-        printf("  offset: %3.1f\n", this->param.blink_time_offset);
-
-        printf("display:\n");
-        printf("  brightness: %d\n", this->param.brightness);
-        printf("  width: %d\n", this->param.screen_size.width);
-        printf("  height: %d\n", this->param.screen_size.height);
-        printf("  scale: %3.1f\n", this->param.screen_scale);
-        printf("=========================================================\n");
-#endif
+        this->load();
     }
 
     return result;
