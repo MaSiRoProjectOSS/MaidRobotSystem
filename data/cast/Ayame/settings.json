@@ -5,7 +5,6 @@
         "回転すると瞳の大きさも変わる。描画範囲で指定しているからと思われる",
         "  * eyeball の回転対応が悪い。（拡大してない）",
         "corneaが未サポート",
-        "blink timeのテスト方法は？",
         "image取得対応をする",
         "ROSの呼び出しが遅いためFPSが出ない。マルチスレッド化を検討する",
         "OpenGL ES対応が不十分",
@@ -21,7 +20,7 @@
     "url": "",
     "version": "0.23.x",
     "name": "Ayame",
-    "path": "/opt/MaidRobotSystem/data/cast/Ayame",
+    "path": "/opt/MaidRobotSystem/data/cast/Ayame/",
     "display": {
         "resolution": 0.5
     },
@@ -118,36 +117,36 @@
                     "name": "normally",
                     "mirror": false,
                     "files": [
-                        "eye/eyelid/normally/000.png",
-                        "eye/eyelid/normally/001.png",
-                        "eye/eyelid/normally/002.png",
-                        "eye/eyelid/normally/003.png",
-                        "eye/eyelid/normally/004.png",
-                        "eye/eyelid/normally/005.png",
-                        "eye/eyelid/normally/006.png",
-                        "eye/eyelid/normally/007.png",
-                        "eye/eyelid/normally/008.png",
-                        "eye/eyelid/normally/009.png",
-                        "eye/eyelid/normally/010.png",
-                        "eye/eyelid/normally/011.png",
-                        "eye/eyelid/normally/012.png",
-                        "eye/eyelid/normally/013.png",
-                        "eye/eyelid/normally/014.png",
-                        "eye/eyelid/normally/015.png",
-                        "eye/eyelid/normally/016.png",
-                        "eye/eyelid/normally/017.png",
-                        "eye/eyelid/normally/018.png",
-                        "eye/eyelid/normally/019.png",
-                        "eye/eyelid/normally/020.png",
-                        "eye/eyelid/normally/021.png",
-                        "eye/eyelid/normally/022.png",
-                        "eye/eyelid/normally/023.png",
-                        "eye/eyelid/normally/024.png",
-                        "eye/eyelid/normally/025.png",
-                        "eye/eyelid/normally/026.png",
-                        "eye/eyelid/normally/027.png",
-                        "eye/eyelid/normally/028.png",
-                        "eye/eyelid/normally/029.png"
+                        "./eye/eyelid/normally/000.png",
+                        "./eye/eyelid/normally/001.png",
+                        "./eye/eyelid/normally/002.png",
+                        "./eye/eyelid/normally/003.png",
+                        "./eye/eyelid/normally/004.png",
+                        "./eye/eyelid/normally/005.png",
+                        "./eye/eyelid/normally/006.png",
+                        "./eye/eyelid/normally/007.png",
+                        "./eye/eyelid/normally/008.png",
+                        "./eye/eyelid/normally/009.png",
+                        "./eye/eyelid/normally/010.png",
+                        "./eye/eyelid/normally/011.png",
+                        "./eye/eyelid/normally/012.png",
+                        "./eye/eyelid/normally/013.png",
+                        "./eye/eyelid/normally/014.png",
+                        "./eye/eyelid/normally/015.png",
+                        "./eye/eyelid/normally/016.png",
+                        "./eye/eyelid/normally/017.png",
+                        "./eye/eyelid/normally/018.png",
+                        "./eye/eyelid/normally/019.png",
+                        "./eye/eyelid/normally/020.png",
+                        "./eye/eyelid/normally/021.png",
+                        "./eye/eyelid/normally/022.png",
+                        "./eye/eyelid/normally/023.png",
+                        "./eye/eyelid/normally/024.png",
+                        "./eye/eyelid/normally/025.png",
+                        "./eye/eyelid/normally/026.png",
+                        "./eye/eyelid/normally/027.png",
+                        "./eye/eyelid/normally/028.png",
+                        "./eye/eyelid/normally/029.png"
                     ]
                 },
                 {
@@ -155,36 +154,36 @@
                     "name": "order",
                     "mirror": false,
                     "files": [
-                        "eye/eyelid/smile/000.png",
-                        "eye/eyelid/smile/001.png",
-                        "eye/eyelid/smile/002.png",
-                        "eye/eyelid/smile/003.png",
-                        "eye/eyelid/smile/004.png",
-                        "eye/eyelid/smile/005.png",
-                        "eye/eyelid/smile/006.png",
-                        "eye/eyelid/smile/007.png",
-                        "eye/eyelid/smile/008.png",
-                        "eye/eyelid/smile/009.png",
-                        "eye/eyelid/smile/010.png",
-                        "eye/eyelid/smile/011.png",
-                        "eye/eyelid/smile/012.png",
-                        "eye/eyelid/smile/013.png",
-                        "eye/eyelid/smile/014.png",
-                        "eye/eyelid/smile/015.png",
-                        "eye/eyelid/smile/016.png",
-                        "eye/eyelid/smile/017.png",
-                        "eye/eyelid/smile/018.png",
-                        "eye/eyelid/smile/019.png",
-                        "eye/eyelid/smile/020.png",
-                        "eye/eyelid/smile/021.png",
-                        "eye/eyelid/smile/022.png",
-                        "eye/eyelid/smile/023.png",
-                        "eye/eyelid/smile/024.png",
-                        "eye/eyelid/smile/025.png",
-                        "eye/eyelid/smile/026.png",
-                        "eye/eyelid/smile/027.png",
-                        "eye/eyelid/smile/028.png",
-                        "eye/eyelid/smile/029.png"
+                        "./eye/eyelid/smile/000.png",
+                        "./eye/eyelid/smile/001.png",
+                        "./eye/eyelid/smile/002.png",
+                        "./eye/eyelid/smile/003.png",
+                        "./eye/eyelid/smile/004.png",
+                        "./eye/eyelid/smile/005.png",
+                        "./eye/eyelid/smile/006.png",
+                        "./eye/eyelid/smile/007.png",
+                        "./eye/eyelid/smile/008.png",
+                        "./eye/eyelid/smile/009.png",
+                        "./eye/eyelid/smile/010.png",
+                        "./eye/eyelid/smile/011.png",
+                        "./eye/eyelid/smile/012.png",
+                        "./eye/eyelid/smile/013.png",
+                        "./eye/eyelid/smile/014.png",
+                        "./eye/eyelid/smile/015.png",
+                        "./eye/eyelid/smile/016.png",
+                        "./eye/eyelid/smile/017.png",
+                        "./eye/eyelid/smile/018.png",
+                        "./eye/eyelid/smile/019.png",
+                        "./eye/eyelid/smile/020.png",
+                        "./eye/eyelid/smile/021.png",
+                        "./eye/eyelid/smile/022.png",
+                        "./eye/eyelid/smile/023.png",
+                        "./eye/eyelid/smile/024.png",
+                        "./eye/eyelid/smile/025.png",
+                        "./eye/eyelid/smile/026.png",
+                        "./eye/eyelid/smile/027.png",
+                        "./eye/eyelid/smile/028.png",
+                        "./eye/eyelid/smile/029.png"
                     ]
                 }
             ],
@@ -193,7 +192,9 @@
                     "id": 0,
                     "name": "normally",
                     "mirror": false,
-                    "file": "eye/eyeball/eyeball_normally.png"
+                    "files": [
+                        "./eye/eyeball/eyeball_normally.png"
+                    ]
                 }
             ],
             "cornea": {
@@ -202,13 +203,17 @@
                         "id": 0,
                         "name": "normally",
                         "mirror": false,
-                        "file": "eye/cornea/cornea_normally.png"
+                        "files": [
+                            "./eye/cornea/cornea_normally.png"
+                        ]
                     },
                     {
                         "id": 1,
                         "name": "order",
                         "mirror": false,
-                        "file": "eye/cornea/cornea_order.png"
+                        "files": [
+                            "./eye/cornea/cornea_order.png"
+                        ]
                     }
                 ],
                 "inside": [
@@ -216,13 +221,17 @@
                         "id": 0,
                         "name": "normally",
                         "mirror": true,
-                        "file": "eye/cornea/cornea_normally.png"
+                        "files": [
+                            "./eye/cornea/cornea_normally.png"
+                        ]
                     },
                     {
                         "id": 1,
                         "name": "order",
                         "mirror": true,
-                        "file": "eye/cornea/cornea_order.png"
+                        "files": [
+                            "./eye/cornea/cornea_order.png"
+                        ]
                     }
                 ]
             }
@@ -234,36 +243,36 @@
                     "name": "normally",
                     "mirror": true,
                     "files": [
-                        "eye/eyelid/normally/000.png",
-                        "eye/eyelid/normally/001.png",
-                        "eye/eyelid/normally/002.png",
-                        "eye/eyelid/normally/003.png",
-                        "eye/eyelid/normally/004.png",
-                        "eye/eyelid/normally/005.png",
-                        "eye/eyelid/normally/006.png",
-                        "eye/eyelid/normally/007.png",
-                        "eye/eyelid/normally/008.png",
-                        "eye/eyelid/normally/009.png",
-                        "eye/eyelid/normally/010.png",
-                        "eye/eyelid/normally/011.png",
-                        "eye/eyelid/normally/012.png",
-                        "eye/eyelid/normally/013.png",
-                        "eye/eyelid/normally/014.png",
-                        "eye/eyelid/normally/015.png",
-                        "eye/eyelid/normally/016.png",
-                        "eye/eyelid/normally/017.png",
-                        "eye/eyelid/normally/018.png",
-                        "eye/eyelid/normally/019.png",
-                        "eye/eyelid/normally/020.png",
-                        "eye/eyelid/normally/021.png",
-                        "eye/eyelid/normally/022.png",
-                        "eye/eyelid/normally/023.png",
-                        "eye/eyelid/normally/024.png",
-                        "eye/eyelid/normally/025.png",
-                        "eye/eyelid/normally/026.png",
-                        "eye/eyelid/normally/027.png",
-                        "eye/eyelid/normally/028.png",
-                        "eye/eyelid/normally/029.png"
+                        "./eye/eyelid/normally/000.png",
+                        "./eye/eyelid/normally/001.png",
+                        "./eye/eyelid/normally/002.png",
+                        "./eye/eyelid/normally/003.png",
+                        "./eye/eyelid/normally/004.png",
+                        "./eye/eyelid/normally/005.png",
+                        "./eye/eyelid/normally/006.png",
+                        "./eye/eyelid/normally/007.png",
+                        "./eye/eyelid/normally/008.png",
+                        "./eye/eyelid/normally/009.png",
+                        "./eye/eyelid/normally/010.png",
+                        "./eye/eyelid/normally/011.png",
+                        "./eye/eyelid/normally/012.png",
+                        "./eye/eyelid/normally/013.png",
+                        "./eye/eyelid/normally/014.png",
+                        "./eye/eyelid/normally/015.png",
+                        "./eye/eyelid/normally/016.png",
+                        "./eye/eyelid/normally/017.png",
+                        "./eye/eyelid/normally/018.png",
+                        "./eye/eyelid/normally/019.png",
+                        "./eye/eyelid/normally/020.png",
+                        "./eye/eyelid/normally/021.png",
+                        "./eye/eyelid/normally/022.png",
+                        "./eye/eyelid/normally/023.png",
+                        "./eye/eyelid/normally/024.png",
+                        "./eye/eyelid/normally/025.png",
+                        "./eye/eyelid/normally/026.png",
+                        "./eye/eyelid/normally/027.png",
+                        "./eye/eyelid/normally/028.png",
+                        "./eye/eyelid/normally/029.png"
                     ]
                 },
                 {
@@ -271,36 +280,36 @@
                     "name": "order",
                     "mirror": true,
                     "files": [
-                        "eye/eyelid/smile/000.png",
-                        "eye/eyelid/smile/001.png",
-                        "eye/eyelid/smile/002.png",
-                        "eye/eyelid/smile/003.png",
-                        "eye/eyelid/smile/004.png",
-                        "eye/eyelid/smile/005.png",
-                        "eye/eyelid/smile/006.png",
-                        "eye/eyelid/smile/007.png",
-                        "eye/eyelid/smile/008.png",
-                        "eye/eyelid/smile/009.png",
-                        "eye/eyelid/smile/010.png",
-                        "eye/eyelid/smile/011.png",
-                        "eye/eyelid/smile/012.png",
-                        "eye/eyelid/smile/013.png",
-                        "eye/eyelid/smile/014.png",
-                        "eye/eyelid/smile/015.png",
-                        "eye/eyelid/smile/016.png",
-                        "eye/eyelid/smile/017.png",
-                        "eye/eyelid/smile/018.png",
-                        "eye/eyelid/smile/019.png",
-                        "eye/eyelid/smile/020.png",
-                        "eye/eyelid/smile/021.png",
-                        "eye/eyelid/smile/022.png",
-                        "eye/eyelid/smile/023.png",
-                        "eye/eyelid/smile/024.png",
-                        "eye/eyelid/smile/025.png",
-                        "eye/eyelid/smile/026.png",
-                        "eye/eyelid/smile/027.png",
-                        "eye/eyelid/smile/028.png",
-                        "eye/eyelid/smile/029.png"
+                        "./eye/eyelid/smile/000.png",
+                        "./eye/eyelid/smile/001.png",
+                        "./eye/eyelid/smile/002.png",
+                        "./eye/eyelid/smile/003.png",
+                        "./eye/eyelid/smile/004.png",
+                        "./eye/eyelid/smile/005.png",
+                        "./eye/eyelid/smile/006.png",
+                        "./eye/eyelid/smile/007.png",
+                        "./eye/eyelid/smile/008.png",
+                        "./eye/eyelid/smile/009.png",
+                        "./eye/eyelid/smile/010.png",
+                        "./eye/eyelid/smile/011.png",
+                        "./eye/eyelid/smile/012.png",
+                        "./eye/eyelid/smile/013.png",
+                        "./eye/eyelid/smile/014.png",
+                        "./eye/eyelid/smile/015.png",
+                        "./eye/eyelid/smile/016.png",
+                        "./eye/eyelid/smile/017.png",
+                        "./eye/eyelid/smile/018.png",
+                        "./eye/eyelid/smile/019.png",
+                        "./eye/eyelid/smile/020.png",
+                        "./eye/eyelid/smile/021.png",
+                        "./eye/eyelid/smile/022.png",
+                        "./eye/eyelid/smile/023.png",
+                        "./eye/eyelid/smile/024.png",
+                        "./eye/eyelid/smile/025.png",
+                        "./eye/eyelid/smile/026.png",
+                        "./eye/eyelid/smile/027.png",
+                        "./eye/eyelid/smile/028.png",
+                        "./eye/eyelid/smile/029.png"
                     ]
                 }
             ],
@@ -309,7 +318,9 @@
                     "id": 0,
                     "name": "normally",
                     "mirror": false,
-                    "file": "eye/eyeball/eyeball_normally.png"
+                    "files": [
+                        "./eye/eyeball/eyeball_normally.png"
+                    ]
                 }
             ],
             "cornea": {
@@ -318,13 +329,17 @@
                         "id": 0,
                         "name": "normally",
                         "mirror": false,
-                        "file": "eye/cornea/cornea_normally.png"
+                        "files": [
+                            "./eye/cornea/cornea_normally.png"
+                        ]
                     },
                     {
                         "id": 1,
                         "name": "order",
                         "mirror": false,
-                        "file": "eye/cornea/cornea_order.png"
+                        "files": [
+                            "./eye/cornea/cornea_order.png"
+                        ]
                     }
                 ],
                 "inside": [
@@ -332,13 +347,17 @@
                         "id": 0,
                         "name": "normally",
                         "mirror": true,
-                        "file": "eye/cornea/cornea_normally.png"
+                        "files": [
+                            "./eye/cornea/cornea_normally.png"
+                        ]
                     },
                     {
                         "id": 1,
                         "name": "order",
                         "mirror": true,
-                        "file": "eye/cornea/cornea_order.png"
+                        "files": [
+                            "./eye/cornea/cornea_order.png"
+                        ]
                     }
                 ]
             }

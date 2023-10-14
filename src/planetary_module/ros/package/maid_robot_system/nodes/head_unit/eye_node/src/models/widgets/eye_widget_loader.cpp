@@ -182,6 +182,100 @@ bool EyeWidget::reload_param()
         printf("      cornea_outside: %d\n", (int)this->param.right_eye.image.cornea_outside.size());
         printf("      cornea_inside: %d\n", (int)this->param.right_eye.image.cornea_inside.size());
 #endif
+
+#if DEBUG_OUTPUT_PARAM_LV > 4
+        printf("  size:\n");
+        printf("    left:\n");
+        printf("      eyelid:\n");
+        if (0 < this->param.left_eye.image.eyelid.size()) {
+            for (size_t i = 0; i < this->param.left_eye.image.eyelid.size(); ++i) {
+                printf("        %s:\n", this->param.left_eye.image.eyelid[i].name.c_str());
+                for (size_t j = 0; j < this->param.left_eye.image.eyelid[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.left_eye.image.eyelid[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      eyeball:\n");
+        if (0 < this->param.left_eye.image.eyeball.size()) {
+            for (size_t i = 0; i < this->param.left_eye.image.eyeball.size(); ++i) {
+                printf("        %s:\n", this->param.left_eye.image.eyeball[i].name.c_str());
+                for (size_t j = 0; j < this->param.left_eye.image.eyeball[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.left_eye.image.eyeball[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      cornea_outside:\n");
+        if (0 < this->param.left_eye.image.cornea_outside.size()) {
+            for (size_t i = 0; i < this->param.left_eye.image.cornea_outside.size(); ++i) {
+                printf("        %s:\n", this->param.left_eye.image.cornea_outside[i].name.c_str());
+                for (size_t j = 0; j < this->param.left_eye.image.cornea_outside[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.left_eye.image.cornea_outside[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      cornea_inside:\n");
+        if (0 < this->param.left_eye.image.cornea_inside.size()) {
+            for (size_t i = 0; i < this->param.left_eye.image.cornea_inside.size(); ++i) {
+                printf("        %s:\n", this->param.left_eye.image.cornea_inside[i].name.c_str());
+                for (size_t j = 0; j < this->param.left_eye.image.cornea_inside[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.left_eye.image.cornea_inside[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("    right:\n");
+        printf("      eyelid:\n");
+        if (0 < this->param.right_eye.image.eyelid.size()) {
+            for (size_t i = 0; i < this->param.right_eye.image.eyelid.size(); ++i) {
+                printf("        %s:\n", this->param.right_eye.image.eyelid[i].name.c_str());
+                for (size_t j = 0; j < this->param.right_eye.image.eyelid[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.right_eye.image.eyelid[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      eyeball:\n");
+        if (0 < this->param.right_eye.image.eyeball.size()) {
+            for (size_t i = 0; i < this->param.right_eye.image.eyeball.size(); ++i) {
+                printf("        %s:\n", this->param.right_eye.image.eyeball[i].name.c_str());
+                for (size_t j = 0; j < this->param.right_eye.image.eyeball[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.right_eye.image.eyeball[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      cornea_outside:\n");
+        if (0 < this->param.right_eye.image.cornea_outside.size()) {
+            for (size_t i = 0; i < this->param.right_eye.image.cornea_outside.size(); ++i) {
+                printf("        %s:\n", this->param.right_eye.image.cornea_outside[i].name.c_str());
+                for (size_t j = 0; j < this->param.right_eye.image.cornea_outside[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.right_eye.image.cornea_outside[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+        printf("      cornea_inside:\n");
+        if (0 < this->param.right_eye.image.cornea_inside.size()) {
+            for (size_t i = 0; i < this->param.right_eye.image.cornea_inside.size(); ++i) {
+                printf("        %s:\n", this->param.right_eye.image.cornea_inside[i].name.c_str());
+                for (size_t j = 0; j < this->param.right_eye.image.cornea_inside[i].files.size(); ++j) {
+                    printf("          %s\n", this->param.right_eye.image.cornea_inside[i].files[j].c_str());
+                }
+            }
+        } else {
+            printf("        --\n");
+        }
+#endif
         printf("=========================================================\n");
 #endif
         result = true;
@@ -340,27 +434,29 @@ bool EyeWidget::set_setting_file(std::string json_file)
                         for (nlohmann::json::iterator it = settings["image"]["left"]["eyelid"].begin(); it != settings["image"]["left"]["eyelid"].end(); ++it) {
                             const nlohmann::json &item = *it;
                             if (true == item.contains("id")) {
-                                std::string it_name = "";
-                                std::string it_file = "";
-                                bool it_mirror      = false;
-                                if (true == item.contains("name")) {
-                                    it_name = item["name"];
-                                }
-                                if (true == item.contains("mirror")) {
-                                    it_mirror = (item["mirror"] ? true : false);
-                                }
-                                if (true == item.contains("file")) {
-                                    it_file = item["file"];
-                                }
-                                StParameter::StImageInfo info((int)item["id"], it_name, it_file, it_mirror);
-                                info.files.clear();
-                                step = "Get value / image.left.eyelid.file";
                                 if (true == item.contains("files")) {
+                                    std::string it_name = "";
+                                    bool it_mirror      = false;
+                                    if (true == item.contains("name")) {
+                                        it_name = item["name"];
+                                    }
+                                    if (true == item.contains("mirror")) {
+                                        it_mirror = (item["mirror"] ? true : false);
+                                    }
+                                    StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                    info.files.clear();
+                                    step = "Get value / image.left.eyelid.file";
                                     for (auto &element : item["files"]) {
                                         const nlohmann::json &r_path = element;
-                                        info.files.push_back(r_path);
+                                        std::filesystem::path f_path = this->param.path;
+                                        f_path /= (std::string)r_path;
+                                        if (true == std::filesystem::is_regular_file(f_path)) {
+                                            info.files.push_back(std::filesystem::canonical(f_path));
+                                        }
                                     }
-                                    this->param.left_eye.image.eyelid.push_back(info);
+                                    if (0 < info.files.size()) {
+                                        this->param.left_eye.image.eyelid.push_back(info);
+                                    }
                                 }
                             }
                         }
@@ -371,7 +467,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                         for (nlohmann::json::iterator it = settings["image"]["left"]["eyeball"].begin(); it != settings["image"]["left"]["eyeball"].end(); ++it) {
                             const nlohmann::json &item = *it;
                             if (true == item.contains("id")) {
-                                if (true == item.contains("file")) {
+                                if (true == item.contains("files")) {
                                     std::string it_name = "";
                                     bool it_mirror      = false;
                                     if (true == item.contains("name")) {
@@ -380,8 +476,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                     if (true == item.contains("mirror")) {
                                         it_mirror = (item["mirror"] ? true : false);
                                     }
-                                    this->param.left_eye.image.eyeball.push_back( //
-                                            StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                    StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                    info.files.clear();
+                                    step = "Get value / image.left.eyeball.file";
+                                    for (auto &element : item["files"]) {
+                                        const nlohmann::json &r_path = element;
+                                        std::filesystem::path f_path = this->param.path;
+                                        f_path /= (std::string)r_path;
+                                        if (true == std::filesystem::is_regular_file(f_path)) {
+                                            info.files.push_back(std::filesystem::canonical(f_path));
+                                        }
+                                    }
+                                    if (0 < info.files.size()) {
+                                        this->param.left_eye.image.eyeball.push_back(info);
+                                    }
                                 }
                             }
                         }
@@ -394,7 +502,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                  ++it) {
                                 const nlohmann::json &item = *it;
                                 if (true == item.contains("id")) {
-                                    if (true == item.contains("file")) {
+                                    if (true == item.contains("files")) {
                                         std::string it_name = "";
                                         bool it_mirror      = false;
                                         if (true == item.contains("name")) {
@@ -403,8 +511,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                         if (true == item.contains("mirror")) {
                                             it_mirror = (item["mirror"] ? true : false);
                                         }
-                                        this->param.left_eye.image.cornea_outside.push_back( //
-                                                StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                        StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                        info.files.clear();
+                                        step = "Get value / image.left.cornea.outside.file";
+                                        for (auto &element : item["files"]) {
+                                            const nlohmann::json &r_path = element;
+                                            std::filesystem::path f_path = this->param.path;
+                                            f_path /= (std::string)r_path;
+                                            if (true == std::filesystem::is_regular_file(f_path)) {
+                                                info.files.push_back(std::filesystem::canonical(f_path));
+                                            }
+                                        }
+                                        if (0 < info.files.size()) {
+                                            this->param.left_eye.image.cornea_outside.push_back(info);
+                                        }
                                     }
                                 }
                             }
@@ -419,7 +539,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                  ++it) {
                                 const nlohmann::json &item = *it;
                                 if (true == item.contains("id")) {
-                                    if (true == item.contains("file")) {
+                                    if (true == item.contains("files")) {
                                         std::string it_name = "";
                                         bool it_mirror      = false;
                                         if (true == item.contains("name")) {
@@ -428,8 +548,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                         if (true == item.contains("mirror")) {
                                             it_mirror = (item["mirror"] ? true : false);
                                         }
-                                        this->param.left_eye.image.cornea_inside.push_back( //
-                                                StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                        StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                        info.files.clear();
+                                        step = "Get value / image.left.cornea.inside.file";
+                                        for (auto &element : item["files"]) {
+                                            const nlohmann::json &r_path = element;
+                                            std::filesystem::path f_path = this->param.path;
+                                            f_path /= (std::string)r_path;
+                                            if (true == std::filesystem::is_regular_file(f_path)) {
+                                                info.files.push_back(std::filesystem::canonical(f_path));
+                                            }
+                                        }
+                                        if (0 < info.files.size()) {
+                                            this->param.left_eye.image.cornea_inside.push_back(info);
+                                        }
                                     }
                                 }
                             }
@@ -447,27 +579,29 @@ bool EyeWidget::set_setting_file(std::string json_file)
                         for (nlohmann::json::iterator it = settings["image"]["right"]["eyelid"].begin(); it != settings["image"]["right"]["eyelid"].end(); ++it) {
                             const nlohmann::json &item = *it;
                             if (true == item.contains("id")) {
-                                std::string it_name = "";
-                                std::string it_file = "";
-                                bool it_mirror      = false;
-                                if (true == item.contains("name")) {
-                                    it_name = item["name"];
-                                }
-                                if (true == item.contains("mirror")) {
-                                    it_mirror = (item["mirror"] ? true : false);
-                                }
-                                if (true == item.contains("file")) {
-                                    it_file = item["file"];
-                                }
-                                StParameter::StImageInfo info((int)item["id"], it_name, it_file, it_mirror);
-                                info.files.clear();
-                                step = "Get value / image.right.eyelid.file";
                                 if (true == item.contains("files")) {
+                                    std::string it_name = "";
+                                    bool it_mirror      = false;
+                                    if (true == item.contains("name")) {
+                                        it_name = item["name"];
+                                    }
+                                    if (true == item.contains("mirror")) {
+                                        it_mirror = (item["mirror"] ? true : false);
+                                    }
+                                    StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                    info.files.clear();
+                                    step = "Get value / image.right.eyelid.file";
                                     for (auto &element : item["files"]) {
                                         const nlohmann::json &r_path = element;
-                                        info.files.push_back(r_path);
+                                        std::filesystem::path f_path = this->param.path;
+                                        f_path /= (std::string)r_path;
+                                        if (true == std::filesystem::is_regular_file(f_path)) {
+                                            info.files.push_back(std::filesystem::canonical(f_path));
+                                        }
                                     }
-                                    this->param.right_eye.image.eyelid.push_back(info);
+                                    if (0 < info.files.size()) {
+                                        this->param.right_eye.image.eyelid.push_back(info);
+                                    }
                                 }
                             }
                         }
@@ -478,7 +612,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                         for (nlohmann::json::iterator it = settings["image"]["right"]["eyeball"].begin(); it != settings["image"]["right"]["eyeball"].end(); ++it) {
                             const nlohmann::json &item = *it;
                             if (true == item.contains("id")) {
-                                if (true == item.contains("file")) {
+                                if (true == item.contains("files")) {
                                     std::string it_name = "";
                                     bool it_mirror      = false;
                                     if (true == item.contains("name")) {
@@ -487,8 +621,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                     if (true == item.contains("mirror")) {
                                         it_mirror = (item["mirror"] ? true : false);
                                     }
-                                    this->param.right_eye.image.eyeball.push_back( //
-                                            StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                    StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                    info.files.clear();
+                                    step = "Get value / image.right.eyeball.file";
+                                    for (auto &element : item["files"]) {
+                                        const nlohmann::json &r_path = element;
+                                        std::filesystem::path f_path = this->param.path;
+                                        f_path /= (std::string)r_path;
+                                        if (true == std::filesystem::is_regular_file(f_path)) {
+                                            info.files.push_back(std::filesystem::canonical(f_path));
+                                        }
+                                    }
+                                    if (0 < info.files.size()) {
+                                        this->param.right_eye.image.eyeball.push_back(info);
+                                    }
                                 }
                             }
                         }
@@ -501,7 +647,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                  ++it) {
                                 const nlohmann::json &item = *it;
                                 if (true == item.contains("id")) {
-                                    if (true == item.contains("file")) {
+                                    if (true == item.contains("files")) {
                                         std::string it_name = "";
                                         bool it_mirror      = false;
                                         if (true == item.contains("name")) {
@@ -510,8 +656,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                         if (true == item.contains("mirror")) {
                                             it_mirror = (item["mirror"] ? true : false);
                                         }
-                                        this->param.right_eye.image.cornea_outside.push_back( //
-                                                StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                        StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                        info.files.clear();
+                                        step = "Get value / image.right.cornea.outside.file";
+                                        for (auto &element : item["files"]) {
+                                            const nlohmann::json &r_path = element;
+                                            std::filesystem::path f_path = this->param.path;
+                                            f_path /= (std::string)r_path;
+                                            if (true == std::filesystem::is_regular_file(f_path)) {
+                                                info.files.push_back(std::filesystem::canonical(f_path));
+                                            }
+                                        }
+                                        if (0 < info.files.size()) {
+                                            this->param.right_eye.image.cornea_outside.push_back(info);
+                                        }
                                     }
                                 }
                             }
@@ -526,7 +684,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                  ++it) {
                                 const nlohmann::json &item = *it;
                                 if (true == item.contains("id")) {
-                                    if (true == item.contains("file")) {
+                                    if (true == item.contains("files")) {
                                         std::string it_name = "";
                                         bool it_mirror      = false;
                                         if (true == item.contains("name")) {
@@ -535,8 +693,20 @@ bool EyeWidget::set_setting_file(std::string json_file)
                                         if (true == item.contains("mirror")) {
                                             it_mirror = (item["mirror"] ? true : false);
                                         }
-                                        this->param.right_eye.image.cornea_inside.push_back( //
-                                                StParameter::StImageInfo((int)item["id"], it_name, item["file"], it_mirror));
+                                        StParameter::StImageInfo info((int)item["id"], it_name, it_mirror);
+                                        info.files.clear();
+                                        step = "Get value / image.right.cornea.inside.file";
+                                        for (auto &element : item["files"]) {
+                                            const nlohmann::json &r_path = element;
+                                            std::filesystem::path f_path = this->param.path;
+                                            f_path /= (std::string)r_path;
+                                            if (true == std::filesystem::is_regular_file(f_path)) {
+                                                info.files.push_back(std::filesystem::canonical(f_path));
+                                            }
+                                        }
+                                        if (0 < info.files.size()) {
+                                            this->param.right_eye.image.cornea_inside.push_back(info);
+                                        }
                                     }
                                 }
                             }

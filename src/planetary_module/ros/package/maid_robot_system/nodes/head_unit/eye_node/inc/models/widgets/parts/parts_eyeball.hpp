@@ -137,25 +137,25 @@ public:
     QPixmap eyeball_origin_l;
     QPixmap eyeball_origin_r;
 #if DRAW_CORNEA_OUTSIDE
-    QPixmap cornea_outside;
+    QPixmap cornea_outside_left;
+    QPixmap cornea_outside_right;
 #endif
 #if DRAW_CORNEA_INSIDE
-    QPixmap cornea_inside;
+    QPixmap cornea_inside_left;
+    QPixmap cornea_inside_right;
 #endif
     /* ============================================= */
 private:
     /* ============================================= */
 #if DRAW_CORNEA_OUTSIDE
-    QMatrix matrix_cornea_outside;
+    QMatrix matrix_cornea_outside_left;
+    QMatrix matrix_cornea_outside_right;
     QPixmap cornea_outside_origin[2];
-    // int cornea_outside_select = 0;
-    double cornea_ling_size_outside = 750;
 #endif
 #if DRAW_CORNEA_INSIDE
-    QMatrix matrix_cornea_inside;
+    QMatrix matrix_cornea_inside_left;
+    QMatrix matrix_cornea_inside_right;
     QPixmap cornea_inside_origin[2];
-    // int cornea_inside_select = 0;
-    double cornea_ling_size_inside = 550;
 #endif
     /* ============================================= */
     int get_index();

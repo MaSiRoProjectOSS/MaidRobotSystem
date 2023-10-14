@@ -57,17 +57,25 @@ void PartsEyeball::set_dimensions(float value)
 void PartsEyeball::draw_outside()
 {
 #if DRAW_CORNEA_OUTSIDE
-    cornea_outside = cornea_outside_origin[this->get_index()];
-    matrix_cornea_outside.reset();
-    matrix_cornea_outside.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.x, (this->right_eye.draw_postion.height + 60) / this->right_eye.size.y);
-    matrix_cornea_outside.rotate(this->right_eye.cornea_outside_angle);
-    cornea_outside = cornea_outside.transformed(matrix_cornea_outside);
     /* ============================================= */
-    // cornea outside postion
-    this->right_eye.draw_cornea_anime.x = eyeball_center_right.x() - (cornea_outside.width() / 2.0);
-    this->right_eye.draw_cornea_anime.y = eyeball_center_right.y() - (cornea_outside.height() / 2.0);
-    this->left_eye.draw_cornea_anime.x  = eyeball_center_left.x() - (cornea_outside.width() / 2.0);
-    this->left_eye.draw_cornea_anime.y  = eyeball_center_left.y() - (cornea_outside.height() / 2.0);
+    // left
+    /* ============================================= */
+    this->matrix_cornea_outside_left.reset();
+    this->matrix_cornea_outside_left.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.x, (this->right_eye.draw_postion.height + 60) / this->right_eye.size.y);
+    this->matrix_cornea_outside_left.rotate(-this->right_eye.cornea_outside_angle);
+    this->cornea_outside_left          = this->cornea_outside_origin[this->get_index()].transformed(this->matrix_cornea_outside_left);
+    this->left_eye.draw_cornea_anime.x = this->eyeball_center_left.x() - (this->cornea_outside_left.width() / 2.0);
+    this->left_eye.draw_cornea_anime.y = this->eyeball_center_left.y() - (this->cornea_outside_left.height() / 2.0);
+    /* ============================================= */
+    // right
+    /* ============================================= */
+    this->matrix_cornea_outside_right.reset();
+    this->matrix_cornea_outside_right.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.x,
+                                            (this->right_eye.draw_postion.height + 60) / this->right_eye.size.y);
+    this->matrix_cornea_outside_right.rotate(-this->right_eye.cornea_outside_angle);
+    this->cornea_outside_right          = this->cornea_outside_origin[this->get_index()].transformed(this->matrix_cornea_outside_right);
+    this->right_eye.draw_cornea_anime.x = this->eyeball_center_right.x() - (this->cornea_outside_right.width() / 2.0);
+    this->right_eye.draw_cornea_anime.y = this->eyeball_center_right.y() - (this->cornea_outside_right.height() / 2.0);
 #endif
 }
 
@@ -78,16 +86,22 @@ void PartsEyeball::draw_outside()
 void PartsEyeball::draw_inside()
 {
 #if DRAW_CORNEA_INSIDE
-    cornea_inside = cornea_inside_origin[this->get_index()];
-    matrix_cornea_inside.reset();
-    matrix_cornea_inside.rotate(this->right_eye.cornea_inside_angle);
-    cornea_inside = cornea_inside.transformed(matrix_cornea_inside);
     /* ============================================= */
-    // cornea inside postion
-    this->right_eye.draw_cornea_anime2.x = eyeball_center_right.x() - (cornea_inside.width() / 2.0);
-    this->right_eye.draw_cornea_anime2.y = eyeball_center_right.y() - (cornea_inside.height() / 2.0);
-    this->left_eye.draw_cornea_anime2.x  = eyeball_center_left.x() - (cornea_inside.width() / 2.0);
-    this->left_eye.draw_cornea_anime2.y  = eyeball_center_left.y() - (cornea_inside.height() / 2.0);
+    // left
+    /* ============================================= */
+    this->matrix_cornea_inside_left.reset();
+    this->matrix_cornea_inside_left.rotate(-this->right_eye.cornea_inside_angle);
+    this->cornea_outside_left           = this->cornea_inside_origin[this->get_index()].transformed(this->matrix_cornea_inside_left);
+    this->left_eye.draw_cornea_anime2.x = this->eyeball_center_left.x() - (this->cornea_outside_left.width() / 2.0);
+    this->left_eye.draw_cornea_anime2.y = this->eyeball_center_left.y() - (this->cornea_outside_left.height() / 2.0);
+    /* ============================================= */
+    // right
+    /* ============================================= */
+    this->matrix_cornea_inside_right.reset();
+    this->matrix_cornea_inside_right.rotate(-this->right_eye.cornea_inside_angle);
+    this->cornea_inside_right            = this->cornea_inside_origin[this->get_index()].transformed(this->matrix_cornea_inside_right);
+    this->right_eye.draw_cornea_anime2.x = this->eyeball_center_right.x() - (this->cornea_inside_right.width() / 2.0);
+    this->right_eye.draw_cornea_anime2.y = this->eyeball_center_right.y() - (this->cornea_inside_right.height() / 2.0);
 #endif
 }
 
@@ -136,7 +150,9 @@ void PartsEyeball::_set_image(StParameter param)
 {
     if (true == std::filesystem::is_directory(param.path)) {
         char buffer_path[255];
+#if DEBUG_OUTPUT_LOAD_IMAGE
         printf("  ---- LOAD [Eyeball] ----\n");
+#endif
         ////////////////
         // eyeball_origin left
         sprintf(buffer_path, "%s/%s", param.path.c_str(), "eye/eyeball/eyeball_normally.png");
@@ -158,9 +174,11 @@ void PartsEyeball::_set_image(StParameter param)
         }
 
 #if DRAW_CORNEA_OUTSIDE
+#if DEBUG_OUTPUT_LOAD_IMAGE
         printf("  ---- LOAD [Cornea-outside] ----\n");
-        // cornea_outside_origin
-        this->matrix_cornea_outside.rotate(0);
+#endif
+        QMatrix matrix_cornea_outside;
+        matrix_cornea_outside.rotate(0);
 
         for (int i = 0; i < 2; i++) {
             switch (i) {
@@ -179,15 +197,17 @@ void PartsEyeball::_set_image(StParameter param)
                     break;
             }
 
-            this->cornea_outside_origin[i] = this->cornea_outside_origin[i].scaled(this->cornea_ling_size_outside, this->cornea_ling_size_outside, Qt::IgnoreAspectRatio);
-            this->cornea_outside_origin[i] = this->cornea_outside_origin[i].transformed(this->matrix_cornea_outside);
+            this->cornea_outside_origin[i] = this->cornea_outside_origin[i].scaled(param.right_eye.eyeball.width, param.right_eye.eyeball.height, Qt::IgnoreAspectRatio);
+            this->cornea_outside_origin[i] = this->cornea_outside_origin[i].transformed(matrix_cornea_outside);
         }
 
 #endif
 #if DRAW_CORNEA_INSIDE
+#if DEBUG_OUTPUT_LOAD_IMAGE
         printf("  ---- LOAD [Cornea-inside] ----\n");
-        // cornea_inside_origin
-        this->matrix_cornea_inside.rotate(0);
+#endif
+        QMatrix matrix_cornea_inside;
+        matrix_cornea_inside.rotate(0);
 
         for (int i = 0; i < 2; i++) {
             switch (i) {
@@ -206,8 +226,8 @@ void PartsEyeball::_set_image(StParameter param)
                     break;
             }
 
-            this->cornea_inside_origin[i] = this->cornea_inside_origin[i].scaled(this->cornea_ling_size_inside, this->cornea_ling_size_inside, Qt::IgnoreAspectRatio);
-            this->cornea_inside_origin[i] = this->cornea_inside_origin[i].transformed(this->matrix_cornea_inside);
+            this->cornea_inside_origin[i] = this->cornea_inside_origin[i].scaled(param.right_eye.eyeball.width, param.right_eye.eyeball.height, Qt::IgnoreAspectRatio);
+            this->cornea_inside_origin[i] = this->cornea_inside_origin[i].transformed(matrix_cornea_inside);
         }
 #endif
     }

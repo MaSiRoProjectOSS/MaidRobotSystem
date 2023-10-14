@@ -25,19 +25,17 @@ public:
     public:
         int id           = 0;
         std::string name = "";
-        std::string file = "";
         std::vector<std::string> files;
         bool mirror = false;
 
-        StImageInfo(int in_id, std::string in_name, std::string in_file, bool in_mirror = false)
+        StImageInfo(int in_id, std::string in_name, bool in_mirror = false)
         {
-            this->set(in_id, in_name, in_file, in_mirror);
+            this->set(in_id, in_name, in_mirror);
         }
-        void set(int in_id, std::string in_name, std::string in_file, bool in_mirror = false)
+        void set(int in_id, std::string in_name, bool in_mirror = false)
         {
             this->id     = in_id;
             this->name   = in_name;
-            this->file   = in_file;
             this->mirror = in_mirror;
         }
     };
