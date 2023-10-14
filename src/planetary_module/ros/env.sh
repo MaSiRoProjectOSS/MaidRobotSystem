@@ -617,16 +617,27 @@ function aros2_param_list {
         return
     fi
     if [ ! -z "${NODE_NAME}" ]; then
-        local PARAM_ARRAY=($(ros2 param list ${NODE_NAME}))
+        local PARAM_ARRAY=($(ros2 param list ${NODE_NAME} | grep -v parameter_events))
+        #local PARAM_ARRAY=($(ros2 param list ${NODE_NAME}))
         local PARAM_COUNT=${#PARAM_ARRAY[@]}
         local RAW_COUNT=0
+        local PARAM_LEN=0
+        local RAW_LEN=0
+        for PARAM_RAW in "${PARAM_ARRAY[@]}"
+        do
+            RAW_LEN=$(echo -n ${PARAM_RAW} | wc -m)
+            if [ ${RAW_LEN} -gt ${PARAM_LEN} ]; then
+                PARAM_LEN=${RAW_LEN}
+            fi
+        done
+
         echo "----------------"
         echo "ros2 param get ${NODE_NAME} ..."
         for PARAM_RAW in "${PARAM_ARRAY[@]}"
         do
             RAW_COUNT=$((RAW_COUNT+1))
             value=$(ros2 param get ${NODE_NAME} ${PARAM_RAW})
-            printf "  [%03s/%03s] %-35s : %s\n" "${RAW_COUNT}" "${PARAM_COUNT}" "${PARAM_RAW:0:34}" "${value}"
+            printf "  [%03s/%03s] %-$((PARAM_LEN+1))s : %s\n" "${RAW_COUNT}" "${PARAM_COUNT}" "${PARAM_RAW:0:${PARAM_LEN}}" "${value}"
         done
         history -s aros2_param_list ${NODE_NAME}
     else
