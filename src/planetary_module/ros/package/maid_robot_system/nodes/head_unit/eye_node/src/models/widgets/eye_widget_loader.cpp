@@ -113,23 +113,31 @@ bool EyeWidget::reload_param()
         printf("    outside:\n");
         printf("      enable: %s\n", this->param.left_eye.cornea_outside.enable ? "True" : "False");
         printf("      speed: %3.1f\n", this->param.left_eye.cornea_outside.speed);
-        printf("      scale: %3.1f\n", this->param.left_eye.cornea_outside.scale);
+        printf("      scale:\n");
+        printf("        x: %3.1f\n", this->param.left_eye.cornea_outside.scale.x);
+        printf("        y: %3.1f\n", this->param.left_eye.cornea_outside.scale.y);
         printf("      alpha: %d\n", this->param.left_eye.cornea_outside.alpha);
         printf("    inside:\n");
         printf("      enable: %s\n", this->param.left_eye.cornea_inside.enable ? "True" : "False");
         printf("      speed: %3.1f\n", this->param.left_eye.cornea_inside.speed);
-        printf("      scale: %3.1f\n", this->param.left_eye.cornea_inside.scale);
+        printf("      scale:\n");
+        printf("        x: %3.1f\n", this->param.left_eye.cornea_inside.scale.x);
+        printf("        y: %3.1f\n", this->param.left_eye.cornea_inside.scale.y);
         printf("      alpha: %d\n", this->param.left_eye.cornea_inside.alpha);
         printf("  right_eye:\n");
         printf("    outside:\n");
         printf("      enable: %s\n", this->param.right_eye.cornea_outside.enable ? "True" : "False");
         printf("      speed: %3.1f\n", this->param.right_eye.cornea_outside.speed);
-        printf("      scale: %3.1f\n", this->param.right_eye.cornea_outside.scale);
+        printf("      scale:\n");
+        printf("        x: %3.1f\n", this->param.right_eye.cornea_outside.scale.x);
+        printf("        y: %3.1f\n", this->param.right_eye.cornea_outside.scale.y);
         printf("      alpha: %d\n", this->param.right_eye.cornea_outside.alpha);
         printf("    inside:\n");
         printf("      enable: %s\n", this->param.right_eye.cornea_inside.enable ? "True" : "False");
         printf("      speed: %3.1f\n", this->param.right_eye.cornea_inside.speed);
-        printf("      scale: %3.1f\n", this->param.right_eye.cornea_inside.scale);
+        printf("      scale:\n");
+        printf("        x: %3.1f\n", this->param.right_eye.cornea_inside.scale.x);
+        printf("        y: %3.1f\n", this->param.right_eye.cornea_inside.scale.y);
         printf("      alpha: %d\n", this->param.right_eye.cornea_inside.alpha);
 #endif
 
@@ -339,12 +347,16 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                       = "Get value / left.cornea.outside";
                             this->param.left_eye.cornea_outside.enable = //
                                     settings["rectangle"]["left"]["cornea"]["outside"].value("enable", this->param.left_eye.cornea_outside.enable);
-                            this->param.left_eye.cornea_outside.scale = //
-                                    settings["rectangle"]["left"]["cornea"]["outside"].value("scale", this->param.left_eye.cornea_outside.scale);
                             this->param.left_eye.cornea_outside.speed = //
                                     settings["rectangle"]["left"]["cornea"]["outside"].value("speed", this->param.left_eye.cornea_outside.speed);
                             this->param.left_eye.cornea_outside.alpha = //
                                     settings["rectangle"]["left"]["cornea"]["outside"].value("alpha", this->param.left_eye.cornea_outside.alpha);
+                            if (true == settings["rectangle"]["left"]["cornea"]["outside"].contains("size_rate")) {
+                                this->param.left_eye.cornea_outside.scale.x = //
+                                        settings["rectangle"]["left"]["cornea"]["outside"]["size_rate"].value("width", this->param.left_eye.cornea_outside.scale.x);
+                                this->param.left_eye.cornea_outside.scale.y = //
+                                        settings["rectangle"]["left"]["cornea"]["outside"]["size_rate"].value("height", this->param.left_eye.cornea_outside.scale.y);
+                            }
                         }
                     }
                     if (true == settings["rectangle"]["left"].contains("cornea")) {
@@ -352,12 +364,16 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                      = "Get value / left.cornea.inside";
                             this->param.left_eye.cornea_inside.enable = //
                                     settings["rectangle"]["left"]["cornea"]["inside"].value("enable", this->param.left_eye.cornea_inside.enable);
-                            this->param.left_eye.cornea_inside.scale = //
-                                    settings["rectangle"]["left"]["cornea"]["inside"].value("scale", this->param.left_eye.cornea_inside.scale);
                             this->param.left_eye.cornea_inside.speed = //
                                     settings["rectangle"]["left"]["cornea"]["inside"].value("speed", this->param.left_eye.cornea_inside.speed);
                             this->param.left_eye.cornea_inside.alpha = //
                                     settings["rectangle"]["left"]["cornea"]["inside"].value("alpha", this->param.left_eye.cornea_inside.alpha);
+                            if (true == settings["rectangle"]["left"]["cornea"]["inside"].contains("size_rate")) {
+                                this->param.left_eye.cornea_inside.scale.x = //
+                                        settings["rectangle"]["left"]["cornea"]["inside"]["size_rate"].value("width", this->param.left_eye.cornea_inside.scale.x);
+                                this->param.left_eye.cornea_inside.scale.y = //
+                                        settings["rectangle"]["left"]["cornea"]["inside"]["size_rate"].value("height", this->param.left_eye.cornea_inside.scale.y);
+                            }
                         }
                     }
                 }
@@ -394,12 +410,16 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                        = "Get value / right.cornea.outside";
                             this->param.right_eye.cornea_outside.enable = //
                                     settings["rectangle"]["right"]["cornea"]["outside"].value("enable", this->param.right_eye.cornea_outside.enable);
-                            this->param.right_eye.cornea_outside.scale = //
-                                    settings["rectangle"]["right"]["cornea"]["outside"].value("scale", this->param.right_eye.cornea_outside.scale);
                             this->param.right_eye.cornea_outside.speed = //
                                     settings["rectangle"]["right"]["cornea"]["outside"].value("speed", this->param.right_eye.cornea_outside.speed);
                             this->param.right_eye.cornea_outside.alpha = //
                                     settings["rectangle"]["right"]["cornea"]["outside"].value("alpha", this->param.right_eye.cornea_outside.alpha);
+                            if (true == settings["rectangle"]["right"]["cornea"]["outside"].contains("size_rate")) {
+                                this->param.right_eye.cornea_outside.scale.x = //
+                                        settings["rectangle"]["right"]["cornea"]["outside"]["size_rate"].value("width", this->param.right_eye.cornea_outside.scale.x);
+                                this->param.right_eye.cornea_outside.scale.y = //
+                                        settings["rectangle"]["right"]["cornea"]["outside"]["size_rate"].value("height", this->param.right_eye.cornea_outside.scale.y);
+                            }
                         }
                     }
                     if (true == settings["rectangle"]["right"].contains("cornea")) {
@@ -407,12 +427,16 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                       = "Get value / right.cornea.inside";
                             this->param.right_eye.cornea_inside.enable = //
                                     settings["rectangle"]["right"]["cornea"]["inside"].value("enable", this->param.right_eye.cornea_inside.enable);
-                            this->param.right_eye.cornea_inside.scale = //
-                                    settings["rectangle"]["right"]["cornea"]["inside"].value("scale", this->param.right_eye.cornea_inside.scale);
                             this->param.right_eye.cornea_inside.speed = //
                                     settings["rectangle"]["right"]["cornea"]["inside"].value("speed", this->param.right_eye.cornea_inside.speed);
                             this->param.right_eye.cornea_inside.alpha = //
                                     settings["rectangle"]["right"]["cornea"]["inside"].value("alpha", this->param.right_eye.cornea_inside.alpha);
+                            if (true == settings["rectangle"]["right"]["cornea"]["inside"].contains("size_rate")) {
+                                this->param.right_eye.cornea_inside.scale.x = //
+                                        settings["rectangle"]["right"]["cornea"]["inside"]["size_rate"].value("width", this->param.right_eye.cornea_inside.scale.x);
+                                this->param.right_eye.cornea_inside.scale.y = //
+                                        settings["rectangle"]["right"]["cornea"]["inside"]["size_rate"].value("height", this->param.right_eye.cornea_inside.scale.y);
+                            }
                         }
                     }
                 }
@@ -749,10 +773,6 @@ void EyeWidget::_init()
 {
     if (false == this->_flag_initialized) {
         this->_flag_initialized = true;
-        /* --------------------------------------------------- */
-        // register[START]
-        /* --------------------------------------------------- */
-        this->eyeball.initialize(this->param.left_eye.eyeball.angle, this->param.right_eye.eyeball.angle);
 
         /* --------------------------------------------------- */
         // set timer

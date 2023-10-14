@@ -20,14 +20,35 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 namespace maid_robot_system
 {
-struct StEyeball {
-    typedef struct {
-        uint elapsed = 0;
-        StVector pos;
-    } eyeball;
+class StEyeball {
+public:
+    QPixmap eyeball{ 1, 1 };
+    QPixmap cornea_outside{ 1, 1 };
+    QPixmap cornea_inside{ 1, 1 };
+    class StImageStorage {
+    public:
+        std::vector<StImageMap> vitreous;
+#if DRAW_CORNEA_OUTSIDE
+        std::vector<StImageMap> cornea_outside;
+        QMatrix matrix_cornea_outside;
+#endif
+#if DRAW_CORNEA_INSIDE
+        std::vector<StImageMap> cornea_inside;
+        QMatrix matrix_cornea_inside;
+#endif
+    };
+    StImageStorage store;
+
+    uint elapsed = 0;
+    StVector pos;
+    QPointF eyeball_center;
+    double calibration_angle     = 0.0;
+    double calibration_angle_cos = 0.0;
+    double calibration_angle_sin = 0.0;
 
     StVector now;
     StVector target;
@@ -126,49 +147,18 @@ public:
     void draw_inside();
 
     void set_default();
-    void initialize(double param_calibration_l_angle, double param_calibration_r_angle);
 
 private:
     void _set_image(StParameter param);
 
-public:
-    /* ============================================= */
-    // QMatrix matrix_eyeball;
-    QPixmap eyeball_origin_l;
-    QPixmap eyeball_origin_r;
-#if DRAW_CORNEA_OUTSIDE
-    QPixmap cornea_outside_left;
-    QPixmap cornea_outside_right;
-#endif
-#if DRAW_CORNEA_INSIDE
-    QPixmap cornea_inside_left;
-    QPixmap cornea_inside_right;
-#endif
-    /* ============================================= */
+    QPixmap _blank{ 1, 1 };
+
 private:
     /* ============================================= */
-#if DRAW_CORNEA_OUTSIDE
-    QMatrix matrix_cornea_outside_left;
-    QMatrix matrix_cornea_outside_right;
-    QPixmap cornea_outside_origin[2];
-#endif
-#if DRAW_CORNEA_INSIDE
-    QMatrix matrix_cornea_inside_left;
-    QMatrix matrix_cornea_inside_right;
-    QPixmap cornea_inside_origin[2];
-#endif
     /* ============================================= */
     int get_index();
     ENUM_STATE current_cornea_state;
     ENUM_STATE request_cornea_state;
-    double calibration_l_angle     = 0.0;
-    double calibration_r_angle     = 0.0;
-    double calibration_l_angle_cos = 0.0;
-    double calibration_l_angle_sin = 0.0;
-    double calibration_r_angle_cos = 0.0;
-    double calibration_r_angle_sin = 0.0;
-    QPointF eyeball_center_right;
-    QPointF eyeball_center_left;
     float request_dimensions = EYEBALL_DIMENSIONS_DEFAULT;
     float dimensions         = EYEBALL_DIMENSIONS_DEFAULT;
 };

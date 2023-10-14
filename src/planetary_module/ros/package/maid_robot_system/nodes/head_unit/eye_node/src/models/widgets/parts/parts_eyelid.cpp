@@ -16,6 +16,8 @@
 
 namespace maid_robot_system
 {
+#define EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX 30
+
 /**
  * @brief
  *
@@ -199,75 +201,81 @@ void PartsEyelid::cycle()
 {
 }
 
-/**
- * @brief
- *
- * @param target
- * @return QPixmap
- */
-QPixmap PartsEyelid::get_eye_id(ENUM_TARGET_EYE target)
+QPixmap PartsEyelid::get_eye_id_right()
+{
+    return this->_get_eye_id(false);
+}
+QPixmap PartsEyelid::get_eye_id_left()
+{
+    return this->_get_eye_id(true);
+}
+QPixmap PartsEyelid::_get_eye_id(bool is_left)
 {
     if (send_animation >= EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX) {
         send_animation = 0;
     }
 
-    int index_elapsed          = send_animation;
-    INDEX_LIP_IMAGE select_lid = INDEX_LIP_NORMAL;
+    int index_elapsed = send_animation;
+    int select_lid    = (int)INDEX_LIP_NORMAL;
 
     switch (eye_emotion) {
-        case miens_close_left:
-            index_elapsed = (int)((TARGET_EYE_LEFT == target) ? send_animation : (send_animation / winkValue));
-            select_lid    = INDEX_LIP_SMILE;
+        case MIENS::miens_close_left:
+            index_elapsed = (int)((is_left) ? send_animation : (send_animation / winkValue));
+            select_lid    = (int)INDEX_LIP_SMILE;
             break;
 
-        case miens_close_right:
-            index_elapsed = (int)((TARGET_EYE_LEFT == target) ? (send_animation / winkValue) : send_animation);
-            select_lid    = INDEX_LIP_SMILE;
+        case MIENS::miens_close_right:
+            index_elapsed = (int)((is_left) ? (send_animation / winkValue) : send_animation);
+            select_lid    = (int)INDEX_LIP_SMILE;
             break;
 
-        case miens_wink_left:
-            index_elapsed = (int)((TARGET_EYE_LEFT == target) ? send_animation : (send_animation / 4));
-            select_lid    = (TARGET_EYE_LEFT == target) ? INDEX_LIP_NORMAL : INDEX_LIP_SMILE;
+        case MIENS::miens_wink_left:
+            index_elapsed = (int)((is_left) ? send_animation : (send_animation / 4));
+            select_lid    = (int)((is_left) ? INDEX_LIP_NORMAL : INDEX_LIP_SMILE);
             break;
 
-        case miens_wink_right:
-            index_elapsed = (int)((TARGET_EYE_LEFT == target) ? (send_animation / 4) : send_animation);
-            select_lid    = (TARGET_EYE_LEFT == target) ? INDEX_LIP_SMILE : INDEX_LIP_NORMAL;
+        case MIENS::miens_wink_right:
+            index_elapsed = (int)((is_left) ? (send_animation / 4) : send_animation);
+            select_lid    = (int)((is_left) ? INDEX_LIP_SMILE : INDEX_LIP_NORMAL);
             break;
 
-        case miens_normal:
-        case miens_close:
+        case MIENS::miens_smile:
             index_elapsed = send_animation;
-            select_lid    = INDEX_LIP_NORMAL;
+            select_lid    = (int)INDEX_LIP_SMILE;
             break;
 
-        case miens_smile:
+        case MIENS::miens_normal:
+        case MIENS::miens_close:
         default:
             index_elapsed = send_animation;
-            select_lid    = INDEX_LIP_SMILE;
+            select_lid    = (int)INDEX_LIP_NORMAL;
             break;
             break;
     }
-
-    switch (select_lid) {
-        case INDEX_LIP_NORMAL:
-            if (TARGET_EYE_LEFT == target) {
-                return this->L_eyelid[index_elapsed];
-            } else {
-                return this->R_eyelid[index_elapsed];
+    if (is_left) {
+        if ((int)this->left_eye.store.size() == 0) {
+            return this->_blank;
+        } else {
+            if ((int)this->left_eye.store.size() <= select_lid) {
+                select_lid = 0;
             }
-
-            break;
-
-        case INDEX_LIP_SMILE:
-        default:
-            if (TARGET_EYE_LEFT == target) {
-                return this->L_smile_lid[index_elapsed];
-            } else {
-                return this->R_smile_lid[index_elapsed];
+            if (this->left_eye.store[select_lid].max <= index_elapsed) {
+                index_elapsed = 0;
             }
-
-            break;
+            return this->left_eye.store[select_lid].data[index_elapsed];
+        }
+    } else {
+        if (this->right_eye.store.size() == 0) {
+            return this->_blank;
+        } else {
+            if ((int)this->right_eye.store.size() <= select_lid) {
+                select_lid = 0;
+            }
+            if (this->right_eye.store[select_lid].max <= index_elapsed) {
+                index_elapsed = 0;
+            }
+            return this->right_eye.store[select_lid].data[index_elapsed];
+        }
     }
 }
 
@@ -301,31 +309,31 @@ void PartsEyelid::set_emotion(MIENS eye_emotion)
     char text_emotion[100];
     if (true == flagChange) {
         switch (next_eye_emotion) {
-            case miens_smile:
+            case MIENS::miens_smile:
                 sprintf(text_emotion, "smile");
                 break;
 
-            case miens_close_left:
+            case MIENS::miens_close_left:
                 sprintf(text_emotion, "lose_left");
                 break;
 
-            case miens_close_right:
+            case MIENS::miens_close_right:
                 sprintf(text_emotion, "close_right");
                 break;
 
-            case miens_close:
+            case MIENS::miens_close:
                 sprintf(text_emotion, "close");
                 break;
 
-            case miens_normal:
+            case MIENS::miens_normal:
                 sprintf(text_emotion, "normal");
                 break;
 
-            case miens_wink_left:
+            case MIENS::miens_wink_left:
                 sprintf(text_emotion, "wink_left");
                 break;
 
-            case miens_wink_right:
+            case MIENS::miens_wink_right:
                 sprintf(text_emotion, "wink_right");
                 break;
 
@@ -365,71 +373,67 @@ void PartsEyelid::set_param(StParameter param)
 }
 void PartsEyelid::_set_image(StParameter param)
 {
-    this->eye_blink_time_quickly      = param.blink_time_quickly;
-    this->eye_blink_time_min          = param.blink_time_min;   // ms
-    this->eye_blink_time_max          = param.blink_time_max;   // ms
-    this->eye_blink_time_limit        = param.blink_time_limit; // ms
-    Qt::ImageConversionFlag imageFlag = Qt::NoOpaqueDetection;
-    imageFlag                         = Qt::OrderedAlphaDither;
-    /* ============================================= */
-    // wink anime  pre load///////////////////////////////////////////////
-    /* ============================================= */
-    std::stringstream ss;
+    this->eye_blink_time_quickly = param.blink_time_quickly;
+    this->eye_blink_time_min     = param.blink_time_min;   // ms
+    this->eye_blink_time_max     = param.blink_time_max;   // ms
+    this->eye_blink_time_limit   = param.blink_time_limit; // ms
+
     std::string f_name;
-    if (true == std::filesystem::is_directory(param.path)) {
 #if DEBUG_OUTPUT_LOAD_IMAGE
-        printf("  ---- LOAD [Eyelid] ----\n");
+    printf("  ---- LOAD [Eyelid] ----\n");
 #endif
-        for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
-            ss.str("");
-            ss.clear();
-            ss << param.path << "/"
-               << "eye/eyelid/normally/" << std::setfill('0') << std::right << std::setw(3) << buf_c << ".png";
-            f_name = ss.str();
-            if (true == std::filesystem::exists(f_name)) {
-                QPixmap buff(f_name.c_str(), nullptr, imageFlag);
-                QMatrix rotate_angle_eyelid;
-                rotate_angle_eyelid.rotate(-90);
-                // left
-                QMatrix rotate_angle_eyelid_l;
-                rotate_angle_eyelid_l.rotate(param.left_eye.eyelid.angle);
-                this->L_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
-                this->L_eyelid[buf_c] = this->L_eyelid[buf_c].transformed(rotate_angle_eyelid_l);
-                // right
-                QMatrix rotate_angle_eyelid_r;
-                rotate_angle_eyelid_r.rotate(param.right_eye.eyelid.angle);
-                this->R_eyelid[buf_c] = buff.transformed(rotate_angle_eyelid);
-                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(QTransform().scale(-1, 1));
-                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
-                this->R_eyelid[buf_c] = this->R_eyelid[buf_c].transformed(rotate_angle_eyelid_r);
+    if (0 < param.left_eye.image.eyelid.size()) {
+        this->left_eye.store.clear();
+        for (size_t i = 0; i < param.left_eye.image.eyelid.size(); ++i) {
+            StImageMap list;
+            list.data.clear();
+            list.id = param.left_eye.image.eyelid[i].id;
+            for (size_t j = 0; j < param.left_eye.image.eyelid[i].files.size(); ++j) {
+                f_name = param.left_eye.image.eyelid[i].files[j];
+                if (true == std::filesystem::exists(f_name)) {
+                    QPixmap buff(f_name.c_str(), nullptr, param.imageFlag);
+                    QMatrix rotate_angle;
+                    if (true == param.left_eye.image.eyelid[i].mirror) {
+                        buff = buff.transformed(QTransform().scale(-1, 1));
+                    }
+                    buff = buff.scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
+
+                    rotate_angle.rotate(param.left_eye.eyelid.angle);
+                    buff = buff.transformed(rotate_angle);
+                    list.data.push_back(buff);
+                }
+            }
+            list.max = (int)list.data.size();
+            if (0 < list.max) {
+                this->left_eye.store.push_back(list);
             }
         }
+    }
 
-        /* ============================================= */
-        for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
-            ss.str("");
-            ss.clear();
-            ss << param.path << "/"
-               << "eye/eyelid/smile/" << std::setfill('0') << std::right << std::setw(3) << buf_c << ".png";
-            f_name = ss.str();
-            QPixmap buff(f_name.c_str(), nullptr, imageFlag);
-            if (true == std::filesystem::exists(f_name)) {
-                QMatrix rotate_angle_smile_lid;
-                rotate_angle_smile_lid.rotate(-90);
-                // left
-                QMatrix rotate_angle_smile_lid_l;
-                rotate_angle_smile_lid_l.rotate(param.left_eye.eyelid.angle);
-                this->L_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].scaled(param.left_eye.eyelid.width, param.left_eye.eyelid.height, Qt::IgnoreAspectRatio);
-                this->L_smile_lid[buf_c] = this->L_smile_lid[buf_c].transformed(rotate_angle_smile_lid_l);
-                // right
-                QMatrix rotate_angle_smile_lid_r;
-                rotate_angle_smile_lid_r.rotate(param.right_eye.eyelid.angle);
-                this->R_smile_lid[buf_c] = buff.transformed(rotate_angle_smile_lid);
-                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(QTransform().scale(-1, 1));
-                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
-                this->R_smile_lid[buf_c] = this->R_smile_lid[buf_c].transformed(rotate_angle_smile_lid_r);
+    if (0 < param.right_eye.image.eyelid.size()) {
+        this->right_eye.store.clear();
+        for (size_t i = 0; i < param.right_eye.image.eyelid.size(); ++i) {
+            StImageMap list;
+            list.data.clear();
+            list.id = param.right_eye.image.eyelid[i].id;
+            for (size_t j = 0; j < param.right_eye.image.eyelid[i].files.size(); ++j) {
+                f_name = param.right_eye.image.eyelid[i].files[j];
+                if (true == std::filesystem::exists(f_name)) {
+                    QPixmap buff(f_name.c_str(), nullptr, param.imageFlag);
+                    QMatrix rotate_angle;
+                    if (true == param.right_eye.image.eyelid[i].mirror) {
+                        buff = buff.transformed(QTransform().scale(-1, 1));
+                    }
+                    buff = buff.scaled(param.right_eye.eyelid.width, param.right_eye.eyelid.height, Qt::IgnoreAspectRatio);
+
+                    rotate_angle.rotate(param.right_eye.eyelid.angle);
+                    buff = buff.transformed(rotate_angle);
+                    list.data.push_back(buff);
+                }
+            }
+            list.max = (int)list.data.size();
+            if (0 < list.max) {
+                this->right_eye.store.push_back(list);
             }
         }
     }

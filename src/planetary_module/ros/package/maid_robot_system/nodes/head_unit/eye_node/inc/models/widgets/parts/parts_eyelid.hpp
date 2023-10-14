@@ -20,18 +20,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 namespace maid_robot_system
 {
-#define EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX 30
-
-/**
- * @brief
- *
- */
 class StEyelid {
-    /* ============================================= */
 public:
+    std::vector<StImageMap> store;
+
     /* ============================================= */
 
     StEyelid();
@@ -80,11 +76,15 @@ public:
 public:
     QColor color;
 
+private:
+    QPixmap _get_eye_id(bool is_left);
+
 public:
     void load(StParameter param);
     void set_param(StParameter param);
 
-    QPixmap get_eye_id(ENUM_TARGET_EYE target);
+    QPixmap get_eye_id_right();
+    QPixmap get_eye_id_left();
 
     double set_eye_blink_time(blink_type type);
     void set_eye_blink(blink_type eye_emotion, bool start_flag);
@@ -106,6 +106,7 @@ public:
     /* ============================================= */
     StEyelid left_eye;
     StEyelid right_eye;
+    QPixmap _blank{ 1, 1 };
 
     int send_animation     = 0;
     int lib_animation      = 0;
@@ -124,7 +125,7 @@ private:
     /* ============================================= */
     typedef enum
     {
-        INDEX_LIP_NORMAL,
+        INDEX_LIP_NORMAL = 0,
         INDEX_LIP_SMILE,
     } INDEX_LIP_IMAGE;
     /* ============================================= */
@@ -136,10 +137,6 @@ private:
     /* ============================================= */
     int elapsed_next = 0;
     /* ============================================= */
-    QPixmap L_eyelid[EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX];
-    QPixmap R_eyelid[EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX];
-    QPixmap L_smile_lid[EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX];
-    QPixmap R_smile_lid[EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX];
     /* ============================================= */
     float winkValue = 3.0;
 };

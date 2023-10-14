@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <string>
 
-#define EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX 30
-
 namespace maid_robot_system
 {
 class LogStore {

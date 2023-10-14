@@ -17,8 +17,6 @@
 #define NEXT_EMOTION_INIT   (MIENS::miens_normal)
 /* ============================================= */
 
-/* ============================================= */
-
 #define EYEBALL_DIMENSIONS_MIN      (0.5f)
 #define EYEBALL_DIMENSIONS_MAX      (1.5f)
 #define EYEBALL_DIMENSIONS_DEFAULT  (1.0f)
@@ -34,16 +32,5 @@
 #define EYE_BLINK_TIME_START_TIME_MS (1000 * 10)
 #define VOICE_MESSAGE_TIMEOUT_MS     (1000 * 3)
 /* ============================================= */
-
-namespace maid_robot_system
-{
-typedef enum
-{
-    TARGET_EYE_LEFT,
-    TARGET_EYE_RIGHT,
-
-} ENUM_TARGET_EYE;
-
-} // namespace maid_robot_system
 
 #endif

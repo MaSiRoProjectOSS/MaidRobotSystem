@@ -119,12 +119,12 @@ void EyeWidget::_update_screen()
                        this->eyeball.left_eye.draw_postion.y,
                        this->eyeball.left_eye.draw_postion.width,
                        this->eyeball.left_eye.draw_postion.height,
-                       this->eyeball.eyeball_origin_l);
+                       this->eyeball.left_eye.eyeball);
     painter.drawPixmap(this->eyeball.right_eye.draw_postion.x,
                        this->eyeball.right_eye.draw_postion.y,
                        this->eyeball.right_eye.draw_postion.width,
                        this->eyeball.right_eye.draw_postion.height,
-                       this->eyeball.eyeball_origin_r);
+                       this->eyeball.right_eye.eyeball);
     logger.set_index(logger.ST_INDEX_DRAW_EYEBALL, current_time.elapsed() - start_time);
 
 #if DRAW_CORNEA_OUTSIDE
@@ -133,10 +133,10 @@ void EyeWidget::_update_screen()
     /* ============================================= */
     start_time = current_time.elapsed();
     if (true == this->param.right_eye.cornea_outside.enable) {
-        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime.x, this->eyeball.right_eye.draw_cornea_anime.y, this->eyeball.cornea_outside_right);
+        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime.x, this->eyeball.right_eye.draw_cornea_anime.y, this->eyeball.right_eye.cornea_outside);
     }
     if (true == this->param.left_eye.cornea_outside.enable) {
-        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime.x, this->eyeball.left_eye.draw_cornea_anime.y, this->eyeball.cornea_outside_left);
+        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime.x, this->eyeball.left_eye.draw_cornea_anime.y, this->eyeball.left_eye.cornea_outside);
     }
     logger.set_index(logger.ST_INDEX_DRAW_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
 #endif
@@ -146,10 +146,10 @@ void EyeWidget::_update_screen()
     /* ============================================= */
     start_time = current_time.elapsed();
     if (true == this->param.right_eye.cornea_inside.enable) {
-        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime2.x, this->eyeball.right_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside_right);
+        painter.drawPixmap(this->eyeball.right_eye.draw_cornea_anime2.x, this->eyeball.right_eye.draw_cornea_anime2.y, this->eyeball.right_eye.cornea_inside);
     }
     if (true == this->param.left_eye.cornea_inside.enable) {
-        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime2.x, this->eyeball.left_eye.draw_cornea_anime2.y, this->eyeball.cornea_inside_left);
+        painter.drawPixmap(this->eyeball.left_eye.draw_cornea_anime2.x, this->eyeball.left_eye.draw_cornea_anime2.y, this->eyeball.left_eye.cornea_inside);
     }
     logger.set_index(logger.ST_INDEX_DRAW_CORNEA_INSIDE, current_time.elapsed() - start_time);
 #endif
@@ -157,8 +157,8 @@ void EyeWidget::_update_screen()
     // Draw : eyelid
     /* ============================================= */
     start_time = current_time.elapsed();
-    painter.drawPixmap(this->eyelid.right_eye.pos.x, this->eyelid.right_eye.pos.y, this->eyelid.get_eye_id(TARGET_EYE_RIGHT));
-    painter.drawPixmap(this->eyelid.left_eye.pos.x, this->eyelid.left_eye.pos.y, this->eyelid.get_eye_id(TARGET_EYE_LEFT));
+    painter.drawPixmap(this->eyelid.right_eye.pos.x, this->eyelid.right_eye.pos.y, this->eyelid.get_eye_id_right());
+    painter.drawPixmap(this->eyelid.left_eye.pos.x, this->eyelid.left_eye.pos.y, this->eyelid.get_eye_id_left());
     logger.set_index(logger.ST_INDEX_DRAW_EYELID, current_time.elapsed() - start_time);
 
     /* ============================================= */
