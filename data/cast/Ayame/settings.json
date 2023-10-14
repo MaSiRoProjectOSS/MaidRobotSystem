@@ -23,7 +23,7 @@
     "name": "Ayame",
     "path": "/opt/MaidRobotSystem/data/cast/Ayame",
     "display": {
-        "resolution": 1.0
+        "resolution": 0.5
     },
     "rectangle": {
         "left": {
@@ -52,11 +52,13 @@
             "cornea": {
                 "outside": {
                     "enable": true,
+                    "alpha": 255,
                     "scale": 1.0,
                     "speed": 1.0
                 },
                 "inside": {
                     "enable": true,
+                    "alpha": 255,
                     "scale": 1.0,
                     "speed": 1.0
                 }
@@ -88,11 +90,13 @@
             "cornea": {
                 "outside": {
                     "enable": true,
+                    "alpha": 255,
                     "scale": 1.0,
                     "speed": 1.0
                 },
                 "inside": {
                     "enable": true,
+                    "alpha": 255,
                     "scale": 1.0,
                     "speed": 1.0
                 }
@@ -113,7 +117,7 @@
                     "id": 0,
                     "name": "normally",
                     "mirror": false,
-                    "file": [
+                    "files": [
                         "eye/eyelid/normally/000.png",
                         "eye/eyelid/normally/001.png",
                         "eye/eyelid/normally/002.png",
@@ -150,7 +154,7 @@
                     "id": 1,
                     "name": "order",
                     "mirror": false,
-                    "file": [
+                    "files": [
                         "eye/eyelid/smile/000.png",
                         "eye/eyelid/smile/001.png",
                         "eye/eyelid/smile/002.png",
@@ -211,13 +215,13 @@
                     {
                         "id": 0,
                         "name": "normally",
-                        "mirror": false,
+                        "mirror": true,
                         "file": "eye/cornea/cornea_normally.png"
                     },
                     {
                         "id": 1,
                         "name": "order",
-                        "mirror": false,
+                        "mirror": true,
                         "file": "eye/cornea/cornea_order.png"
                     }
                 ]
@@ -229,7 +233,7 @@
                     "id": 0,
                     "name": "normally",
                     "mirror": true,
-                    "file": [
+                    "files": [
                         "eye/eyelid/normally/000.png",
                         "eye/eyelid/normally/001.png",
                         "eye/eyelid/normally/002.png",
@@ -266,7 +270,7 @@
                     "id": 1,
                     "name": "order",
                     "mirror": true,
-                    "file": [
+                    "files": [
                         "eye/eyelid/smile/000.png",
                         "eye/eyelid/smile/001.png",
                         "eye/eyelid/smile/002.png",
@@ -327,13 +331,13 @@
                     {
                         "id": 0,
                         "name": "normally",
-                        "mirror": false,
+                        "mirror": true,
                         "file": "eye/cornea/cornea_normally.png"
                     },
                     {
                         "id": 1,
                         "name": "order",
-                        "mirror": false,
+                        "mirror": true,
                         "file": "eye/cornea/cornea_order.png"
                     }
                 ]

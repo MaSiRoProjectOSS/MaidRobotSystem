@@ -8,6 +8,7 @@
  */
 #include "models/widgets/eye_widget.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -20,7 +21,9 @@ std::string EyeWidget::_read_file(const std::string &path)
     auto ss = std::ostringstream{};
     std::ifstream input_file(path);
     if (!input_file.is_open()) {
-        printf("Could not open the file : '%s'\n", path.c_str());
+        char message[255];
+        sprintf(message, "Could not open the file : '%s'", path.c_str());
+        throw new std::logic_error(message);
         return "{}";
     }
     ss << input_file.rdbuf();

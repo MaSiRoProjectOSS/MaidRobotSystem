@@ -21,7 +21,7 @@ source /opt/MaidRobotSystem/src/planetary_module/ros/env.sh
 * eyeには、目の画像のパスを指定してください。
   * eyeballには、目玉の画像のpathからのパスを指定してください。
   * eyelidには、まぶたの画像のpathからのパスを指定してください。
-  * pupilには、瞳の画像のpathからのパスを指定してください。
+  * corneaには、瞳の画像のpathからのパスを指定してください。
 
 ```json
 {
@@ -37,8 +37,8 @@ source /opt/MaidRobotSystem/src/planetary_module/ros/env.sh
             "eye/eyelid/normally/002.png"
         ]
     },
-    "pupil": {
-        "normally": "eye/pupil/pupil_normally.png"
+    "cornea": {
+        "normally": "eye/cornea/cornea_normally.png"
     }
   }
 }

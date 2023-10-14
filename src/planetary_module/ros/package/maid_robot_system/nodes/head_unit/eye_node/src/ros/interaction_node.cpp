@@ -69,6 +69,21 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
                                msg.right_y);
 }
 
+bool InteractionNode::_set_setting_file(std::string value)
+{
+    bool result = false;
+    try {
+        result = g_model->set_setting_file(value);
+    } catch (const std::logic_error &err) {
+        result = false;
+        RCLCPP_ERROR(this->get_logger(), err.what());
+    } catch (...) {
+        result = false;
+        RCLCPP_ERROR(this->get_logger(), "Parsing of setting file failed.");
+    }
+    return result;
+}
+
 void InteractionNode::_callback_param_init()
 {
     // declare_parameter
@@ -89,7 +104,7 @@ void InteractionNode::_callback_param_init()
     g_model->set_ciliary_color_r(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R).as_int());
     g_model->set_ciliary_color_g(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G).as_int());
     g_model->set_ciliary_color_b(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B).as_int());
-    bool flag_load_file = g_model->set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
+    bool flag_load_file = this->_set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
     if (false == flag_load_file) {
         RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
     }
@@ -109,7 +124,7 @@ void InteractionNode::_callback_param_init()
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_STRING:
                     if (param.get_name() == this->MRS_PARAMETER_SETTING_FILE) {
-                        results->successful = g_model->set_setting_file(param.as_string());
+                        results->successful = this->_set_setting_file(param.as_string());
                         if (false == results->successful) {
                             RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", param.as_string().c_str());
                         }

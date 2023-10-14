@@ -89,7 +89,7 @@ bool WidgetNode::calculate()
 {
     bool result = false;
     if (nullptr != this->_widget) {
-        this->_widget->calculate();
+        this->_widget->update();
         this->app->processEvents();
         result = true;
     }

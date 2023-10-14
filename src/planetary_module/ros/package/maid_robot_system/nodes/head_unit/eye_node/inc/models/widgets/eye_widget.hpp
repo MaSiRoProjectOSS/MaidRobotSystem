@@ -112,6 +112,10 @@ private:
     PartsEyelid eyelid;
     LogStore logger;
 
+    int _thinking_next_time_notAccepted = 0;
+    QColor _ciliary_color;
+    QTimer *_timer_update;
+    // =============================
     QTime current_time;
     int last_ros_msg_time;
     int last_voiceId_time;
@@ -119,9 +123,6 @@ private:
     bool flag_first_request                 = false;
     bool flag_voice_id                      = false;
     control_state thinking_flag_notAccepted = control_state::STATE_FREE;
-
-    int _thinking_next_time_notAccepted = 0;
-    QColor _ciliary_color;
 
 private:
     // =============================

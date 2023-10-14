@@ -12,6 +12,7 @@
 
 #include "eye_node_settings.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "ros/widget_node.hpp"
 
 #include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
 
@@ -21,6 +22,7 @@ class InteractionNode : public rclcpp::Node {
 private:
 public:
     InteractionNode(std::string node_name, int argc, char **argv);
+    //InteractionNode(std::string node_name, WidgetNode &widget);
     ~InteractionNode();
 
 private:
@@ -47,6 +49,18 @@ private:
     void _callback_output_state();
     rclcpp::TimerBase::SharedPtr _ros_output_state;
 #endif
+
+private:
+    // =============================
+    // PUBLIC : Setter
+    // =============================
+    bool _set_setting_file(std::string value);
+
+private:
+    // =============================
+    // PRIVATE : Variable
+    // =============================
+    //WidgetNode *_widget;
 
 private:
     // =============================

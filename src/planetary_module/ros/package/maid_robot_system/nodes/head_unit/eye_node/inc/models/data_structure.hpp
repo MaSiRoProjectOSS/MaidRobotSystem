@@ -15,21 +15,51 @@
 
 #include <Qt>
 #include <string>
+#include <vector>
 
 namespace maid_robot_system
 {
 class StParameter {
 public:
+    class StImageInfo {
+    public:
+        int id           = 0;
+        std::string name = "";
+        std::string file = "";
+        std::vector<std::string> files;
+        bool mirror = false;
+
+        StImageInfo(int in_id, std::string in_name, std::string in_file, bool in_mirror = false)
+        {
+            this->set(in_id, in_name, in_file, in_mirror);
+        }
+        void set(int in_id, std::string in_name, std::string in_file, bool in_mirror = false)
+        {
+            this->id     = in_id;
+            this->name   = in_name;
+            this->file   = in_file;
+            this->mirror = in_mirror;
+        }
+    };
+    class StImageList {
+    public:
+        std::vector<StImageInfo> eyeball;
+        std::vector<StImageInfo> eyelid;
+        std::vector<StImageInfo> cornea_outside;
+        std::vector<StImageInfo> cornea_inside;
+    };
     class StCornea {
     public:
         bool enable  = true;
         double speed = 1.0;
         double scale = 1.0;
-        void set(bool in_enable, double in_speed, double in_scale)
+        int alpha    = 255;
+        void set(bool in_enable, double in_speed, double in_scale, int in_alpha)
         {
             this->enable = in_enable;
             this->speed  = in_speed;
             this->scale  = in_scale;
+            this->alpha  = in_alpha;
         }
     };
 
@@ -45,6 +75,8 @@ public:
         St2DRectangle eyeball;
         StVector eyeball_scale;
         StVector eyeball_center;
+        // image
+        StImageList image;
     };
     StParameter()
     {
@@ -80,11 +112,21 @@ public:
         this->right_eye.eyeball_center.set(0, 0, 0);
 
         // Settings : Parts : cornea
-        this->left_eye.cornea_outside.set(true, 1.0, 1.0);
-        this->left_eye.cornea_inside.set(true, 1.0, 0.8);
+        this->left_eye.cornea_outside.set(true, 1.0, 1.0, 255);
+        this->left_eye.cornea_inside.set(true, 1.0, 0.8, 255);
 
-        this->right_eye.cornea_outside.set(true, 1.0, 1.0);
-        this->right_eye.cornea_inside.set(true, 1.0, 0.8);
+        this->right_eye.cornea_outside.set(true, 1.0, 1.0, 255);
+        this->right_eye.cornea_inside.set(true, 1.0, 0.8, 255);
+
+        // image
+        this->left_eye.image.eyelid.clear();
+        this->left_eye.image.eyeball.clear();
+        this->left_eye.image.cornea_outside.clear();
+        this->left_eye.image.cornea_inside.clear();
+        this->right_eye.image.eyelid.clear();
+        this->right_eye.image.eyeball.clear();
+        this->right_eye.image.cornea_outside.clear();
+        this->right_eye.image.cornea_inside.clear();
     }
 
 public:

@@ -280,24 +280,25 @@ void PartsEyelid::set_emotion(MIENS eye_emotion)
 {
     bool flagChange  = (next_eye_emotion == eye_emotion) ? false : true;
     next_eye_emotion = eye_emotion;
-    char text_emotion[100];
 
     switch (next_eye_emotion) {
-        case miens_smile:
-        case miens_close_left:
-        case miens_close_right:
-        case miens_close:
+        case MIENS::miens_smile:
+        case MIENS::miens_close_left:
+        case MIENS::miens_close_right:
+        case MIENS::miens_close:
             flag_EmotionKeep = true;
             break;
 
-        case miens_normal:
-        case miens_wink_left:
-        case miens_wink_right:
+        case MIENS::miens_normal:
+        case MIENS::miens_wink_left:
+        case MIENS::miens_wink_right:
         default:
             flag_EmotionKeep = false;
             break;
     }
 
+#if DEBUG_OUTPUT_BEHAVIOR
+    char text_emotion[100];
     if (true == flagChange) {
         switch (next_eye_emotion) {
             case miens_smile:
@@ -335,6 +336,7 @@ void PartsEyelid::set_emotion(MIENS eye_emotion)
 
         printf("Emotion = %s\n", text_emotion);
     }
+#endif
 }
 
 void PartsEyelid::set_cycle(uint elapsed)
@@ -375,7 +377,9 @@ void PartsEyelid::_set_image(StParameter param)
     std::stringstream ss;
     std::string f_name;
     if (true == std::filesystem::is_directory(param.path)) {
+#if DEBUG_OUTPUT_LOAD_IMAGE
         printf("  ---- LOAD [Eyelid] ----\n");
+#endif
         for (int buf_c = 0; buf_c < EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX; buf_c++) {
             ss.str("");
             ss.clear();
