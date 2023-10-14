@@ -79,6 +79,8 @@ public:
     bool start_exec();
     void calculate();
     void closing();
+    bool is_start();
+    bool is_running();
 
     // =============================
     // PUBLIC :
@@ -115,7 +117,11 @@ private:
     int _thinking_next_time_notAccepted = 0;
     QColor _ciliary_color;
     QTimer *_timer_update;
-    volatile bool _flag_reload = false;
+    QTimer *_timer_start;
+    volatile bool _flag_reload  = false;
+    volatile bool _flag_start   = false;
+    volatile bool _flag_running = false;
+
     // =============================
     QTime current_time;
     int last_ros_msg_time;

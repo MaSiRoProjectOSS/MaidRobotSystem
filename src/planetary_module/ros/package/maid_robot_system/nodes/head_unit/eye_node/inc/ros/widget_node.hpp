@@ -35,11 +35,14 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    bool open(int argc, char **argv);
     bool start_exec();
     bool closing();
+    bool is_start();
+    bool is_running();
 
-    bool calculate();
+    // =============================
+    // PUBLIC : Function
+    // =============================
     void set_msg_eye(float size,
                      float distance,
 

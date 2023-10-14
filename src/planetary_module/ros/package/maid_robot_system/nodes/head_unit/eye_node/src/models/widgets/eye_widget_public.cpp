@@ -117,6 +117,14 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
     this->last_ros_msg_time = current_time.elapsed();
 }
 
+bool EyeWidget::is_start()
+{
+    return this->_flag_start;
+}
+bool EyeWidget::is_running()
+{
+    return this->_flag_running;
+}
 // =============================
 // Constructor
 // =============================
@@ -125,6 +133,7 @@ EyeWidget::EyeWidget(QWidget *parent) : QOpenGLWidget(parent), eyeball(), eyelid
 }
 EyeWidget::~EyeWidget()
 {
+    this->_flag_running = false;
 }
 
 } // namespace maid_robot_system

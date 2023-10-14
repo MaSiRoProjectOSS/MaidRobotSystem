@@ -1,5 +1,5 @@
 /**
- * @file node_settings.hpp
+ * @file eye_node_settings.hpp
  * @brief
  * @version 0.23.7
  * @date 2023-10-07

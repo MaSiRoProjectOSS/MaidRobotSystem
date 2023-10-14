@@ -777,10 +777,13 @@ void EyeWidget::_init()
         /* --------------------------------------------------- */
         // set timer
         /* --------------------------------------------------- */
-        // this->_timer_update = new QTimer(this);
-        // this->_timer_update->setSingleShot(false);
-        // this->connect(this->_timer_update, SIGNAL(timeout()), this, SLOT(update()));
-        // this->_timer_update->start(1000 / DRAWING_MAX_FPS);
+        this->_timer_start = new QTimer(this);
+        this->_timer_start->setSingleShot(true);
+        this->connect(this->_timer_start, SIGNAL(timeout()), this, SLOT(showFullScreen()));
+
+        this->_timer_update = new QTimer(this);
+        this->_timer_update->setSingleShot(false);
+        this->connect(this->_timer_update, SIGNAL(timeout()), this, SLOT(update()));
         // qApp->installEventFilter(this);
         this->current_time.start();
 
@@ -797,17 +800,19 @@ void EyeWidget::_init()
 
 bool EyeWidget::start_exec()
 {
+    this->_flag_start = true;
     if (false == this->_flag_initialized) {
         this->_init();
         this->reload_param();
     }
-    this->showFullScreen();
+    this->_timer_start->start(100);
     return true;
 }
 
 void EyeWidget::closing()
 {
-    //this->_timer_update->stop();
+    this->_timer_update->stop();
+    this->_flag_running = false;
     if (true == this->_flag_initialized) {
         this->_flag_initialized = false;
 #if LOGGER_INFO_DETAIL

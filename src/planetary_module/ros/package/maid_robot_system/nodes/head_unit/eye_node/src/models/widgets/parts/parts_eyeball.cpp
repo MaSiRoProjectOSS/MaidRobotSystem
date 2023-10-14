@@ -156,8 +156,8 @@ void PartsEyeball::set_param(StParameter param)
     printf("------------ Calibration Postion ------------\n");
     printf(" Size (x,y) = (%d,%d)\n", param.left_eye.eyelid.width, param.left_eye.eyelid.height);
     printf(" Size (x,y) = (%d,%d)\n", param.right_eye.eyelid.width, param.right_eye.eyelid.height);
-    printf(" Pos r(x,y) = (%f,%f)\n", param.left_eye.eyeball.x, param.left_eye.eyeball.y);
-    printf(" Pos l(x,y) = (%f,%f)\n", param.right_eye.eyeball.x, param.right_eye.eyeball.y);
+    printf(" Pos r(x,y) = (%d,%d)\n", param.left_eye.eyeball.x, param.left_eye.eyeball.y);
+    printf(" Pos l(x,y) = (%d,%d)\n", param.right_eye.eyeball.x, param.right_eye.eyeball.y);
     printf("---------------------------------------------\n");
 #endif
     /* ============================================= */

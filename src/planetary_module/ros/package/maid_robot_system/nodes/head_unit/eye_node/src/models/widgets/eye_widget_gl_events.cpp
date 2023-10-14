@@ -18,6 +18,9 @@ void EyeWidget::initializeGL()
     // initializeOpenGLFunctions();
     //  connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &EyeWidget::cleanup);
 
+    this->_flag_running = true;
+    this->_flag_start   = false;
+    this->_timer_update->start(1000 / DRAWING_MAX_FPS);
 #if DEBUG_OUTPUT_OPEN_GL
     printf(" * initializeGL end\n");
 #endif

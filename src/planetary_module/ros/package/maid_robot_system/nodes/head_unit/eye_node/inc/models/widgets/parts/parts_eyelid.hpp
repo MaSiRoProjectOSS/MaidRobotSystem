@@ -9,6 +9,7 @@
 #ifndef MRS_EYE_NODE_MODELS_PARTS_EYELID_HPP
 #define MRS_EYE_NODE_MODELS_PARTS_EYELID_HPP
 
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
 #include "maid_robot_system/emotion.hpp"
 #include "math.h"

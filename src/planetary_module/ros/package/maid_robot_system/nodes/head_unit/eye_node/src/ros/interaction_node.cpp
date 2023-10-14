@@ -20,8 +20,6 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-WidgetNode *g_model;
-
 void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg)
 {
 #if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
@@ -29,7 +27,7 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
 #endif
     switch (msg.cornea_effect) {
         case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_ORDER:
-            (void)g_model->effect_cornea_order();
+            (void)this->_widget->effect_cornea_order();
             break;
 
         case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL:
@@ -38,42 +36,42 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
     }
     switch (msg.emotions) {
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE:
-            g_model->emotion(MIENS::miens_close);
+            this->_widget->emotion(MIENS::miens_close);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_SMILE:
-            g_model->emotion(MIENS::miens_smile);
+            this->_widget->emotion(MIENS::miens_smile);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_LEFT:
-            g_model->emotion(MIENS::miens_close_left);
+            this->_widget->emotion(MIENS::miens_close_left);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_RIGHT:
-            g_model->emotion(MIENS::miens_close_right);
+            this->_widget->emotion(MIENS::miens_close_right);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_LEFT:
-            g_model->emotion(MIENS::miens_wink_left);
+            this->_widget->emotion(MIENS::miens_wink_left);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_RIGHT:
-            g_model->emotion(MIENS::miens_wink_right);
+            this->_widget->emotion(MIENS::miens_wink_right);
             break;
         case maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL:
         default:
-            g_model->emotion(MIENS::miens_normal);
+            this->_widget->emotion(MIENS::miens_normal);
             break;
     }
-    (void)g_model->set_msg_eye(msg.size,
-                               msg.distance,
+    (void)this->_widget->set_msg_eye(msg.size,
+                                     msg.distance,
 
-                               msg.left_x,
-                               msg.left_y,
-                               msg.right_x,
-                               msg.right_y);
+                                     msg.left_x,
+                                     msg.left_y,
+                                     msg.right_x,
+                                     msg.right_y);
 }
 
 bool InteractionNode::_set_setting_file(std::string value)
 {
     bool result = false;
     try {
-        result = g_model->set_setting_file(value);
+        result = this->_widget->set_setting_file(value);
     } catch (const std::logic_error &err) {
         result = false;
         RCLCPP_ERROR(this->get_logger(), err.what());
@@ -87,23 +85,23 @@ bool InteractionNode::_set_setting_file(std::string value)
 void InteractionNode::_callback_param_init()
 {
     // declare_parameter
-    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, g_model->get_setting_file());
-    this->declare_parameter(this->MRS_PARAMETER_BRIGHTNESS, g_model->get_brightness());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_R, g_model->get_eyelid_color_r());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_G, g_model->get_eyelid_color_g());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_B, g_model->get_eyelid_color_b());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R, g_model->get_ciliary_color_r());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G, g_model->get_ciliary_color_g());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B, g_model->get_ciliary_color_b());
+    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, this->_widget->get_setting_file());
+    this->declare_parameter(this->MRS_PARAMETER_BRIGHTNESS, this->_widget->get_brightness());
+    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_R, this->_widget->get_eyelid_color_r());
+    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_G, this->_widget->get_eyelid_color_g());
+    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_B, this->_widget->get_eyelid_color_b());
+    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R, this->_widget->get_ciliary_color_r());
+    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G, this->_widget->get_ciliary_color_g());
+    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B, this->_widget->get_ciliary_color_b());
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    g_model->set_brightness(this->get_parameter(this->MRS_PARAMETER_BRIGHTNESS).as_int());
-    g_model->set_eyelid_color_r(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_R).as_int());
-    g_model->set_eyelid_color_g(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_G).as_int());
-    g_model->set_eyelid_color_b(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_B).as_int());
-    g_model->set_ciliary_color_r(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R).as_int());
-    g_model->set_ciliary_color_g(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G).as_int());
-    g_model->set_ciliary_color_b(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B).as_int());
+    this->_widget->set_brightness(this->get_parameter(this->MRS_PARAMETER_BRIGHTNESS).as_int());
+    this->_widget->set_eyelid_color_r(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_R).as_int());
+    this->_widget->set_eyelid_color_g(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_G).as_int());
+    this->_widget->set_eyelid_color_b(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_B).as_int());
+    this->_widget->set_ciliary_color_r(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R).as_int());
+    this->_widget->set_ciliary_color_g(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G).as_int());
+    this->_widget->set_ciliary_color_b(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B).as_int());
     bool flag_load_file = this->_set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
     if (false == flag_load_file) {
         RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
@@ -132,19 +130,19 @@ void InteractionNode::_callback_param_init()
                     break;
                 case rclcpp::PARAMETER_INTEGER:
                     if (param.get_name() == this->MRS_PARAMETER_BRIGHTNESS) {
-                        results->successful = g_model->set_brightness(param.as_int());
+                        results->successful = this->_widget->set_brightness(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_R) {
-                        results->successful = g_model->set_eyelid_color_r(param.as_int());
+                        results->successful = this->_widget->set_eyelid_color_r(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_G) {
-                        results->successful = g_model->set_eyelid_color_g(param.as_int());
+                        results->successful = this->_widget->set_eyelid_color_g(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_B) {
-                        results->successful = g_model->set_eyelid_color_b(param.as_int());
+                        results->successful = this->_widget->set_eyelid_color_b(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_R) {
-                        results->successful = g_model->set_ciliary_color_r(param.as_int());
+                        results->successful = this->_widget->set_ciliary_color_r(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_G) {
-                        results->successful = g_model->set_ciliary_color_g(param.as_int());
+                        results->successful = this->_widget->set_ciliary_color_g(param.as_int());
                     } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_B) {
-                        results->successful = g_model->set_ciliary_color_b(param.as_int());
+                        results->successful = this->_widget->set_ciliary_color_b(param.as_int());
                     }
                     break;
                 case rclcpp::PARAMETER_DOUBLE:
@@ -168,26 +166,25 @@ void InteractionNode::_callback_param_init()
 void InteractionNode::_callback_timer()
 {
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
-    (void)g_model->calculate();
+    (void)this->_widget->is_running();
 }
 
 #if DEBUG_OUTPUT_REPORT > 0
 void InteractionNode::_callback_output_state()
 {
-    RCLCPP_INFO(this->get_logger(), "%s", g_model->output_message().c_str());
+    RCLCPP_INFO(this->get_logger(), "%s", this->_widget->output_message().c_str());
 }
 #endif
 
-InteractionNode::InteractionNode(std::string node_name, int argc, char **argv) : Node(node_name)
+InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : Node(node_name)
 {
 #if LOGGER_INFO_CALL_FUNCTION
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
-    g_model = new WidgetNode(node_name, argc, argv);
-    if (true == g_model->open(argc, argv)) {
+    this->_widget = &widget;
+    if (nullptr != this->_widget) {
         // set parameter
         this->_callback_param_init();
-        g_model->start_exec();
 
         // set subscription
         this->_sub_mrs_eye =                                                          //
@@ -211,7 +208,7 @@ InteractionNode::~InteractionNode()
 #if LOGGER_INFO_CALL_FUNCTION
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
-    g_model->closing();
+    this->_widget->closing();
 }
 
 } // namespace maid_robot_system

@@ -28,9 +28,42 @@
 
 namespace maid_robot_system
 {
-bool WidgetNode::open(int argc, char **argv)
+bool WidgetNode::is_start()
+{
+    this->app->processEvents();
+    return this->_widget->is_start();
+}
+bool WidgetNode::is_running()
+{
+    this->app->processEvents();
+    return this->_widget->is_running();
+}
+
+bool WidgetNode::start_exec()
 {
     bool result = false;
+    if (nullptr != this->_widget) {
+        result = this->_widget->start_exec();
+    }
+    return result;
+}
+
+bool WidgetNode::closing()
+{
+    bool result = false;
+    if (nullptr != this->_widget) {
+        this->_widget->closing();
+        this->app->closeAllWindows();
+        result = true;
+    }
+    return result;
+}
+
+// =============================
+// Constructor
+// =============================
+WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
+{
     try {
         this->app = new QApplication(argc, argv);
         // format
@@ -69,49 +102,8 @@ bool WidgetNode::open(int argc, char **argv)
         // Widget
         this->_widget = new EyeWidget();
         this->_widget->setFormat(format);
-        result = true;
     } catch (...) {
     }
-
-    return result;
-}
-
-bool WidgetNode::start_exec()
-{
-    bool result = false;
-    if (nullptr != this->_widget) {
-        result = this->_widget->start_exec();
-    }
-    return result;
-}
-
-bool WidgetNode::calculate()
-{
-    bool result = false;
-    if (nullptr != this->_widget) {
-        this->_widget->update();
-        this->app->processEvents();
-        result = true;
-    }
-    return result;
-}
-
-bool WidgetNode::closing()
-{
-    bool result = false;
-    if (nullptr != this->_widget) {
-        this->_widget->closing();
-        this->app->closeAllWindows();
-        result = true;
-    }
-    return result;
-}
-
-// =============================
-// Constructor
-// =============================
-WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
-{
 }
 WidgetNode::~WidgetNode()
 {

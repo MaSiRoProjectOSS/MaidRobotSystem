@@ -21,8 +21,7 @@ namespace maid_robot_system
 class InteractionNode : public rclcpp::Node {
 private:
 public:
-    InteractionNode(std::string node_name, int argc, char **argv);
-    //InteractionNode(std::string node_name, WidgetNode &widget);
+    InteractionNode(std::string node_name, WidgetNode &widget);
     ~InteractionNode();
 
 private:
@@ -60,7 +59,7 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    //WidgetNode *_widget;
+    WidgetNode *_widget;
 
 private:
     // =============================

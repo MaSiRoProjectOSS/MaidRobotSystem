@@ -43,3 +43,31 @@ source /opt/MaidRobotSystem/src/planetary_module/ros/env.sh
   }
 }
 ```
+
+
+
+## eyeの色変更
+
+コマンド```ros2 param list```からパラメータリストを確認できて、```ros2 param set```でパラメータを変更できます。
+
+
+```bash
+# ノード名
+WORK_NODE_NAME=/maid_robot_system/Ayame/head_unit/device/eye_node
+
+# 全体
+WORK_VALUE=100
+ros2 param set ${WORK_NODE_NAME} ciliary/color/r ${WORK_VALUE}
+ros2 param set ${WORK_NODE_NAME} ciliary/color/g ${WORK_VALUE}
+ros2 param set ${WORK_NODE_NAME} ciliary/color/b ${WORK_VALUE}
+
+# 白目部分
+WORK_VALUE=255
+ros2 param set ${WORK_NODE_NAME} eyelid/color/r ${WORK_VALUE}
+ros2 param set ${WORK_NODE_NAME} eyelid/color/g ${WORK_VALUE}
+ros2 param set ${WORK_NODE_NAME} eyelid/color/b ${WORK_VALUE}
+
+# パラメータ全部を確認したい場合は、下記のコマンドを用意してます。
+aros2_param_list
+
+```
