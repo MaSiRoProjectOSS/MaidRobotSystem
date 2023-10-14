@@ -115,6 +115,7 @@ private:
     int _thinking_next_time_notAccepted = 0;
     QColor _ciliary_color;
     QTimer *_timer_update;
+    volatile bool _flag_reload = false;
     // =============================
     QTime current_time;
     int last_ros_msg_time;

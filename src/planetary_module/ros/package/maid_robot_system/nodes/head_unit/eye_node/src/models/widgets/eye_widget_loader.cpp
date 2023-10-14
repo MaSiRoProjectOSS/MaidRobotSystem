@@ -38,9 +38,7 @@ bool EyeWidget::reload_param()
         this->param.screen_size.height = (double)(this->param.view_size.height / this->param.screen_resolution);
         eye_size.x                     = this->param.screen_size.width * 0.5;
         eye_size.y                     = this->param.screen_size.height;
-#if DEBUG_OUTPUT_PARAM_LV > 0
-        printf("  ---- reload_param ----\n");
-#endif
+
         // calculate
         this->param.left_eye.eyelid.width   = (int)std::max(1.0, eye_size.x * this->param.left_eye.eyelid_scale.x);
         this->param.left_eye.eyelid.height  = (int)std::max(1.0, eye_size.y * this->param.left_eye.eyelid_scale.y);
@@ -158,7 +156,9 @@ bool EyeWidget::reload_param()
         printf("  offset: %3.1f\n", this->param.blink_time_offset);
 #endif
         printf("display:\n");
+#if DEBUG_OUTPUT_PARAM_LV > 2
         printf("  brightness: %d\n", this->param.brightness);
+#endif
         printf("  width: %d\n", this->param.screen_size.width);
         printf("  height: %d\n", this->param.screen_size.height);
         printf("  resolution: %3.3f\n", (1.0 / this->param.screen_resolution));
@@ -756,7 +756,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
 
     if (true == result) {
         this->reload_param();
-        this->load();
+        this->_flag_reload = true;
     } else {
         std::string message = "Parsing of setting file failed.";
         message.append(" step[");

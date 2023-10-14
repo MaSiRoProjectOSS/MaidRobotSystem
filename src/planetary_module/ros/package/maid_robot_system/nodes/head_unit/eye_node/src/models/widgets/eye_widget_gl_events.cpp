@@ -31,11 +31,15 @@ void EyeWidget::resizeGL(int w, int h)
     printf(" * resizeGL [%d, %d]\n", this->param.view_size.width, this->param.view_size.height);
 #endif
     this->reload_param();
-    this->load();
+    this->_flag_reload = true;
 }
 
 void EyeWidget::paintGL()
 {
+    if (true == this->_flag_reload) {
+        this->_flag_reload = false;
+        this->load();
+    }
     int current = current_time.elapsed();
     this->calculate();
     this->_update_screen();

@@ -19,7 +19,7 @@ namespace maid_robot_system
 #define DEBUG_OUTPUT_WIDGET      1
 #define DEBUG_OUTPUT_FPS_VERBOSE 0
 #define DEBUG_OUTPUT_LOAD_IMAGE  1
-#define DEBUG_OUTPUT_PARAM_LV    5
+#define DEBUG_OUTPUT_PARAM_LV    1
 
 #define DEBUG_OUTPUT_BEHAVIOR 1
 
