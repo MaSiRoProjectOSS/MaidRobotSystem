@@ -10,7 +10,9 @@
 #include "maid_robot_system/common_structure.hpp"
 #include "models/data_structure.hpp"
 
+#include <QPainter>
 #include <QPixmap>
+#include <QRect>
 #include <stdio.h>
 
 namespace maid_robot_system
@@ -38,6 +40,9 @@ public:
     ~StEyeball();
 
 public:
+    QRect rect_ciliary;
+    QColor color;
+
     // =============================
     // PUBLIC : Variable
     // =============================

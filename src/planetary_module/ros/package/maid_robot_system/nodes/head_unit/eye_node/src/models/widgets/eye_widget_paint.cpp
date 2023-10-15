@@ -78,18 +78,18 @@ void EyeWidget::_update_screen()
                      this->param.screen_size.y,
                      this->param.screen_size.width,
                      this->param.screen_size.height,
-                     this->_ciliary_color);
+                     this->eyelid.color);
 
     painter.fillRect((int)this->eyelid.left_eye.pos.x, //
                      (int)this->eyelid.left_eye.pos.y,
                      this->param.left_eye.eyelid.width,
                      this->param.left_eye.eyelid.height,
-                     this->eyelid.color);
+                     this->eyeball.left_eye.color);
     painter.fillRect((int)this->eyelid.right_eye.pos.x, //
                      (int)this->eyelid.right_eye.pos.y,
                      this->param.right_eye.eyelid.width,
                      this->param.right_eye.eyelid.height,
-                     this->eyelid.color);
+                     this->eyeball.right_eye.color);
     logger.set_index(logger.ST_INDEX_DRAW_BACKGROUND, current_time.elapsed() - start_time);
 
     /* ============================================= */

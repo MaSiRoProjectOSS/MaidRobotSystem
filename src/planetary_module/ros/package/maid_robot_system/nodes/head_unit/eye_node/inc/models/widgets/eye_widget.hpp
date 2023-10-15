@@ -126,7 +126,6 @@ private:
     LogStore logger;
 
     int _thinking_next_time_notAccepted = 0;
-    QColor _ciliary_color;
     QTimer *_timer_update;
     QTimer *_timer_start;
     volatile bool _flag_reload  = false;

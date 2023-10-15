@@ -16,6 +16,7 @@ namespace maid_robot_system
 // =============================
 StEyeball::StEyeball()
 {
+    this->rect_ciliary.setRect(0, 0, 100, 100);
 }
 StEyeball::~StEyeball()
 {

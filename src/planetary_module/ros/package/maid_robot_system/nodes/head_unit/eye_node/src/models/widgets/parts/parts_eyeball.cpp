@@ -62,9 +62,7 @@ void PartsEyeball::calculate(int elapsed, int send_animation)
     /* ============================================= */
     // drawing
     /* ============================================= */
-    this->_draw_vitreous(state);
-    this->_draw_cornea_outside(state);
-    this->_draw_cornea_inside(state);
+    this->_drawing(state);
 }
 
 void PartsEyeball::load(StParameter param)
@@ -273,6 +271,14 @@ void PartsEyeball::load(StParameter param)
 void PartsEyeball::set_param(StParameter param)
 {
     // TODO
+    this->left_eye.color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
+    this->right_eye.color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
+
+    this->left_eye.rect_ciliary.setWidth(param.left_eye.eyelid.width);
+    this->left_eye.rect_ciliary.setHeight(param.left_eye.eyelid.height);
+    this->right_eye.rect_ciliary.setWidth(param.right_eye.eyelid.width);
+    this->right_eye.rect_ciliary.setHeight(param.right_eye.eyelid.height);
+
     this->left_eye.calibration_angle      = param.left_eye.eyeball.angle * (M_PI / 180);
     this->right_eye.calibration_angle     = param.right_eye.eyeball.angle * (M_PI / 180);
     this->left_eye.calibration_angle_cos  = std::abs(std::cos(this->left_eye.calibration_angle));
@@ -323,7 +329,7 @@ void PartsEyeball::set_default()
 // =============================
 // PRIVATE : Function
 // =============================
-void PartsEyeball::_draw_vitreous(ENUM_STATE state)
+void PartsEyeball::_drawing(ENUM_STATE state)
 {
     /* ============================================= */
     // left
@@ -337,10 +343,7 @@ void PartsEyeball::_draw_vitreous(ENUM_STATE state)
     if (0 < (int)this->right_eye.store.vitreous.size()) {
         this->right_eye.eyeball = this->right_eye.store.vitreous[0].data[0];
     }
-}
 
-void PartsEyeball::_draw_cornea_outside(ENUM_STATE state)
-{
 #if DRAW_CORNEA_OUTSIDE
     /* ============================================= */
     // left
@@ -367,10 +370,7 @@ void PartsEyeball::_draw_cornea_outside(ENUM_STATE state)
         this->right_eye.draw_cornea_anime.y = this->right_eye.eyeball_center.y() - (this->right_eye.cornea_outside.height() / 2.0);
     }
 #endif
-}
 
-void PartsEyeball::_draw_cornea_inside(ENUM_STATE state)
-{
 #if DRAW_CORNEA_INSIDE
     /* ============================================= */
     // left

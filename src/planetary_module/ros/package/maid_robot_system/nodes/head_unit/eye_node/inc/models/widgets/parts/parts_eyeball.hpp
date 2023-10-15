@@ -69,9 +69,7 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    void _draw_vitreous(ENUM_STATE state);
-    void _draw_cornea_outside(ENUM_STATE state);
-    void _draw_cornea_inside(ENUM_STATE state);
+    void _drawing(ENUM_STATE state);
     int _get_index(ENUM_STATE state);
 
 private:
