@@ -82,6 +82,12 @@ public:
     bool is_start();
     bool is_running();
 
+public:
+    // =============================
+    bool load();
+    bool reload_param();
+
+public:
     // =============================
     // PUBLIC :
     // =============================
@@ -89,12 +95,17 @@ public:
     void emotion(MIENS value);
     void stare(float size, float distance, float left_x, float left_y, float right_x, float right_y);
 
-    std::string output_message();
-
+public:
     // =============================
-    bool load();
-    bool reload_param();
+    // PUBLIC : Setter
+    // =============================
     bool set_setting_file(std::string value);
+
+public:
+    // =============================
+    // PUBLIC : Getter
+    // =============================
+    std::string output_message();
 
 private:
     // =============================
@@ -138,14 +149,13 @@ private:
 
 #if 1
 private:
-    /* ============================================= */
+    // =============================
+    // PRIVATE : QT
+    // =============================
     GLuint m_program;
-
     GLuint m_vao;
     GLuint m_vbo;
-
     QVector<GLfloat> m_vertices;
-
     const char *vshader_src = "#version 400 core\n"
                               "layout(location = 0) in vec4 position;\n"
                               "void main(){\n"

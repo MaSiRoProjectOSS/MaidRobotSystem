@@ -10,6 +10,7 @@
 #include "ros/widget_node.hpp"
 
 #include <QPair>
+#include <exception>
 #include <filesystem>
 
 #ifndef NODE_OPEN_GL_VERSION_MAJOR
@@ -28,34 +29,20 @@
 
 namespace maid_robot_system
 {
-bool WidgetNode::is_start()
-{
-    this->app->processEvents();
-    return this->_widget->is_start();
-}
-bool WidgetNode::is_running()
-{
-    this->app->processEvents();
-    return this->_widget->is_running();
-}
-
+// =============================
+// PUBLIC : Function
+// =============================
 bool WidgetNode::start_exec()
 {
-    bool result = false;
-    if (nullptr != this->_widget) {
-        result = this->_widget->start_exec();
-    }
-    return result;
+    return this->_widget->start_exec();
 }
 
 bool WidgetNode::closing()
 {
     bool result = false;
-    if (nullptr != this->_widget) {
-        this->_widget->closing();
-        this->app->closeAllWindows();
-        result = true;
-    }
+    this->_widget->closing();
+    this->_app->closeAllWindows();
+    result = true;
     return result;
 }
 
@@ -65,7 +52,7 @@ bool WidgetNode::closing()
 WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
 {
     try {
-        this->app = new QApplication(argc, argv);
+        this->_app = new QApplication(argc, argv);
         // format
         QSurfaceFormat format;
         format.setStereo(true);
@@ -96,15 +83,17 @@ WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
         // Cursor
         QCursor::setPos(0, 0);
         QCursor cursor(Qt::BlankCursor);
-        this->app->setOverrideCursor(cursor);
-        this->app->changeOverrideCursor(cursor);
+        this->_app->setOverrideCursor(cursor);
+        this->_app->changeOverrideCursor(cursor);
 
         // Widget
         this->_widget = new EyeWidget();
         this->_widget->setFormat(format);
     } catch (...) {
+        throw new std::runtime_error("Failed to initialize widget.");
     }
 }
+
 WidgetNode::~WidgetNode()
 {
 }

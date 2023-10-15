@@ -12,19 +12,20 @@
 
 namespace maid_robot_system
 {
+// =============================
+// Constructor
+// =============================
 LogStore::LogStore()
 {
     this->_clear();
 }
-
-void LogStore::_clear()
+LogStore::~LogStore()
 {
-    for (int i = 0; i < ST_INDEX_LOG::ST_INDEX_LOG_MAX; i++) {
-        this->_spent_time_list[i] = 0;
-    }
-    this->_count = 0;
 }
 
+// =============================
+// PUBLIC : Function
+// =============================
 void LogStore::set_index(ST_INDEX_LOG index, int spent_time)
 {
     if (ST_INDEX_LOG::ST_INDEX_LOG_MAX > index) {
@@ -35,6 +36,7 @@ void LogStore::set_index(ST_INDEX_LOG index, int spent_time)
         this->_count++;
     }
 }
+
 std::string LogStore::get_message(std::string miens_text, double current_time_msec)
 {
     std::string result    = "";
@@ -102,6 +104,17 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
     }
 
     return result;
+}
+
+// =============================
+// PRIVATE : Function
+// =============================
+void LogStore::_clear()
+{
+    for (int i = 0; i < ST_INDEX_LOG::ST_INDEX_LOG_MAX; i++) {
+        this->_spent_time_list[i] = 0;
+    }
+    this->_count = 0;
 }
 
 } // namespace maid_robot_system

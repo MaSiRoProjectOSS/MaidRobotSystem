@@ -23,9 +23,6 @@ namespace maid_robot_system
 {
 class LogStore {
 public:
-    /* ============================================= */
-    LogStore();
-    /* ============================================= */
     typedef enum
     {
         ST_INDEX_INIT,
@@ -43,12 +40,30 @@ public:
         ST_INDEX_LOG_MAX
     } ST_INDEX_LOG;
 
+public:
+    // =============================
+    // Constructor
+    // =============================
+    LogStore();
+    ~LogStore();
+
+public:
+    // =============================
+    // PUBLIC : Function
+    // =============================
     void set_index(ST_INDEX_LOG index, int spent_time);
     std::string get_message(std::string miens_text, double current_time_msec);
 
 private:
-    /* ============================================= */
+    // =============================
+    // PRIVATE : Function
+    // =============================
     void _clear();
+
+private:
+    // =============================
+    // PRIVATE : Variable
+    // =============================
     int _spent_time_list[ST_INDEX_LOG_MAX];
     int _count = 0;
 };

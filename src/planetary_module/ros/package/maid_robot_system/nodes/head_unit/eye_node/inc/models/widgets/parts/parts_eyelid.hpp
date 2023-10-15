@@ -15,6 +15,7 @@
 #include "math.h"
 #include "models/calibration.hpp"
 #include "models/data_structure.hpp"
+#include "st_eyelid.hpp"
 
 #include <QPixmap>
 #include <sstream>
@@ -25,42 +26,18 @@
 
 namespace maid_robot_system
 {
-class StEyelid {
-public:
-    std::vector<StImageMap> store;
-
-    /* ============================================= */
-
-    StEyelid();
-    uint get_elapsed();
-
-    void open_eye(uint wink_time_millisecond);
-
-    void wink(uint wink_time_millisecond);
-
-    void set_elapsed(uint current_time);
-    bool enable_motion();
-    /* ============================================= */
-    StRectangle pos;
-    StVector pos_center;
-    /* ============================================= */
-
-private:
-    bool _flag_next_blink       = false;
-    uint _eye_blink_time        = 0;
-    uint _elapsedIndex          = 0;
-    uint _start_time            = 0xFFFFFFFF;
-    uint _wink_time_millisecond = 0;
-    bool _wink                  = false;
-    uint _current_time          = 0;
-    void fin_wink();
-};
-
 /**
  * @brief
  *
  */
 class PartsEyelid {
+private:
+    typedef enum
+    {
+        INDEX_LIP_NORMAL = 0,
+        INDEX_LIP_SMILE,
+    } INDEX_LIP_IMAGE;
+
 public:
     typedef enum ENUM_BLINK_TYPE
     {
@@ -69,77 +46,79 @@ public:
         BLINK_TYPE_QUICKLY,
 
     } blink_type;
-    /* ============================================= */
 
 public:
+    // =============================
+    // Constructor
+    // =============================
     PartsEyelid();
+    ~PartsEyelid();
 
 public:
+    // =============================
+    // PUBLIC : Variable
+    // =============================
     QColor color;
+    StEyelid left_eye;
+    StEyelid right_eye;
 
-private:
-    QPixmap _get_eye_id(bool is_left);
+    MIENS eye_emotion = miens_close;
 
 public:
+    // =============================
+    // PUBLIC : Function
+    // =============================
+    int calc_animation(int elapsed);
     void load(StParameter param);
-    void set_param(StParameter param);
 
+public:
+    // =============================
+    // PUBLIC : Setter
+    // =============================
+    void set_param(StParameter param);
+    void set_eye_blink(blink_type eye_emotion, bool start_flag);
+    double set_eye_blink_time(blink_type type);
+    void set_emotion(MIENS eye_emotion);
+    void set_on_the_way();
+
+public:
+    // =============================
+    // PUBLIC : Getter
+    // =============================
+    bool enable_motion();
     QPixmap get_eye_id_right();
     QPixmap get_eye_id_left();
-
-    double set_eye_blink_time(blink_type type);
-    void set_eye_blink(blink_type eye_emotion, bool start_flag);
-    void set_emotion(MIENS eye_emotion);
-    void set_cycle(uint elapsed);
-
-    void set_on_the_way();
-    void cycle();
-
-    bool enable_motion();
-
     uint get_ms_time(int time_current, int time_check, int add_Value);
 
 private:
-    void _set_image(StParameter param);
+    // =============================
+    // PRIVATE : Function
+    // =============================
+    QPixmap _get_eye_id(bool is_left);
     void _reset_position(StParameter param);
 
-public:
-    /* ============================================= */
-    StEyelid left_eye;
-    StEyelid right_eye;
+private:
+    // =============================
+    // PRIVATE : Variable
+    // =============================
     QPixmap _blank{ 1, 1 };
 
-    int send_animation     = 0;
-    int lib_animation      = 0;
-    int lib_animation_flag = 0;
+    int _send_animation = 0;
+    int _elapsed_next   = 0;
+    float _wink_value   = 3.0;
 
-    bool thinking = false;
-    int qt_wink_anime_start_time;
+    float _eye_blink_time_quickly = 150.0f;            // ms
+    float _eye_blink_time_min     = (500.0f - 100.0f); // ms
+    float _eye_blink_time_max     = (500.0f + 100.0f); // ms
+    float _eye_blink_time_limit   = 15000.0f;          // ms
+    float _eye_blink_time_offset  = 0.0f;
+    float _eye_blink_time         = (500.0f + 100.0f); // ms
 
-    bool flag_EmotionKeep  = false;
-    MIENS eye_emotion      = miens_close;
-    MIENS next_eye_emotion = miens_close;
-    void calc_animation(int elapsed);
+    MIENS _next_eye_emotion = miens_close;
 
-    float eye_blink_time = (500.0f + 100.0f); // ms
-private:
-    /* ============================================= */
-    typedef enum
-    {
-        INDEX_LIP_NORMAL = 0,
-        INDEX_LIP_SMILE,
-    } INDEX_LIP_IMAGE;
-    /* ============================================= */
-    float eye_blink_time_quickly = 150.0f;            // ms
-    float eye_blink_time_min     = (500.0f - 100.0f); // ms
-    float eye_blink_time_max     = (500.0f + 100.0f); // ms
-    float eye_blink_time_limit   = 15000.0f;          // ms
-    float eye_blink_time_offset  = 0.0f;
-    /* ============================================= */
-    int elapsed_next = 0;
-    /* ============================================= */
-    /* ============================================= */
-    float winkValue = 3.0;
+    int _lib_animation     = 0;
+    bool _thinking         = false;
+    bool _flag_EmotionKeep = false;
 };
 
 } // namespace maid_robot_system

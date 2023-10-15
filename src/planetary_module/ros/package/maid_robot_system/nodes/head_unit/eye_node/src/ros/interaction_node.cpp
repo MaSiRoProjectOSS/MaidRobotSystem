@@ -20,68 +20,47 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg)
+// =============================
+// Constructor
+// =============================
+InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : Node(node_name)
 {
-#if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
-    switch (msg.cornea_effect) {
-        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_ORDER:
-            (void)this->_widget->effect_cornea_order();
-            break;
+    this->_widget = &widget;
+    if (nullptr != this->_widget) {
+        // set parameter
+        this->_callback_param_init();
 
-        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL:
-        default:
-            break;
-    }
-    switch (msg.emotions) {
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE:
-            this->_widget->emotion(MIENS::miens_close);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_SMILE:
-            this->_widget->emotion(MIENS::miens_smile);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_LEFT:
-            this->_widget->emotion(MIENS::miens_close_left);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_RIGHT:
-            this->_widget->emotion(MIENS::miens_close_right);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_LEFT:
-            this->_widget->emotion(MIENS::miens_wink_left);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_RIGHT:
-            this->_widget->emotion(MIENS::miens_wink_right);
-            break;
-        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL:
-        default:
-            this->_widget->emotion(MIENS::miens_normal);
-            break;
-    }
-    (void)this->_widget->set_msg_eye(msg.size,
-                                     msg.distance,
+        // set subscription
+        this->_sub_mrs_eye =                                                          //
+                this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
+                        this->MRS_TOPIC_INPUT,                                        //
+                        this->CONFIG_SUBSCRIPTION_SIZE,                               //
+                        std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
-                                     msg.left_x,
-                                     msg.left_y,
-                                     msg.right_x,
-                                     msg.right_y);
+        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
+#if DEBUG_OUTPUT_REPORT > 0
+        this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
+#endif
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open.");
+        throw new std::runtime_error("Failed to open.");
+    }
 }
 
-bool InteractionNode::_set_setting_file(std::string value)
+InteractionNode::~InteractionNode()
 {
-    bool result = false;
-    try {
-        result = this->_widget->set_setting_file(value);
-    } catch (const std::logic_error &err) {
-        result = false;
-        RCLCPP_ERROR(this->get_logger(), err.what());
-    } catch (...) {
-        result = false;
-        RCLCPP_ERROR(this->get_logger(), "Parsing of setting file failed.");
-    }
-    return result;
+#if LOGGER_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#endif
+    this->_widget->closing();
 }
 
+// =============================
+// ROS : parameter
+// =============================
 void InteractionNode::_callback_param_init()
 {
     // declare_parameter
@@ -163,6 +142,59 @@ void InteractionNode::_callback_param_init()
     });
 }
 
+// =============================
+// ROS : subscription
+// =============================
+void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg)
+{
+#if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
+#endif
+    switch (msg.cornea_effect) {
+        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_ORDER:
+            (void)this->_widget->effect_cornea_order();
+            break;
+
+        case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL:
+        default:
+            break;
+    }
+    switch (msg.emotions) {
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE:
+            this->_widget->emotion(MIENS::miens_close);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_SMILE:
+            this->_widget->emotion(MIENS::miens_smile);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_LEFT:
+            this->_widget->emotion(MIENS::miens_close_left);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_RIGHT:
+            this->_widget->emotion(MIENS::miens_close_right);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_LEFT:
+            this->_widget->emotion(MIENS::miens_wink_left);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_WINK_RIGHT:
+            this->_widget->emotion(MIENS::miens_wink_right);
+            break;
+        case maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL:
+        default:
+            this->_widget->emotion(MIENS::miens_normal);
+            break;
+    }
+    (void)this->_widget->set_msg_eye(msg.size,
+                                     msg.distance,
+
+                                     msg.left_x,
+                                     msg.left_y,
+                                     msg.right_x,
+                                     msg.right_y);
+}
+
+// =============================
+// ROS : loop function
+// =============================
 void InteractionNode::_callback_timer()
 {
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
@@ -176,39 +208,22 @@ void InteractionNode::_callback_output_state()
 }
 #endif
 
-InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : Node(node_name)
+// =============================
+// PRIVATE : Function
+// =============================
+bool InteractionNode::_set_setting_file(std::string value)
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
-#endif
-    this->_widget = &widget;
-    if (nullptr != this->_widget) {
-        // set parameter
-        this->_callback_param_init();
-
-        // set subscription
-        this->_sub_mrs_eye =                                                          //
-                this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
-                        this->MRS_TOPIC_INPUT,                                        //
-                        this->CONFIG_SUBSCRIPTION_SIZE,                               //
-                        std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
-
-        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
-#if DEBUG_OUTPUT_REPORT > 0
-        this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
-#endif
-    } else {
-        RCLCPP_ERROR(this->get_logger(), "Failed to open.");
-        throw new std::runtime_error("Failed to open.");
+    bool result = false;
+    try {
+        result = this->_widget->set_setting_file(value);
+    } catch (const std::logic_error &err) {
+        result = false;
+        RCLCPP_ERROR(this->get_logger(), err.what());
+    } catch (...) {
+        result = false;
+        RCLCPP_ERROR(this->get_logger(), "Parsing of setting file failed.");
     }
-}
-
-InteractionNode::~InteractionNode()
-{
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
-#endif
-    this->_widget->closing();
+    return result;
 }
 
 } // namespace maid_robot_system

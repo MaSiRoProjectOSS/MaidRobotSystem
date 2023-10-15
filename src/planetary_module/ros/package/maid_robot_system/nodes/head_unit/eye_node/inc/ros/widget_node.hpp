@@ -27,6 +27,7 @@ class WidgetNode {
 public:
     // =============================
     // Constructor
+    // widget_node.cpp
     // =============================
     WidgetNode(std::string node_name, int argc, char **argv);
     ~WidgetNode();
@@ -34,15 +35,18 @@ public:
 public:
     // =============================
     // PUBLIC : Function
+    // file : widget_node.cpp
     // =============================
     bool start_exec();
     bool closing();
-    bool is_start();
-    bool is_running();
 
+public:
     // =============================
-    // PUBLIC : Function
+    // PUBLIC : Control
+    // file : widget_node_control.cpp
     // =============================
+    void effect_cornea_order();
+    void emotion(MIENS value);
     void set_msg_eye(float size,
                      float distance,
 
@@ -51,24 +55,14 @@ public:
 
                      float right_x,
                      float right_y);
-    void effect_cornea_order();
-    void emotion(MIENS value);
 
-    // =============================
-    // PUBLIC : Setter
-    // =============================
-    bool set_setting_file(std::string value);
-    bool set_brightness(int value);
-    bool set_eyelid_color_r(int value);
-    bool set_eyelid_color_g(int value);
-    bool set_eyelid_color_b(int value);
-    bool set_ciliary_color_r(int value);
-    bool set_ciliary_color_g(int value);
-    bool set_ciliary_color_b(int value);
-
+public:
     // =============================
     // PUBLIC : Getter
+    // file : widget_node_getter.cpp
     // =============================
+    bool is_start();
+    bool is_running();
     std::string output_message();
     std::string get_setting_file();
     int get_brightness();
@@ -79,22 +73,33 @@ public:
     int get_ciliary_color_g();
     int get_ciliary_color_b();
 
+public:
+    // =============================
+    // PUBLIC : Setter
+    // file : widget_node_setter.cpp
+    // =============================
+    bool set_setting_file(std::string value);
+    bool set_brightness(int value);
+    bool set_eyelid_color_r(int value);
+    bool set_eyelid_color_g(int value);
+    bool set_eyelid_color_b(int value);
+    bool set_ciliary_color_r(int value);
+    bool set_ciliary_color_g(int value);
+    bool set_ciliary_color_b(int value);
+
 private:
     // =============================
     // PRIVATE : Function
     // =============================
+    // file : widget_node_setter.cpp
     bool _within_range(int value, int min = 0, int max = 255);
 
 private:
     // =============================
-    // PRIVATE : parameter
-    // =============================
-    QApplication *app;
-    EyeWidget *_widget = nullptr;
-
-    // =============================
     // PRIVATE : Variable
     // =============================
+    QApplication *_app;
+    EyeWidget *_widget = nullptr;
 };
 
 } // namespace maid_robot_system

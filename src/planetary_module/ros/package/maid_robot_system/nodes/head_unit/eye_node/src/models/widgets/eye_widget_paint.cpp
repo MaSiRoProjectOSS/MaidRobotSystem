@@ -65,29 +65,10 @@ void EyeWidget::_update_screen()
     /* ============================================= */
     // Pre-calculation
     /* ============================================= */
-    start_time = current_time.elapsed();
-    this->eyelid.calc_animation(current);
-    this->eyeball.calc_draw_pixel(current, this->eyelid.send_animation);
+    start_time       = current_time.elapsed();
+    int eyelid_index = this->eyelid.calc_animation(current);
+    this->eyeball.calculate(current, eyelid_index);
     logger.set_index(logger.ST_INDEX_PRE_CALCULATION, current_time.elapsed() - start_time);
-
-#if DRAW_CORNEA_OUTSIDE
-    /* ============================================= */
-    // Make cornea outside
-    /* ============================================= */
-    start_time = current_time.elapsed();
-    this->eyeball.draw_outside();
-    logger.set_index(logger.ST_INDEX_MAKE_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
-
-#endif
-#if DRAW_CORNEA_INSIDE
-    /* ============================================= */
-    // Make cornea inside
-    /* ============================================= */
-    start_time = current_time.elapsed();
-    this->eyeball.draw_inside();
-    logger.set_index(logger.ST_INDEX_MAKE_CORNEA_INSIDE, current_time.elapsed() - start_time);
-
-#endif
 
     /* ============================================= */
     // Make cornea outside

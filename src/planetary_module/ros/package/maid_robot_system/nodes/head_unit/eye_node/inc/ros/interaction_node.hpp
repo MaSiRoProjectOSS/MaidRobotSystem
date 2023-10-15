@@ -19,17 +19,12 @@
 namespace maid_robot_system
 {
 class InteractionNode : public rclcpp::Node {
-private:
 public:
+    // =============================
+    // Constructor
+    // =============================
     InteractionNode(std::string node_name, WidgetNode &widget);
     ~InteractionNode();
-
-private:
-    // =============================
-    // ROS : subscription
-    // =============================
-    void _callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg);
-    rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsEye>::SharedPtr _sub_mrs_eye;
 
 private:
     // =============================
@@ -37,6 +32,13 @@ private:
     // =============================
     void _callback_param_init();
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
+
+private:
+    // =============================
+    // ROS : subscription
+    // =============================
+    void _callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg);
+    rclcpp::Subscription<maid_robot_system_interfaces::msg::MrsEye>::SharedPtr _sub_mrs_eye;
 
 private:
     // =============================
@@ -51,7 +53,7 @@ private:
 
 private:
     // =============================
-    // PUBLIC : Setter
+    // PRIVATE : Function
     // =============================
     bool _set_setting_file(std::string value);
 
@@ -71,10 +73,14 @@ private:
 #if DEBUG_OUTPUT_REPORT > 0
     const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ DEBUG_OUTPUT_REPORT };
 #endif
+
+private:
     // =============================
-    // CONST: ROS Topic / Service / Action
+    // CONST: ROS Name :Topic / Service / Action
     // =============================
     const std::string MRS_TOPIC_INPUT = "in";
+
+private:
     // =============================
     // CONST: ROS PARAMETER
     // =============================
