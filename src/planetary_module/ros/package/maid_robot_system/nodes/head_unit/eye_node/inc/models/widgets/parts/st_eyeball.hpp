@@ -30,6 +30,9 @@ public:
         std::vector<StImageMap> cornea_inside;
         QMatrix matrix_cornea_inside;
 #endif
+        bool exit_vitreous       = false;
+        bool exit_cornea_outside = false;
+        bool exit_cornea_inside  = false;
     };
 
 public:

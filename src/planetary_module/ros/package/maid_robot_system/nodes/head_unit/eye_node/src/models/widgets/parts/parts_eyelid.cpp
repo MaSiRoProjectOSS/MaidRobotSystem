@@ -133,6 +133,7 @@ void PartsEyelid::load(StParameter param)
     printf("  ---- LOAD [Eyelid] ----\n");
 #endif
     if (0 < param.left_eye.image.eyelid.size()) {
+        this->left_eye.exit_eyelid = false;
         this->left_eye.store.clear();
         for (size_t i = 0; i < param.left_eye.image.eyelid.size(); ++i) {
             StImageMap list;
@@ -158,9 +159,13 @@ void PartsEyelid::load(StParameter param)
                 this->left_eye.store.push_back(list);
             }
         }
+        if (0 < (int)this->left_eye.store.size()) {
+            this->left_eye.exit_eyelid = true;
+        }
     }
 
     if (0 < param.right_eye.image.eyelid.size()) {
+        this->right_eye.exit_eyelid = false;
         this->right_eye.store.clear();
         for (size_t i = 0; i < param.right_eye.image.eyelid.size(); ++i) {
             StImageMap list;
@@ -186,6 +191,9 @@ void PartsEyelid::load(StParameter param)
                 this->right_eye.store.push_back(list);
             }
         }
+        if (0 < (int)this->right_eye.store.size()) {
+            this->right_eye.exit_eyelid = true;
+        }
     }
 }
 
@@ -202,13 +210,13 @@ void PartsEyelid::set_param(StParameter param)
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
-    printf("  position\n");
-    printf("     Left (x,y) = (%f,%f)\n", this->left_eye.pos.x, this->left_eye.pos.y);
-    printf("     Right (x,y) = (%f,%f)\n", this->right_eye.pos.x, this->right_eye.pos.y);
+    printf("  rect\n");
+    printf("     Left  (x,y), (w,h) = (%6.1f,%6.1f), (%6.1f,%6.1f)\n", this->left_eye.rect.x, this->left_eye.rect.y, this->left_eye.rect.width, this->left_eye.rect.height);
+    printf("     Right (x,y), (w,h) = (%6.1f,%6.1f), (%6.1f,%6.1f)\n", this->right_eye.rect.x, this->right_eye.rect.y, this->right_eye.rect.width, this->right_eye.rect.height);
     printf("  center\n");
-    printf("   Left (x,y) = (%f,%f)\n", this->left_eye.pos_center.x, this->left_eye.pos_center.y);
-    printf("   Right (x,y) = (%f,%f)\n", this->right_eye.pos_center.x, this->right_eye.pos_center.y);
-    printf("=============================================\n");
+    printf("     Left  (x,y) = (%6.1f,%6.1f)\n", this->left_eye.pos_center.x, this->left_eye.pos_center.y);
+    printf("     Right (x,y) = (%6.1f,%6.1f)\n", this->right_eye.pos_center.x, this->right_eye.pos_center.y);
+
 #endif
 }
 
@@ -407,46 +415,41 @@ QPixmap PartsEyelid::_get_eye_id(bool is_left)
 void PartsEyelid::_reset_position(StParameter param)
 {
     /**
-     *  設定する値は下図に示すように描画位置の左上座標
-     *    これにモニタの設置キャリブレーション値を追加して位置の補正を行う
+     * The value to be set is the upper left coordinate of the drawing position as shown in the figure below
+     *   Add the monitor's installation calibration value to this value to correct the position.
+     *  postion_right = (window_size * ( 1.0 / 4.0 ) ) - (image_size / 2.0)
+     *  postion_left  = (window_size * ( 3.0 / 4.0 ) ) - (image_size / 2.0)
      *
-     *  |-----------------------|-----------------------|-----------------------|-----------------------|
-     *  |                                                                                               |
-     *  |        (R)                                            (L)                                     |
-     *  |         |---------------------------|                  |---------------------------|          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  -         |                           |                  |                           |          -
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  -         |             +             |                  |             +             |          -
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  -         |                           |                  |                           |          -
-     *  |         |                           |                  |                           |          |
-     *  |         |                           |                  |                           |          |
-     *  |         |---------------------------|                  |---------------------------|          |
-     *  |                                                                                               |
-     *  |                                                                                               |
-     *  |-----------------------|-----------------------|-----------------------|-----------------------|
-     *
-     *  Rの位置計算 = (ウィンドウサイズ * ( 1.0 / 4.0 ) ) - (eyelidのイメージサイズ / 2.0)
-     *  Lの位置計算 = (ウィンドウサイズ * ( 3.0 / 4.0 ) ) - (eyelidのイメージサイズ / 2.0)
+     *  |------------|------------|------------|------------|
+     *  |    (R)                      (L)                   |
+     *  |     |-------------|          |---------------|    |
+     *  -     |             |          |               |    -
+     *  |     |             |          |               |    |
+     *  |     |             |          |               |    |
+     *  -     |      +      |          |       +       |    -
+     *  |     |             |          |               |    |
+     *  |     |             |          |               |    |
+     *  -     |             |          |               |    -
+     *  |     |-------------|          |---------------|    |
+     *  |                                                   |
+     *  |------------|------------|------------|------------|
      */
-    /* eyelid の中心座標 */
-    this->left_eye.pos_center.set((param.screen_size.width * 0.75) + param.left_eye.eyelid.x, (param.screen_size.height * 0.5) + param.left_eye.eyelid.y, 0);
-    this->right_eye.pos_center.set((param.screen_size.width * 0.25) + param.right_eye.eyelid.x, (param.screen_size.height * 0.5) + param.right_eye.eyelid.y, 0);
-    /* eyelid の描画開始座標 */
-    this->right_eye.pos.set_axis(this->right_eye.pos_center.x - (param.right_eye.eyelid.width * 0.5),   //
-                                 this->right_eye.pos_center.y - (param.right_eye.eyelid.height * 0.5)); //
-    this->left_eye.pos.set_axis(this->left_eye.pos_center.x - (param.left_eye.eyelid.width * 0.5),      //
-                                this->left_eye.pos_center.y - (param.left_eye.eyelid.height * 0.5));    //
+    /* center position */
+    this->left_eye.pos_center.set((param.screen_size.width * 0.75) + param.left_eye.eyelid.x, //
+                                  (param.screen_size.height * 0.5) + param.left_eye.eyelid.y,
+                                  0);
+    this->right_eye.pos_center.set((param.screen_size.width * 0.25) + param.right_eye.eyelid.x, //
+                                   (param.screen_size.height * 0.5) + param.right_eye.eyelid.y,
+                                   0);
+    /* Drawing range */
+    this->left_eye.rect.set(this->left_eye.pos_center.x - (param.left_eye.eyelid.width * 0.5),
+                            this->left_eye.pos_center.y - (param.left_eye.eyelid.height * 0.5),
+                            param.left_eye.eyelid.width,
+                            param.left_eye.eyelid.height);
+    this->right_eye.rect.set(this->right_eye.pos_center.x - (param.right_eye.eyelid.width * 0.5),
+                             this->right_eye.pos_center.y - (param.right_eye.eyelid.height * 0.5),
+                             param.right_eye.eyelid.width,
+                             param.right_eye.eyelid.height);
 }
 
 } // namespace maid_robot_system

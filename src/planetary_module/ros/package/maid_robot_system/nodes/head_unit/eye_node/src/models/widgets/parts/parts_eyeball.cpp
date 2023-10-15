@@ -75,6 +75,7 @@ void PartsEyeball::load(StParameter param)
         printf("  ---- LOAD [Vitreous] ----\n");
 #endif
         if (0 < param.left_eye.image.eyeball.size()) {
+            this->left_eye.store.exit_vitreous = false;
             this->left_eye.store.vitreous.clear();
             for (size_t i = 0; i < param.left_eye.image.eyeball.size(); ++i) {
                 StImageMap list;
@@ -101,8 +102,12 @@ void PartsEyeball::load(StParameter param)
                     this->left_eye.store.vitreous.push_back(list);
                 }
             }
+            if (0 < (int)this->left_eye.store.vitreous.size()) {
+                this->left_eye.store.exit_vitreous = true;
+            }
         }
         if (0 < param.right_eye.image.eyeball.size()) {
+            this->right_eye.store.exit_vitreous = false;
             this->right_eye.store.vitreous.clear();
             for (size_t i = 0; i < param.right_eye.image.eyeball.size(); ++i) {
                 StImageMap list;
@@ -129,6 +134,9 @@ void PartsEyeball::load(StParameter param)
                     this->right_eye.store.vitreous.push_back(list);
                 }
             }
+            if (0 < (int)this->right_eye.store.vitreous.size()) {
+                this->right_eye.store.exit_vitreous = true;
+            }
         }
 
         /* ============================================= */
@@ -137,6 +145,7 @@ void PartsEyeball::load(StParameter param)
         printf("  ---- LOAD [Cornea-outside] ----\n");
 #endif
         if (0 < param.left_eye.image.cornea_outside.size()) {
+            this->left_eye.store.exit_cornea_outside = false;
             this->left_eye.store.cornea_outside.clear();
             for (size_t i = 0; i < param.left_eye.image.cornea_outside.size(); ++i) {
                 StImageMap list;
@@ -165,8 +174,14 @@ void PartsEyeball::load(StParameter param)
                     this->left_eye.store.cornea_outside.push_back(list);
                 }
             }
+            if (true == param.left_eye.cornea_outside.enable) {
+                if (0 < (int)this->left_eye.store.cornea_outside.size()) {
+                    this->left_eye.store.exit_cornea_outside = true;
+                }
+            }
         }
         if (0 < param.right_eye.image.cornea_outside.size()) {
+            this->right_eye.store.exit_cornea_outside = false;
             this->right_eye.store.cornea_outside.clear();
             for (size_t i = 0; i < param.right_eye.image.cornea_outside.size(); ++i) {
                 StImageMap list;
@@ -195,6 +210,11 @@ void PartsEyeball::load(StParameter param)
                     this->right_eye.store.cornea_outside.push_back(list);
                 }
             }
+            if (true == param.right_eye.cornea_outside.enable) {
+                if (0 < (int)this->right_eye.store.cornea_outside.size()) {
+                    this->right_eye.store.exit_cornea_outside = true;
+                }
+            }
         }
 #endif
 #if DRAW_CORNEA_INSIDE
@@ -202,6 +222,7 @@ void PartsEyeball::load(StParameter param)
         printf("  ---- LOAD [Cornea-inside] ----\n");
 #endif
         if (0 < param.left_eye.image.cornea_inside.size()) {
+            this->left_eye.store.exit_cornea_inside = false;
             this->left_eye.store.cornea_inside.clear();
             for (size_t i = 0; i < param.left_eye.image.cornea_inside.size(); ++i) {
                 StImageMap list;
@@ -230,8 +251,14 @@ void PartsEyeball::load(StParameter param)
                     this->left_eye.store.cornea_inside.push_back(list);
                 }
             }
+            if (true == param.left_eye.cornea_inside.enable) {
+                if (0 < (int)this->left_eye.store.cornea_inside.size()) {
+                    this->left_eye.store.exit_cornea_inside = true;
+                }
+            }
         }
         if (0 < param.right_eye.image.cornea_inside.size()) {
+            this->right_eye.store.exit_cornea_inside = false;
             this->right_eye.store.cornea_inside.clear();
             for (size_t i = 0; i < param.right_eye.image.cornea_inside.size(); ++i) {
                 StImageMap list;
@@ -258,6 +285,11 @@ void PartsEyeball::load(StParameter param)
                 list.max = (int)list.data.size();
                 if (0 < list.max) {
                     this->right_eye.store.cornea_inside.push_back(list);
+                }
+            }
+            if (true == param.right_eye.cornea_inside.enable) {
+                if (0 < (int)this->right_eye.store.cornea_inside.size()) {
+                    this->right_eye.store.exit_cornea_inside = true;
                 }
             }
         }
@@ -290,15 +322,14 @@ void PartsEyeball::set_param(StParameter param)
     this->left_eye.setting(param.left_eye.eyeball.width, param.left_eye.eyeball.height, param.left_eye.eyeball_center);
 #if DEBUG_OUTPUT_WIDGET
     printf("============== Eyeball center ===============\n");
-    printf(" Right (x,y) = (%f,%f)\n", param.right_eye.eyeball_center.x, param.right_eye.eyeball_center.y);
-    printf(" Left (x,y) = (%f,%f)\n", param.left_eye.eyeball_center.x, param.left_eye.eyeball_center.y);
-    printf("=============================================\n");
+    printf(" Right (x,y) = (%6.1f,%6.1f)\n", param.right_eye.eyeball_center.x, param.right_eye.eyeball_center.y);
+    printf(" Left (x,y) = (%6.1f,%6.1f)\n", param.left_eye.eyeball_center.x, param.left_eye.eyeball_center.y);
+
     printf("------------ Calibration Postion ------------\n");
     printf(" Size (x,y) = (%d,%d)\n", param.left_eye.eyelid.width, param.left_eye.eyelid.height);
     printf(" Size (x,y) = (%d,%d)\n", param.right_eye.eyelid.width, param.right_eye.eyelid.height);
     printf(" Pos r(x,y) = (%d,%d)\n", param.left_eye.eyeball.x, param.left_eye.eyeball.y);
     printf(" Pos l(x,y) = (%d,%d)\n", param.right_eye.eyeball.x, param.right_eye.eyeball.y);
-    printf("---------------------------------------------\n");
 #endif
     /* ============================================= */
 }
@@ -334,13 +365,13 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     // left
     /* ============================================= */
-    if (0 < (int)this->left_eye.store.vitreous.size()) {
+    if (true == this->left_eye.store.exit_vitreous) {
         this->left_eye.eyeball = this->left_eye.store.vitreous[0].data[0];
     }
     /* ============================================= */
     // right
     /* ============================================= */
-    if (0 < (int)this->right_eye.store.vitreous.size()) {
+    if (true == this->right_eye.store.exit_vitreous) {
         this->right_eye.eyeball = this->right_eye.store.vitreous[0].data[0];
     }
 
@@ -348,7 +379,7 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     // left
     /* ============================================= */
-    if (0 < (int)this->left_eye.store.cornea_outside.size()) {
+    if (true == this->left_eye.store.exit_cornea_outside) {
         this->left_eye.store.matrix_cornea_outside.reset();
         this->left_eye.store.matrix_cornea_outside.scale((this->left_eye.draw_postion.width - 20) / this->left_eye.size.x, //
                                                          (this->left_eye.draw_postion.height + 60) / this->left_eye.size.y);
@@ -360,7 +391,7 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     // right
     /* ============================================= */
-    if (0 < (int)this->right_eye.store.cornea_outside.size()) {
+    if (true == this->right_eye.store.exit_cornea_outside) {
         this->right_eye.store.matrix_cornea_outside.reset();
         this->right_eye.store.matrix_cornea_outside.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.x, //
                                                           (this->right_eye.draw_postion.height + 60) / this->right_eye.size.y);
@@ -375,7 +406,7 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     // left
     /* ============================================= */
-    if (0 < (int)this->right_eye.store.cornea_inside.size()) {
+    if (true == this->left_eye.store.exit_cornea_inside) {
         this->left_eye.store.matrix_cornea_inside.reset();
         this->left_eye.store.matrix_cornea_inside.rotate(this->left_eye.cornea_inside_angle);
         this->left_eye.cornea_inside        = this->left_eye.store.cornea_inside[this->_get_index(state)].data[0].transformed(this->left_eye.store.matrix_cornea_inside);
@@ -385,7 +416,7 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     // right
     /* ============================================= */
-    if (0 < (int)this->right_eye.store.cornea_inside.size()) {
+    if (true == this->right_eye.store.exit_cornea_inside) {
         this->right_eye.store.matrix_cornea_inside.reset();
         this->right_eye.store.matrix_cornea_inside.rotate(this->right_eye.cornea_inside_angle);
         this->right_eye.cornea_inside        = this->right_eye.store.cornea_inside[this->_get_index(state)].data[0].transformed(this->right_eye.store.matrix_cornea_inside);

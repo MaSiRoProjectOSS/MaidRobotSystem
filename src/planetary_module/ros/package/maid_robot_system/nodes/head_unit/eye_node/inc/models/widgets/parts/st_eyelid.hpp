@@ -26,8 +26,9 @@ public:
     // PUBLIC : Variable
     // =============================
     std::vector<StImageMap> store;
-    StRectangle pos;
+    StRectangle rect;
     StVector pos_center;
+    bool exit_eyelid = false;
 
 public:
     // =============================
