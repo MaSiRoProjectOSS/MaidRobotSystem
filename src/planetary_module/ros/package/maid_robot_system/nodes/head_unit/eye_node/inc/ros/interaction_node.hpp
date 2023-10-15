@@ -46,7 +46,7 @@ private:
     // =============================
     void _callback_timer();
     rclcpp::TimerBase::SharedPtr _ros_timer;
-#if DEBUG_OUTPUT_REPORT > 0
+#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
     void _callback_output_state();
     rclcpp::TimerBase::SharedPtr _ros_output_state;
 #endif
@@ -70,8 +70,8 @@ private:
     const int CONFIG_QOS               = 255;
     const int CONFIG_SUBSCRIPTION_SIZE = 5;
     const std::chrono::milliseconds TP_MSEC{ 1000 / DRAWING_MAX_FPS };
-#if DEBUG_OUTPUT_REPORT > 0
-    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ DEBUG_OUTPUT_REPORT };
+#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
+    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ LOGGER_INFO_OUTPUT_REPORT_TIME };
 #endif
 
 private:

@@ -41,7 +41,7 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
                         std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
         this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
-#if DEBUG_OUTPUT_REPORT > 0
+#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
         this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
 #endif
     } else {
@@ -201,7 +201,7 @@ void InteractionNode::_callback_timer()
     (void)this->_widget->is_running();
 }
 
-#if DEBUG_OUTPUT_REPORT > 0
+#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
 void InteractionNode::_callback_output_state()
 {
     RCLCPP_INFO(this->get_logger(), "%s", this->_widget->output_message().c_str());
