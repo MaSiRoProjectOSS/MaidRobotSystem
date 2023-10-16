@@ -24,8 +24,8 @@ namespace maid_robot_system
 bool EyeWidget::load()
 {
     bool result = false;
-    this->eyelid.load(this->param);
-    this->eyeball.load(this->param);
+    this->eyelid->load(this->param);
+    this->eyeball->load(this->param);
     return result;
 }
 
@@ -51,12 +51,12 @@ bool EyeWidget::reload_param()
         this->param.right_eye.eyeball.height = (int)std::max(1.0, eye_size.y * this->param.right_eye.eyeball_scale.y);
 
         // set
-        this->eyelid.set_param(this->param);
-        this->param.left_eye.eyeball_center.x  = this->eyelid.left_eye.pos_center.x + this->param.left_eye.eyeball.x;
-        this->param.left_eye.eyeball_center.y  = this->eyelid.left_eye.pos_center.y + this->param.left_eye.eyeball.y;
-        this->param.right_eye.eyeball_center.x = this->eyelid.right_eye.pos_center.x + this->param.right_eye.eyeball.x;
-        this->param.right_eye.eyeball_center.y = this->eyelid.right_eye.pos_center.y + this->param.right_eye.eyeball.y;
-        this->eyeball.set_param(this->param);
+        this->eyelid->set_param(this->param);
+        this->param.left_eye.eyeball_center.x  = this->eyelid->left_eye.pos_center.x + this->param.left_eye.eyeball.x;
+        this->param.left_eye.eyeball_center.y  = this->eyelid->left_eye.pos_center.y + this->param.left_eye.eyeball.y;
+        this->param.right_eye.eyeball_center.x = this->eyelid->right_eye.pos_center.x + this->param.right_eye.eyeball.x;
+        this->param.right_eye.eyeball_center.y = this->eyelid->right_eye.pos_center.y + this->param.right_eye.eyeball.y;
+        this->eyeball->set_param(this->param);
 
 #if DEBUG_OUTPUT_PARAM_LV > 0
         printf("=========================================================\n");
@@ -785,10 +785,10 @@ void EyeWidget::_init()
         /* --------------------------------------------------- */
         // load
         /* --------------------------------------------------- */
-        this->eyelid.set_emotion(miens_close);
-        this->eyelid.calc_animation(0);
+        this->eyelid->set_emotion(miens_close);
+        this->eyelid->calc_animation(0);
         this->last_ros_msg_time = this->current_time.elapsed();
-        this->eyelid.calc_animation(this->current_time.elapsed());
+        this->eyelid->calc_animation(this->current_time.elapsed());
         this->_thinking_next_time_notAccepted = current_time.elapsed() + EYE_BLINK_TIME_START_TIME_MS;
     }
 }
@@ -806,6 +806,8 @@ bool EyeWidget::exec_start()
 
 void EyeWidget::closing()
 {
+    this->eyelid->closing();
+    this->eyeball->closing();
     this->_flag_running = false;
     if (true == this->_flag_initialized) {
         this->_flag_initialized = false;

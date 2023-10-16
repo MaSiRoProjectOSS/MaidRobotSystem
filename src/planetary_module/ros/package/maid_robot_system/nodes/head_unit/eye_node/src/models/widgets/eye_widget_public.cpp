@@ -12,7 +12,7 @@ namespace maid_robot_system
 {
 void EyeWidget::cornea_order()
 {
-    this->eyeball.set_state_cornea(PartsEyeball::CorneaState::Receiving);
+    this->eyeball->set_state_cornea(PartsEyeball::CorneaState::Receiving);
 
     this->last_voiceId_time = current_time.elapsed();
     this->flag_voice_id     = true;
@@ -20,7 +20,7 @@ void EyeWidget::cornea_order()
 
 void EyeWidget::emotion(MIENS value)
 {
-    this->eyelid.set_emotion(value);
+    this->eyelid->set_emotion(value);
 }
 
 void EyeWidget::stare(float size, float distance, float left_x, float left_y, float right_x, float right_y)
@@ -30,7 +30,7 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
     }
     const int limit_y = 190;
     /* 瞳の大きさ */
-    this->eyeball.set_dimensions(size);
+    this->eyeball->set_dimensions(size);
     /* ============================================= */
     float get_target_y = ((left_y / 200.0) * param.left_eye.eyelid.height);
     float get_target_x = ((-left_x / 230.0) * param.left_eye.eyelid.width);
@@ -74,7 +74,7 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 break;
             case control_state::STATE_ACCEPTED:
                 if (this->_thinking_next_time_notAccepted < current_time.elapsed()) {
-                    this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
+                    this->eyelid->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
                     this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
                     this->_thinking_next_time_notAccepted
                             = current_time.elapsed() + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
@@ -85,8 +85,8 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 }
             case control_state::STATE_FREE:
             default:
-                if (abs(this->eyeball.right_eye.target.y - get_target_y) > 150 || abs(this->eyeball.right_eye.target.x - get_target_x) > 150) {
-                    this->eyelid.set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
+                if (abs(this->eyeball->right_eye.target.y - get_target_y) > 150 || abs(this->eyeball->right_eye.target.x - get_target_x) > 150) {
+                    this->eyelid->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
 
                     if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
                         this->_thinking_next_time_notAccepted
@@ -102,14 +102,14 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
                 break;
         }
 
-        if (abs(this->eyeball.right_eye.target.x - get_target_x) > 0) {
-            this->eyeball.left_eye.target.x  = get_target_x - ((param.left_eye.eyeball.width * distance_change) / 100.0);
-            this->eyeball.right_eye.target.x = get_target_x + ((param.right_eye.eyeball.width * distance_change) / 100.0);
+        if (abs(this->eyeball->right_eye.target.x - get_target_x) > 0) {
+            this->eyeball->left_eye.target.x  = get_target_x - ((param.left_eye.eyeball.width * distance_change) / 100.0);
+            this->eyeball->right_eye.target.x = get_target_x + ((param.right_eye.eyeball.width * distance_change) / 100.0);
         }
 
-        if (abs(this->eyeball.right_eye.target.y - get_target_y) > 0) {
-            this->eyeball.right_eye.target.y = get_target_y;
-            this->eyeball.left_eye.target.y  = get_target_y;
+        if (abs(this->eyeball->right_eye.target.y - get_target_y) > 0) {
+            this->eyeball->right_eye.target.y = get_target_y;
+            this->eyeball->left_eye.target.y  = get_target_y;
         }
     }
 
@@ -133,6 +133,8 @@ bool EyeWidget::request_update()
 // =============================
 EyeWidget::EyeWidget(QWidget *parent) : QOpenGLWidget(parent), eyeball(), eyelid(), logger()
 {
+    this->eyeball = new PartsEyeball();
+    this->eyelid  = new PartsEyelid();
 }
 EyeWidget::~EyeWidget()
 {

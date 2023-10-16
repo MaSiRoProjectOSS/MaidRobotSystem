@@ -31,6 +31,13 @@ PartsEyelid::~PartsEyelid()
 // =============================
 // PUBLIC : Function
 // =============================
+void PartsEyelid::init()
+{
+}
+void PartsEyelid::closing()
+{
+}
+
 int PartsEyelid::calc_animation(int elapsed)
 {
     static MIENS previous_emotion    = NEXT_EMOTION_INIT;

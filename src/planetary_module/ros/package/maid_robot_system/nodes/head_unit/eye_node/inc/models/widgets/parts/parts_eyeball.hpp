@@ -53,6 +53,8 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
+    void init();
+    void closing();
     void calculate(int elapsed, int send_animation);
     void load(StParameter param);
 

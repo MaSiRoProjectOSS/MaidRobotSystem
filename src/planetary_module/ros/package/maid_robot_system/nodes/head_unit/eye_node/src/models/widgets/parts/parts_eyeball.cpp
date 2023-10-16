@@ -29,6 +29,13 @@ PartsEyeball::~PartsEyeball()
 // =============================
 // PUBLIC : Function
 // =============================
+void PartsEyeball::init()
+{
+}
+void PartsEyeball::closing()
+{
+}
+
 void PartsEyeball::calculate(int elapsed, int send_animation)
 {
     ENUM_STATE state     = this->_request_cornea_state;

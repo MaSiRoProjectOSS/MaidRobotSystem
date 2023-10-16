@@ -121,8 +121,8 @@ private:
     // PRIVATE : Variable
     // =============================
     bool _flag_initialized = false;
-    PartsEyeball eyeball;
-    PartsEyelid eyelid;
+    PartsEyeball *eyeball;
+    PartsEyelid *eyelid;
     LogStore logger;
 
     int _thinking_next_time_notAccepted = 0;

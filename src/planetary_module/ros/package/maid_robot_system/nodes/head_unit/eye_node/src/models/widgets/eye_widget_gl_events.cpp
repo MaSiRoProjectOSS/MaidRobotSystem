@@ -20,6 +20,8 @@ void EyeWidget::initializeGL()
 
     this->_flag_running = true;
     this->_flag_start   = false;
+    this->eyelid->init();
+    this->eyeball->init();
 #if DEBUG_OUTPUT_OPEN_GL
     printf(" * initializeGL end\n");
 #endif
