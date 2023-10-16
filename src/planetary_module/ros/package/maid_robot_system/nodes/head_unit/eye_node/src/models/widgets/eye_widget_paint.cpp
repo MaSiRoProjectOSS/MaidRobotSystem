@@ -61,14 +61,14 @@ void EyeWidget::_update_screen()
     // painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
     painter.scale(this->param.screen_resolution, this->param.screen_resolution);
 
-    logger.set_index(logger.ST_INDEX_INIT, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_INIT, current_time.elapsed() - start_time);
     /* ============================================= */
     // Pre-calculation
     /* ============================================= */
     start_time       = current_time.elapsed();
     int eyelid_index = this->eyelid->calc_animation(current);
     this->eyeball->calculate(current, eyelid_index);
-    logger.set_index(logger.ST_INDEX_PRE_CALCULATION, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_PRE_CALCULATION, current_time.elapsed() - start_time);
 
     /* ============================================= */
     // Make cornea outside
@@ -90,7 +90,7 @@ void EyeWidget::_update_screen()
                      (int)this->eyelid->right_eye.rect.width,
                      (int)this->eyelid->right_eye.rect.height,
                      this->eyeball->right_eye.color);
-    logger.set_index(logger.ST_INDEX_DRAW_BACKGROUND, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_BACKGROUND, current_time.elapsed() - start_time);
 
     /* ============================================= */
     // Draw : eye
@@ -110,7 +110,7 @@ void EyeWidget::_update_screen()
                            this->eyeball->left_eye.draw_postion.height,
                            this->eyeball->left_eye.eyeball);
     }
-    logger.set_index(logger.ST_INDEX_DRAW_EYEBALL, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYEBALL, current_time.elapsed() - start_time);
 
 #if DRAW_CORNEA_OUTSIDE
     /* ============================================= */
@@ -127,7 +127,7 @@ void EyeWidget::_update_screen()
             painter.drawPixmap(this->eyeball->left_eye.draw_cornea_anime.x, this->eyeball->left_eye.draw_cornea_anime.y, this->eyeball->left_eye.cornea_outside);
         }
     }
-    logger.set_index(logger.ST_INDEX_DRAW_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
 #endif
 #if DRAW_CORNEA_INSIDE
     /* ============================================= */
@@ -144,7 +144,7 @@ void EyeWidget::_update_screen()
             painter.drawPixmap(this->eyeball->left_eye.draw_cornea_anime2.x, this->eyeball->left_eye.draw_cornea_anime2.y, this->eyeball->left_eye.cornea_inside);
         }
     }
-    logger.set_index(logger.ST_INDEX_DRAW_CORNEA_INSIDE, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_INSIDE, current_time.elapsed() - start_time);
 #endif
     /* ============================================= */
     // Draw : eyelid
@@ -164,7 +164,7 @@ void EyeWidget::_update_screen()
                            this->eyelid->left_eye.rect.height,
                            this->eyelid->get_eye_id_left());
     }
-    logger.set_index(logger.ST_INDEX_DRAW_EYELID, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYELID, current_time.elapsed() - start_time);
 
     /* ============================================= */
     // final
@@ -172,7 +172,7 @@ void EyeWidget::_update_screen()
     start_time = current_time.elapsed();
     //painter.endNativePainting();
     painter.end();
-    logger.set_index(logger.ST_INDEX_FIN, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_FIN, current_time.elapsed() - start_time);
     //********************************************************************************//
 }
 

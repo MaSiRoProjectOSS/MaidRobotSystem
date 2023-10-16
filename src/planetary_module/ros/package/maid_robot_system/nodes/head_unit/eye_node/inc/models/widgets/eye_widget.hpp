@@ -123,7 +123,7 @@ private:
     bool _flag_initialized = false;
     PartsEyeball *eyeball;
     PartsEyelid *eyelid;
-    LogStore logger;
+    LogStore *logger;
 
     int _thinking_next_time_notAccepted = 0;
     QTimer *_timer_start;

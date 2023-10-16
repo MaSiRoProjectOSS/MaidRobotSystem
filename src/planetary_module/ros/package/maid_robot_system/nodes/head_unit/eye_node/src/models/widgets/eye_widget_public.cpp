@@ -123,7 +123,7 @@ bool EyeWidget::is_start()
 }
 bool EyeWidget::request_update()
 {
-    this->logger.set_index(logger.ST_INDEX_REQUEST_UPDATE, 0);
+    this->logger->set_index(this->logger->ST_INDEX_REQUEST_UPDATE, 0);
     this->update();
     return this->_flag_running;
 }
@@ -133,6 +133,7 @@ bool EyeWidget::request_update()
 // =============================
 EyeWidget::EyeWidget(QWidget *parent) : QOpenGLWidget(parent), eyeball(), eyelid(), logger()
 {
+    this->logger  = new LogStore();
     this->eyeball = new PartsEyeball();
     this->eyelid  = new PartsEyelid();
 }

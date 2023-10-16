@@ -47,7 +47,7 @@ void EyeWidget::paintGL()
     int current = current_time.elapsed();
     this->calculate();
     this->_update_screen();
-    logger.set_index(logger.ST_INDEX_UPDATE, current_time.elapsed() - current);
+    this->logger->set_index(this->logger->ST_INDEX_UPDATE, current_time.elapsed() - current);
 }
 
 } // namespace maid_robot_system
