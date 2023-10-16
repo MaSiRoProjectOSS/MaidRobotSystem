@@ -323,7 +323,7 @@ void PartsEyeball::set_param(StParameter param)
 #if DEBUG_OUTPUT_WIDGET
     printf("============== Eyeball center ===============\n");
     printf(" Right (x,y) = (%6.1f,%6.1f)\n", param.right_eye.eyeball_center.x, param.right_eye.eyeball_center.y);
-    printf(" Left (x,y) = (%6.1f,%6.1f)\n", param.left_eye.eyeball_center.x, param.left_eye.eyeball_center.y);
+    printf(" Left  (x,y) = (%6.1f,%6.1f)\n", param.left_eye.eyeball_center.x, param.left_eye.eyeball_center.y);
 
     printf("------------ Calibration Postion ------------\n");
     printf(" Size (x,y) = (%d,%d)\n", param.left_eye.eyelid.width, param.left_eye.eyelid.height);

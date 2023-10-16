@@ -32,9 +32,9 @@ namespace maid_robot_system
 // =============================
 // PUBLIC : Function
 // =============================
-bool WidgetNode::start_exec()
+bool WidgetNode::exec_start()
 {
-    return this->_widget->start_exec();
+    return this->_widget->exec_start();
 }
 
 bool WidgetNode::closing()

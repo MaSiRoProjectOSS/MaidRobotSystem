@@ -121,10 +121,13 @@ bool EyeWidget::is_start()
 {
     return this->_flag_start;
 }
-bool EyeWidget::is_running()
+bool EyeWidget::request_update()
 {
+    this->logger.set_index(logger.ST_INDEX_REQUEST_UPDATE, 0);
+    this->update();
     return this->_flag_running;
 }
+
 // =============================
 // Constructor
 // =============================

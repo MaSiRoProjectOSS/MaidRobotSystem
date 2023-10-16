@@ -37,7 +37,7 @@ public:
     // PUBLIC : Function
     // file : widget_node.cpp
     // =============================
-    bool start_exec();
+    bool exec_start();
     bool closing();
 
 public:
@@ -62,7 +62,8 @@ public:
     // file : widget_node_getter.cpp
     // =============================
     bool is_start();
-    bool is_running();
+    bool request_update();
+    int running_exec();
     std::string output_message();
     std::string get_setting_file();
     int get_brightness();

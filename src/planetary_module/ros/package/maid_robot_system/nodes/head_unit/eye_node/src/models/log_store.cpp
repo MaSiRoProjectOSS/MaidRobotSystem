@@ -32,8 +32,12 @@ void LogStore::set_index(ST_INDEX_LOG index, int spent_time)
         this->_spent_time_list[(int)index] += spent_time;
     }
 
-    if (ST_INDEX_LOG::ST_INDEX_TOTAL == index) {
-        this->_count++;
+    if (ST_INDEX_LOG::ST_INDEX_UPDATE == index) {
+        this->_count_update++;
+    }
+
+    if (ST_INDEX_LOG::ST_INDEX_REQUEST_UPDATE == index) {
+        this->_count_request++;
     }
 }
 
@@ -41,13 +45,14 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
 {
     std::string result    = "";
     static double elapsed = current_time_msec;
-    if (0 < this->_count) {
+    if (0 < this->_count_update) {
         char buffer[1024];
         double total_spent_msec = (current_time_msec - elapsed);
-        double p_count          = (double)this->_count;
+        double cnt_update       = (double)this->_count_update;
+        double cnt_request      = (double)this->_count_request;
         float p_spent_time_list[ST_INDEX_LOG::ST_INDEX_LOG_MAX];
         for (int i = 0; i < ST_INDEX_LOG::ST_INDEX_LOG_MAX; i++) {
-            p_spent_time_list[i] = this->_spent_time_list[i] / p_count;
+            p_spent_time_list[i] = this->_spent_time_list[i] / cnt_update;
         }
         this->_clear();
         if (0 < total_spent_msec) {
@@ -79,17 +84,18 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_FIN]);
             result.append(buffer);
 
-            sprintf(buffer, "  calling[%d]", (int)p_count);
+            sprintf(buffer, "  update [%d]", (int)cnt_update);
             result.append(buffer);
 
             sprintf(buffer, " -> Emotion: %s\n", miens_text.c_str());
             result.append(buffer);
 #endif
             sprintf(buffer,
-                    "FPS is %7.3f [%8.3f ms][%4d times]", //
-                    (p_count * 1000.0) / total_spent_msec,
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_TOTAL],
-                    (int)p_count);
+                    "FPS is %7.3f [%8.3f ms][%4d/%4d times]", //
+                    (cnt_update * 1000.0) / total_spent_msec,
+                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_UPDATE],
+                    (int)cnt_update,
+                    (int)cnt_request);
             result.append(buffer);
         } else {
             result = "Measuring...";
@@ -110,7 +116,8 @@ void LogStore::_clear()
     for (int i = 0; i < ST_INDEX_LOG::ST_INDEX_LOG_MAX; i++) {
         this->_spent_time_list[i] = 0;
     }
-    this->_count = 0;
+    this->_count_update  = 0;
+    this->_count_request = 0;
 }
 
 } // namespace maid_robot_system

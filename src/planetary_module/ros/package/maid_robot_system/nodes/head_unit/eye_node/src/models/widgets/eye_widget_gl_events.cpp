@@ -20,7 +20,6 @@ void EyeWidget::initializeGL()
 
     this->_flag_running = true;
     this->_flag_start   = false;
-    this->_timer_update->start(1000 / DRAWING_MAX_FPS);
 #if DEBUG_OUTPUT_OPEN_GL
     printf(" * initializeGL end\n");
 #endif
@@ -46,7 +45,7 @@ void EyeWidget::paintGL()
     int current = current_time.elapsed();
     this->calculate();
     this->_update_screen();
-    logger.set_index(logger.ST_INDEX_TOTAL, current_time.elapsed() - current);
+    logger.set_index(logger.ST_INDEX_UPDATE, current_time.elapsed() - current);
 }
 
 } // namespace maid_robot_system

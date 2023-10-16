@@ -21,10 +21,13 @@ bool WidgetNode::is_start()
     this->_app->processEvents();
     return this->_widget->is_start();
 }
-bool WidgetNode::is_running()
+bool WidgetNode::request_update()
 {
-    this->_app->processEvents();
-    return this->_widget->is_running();
+    return this->_widget->request_update();
+}
+int WidgetNode::running_exec()
+{
+    return this->_app->exec();
 }
 
 std::string WidgetNode::output_message()

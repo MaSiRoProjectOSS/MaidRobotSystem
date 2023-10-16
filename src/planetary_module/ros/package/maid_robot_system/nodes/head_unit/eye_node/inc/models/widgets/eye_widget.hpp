@@ -76,11 +76,11 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    bool start_exec();
+    bool exec_start();
     void calculate();
     void closing();
     bool is_start();
-    bool is_running();
+    bool request_update();
 
 public:
     // =============================
@@ -126,7 +126,6 @@ private:
     LogStore logger;
 
     int _thinking_next_time_notAccepted = 0;
-    QTimer *_timer_update;
     QTimer *_timer_start;
     volatile bool _flag_reload  = false;
     volatile bool _flag_start   = false;

@@ -12,6 +12,7 @@
 
 #include <exception>
 #include <iostream>
+#include <rclcpp/rclcpp.hpp>
 #include <stdexcept>
 #include <thread>
 #include <unistd.h>
@@ -21,38 +22,34 @@ int main(int argc, char **argv)
     std::string node_name   = NODE_NAME;
     std::string widget_name = "widget_";
     widget_name.append(NODE_NAME);
+    std::string logger_name = "logger_";
+    logger_name.append(NODE_NAME);
+
+    rclcpp::init(argc, argv);
+    rclcpp::Node::SharedPtr log_node = rclcpp::Node::make_shared(logger_name);
     try {
         maid_robot_system::WidgetNode widget(widget_name, argc, argv);
-        rclcpp::init(argc, argv);
-        rclcpp::executors::SingleThreadedExecutor exec;
         auto interaction_node = std::make_shared<maid_robot_system::InteractionNode>(node_name, widget);
-        exec.add_node(interaction_node);
-        widget.start_exec();
-#if 1
-        exec.spin();
-#else
-        std::thread widget_thread([&widget] {
+        widget.exec_start();
+
+        std::thread ros_thread([&interaction_node] {
             try {
-                do {
-                    sleep(0.1);
-                } while (true == widget.is_start());
-                while (true == widget.is_running()) {
-                    sleep(0.001);
-                };
+                rclcpp::executors::MultiThreadedExecutor exec;
+                exec.add_node(interaction_node);
+                exec.spin();
             } catch (...) {
             }
         });
-        exec.spin();
-        widget_thread.join();
-#endif
+        widget.running_exec();
+        ros_thread.join();
     } catch (char *e) {
-        std::cout << e << std::endl;
+        RCLCPP_ERROR(log_node->get_logger(), "<ERROR> %s", e);
     } catch (const std::logic_error &l_err) {
-        std::cout << l_err.what() << std::endl;
+        RCLCPP_ERROR(log_node->get_logger(), "<LOGIC_ERROR> %s", l_err.what());
     } catch (const std::runtime_error &r_err) {
-        std::cout << r_err.what() << std::endl;
+        RCLCPP_ERROR(log_node->get_logger(), "<RUNTIME_ERROR> %s", r_err.what());
     } catch (...) {
-        std::cout << "An unknown error has occurred." << std::endl;
+        RCLCPP_ERROR(log_node->get_logger(), "<ERROR> %s", "An unknown error has occurred.");
     }
     rclcpp::shutdown();
     return 0;

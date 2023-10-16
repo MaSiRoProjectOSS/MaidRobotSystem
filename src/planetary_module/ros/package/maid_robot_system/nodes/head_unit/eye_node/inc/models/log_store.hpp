@@ -9,6 +9,7 @@
 #ifndef MRS_EYE_NODE_LOG_STORE_HPP
 #define MRS_EYE_NODE_LOG_STORE_HPP
 
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
 #include "math.h"
 #include "models/calibration.hpp"
@@ -34,7 +35,8 @@ public:
         ST_INDEX_DRAW_EYELID,
         ST_INDEX_FIN,
         /* ======== */
-        ST_INDEX_TOTAL,
+        ST_INDEX_UPDATE,
+        ST_INDEX_REQUEST_UPDATE,
         ST_INDEX_LOG_MAX
     } ST_INDEX_LOG;
 
@@ -63,7 +65,8 @@ private:
     // PRIVATE : Variable
     // =============================
     int _spent_time_list[ST_INDEX_LOG_MAX];
-    int _count = 0;
+    int _count_update         = 0;
+    int _count_request = 0;
 };
 
 } // namespace maid_robot_system

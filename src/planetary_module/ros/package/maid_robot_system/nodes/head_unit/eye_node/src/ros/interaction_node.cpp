@@ -198,7 +198,7 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
 void InteractionNode::_callback_timer()
 {
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
-    (void)this->_widget->is_running();
+    (void)this->_widget->request_update();
 }
 
 #if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
