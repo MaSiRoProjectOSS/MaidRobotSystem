@@ -24,8 +24,8 @@ void NodeImplement::_callback_param_init()
         results->reason     = "";
 
         for (auto &&param : params) {
-#if LOGGER_INFO_PARAMETER
-            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
+#if LOGGER_ROS_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
 #endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:
@@ -59,15 +59,15 @@ void NodeImplement::_callback_timer()
 {
     if (true == this->_model.is_text()) {
         this->_msg_text.data = this->_model.pop();
-        RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_TIMER, "text : %s", this->_msg_text.data.c_str());
+        RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_TIMER, "text : %s", this->_msg_text.data.c_str());
         this->_pub_text->publish(this->_msg_text);
     }
 }
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
 
     // set parameter
@@ -84,8 +84,8 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 
 NodeImplement::~NodeImplement()
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
 }
 

@@ -25,8 +25,8 @@ namespace maid_robot_system
 // =============================
 InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : Node(node_name)
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
     this->_widget = &widget;
     if (nullptr != this->_widget) {
@@ -41,7 +41,7 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
                         std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
         this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
-#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
         this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
 #endif
     } else {
@@ -52,8 +52,8 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
 
 InteractionNode::~InteractionNode()
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
     this->_widget->closing();
 }
@@ -95,8 +95,8 @@ void InteractionNode::_callback_param_init()
         results->reason     = "";
 
         for (auto &&param : params) {
-#if LOGGER_INFO_PARAMETER
-            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
+#if LOGGER_ROS_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
 #endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_STRING:
@@ -147,8 +147,8 @@ void InteractionNode::_callback_param_init()
 // =============================
 void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::msg::MrsEye &msg)
 {
-#if LOGGER_INFO_SUBSCRIPTION_MRS_EYE
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
+#if LOGGER_ROS_INFO_SUBSCRIPTION_MRS_EYE
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_SUBSCRIPTION_MRS_EYE, "get message : MrsEye.msg");
 #endif
     switch (msg.cornea_effect) {
         case maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_ORDER:
@@ -197,11 +197,13 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
 // =============================
 void InteractionNode::_callback_timer()
 {
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
+#if LOGGER_ROS_INFO_DETAIL
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_DETAIL, "[%s] : %s", this->get_name(), "calculate");
+#endif
     (void)this->_widget->request_update();
 }
 
-#if LOGGER_INFO_OUTPUT_REPORT_TIME > 0
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
 void InteractionNode::_callback_output_state()
 {
     RCLCPP_INFO(this->get_logger(), "%s", this->_widget->output_message().c_str());

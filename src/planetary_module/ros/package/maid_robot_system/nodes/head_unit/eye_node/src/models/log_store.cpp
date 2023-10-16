@@ -91,11 +91,12 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
             result.append(buffer);
 #endif
             sprintf(buffer,
-                    "FPS is %7.3f [%8.3f ms][%4d/%4d times]", //
+                    "FPS is %7.3f [%8.3f ms][%4d/%4d times] interval: %8.3f s", //
                     (cnt_update * 1000.0) / total_spent_msec,
                     p_spent_time_list[ST_INDEX_LOG::ST_INDEX_UPDATE],
                     (int)cnt_update,
-                    (int)cnt_request);
+                    (int)cnt_request,
+                    (total_spent_msec / 1000.0));
             result.append(buffer);
         } else {
             result = "Measuring...";

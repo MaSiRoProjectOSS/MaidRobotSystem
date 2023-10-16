@@ -809,7 +809,7 @@ void EyeWidget::closing()
     this->_flag_running = false;
     if (true == this->_flag_initialized) {
         this->_flag_initialized = false;
-#if LOGGER_INFO_DETAIL
+#if LOGGER_ROS_INFO_DETAIL
         printf("\n==============\n CLOSE APP.\n==============\n");
 #endif
     }

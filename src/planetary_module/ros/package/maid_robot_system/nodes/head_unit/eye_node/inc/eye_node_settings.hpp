@@ -12,21 +12,21 @@
 
 namespace maid_robot_system
 {
-#define DRAWING_MAX_FPS (40)
+#define DRAWING_MAX_FPS (60)
 
-#define DEBUG_OUTPUT_OPEN_GL     1
-#define DEBUG_OUTPUT_WIDGET      1
+#define DEBUG_OUTPUT_OPEN_GL     0
+#define DEBUG_OUTPUT_WIDGET      0
 #define DEBUG_OUTPUT_FPS_VERBOSE 0
-#define DEBUG_OUTPUT_LOAD_IMAGE  1
+#define DEBUG_OUTPUT_LOAD_IMAGE  0
 #define DEBUG_OUTPUT_PARAM_LV    1
 
 #define DEBUG_OUTPUT_BEHAVIOR 1
 
-#define LOGGER_INFO_OUTPUT_REPORT_TIME   (1000 * 10)
-#define LOGGER_INFO_DETAIL               0
-#define LOGGER_INFO_PARAMETER            0
-#define LOGGER_INFO_SUBSCRIPTION_MRS_EYE 0
-#define LOGGER_INFO_CALL_FUNCTION        0
+#define LOGGER_ROS_INFO_OUTPUT_REPORT_TIME   (1000 * 10)
+#define LOGGER_ROS_INFO_DETAIL               0
+#define LOGGER_ROS_INFO_PARAMETER            0
+#define LOGGER_ROS_INFO_SUBSCRIPTION_MRS_EYE 0
+#define LOGGER_ROS_INFO_CALL_FUNCTION        0
 
 } // namespace maid_robot_system
 

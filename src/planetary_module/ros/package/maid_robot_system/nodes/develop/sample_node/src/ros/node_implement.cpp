@@ -19,7 +19,7 @@ namespace maid_robot_system
 void NodeImplement::_callback_message(const std_msgs::msg::Float64 &msg)
 {
     this->_model.set_value(msg.data);
-    // RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_GET_MESSAGE, "callback_message() : %3.1f", this->_model.calculate());
+    // RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_GET_MESSAGE, "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_WARN(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_ERROR(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
     // RCLCPP_FATAL(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
@@ -42,8 +42,8 @@ void NodeImplement::_callback_param_init()
         results->reason     = "";
 
         for (auto &&param : params) {
-#if LOGGER_INFO_PARAMETER
-            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
+#if LOGGER_ROS_INFO_PARAMETER
+            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
 #endif
             switch (param.get_type()) {
                 case rclcpp::PARAMETER_DOUBLE:
@@ -92,7 +92,7 @@ void NodeImplement::_callback_timer()
         (__value != this->_model.get_value()) ||   //
         (__data != this->_msg_convert.value.data)) {
         RCLCPP_INFO_EXPRESSION(this->get_logger(), //
-                               LOGGER_INFO_TIMER,
+                               LOGGER_ROS_INFO_TIMER,
                                "callback_timer : %f = %f * n(%2.1f) + %f",
                                this->_msg_convert.value.data,
                                this->_model.get_times(),
@@ -107,8 +107,8 @@ void NodeImplement::_callback_timer()
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "start.");
 #endif
 
     if (true) {
@@ -140,8 +140,8 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 
 NodeImplement::~NodeImplement()
 {
-#if LOGGER_INFO_CALL_FUNCTION
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
+#if LOGGER_ROS_INFO_CALL_FUNCTION
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
 }
 
