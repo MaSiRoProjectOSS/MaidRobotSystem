@@ -72,6 +72,9 @@ void InteractionNode::_callback_param_init()
     this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G, this->_widget->get_ciliary_color_g());
     this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B, this->_widget->get_ciliary_color_b());
 
+    this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE, this->_is_notify_enable);
+    this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE, this->_is_notify_verbose);
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this->_widget->set_brightness(this->get_parameter(this->MRS_PARAMETER_BRIGHTNESS).as_int());
     this->_widget->set_eyelid_color_r(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_R).as_int());
@@ -84,6 +87,8 @@ void InteractionNode::_callback_param_init()
     if (false == flag_load_file) {
         RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
     }
+    this->_is_notify_enable  = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE).as_bool();
+    this->_is_notify_verbose = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE).as_bool();
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // make parameter callback
@@ -123,9 +128,21 @@ void InteractionNode::_callback_param_init()
                         results->successful = this->_widget->set_ciliary_color_b(param.as_int());
                     }
                     break;
+                case rclcpp::PARAMETER_BOOL:
+                    if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE) {
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
+                        this->_is_notify_enable = param.as_bool();
+                        results->successful     = true;
+#endif
+                    } else if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE) {
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
+                        this->_is_notify_verbose = param.as_bool();
+                        results->successful      = true;
+#endif
+                    }
+                    break;
                 case rclcpp::PARAMETER_DOUBLE:
                 case rclcpp::PARAMETER_NOT_SET:
-                case rclcpp::PARAMETER_BOOL:
                 case rclcpp::PARAMETER_BYTE_ARRAY:
                 case rclcpp::PARAMETER_BOOL_ARRAY:
                 case rclcpp::PARAMETER_INTEGER_ARRAY:
@@ -205,7 +222,7 @@ void InteractionNode::_callback_timer()
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
 void InteractionNode::_callback_output_state()
 {
-    RCLCPP_INFO(this->get_logger(), "%s", this->_widget->output_message().c_str());
+    RCLCPP_INFO_EXPRESSION(this->get_logger(), this->_is_notify_enable, "%s", this->_widget->output_message(this->_is_notify_verbose).c_str());
 }
 #endif
 

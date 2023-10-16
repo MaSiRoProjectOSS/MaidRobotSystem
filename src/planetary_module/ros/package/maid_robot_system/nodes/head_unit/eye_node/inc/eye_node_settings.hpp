@@ -14,11 +14,10 @@ namespace maid_robot_system
 {
 #define DRAWING_MAX_FPS (60)
 
-#define DEBUG_OUTPUT_OPEN_GL     0
-#define DEBUG_OUTPUT_WIDGET      0
-#define DEBUG_OUTPUT_FPS_VERBOSE 0
-#define DEBUG_OUTPUT_LOAD_IMAGE  0
-#define DEBUG_OUTPUT_PARAM_LV    1
+#define DEBUG_OUTPUT_OPEN_GL    0
+#define DEBUG_OUTPUT_WIDGET     0
+#define DEBUG_OUTPUT_LOAD_IMAGE 0
+#define DEBUG_OUTPUT_PARAM_LV   1
 
 #define DEBUG_OUTPUT_BEHAVIOR 1
 

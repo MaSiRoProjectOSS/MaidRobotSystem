@@ -26,6 +26,8 @@ def generate_launch_description():
             ('in', _ros_namespace + _ros_sub_input + '/eye')
         ],
         parameters=[{
+            "notify/message/enable": False,
+            "notify/message/verbose": False,
             "setting_file": _setting_file,
             "brightness": 100,
             "eyelid/color/r": 231,

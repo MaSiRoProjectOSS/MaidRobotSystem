@@ -64,7 +64,7 @@ public:
     bool is_start();
     bool request_update();
     int running_exec();
-    std::string output_message();
+    std::string output_message(bool verbose = false);
     std::string get_setting_file();
     int get_brightness();
     int get_eyelid_color_r();

@@ -43,9 +43,9 @@ std::string EyeWidget::_miens_text(MIENS value)
     return result;
 }
 
-std::string EyeWidget::output_message()
+std::string EyeWidget::output_message(bool verbose)
 {
-    return logger.get_message(this->_miens_text(eyelid.eye_emotion), current_time.elapsed());
+    return logger.get_message(this->_miens_text(eyelid.eye_emotion), current_time.elapsed(), verbose);
 }
 
 } // namespace maid_robot_system

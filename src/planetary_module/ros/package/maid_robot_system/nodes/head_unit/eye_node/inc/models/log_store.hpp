@@ -52,7 +52,7 @@ public:
     // PUBLIC : Function
     // =============================
     void set_index(ST_INDEX_LOG index, int spent_time);
-    std::string get_message(std::string miens_text, double current_time_msec);
+    std::string get_message(std::string miens_text, double current_time_msec, bool verbose);
 
 private:
     // =============================

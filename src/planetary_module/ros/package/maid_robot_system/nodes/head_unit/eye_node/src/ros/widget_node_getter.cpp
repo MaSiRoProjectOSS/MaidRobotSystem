@@ -30,10 +30,10 @@ int WidgetNode::running_exec()
     return this->_app->exec();
 }
 
-std::string WidgetNode::output_message()
+std::string WidgetNode::output_message(bool verbose)
 {
     if (nullptr != this->_widget) {
-        return this->_widget->output_message();
+        return this->_widget->output_message(verbose);
     } else {
         return "The widget is not started.";
     }

@@ -62,6 +62,8 @@ private:
     // PRIVATE : Variable
     // =============================
     WidgetNode *_widget;
+    bool _is_notify_enable  = false;
+    bool _is_notify_verbose = false;
 
 private:
     // =============================
@@ -92,6 +94,9 @@ private:
     const std::string MRS_PARAMETER_EYELID_COLOR_R  = "eyelid/color/r";
     const std::string MRS_PARAMETER_EYELID_COLOR_G  = "eyelid/color/g";
     const std::string MRS_PARAMETER_EYELID_COLOR_B  = "eyelid/color/b";
+
+    const std::string MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE  = "notify/message/enable";
+    const std::string MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE = "notify/message/verbose";
 };
 
 } // namespace maid_robot_system

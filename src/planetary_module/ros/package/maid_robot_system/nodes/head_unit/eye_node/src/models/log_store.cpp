@@ -41,7 +41,7 @@ void LogStore::set_index(ST_INDEX_LOG index, int spent_time)
     }
 }
 
-std::string LogStore::get_message(std::string miens_text, double current_time_msec)
+std::string LogStore::get_message(std::string miens_text, double current_time_msec, bool verbose)
 {
     std::string result    = "";
     static double elapsed = current_time_msec;
@@ -56,40 +56,40 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
         }
         this->_clear();
         if (0 < total_spent_msec) {
-#if DEBUG_OUTPUT_FPS_VERBOSE
-            result.append("======================\n");
-            sprintf(buffer,
-                    "  elapsed : %12.3f s\n"
-                    "  spent   : %12.3f s\n",
-                    (current_time_msec / 1000.0),
-                    (total_spent_msec / 1000.0));
-            result.append(buffer);
+            if (true == verbose) {
+                result.append("======================\n");
+                sprintf(buffer,
+                        "  elapsed : %12.3f s\n"
+                        "  spent   : %12.3f s\n",
+                        (current_time_msec / 1000.0),
+                        (total_spent_msec / 1000.0));
+                result.append(buffer);
 
-            sprintf(buffer,
-                    "  Init                  [%7.3f ms]\n"
-                    "  Calculate             [%7.3f ms]\n"
-                    "  DRAW - background     [%7.3f ms]\n"
-                    "  DRAW - eyeball        [%7.3f ms]\n"
-                    "  DRAW - cornea outside [%7.3f ms]\n"
-                    "  DRAW - cornea inside  [%7.3f ms]\n"
-                    "  DRAW - eyelid         [%7.3f ms]\n"
-                    "  FIN                   [%7.3f ms]\n",
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_INIT],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_PRE_CALCULATION],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_BACKGROUND],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYEBALL],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_INSIDE],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_OUTSIDE],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYELID],
-                    p_spent_time_list[ST_INDEX_LOG::ST_INDEX_FIN]);
-            result.append(buffer);
+                sprintf(buffer,
+                        "  Init                  [%7.3f ms]\n"
+                        "  Calculate             [%7.3f ms]\n"
+                        "  DRAW - background     [%7.3f ms]\n"
+                        "  DRAW - eyeball        [%7.3f ms]\n"
+                        "  DRAW - cornea outside [%7.3f ms]\n"
+                        "  DRAW - cornea inside  [%7.3f ms]\n"
+                        "  DRAW - eyelid         [%7.3f ms]\n"
+                        "  FIN                   [%7.3f ms]\n",
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_INIT],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_PRE_CALCULATION],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_BACKGROUND],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYEBALL],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_INSIDE],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_OUTSIDE],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYELID],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_FIN]);
+                result.append(buffer);
 
-            sprintf(buffer, "  update [%d]", (int)cnt_update);
-            result.append(buffer);
+                sprintf(buffer, "  update [%d]", (int)cnt_update);
+                result.append(buffer);
 
-            sprintf(buffer, " -> Emotion: %s\n", miens_text.c_str());
-            result.append(buffer);
-#endif
+                sprintf(buffer, " -> Emotion: %s\n", miens_text.c_str());
+                result.append(buffer);
+            }
             sprintf(buffer,
                     "FPS is %7.3f [%8.3f ms][%4d/%4d times] interval: %8.3f s", //
                     (cnt_update * 1000.0) / total_spent_msec,

@@ -105,7 +105,7 @@ public:
     // =============================
     // PUBLIC : Getter
     // =============================
-    std::string output_message();
+    std::string output_message(bool verbose);
 
 private:
     // =============================
