@@ -61,21 +61,29 @@ void StEyeball::eye_p_drive()
 // =============================
 // PUBLIC : Setter
 // =============================
-void StEyeball::setting(int size_x, int size_y, StVector axis)
+void StEyeball::setting(StParameter::StEyeSettings param, int center_x, int center_y)
 {
+    this->color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
+    this->rect_ciliary.setWidth(param.eyelid.width);
+    this->rect_ciliary.setHeight(param.eyelid.height);
+
+    this->calibration_angle     = param.eyeball.angle * (M_PI / 180);
+    this->calibration_angle_cos = std::abs(std::cos(this->calibration_angle));
+    this->calibration_angle_sin = std::abs(std::sin(this->calibration_angle));
+
     now.set(0, 0, 0);
     target.set(0, 0, 0);
-    center.set(axis.x, axis.y, 0);
-    size.set(size_x, size_y, 0);
-    draw_postion.set_size(size_x, size_y);
+    center.set(center_x, center_y, 0);
+    size.set_size(param.eyeball.width, param.eyeball.height);
+    draw_postion.set_size(param.eyeball.width, param.eyeball.height);
     size_cornea_anime.set(550, 550, 0);
 }
 
 void StEyeball::set_draw_pixel(int send_animation, double dimensions, double calibration_angle_cos, double calibration_angle_sin)
 {
-    wink_eye_up        = ((send_animation / 30.0) * size.y) / 27.0;
-    double size_width  = dimensions * (size.x * (1.0 - (abs(now.x) / (size.x * 1.3))));
-    double size_height = dimensions * (size.y * (1.0 - (abs(now.y) / (size.y * 1.3))));
+    wink_eye_up        = ((send_animation / 30.0) * this->size.height) / 27.0;
+    double size_width  = dimensions * (this->size.width * (1.0 - (abs(now.x) / (this->size.width * 1.3))));
+    double size_height = dimensions * (this->size.height * (1.0 - (abs(now.y) / (this->size.height * 1.3))));
     draw_postion.set_size(size_width * calibration_angle_cos + size_height * calibration_angle_sin, size_width * calibration_angle_sin + size_height * calibration_angle_cos);
     cornea.set(center.x + now.x, center.y + now.y, 0);
     draw_postion.set_axis(center.x + now.x - (draw_postion.width / 2.0), center.y + now.y - (draw_postion.height / 2.0) - wink_eye_up);

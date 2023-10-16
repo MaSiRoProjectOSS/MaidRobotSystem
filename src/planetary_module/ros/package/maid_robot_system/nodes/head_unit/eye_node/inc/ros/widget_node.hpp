@@ -47,14 +47,7 @@ public:
     // =============================
     void effect_cornea_order();
     void emotion(MIENS value);
-    void set_msg_eye(float size,
-                     float distance,
-
-                     float left_x,
-                     float left_y,
-
-                     float right_x,
-                     float right_y);
+    void set_msg_eye(float size, float distance, float left_y, float left_z, float right_y, float right_z);
 
 public:
     // =============================

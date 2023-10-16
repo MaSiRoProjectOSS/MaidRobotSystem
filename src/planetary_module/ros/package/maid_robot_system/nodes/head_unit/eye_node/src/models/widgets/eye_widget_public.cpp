@@ -23,7 +23,7 @@ void EyeWidget::emotion(MIENS value)
     this->eyelid->set_emotion(value);
 }
 
-void EyeWidget::stare(float size, float distance, float left_x, float left_y, float right_x, float right_y)
+void EyeWidget::stare(float size, float distance, float left_y, float left_z, float right_y, float right_z)
 {
     if (false == flag_first_request) {
         flag_first_request = true;
@@ -32,8 +32,8 @@ void EyeWidget::stare(float size, float distance, float left_x, float left_y, fl
     /* 瞳の大きさ */
     this->eyeball->set_dimensions(size);
     /* ============================================= */
-    float get_target_y = ((left_y / 200.0) * param.left_eye.eyelid.height);
-    float get_target_x = ((-left_x / 230.0) * param.left_eye.eyelid.width);
+    float get_target_y = ((-left_z / 200.0) * param.left_eye.eyelid.height);
+    float get_target_x = ((-left_y / 230.0) * param.left_eye.eyelid.width);
     /* ============================================= */
     const int min_per_eye_distance = 8;
     /* 近くなるほど寄り目になる */

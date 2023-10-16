@@ -93,7 +93,7 @@ public:
     // =============================
     void cornea_order();
     void emotion(MIENS value);
-    void stare(float size, float distance, float left_x, float left_y, float right_x, float right_y);
+    void stare(float size, float distance, float left_y, float left_z, float right_y, float right_z);
 
 public:
     // =============================

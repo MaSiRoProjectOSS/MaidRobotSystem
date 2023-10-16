@@ -307,36 +307,18 @@ void PartsEyeball::load(StParameter param)
 // =============================
 // PUBLIC : Setter
 // =============================
-void PartsEyeball::set_param(StParameter param)
+void PartsEyeball::set_param(StParameter param, StVector left_eye_center, StVector right_eye_center)
 {
-    // TODO
-    this->left_eye.color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
-    this->right_eye.color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
-
-    this->left_eye.rect_ciliary.setWidth(param.left_eye.eyelid.width);
-    this->left_eye.rect_ciliary.setHeight(param.left_eye.eyelid.height);
-    this->right_eye.rect_ciliary.setWidth(param.right_eye.eyelid.width);
-    this->right_eye.rect_ciliary.setHeight(param.right_eye.eyelid.height);
-
-    this->left_eye.calibration_angle      = param.left_eye.eyeball.angle * (M_PI / 180);
-    this->right_eye.calibration_angle     = param.right_eye.eyeball.angle * (M_PI / 180);
-    this->left_eye.calibration_angle_cos  = std::abs(std::cos(this->left_eye.calibration_angle));
-    this->left_eye.calibration_angle_sin  = std::abs(std::sin(this->left_eye.calibration_angle));
-    this->right_eye.calibration_angle_cos = std::abs(std::cos(this->right_eye.calibration_angle));
-    this->right_eye.calibration_angle_sin = std::abs(std::sin(this->right_eye.calibration_angle));
-
-    this->right_eye.setting(param.right_eye.eyeball.width, param.right_eye.eyeball.height, param.right_eye.eyeball_center);
-    this->left_eye.setting(param.left_eye.eyeball.width, param.left_eye.eyeball.height, param.left_eye.eyeball_center);
+    this->left_eye.setting(param.left_eye, left_eye_center.x + param.left_eye.eyeball.x, left_eye_center.y + param.left_eye.eyeball.y);
+    this->right_eye.setting(param.right_eye, right_eye_center.x + param.right_eye.eyeball.x, right_eye_center.y + param.right_eye.eyeball.y);
 #if DEBUG_OUTPUT_WIDGET
-    printf("============== Eyeball center ===============\n");
-    printf(" Right (x,y) = (%6.1f,%6.1f)\n", param.right_eye.eyeball_center.x, param.right_eye.eyeball_center.y);
-    printf(" Left  (x,y) = (%6.1f,%6.1f)\n", param.left_eye.eyeball_center.x, param.left_eye.eyeball_center.y);
-
-    printf("------------ Calibration Postion ------------\n");
-    printf(" Size (x,y) = (%d,%d)\n", param.left_eye.eyelid.width, param.left_eye.eyelid.height);
-    printf(" Size (x,y) = (%d,%d)\n", param.right_eye.eyelid.width, param.right_eye.eyelid.height);
-    printf(" Pos r(x,y) = (%d,%d)\n", param.left_eye.eyeball.x, param.left_eye.eyeball.y);
-    printf(" Pos l(x,y) = (%d,%d)\n", param.right_eye.eyeball.x, param.right_eye.eyeball.y);
+    // printf("============== Eyeball ===============\n");
+    printf("  Left\n");
+    printf("    Center (x,y) = (%d,%d)\n", this->left_eye.center.x, this->left_eye.center.y);
+    printf("    Size   (w,h) = (%d,%d)\n", this->left_eye.size.width, this->left_eye.size.height);
+    printf("  Right\n");
+    printf("    Center (x,y) = (%d,%d)\n", this->right_eye.center.x, this->right_eye.center.y);
+    printf("    Size   (w,h) = (%d,%d)\n", this->right_eye.size.width, this->right_eye.size.height);
 #endif
     /* ============================================= */
 }
@@ -388,8 +370,8 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     if (true == this->left_eye.store.exit_cornea_outside) {
         this->left_eye.store.matrix_cornea_outside.reset();
-        this->left_eye.store.matrix_cornea_outside.scale((this->left_eye.draw_postion.width - 20) / this->left_eye.size.x, //
-                                                         (this->left_eye.draw_postion.height + 60) / this->left_eye.size.y);
+        this->left_eye.store.matrix_cornea_outside.scale((this->left_eye.draw_postion.width - 20) / this->left_eye.size.width, //
+                                                         (this->left_eye.draw_postion.height + 60) / this->left_eye.size.height);
         this->left_eye.store.matrix_cornea_outside.rotate(this->left_eye.cornea_outside_angle);
         this->left_eye.cornea_outside      = this->left_eye.store.cornea_outside[this->_get_index(state)].data[0].transformed(this->left_eye.store.matrix_cornea_outside);
         this->left_eye.draw_cornea_anime.x = this->left_eye.eyeball_center.x() - (this->left_eye.cornea_outside.width() / 2.0);
@@ -400,8 +382,8 @@ void PartsEyeball::_drawing(ENUM_STATE state)
     /* ============================================= */
     if (true == this->right_eye.store.exit_cornea_outside) {
         this->right_eye.store.matrix_cornea_outside.reset();
-        this->right_eye.store.matrix_cornea_outside.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.x, //
-                                                          (this->right_eye.draw_postion.height + 60) / this->right_eye.size.y);
+        this->right_eye.store.matrix_cornea_outside.scale((this->right_eye.draw_postion.width - 20) / this->right_eye.size.width, //
+                                                          (this->right_eye.draw_postion.height + 60) / this->right_eye.size.height);
         this->right_eye.store.matrix_cornea_outside.rotate(this->right_eye.cornea_outside_angle);
         this->right_eye.cornea_outside      = this->right_eye.store.cornea_outside[this->_get_index(state)].data[0].transformed(this->right_eye.store.matrix_cornea_outside);
         this->right_eye.draw_cornea_anime.x = this->right_eye.eyeball_center.x() - (this->right_eye.cornea_outside.width() / 2.0);

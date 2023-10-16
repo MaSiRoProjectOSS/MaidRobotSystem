@@ -63,7 +63,7 @@ public:
     StVector now;
     StVector target;
     StVector center;
-    StVector size;
+    StRectangle size;
     StVector cornea;
 
     int ini_rotation;
@@ -89,7 +89,7 @@ public:
     // =============================
     // PUBLIC : Setter
     // =============================
-    void setting(int size_x, int size_y, StVector axis);
+    void setting(StParameter::StEyeSettings param, int center_x, int center_y);
     void set_draw_pixel(int send_animation, double dimensions, double calibration_angle_cos, double calibration_angle_sin);
 };
 } // namespace maid_robot_system

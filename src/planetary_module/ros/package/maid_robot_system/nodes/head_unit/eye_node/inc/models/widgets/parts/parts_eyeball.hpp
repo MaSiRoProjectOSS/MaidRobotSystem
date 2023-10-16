@@ -62,7 +62,7 @@ public:
     // =============================
     // PUBLIC : Setter
     // =============================
-    void set_param(StParameter param);
+    void set_param(StParameter param, StVector left_eye_center, StVector right_eye_center);
     void set_dimensions(float value);
     void set_state_cornea(CorneaState state);
     void set_default();

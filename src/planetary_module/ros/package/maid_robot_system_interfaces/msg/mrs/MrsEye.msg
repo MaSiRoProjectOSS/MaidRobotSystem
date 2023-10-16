@@ -19,8 +19,8 @@ int32       cornea_effect
 float32     size
 float32     distance
 
-float32     left_x
 float32     left_y
+float32     left_z
 
-float32     right_x
 float32     right_y
+float32     right_z

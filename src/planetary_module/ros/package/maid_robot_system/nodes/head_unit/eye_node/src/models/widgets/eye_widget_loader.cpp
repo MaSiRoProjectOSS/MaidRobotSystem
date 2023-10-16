@@ -52,11 +52,7 @@ bool EyeWidget::reload_param()
 
         // set
         this->eyelid->set_param(this->param);
-        this->param.left_eye.eyeball_center.x  = this->eyelid->left_eye.pos_center.x + this->param.left_eye.eyeball.x;
-        this->param.left_eye.eyeball_center.y  = this->eyelid->left_eye.pos_center.y + this->param.left_eye.eyeball.y;
-        this->param.right_eye.eyeball_center.x = this->eyelid->right_eye.pos_center.x + this->param.right_eye.eyeball.x;
-        this->param.right_eye.eyeball_center.y = this->eyelid->right_eye.pos_center.y + this->param.right_eye.eyeball.y;
-        this->eyeball->set_param(this->param);
+        this->eyeball->set_param(this->param, this->eyelid->left_eye.pos_center, this->eyelid->right_eye.pos_center);
 
 #if DEBUG_OUTPUT_PARAM_LV > 0
         printf("=========================================================\n");
@@ -91,18 +87,12 @@ bool EyeWidget::reload_param()
         printf("    width: %d\n", this->param.left_eye.eyeball.width);
         printf("    height: %d\n", this->param.left_eye.eyeball.height);
         printf("    angle: %3.1f\n", this->param.left_eye.eyeball.angle);
-        printf("    center:\n");
-        printf("      x: %3.1f\n", this->param.left_eye.eyeball_center.x);
-        printf("      y: %3.1f\n", this->param.left_eye.eyeball_center.y);
         printf("  right_eye:\n");
         printf("    x: %d\n", this->param.right_eye.eyeball.x);
         printf("    y: %d\n", this->param.right_eye.eyeball.y);
         printf("    width: %d\n", this->param.right_eye.eyeball.width);
         printf("    height: %d\n", this->param.right_eye.eyeball.height);
         printf("    angle: %3.1f\n", this->param.right_eye.eyeball.angle);
-        printf("    center:\n");
-        printf("      x: %3.1f\n", this->param.right_eye.eyeball_center.x);
-        printf("      y: %3.1f\n", this->param.right_eye.eyeball_center.y);
 
 #if DEBUG_OUTPUT_PARAM_LV > 1
         printf("cornea:\n");

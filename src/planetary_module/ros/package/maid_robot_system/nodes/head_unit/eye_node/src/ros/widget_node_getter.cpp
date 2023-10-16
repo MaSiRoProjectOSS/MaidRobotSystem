@@ -63,15 +63,15 @@ int WidgetNode::get_eyelid_color_b()
 
 int WidgetNode::get_ciliary_color_r()
 {
-    return this->_widget->param.ciliary_color.r;
+    return this->_widget->param.left_eye.ciliary_color.r;
 }
 int WidgetNode::get_ciliary_color_g()
 {
-    return this->_widget->param.ciliary_color.g;
+    return this->_widget->param.left_eye.ciliary_color.g;
 }
 int WidgetNode::get_ciliary_color_b()
 {
-    return this->_widget->param.ciliary_color.b;
+    return this->_widget->param.left_eye.ciliary_color.b;
 }
 
 } // namespace maid_robot_system

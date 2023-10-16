@@ -18,10 +18,10 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
     static int emotions = 0;
     static int size     = 0;
     static int distance = 0;
-    static int left_x   = 0;
     static int left_y   = 0;
-    static int right_x  = 0;
+    static int left_z   = 0;
     static int right_y  = 0;
+    static int right_z  = 0;
     if (emotions != this->_msg_eye.emotions) {
         result = true;
     }
@@ -31,35 +31,35 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
     if (distance != this->_msg_eye.distance) {
         result = true;
     }
-    if (left_x != this->_msg_eye.left_x) {
-        result = true;
-    }
     if (left_y != this->_msg_eye.left_y) {
         result = true;
     }
-    if (right_x != this->_msg_eye.right_x) {
+    if (left_z != this->_msg_eye.left_z) {
         result = true;
     }
     if (right_y != this->_msg_eye.right_y) {
+        result = true;
+    }
+    if (right_z != this->_msg_eye.right_z) {
         result = true;
     }
     if (true == result) {
         emotions = this->_msg_eye.emotions;
         size     = this->_msg_eye.size;
         distance = this->_msg_eye.distance;
-        left_x   = this->_msg_eye.left_x;
         left_y   = this->_msg_eye.left_y;
-        right_x  = this->_msg_eye.right_x;
+        left_z   = this->_msg_eye.left_z;
         right_y  = this->_msg_eye.right_y;
+        right_z  = this->_msg_eye.right_z;
     }
 
     msg.emotions = emotions;
     msg.size     = size;
     msg.distance = distance;
-    msg.left_x   = left_x;
     msg.left_y   = left_y;
-    msg.right_x  = right_x;
+    msg.left_z   = left_z;
     msg.right_y  = right_y;
+    msg.right_z  = right_z;
 }
 void ModelImplement::_calculate_eye(double x, double y, double size, double distance)
 {
@@ -108,10 +108,10 @@ void ModelImplement::_calculate_eye(double x, double y, double size, double dist
     // ===========================================
     // Postion and size
     // ===========================================
-    this->_msg_eye.left_x   = x;        // Eye position X coordinate (left)
-    this->_msg_eye.left_y   = y;        // Eye position Y coordinate (left)
-    this->_msg_eye.right_x  = x;        // Eye position X coordinate (right)
-    this->_msg_eye.right_y  = y;        // Eye position Y coordinate (right)
+    this->_msg_eye.left_y   = x;        // Eye position X coordinate (left)
+    this->_msg_eye.left_z   = -y;       // Eye position Y coordinate (left)
+    this->_msg_eye.right_y  = x;        // Eye position X coordinate (right)
+    this->_msg_eye.right_z  = -y;       // Eye position Y coordinate (right)
     this->_msg_eye.size     = size;     // Eyeball size
     this->_msg_eye.distance = distance; // About the distance from the eyeball
 }

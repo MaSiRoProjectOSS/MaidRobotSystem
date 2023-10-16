@@ -72,6 +72,8 @@ public:
 
     class StEyeSettings {
     public:
+        // ciliary
+        StColor ciliary_color;
         // cornea
         StCornea cornea_outside;
         StCornea cornea_inside;
@@ -81,7 +83,6 @@ public:
         // eyeball
         St2DRectangle eyeball;
         StVector eyeball_scale;
-        StVector eyeball_center;
         // image
         StImageList image;
     };
@@ -96,7 +97,8 @@ public:
         // Settings : Screen
         this->brightness = 100;
         this->eyelid_color.set(255, 255, 255, 255);
-        this->ciliary_color.set(231, 183, 147, 255);
+        this->left_eye.ciliary_color.set(231, 183, 147, 255);
+        this->right_eye.ciliary_color.set(231, 183, 147, 255);
         this->screen_size.set(0, 0, 640, 480, 0);
         this->view_size.set(0, 0, 640, 480, 0);
         this->screen_resolution = 1.0;
@@ -115,8 +117,6 @@ public:
         this->left_eye.eyeball.set(0, 320, 320, 480, 0);
 
         this->right_eye.eyeball.set(0, 0, 320, 480, 0);
-        this->left_eye.eyeball_center.set(0, 0, 0);
-        this->right_eye.eyeball_center.set(0, 0, 0);
 
         // Settings : Parts : cornea
         this->left_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 255);
@@ -160,7 +160,6 @@ public:
     // Settings
     // ----------------------------------- //
     StColor eyelid_color;
-    StColor ciliary_color;
     StEyeSettings left_eye;
     StEyeSettings right_eye;
 
