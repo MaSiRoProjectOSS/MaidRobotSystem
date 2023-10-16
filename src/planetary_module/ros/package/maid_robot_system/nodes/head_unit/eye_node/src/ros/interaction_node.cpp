@@ -55,7 +55,6 @@ InteractionNode::~InteractionNode()
 #if LOGGER_ROS_INFO_CALL_FUNCTION
     RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_CALL_FUNCTION, "[%s] : %s", this->get_name(), "fin.");
 #endif
-    this->_widget->closing();
 }
 
 // =============================

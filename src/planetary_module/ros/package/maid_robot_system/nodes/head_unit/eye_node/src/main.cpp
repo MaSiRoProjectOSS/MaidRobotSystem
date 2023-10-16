@@ -32,11 +32,12 @@ int main(int argc, char **argv)
         auto interaction_node = std::make_shared<maid_robot_system::InteractionNode>(node_name, widget);
         widget.exec_start();
 
-        std::thread ros_thread([&interaction_node] {
+        std::thread ros_thread([&interaction_node, &widget] {
             try {
                 rclcpp::executors::MultiThreadedExecutor exec;
                 exec.add_node(interaction_node);
                 exec.spin();
+                widget.closing();
             } catch (...) {
             }
         });
