@@ -83,6 +83,7 @@ public:
         // eyeball
         St2DRectangle eyeball;
         StVector eyeball_scale;
+        double eyeball_descend;
         // image
         StImageList image;
     };
@@ -115,8 +116,10 @@ public:
 
         // Settings : Parts : eyeball
         this->left_eye.eyeball.set(0, 320, 320, 480, 0);
-
         this->right_eye.eyeball.set(0, 0, 320, 480, 0);
+
+        this->left_eye.eyeball_descend  = 0.1;
+        this->right_eye.eyeball_descend = 0.1;
 
         // Settings : Parts : cornea
         this->left_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 255);

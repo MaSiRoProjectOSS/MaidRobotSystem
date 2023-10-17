@@ -56,7 +56,7 @@ public:
     // =============================
     void init();
     void closing();
-    void calculate(int elapsed, int send_animation);
+    void calculate(int progress, int elapsed);
     void load(StParameter param);
     void update_background(QPainter &painter);
     void update_eyeball(QPainter &painter);

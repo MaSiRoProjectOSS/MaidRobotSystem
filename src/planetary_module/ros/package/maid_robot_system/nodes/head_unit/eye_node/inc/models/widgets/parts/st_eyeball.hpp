@@ -78,6 +78,8 @@ public:
 
     StRectangle draw_postion;
 
+    double descend = 0.1;
+
 public:
     // =============================
     // PUBLIC : Function
@@ -89,6 +91,6 @@ public:
     // PUBLIC : Setter
     // =============================
     void setting(StParameter::StEyeSettings param, int center_x, int center_y);
-    void set_draw_pixel(int send_animation, double dimensions, double calibration_angle_cos, double calibration_angle_sin);
+    void set_draw_pixel(int progress, double dimensions, double calibration_angle_cos, double calibration_angle_sin);
 };
 } // namespace maid_robot_system

@@ -78,9 +78,11 @@ void StEyeball::setting(StParameter::StEyeSettings param, int center_x, int cent
     size_cornea_anime.set(550, 550, 0);
 }
 
-void StEyeball::set_draw_pixel(int send_animation, double dimensions, double calibration_angle_cos, double calibration_angle_sin)
+void StEyeball::set_draw_pixel(int progress, double dimensions, double calibration_angle_cos, double calibration_angle_sin)
 {
-    wink_eye_up        = ((send_animation / 30.0) * this->size.height) / 27.0;
+    // the eyeballs also descend when close the eyelids
+    wink_eye_up = (((std::abs(progress) - 100.0) / 100.0) * this->size.height) * this->descend;
+
     double size_width  = dimensions * (this->size.width * (1.0 - (abs(now.x) / (this->size.width * 1.3))));
     double size_height = dimensions * (this->size.height * (1.0 - (abs(now.y) / (this->size.height * 1.3))));
     draw_postion.set_size(size_width * calibration_angle_cos + size_height * calibration_angle_sin, size_width * calibration_angle_sin + size_height * calibration_angle_cos);

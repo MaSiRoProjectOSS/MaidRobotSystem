@@ -54,15 +54,10 @@ void PartsEyelid::closing()
 
 void PartsEyelid::load(StParameter param)
 {
-    this->_eye_blink_time_quickly = param.blink_time_quickly;
-    this->_eye_blink_time_min     = param.blink_time_min;   // ms
-    this->_eye_blink_time_max     = param.blink_time_max;   // ms
-    this->_eye_blink_time_limit   = param.blink_time_limit; // ms
-
-    std::string f_name;
 #if DEBUG_OUTPUT_LOAD_IMAGE
     printf("  ---- LOAD [Eyelid] ----\n");
 #endif
+    std::string f_name;
     int buf_size   = 1000;
     bool flag_size = false;
 
@@ -142,13 +137,18 @@ void PartsEyelid::load(StParameter param)
 // =============================
 void PartsEyelid::set_param(StParameter param)
 {
-    // TODO
-    this->_eye_blink_time_offset = param.blink_time_offset;
-    this->_elapsed_next          = 0;
+    this->_eye_blink_time_quickly = param.blink_time_quickly;
+    this->_eye_blink_time_min     = param.blink_time_min;   // ms
+    this->_eye_blink_time_max     = param.blink_time_max;   // ms
+    this->_eye_blink_time_limit   = param.blink_time_limit; // ms
+    this->_eye_blink_time_offset  = param.blink_time_offset;
 
-    this->color.setRgb(param.eyelid_color.r, param.eyelid_color.g, param.eyelid_color.b);
+    this->_elapsed_next = 0;
+
+    this->_eyelid_color.setRgb(param.eyelid_color.r, param.eyelid_color.g, param.eyelid_color.b);
     this->left_eye.ciliary_color.setRgb(param.left_eye.ciliary_color.r, param.left_eye.ciliary_color.g, param.left_eye.ciliary_color.b);
     this->right_eye.ciliary_color.setRgb(param.right_eye.ciliary_color.r, param.right_eye.ciliary_color.g, param.right_eye.ciliary_color.b);
+
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
@@ -204,14 +204,15 @@ void PartsEyelid::set_emotion(MIENS eye_emotion)
         case MIENS::miens_close_left:
         case MIENS::miens_close_right:
         case MIENS::miens_close:
-            this->_flag_EmotionKeep = true;
+        case MIENS::miens_keep_normal:
+            this->_flag_keep = true;
             break;
 
         case MIENS::miens_normal:
         case MIENS::miens_wink_left:
         case MIENS::miens_wink_right:
         default:
-            this->_flag_EmotionKeep = false;
+            this->_flag_keep = false;
             break;
     }
 

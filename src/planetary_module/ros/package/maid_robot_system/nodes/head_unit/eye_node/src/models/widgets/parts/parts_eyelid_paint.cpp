@@ -19,7 +19,7 @@ void PartsEyelid::update_background(QPainter &painter, St2DRectangle screen_size
                      screen_size.y,
                      screen_size.width,
                      screen_size.height,
-                     this->color);
+                     this->_eyelid_color);
 
     // TODO : Write with polygons.    Frame is -1
     painter.fillRect((int)this->left_eye.rect.x, //
@@ -105,7 +105,7 @@ int PartsEyelid::calculate(int elapsed)
                 }
             }
 
-            if ((true == this->_flag_EmotionKeep) || (true == start_animation)) {
+            if ((true == this->_flag_keep) || (true == start_animation)) {
                 wink_anime_start_time = elapsed;
                 this->set_eye_blink(blink_type::BLINK_TYPE_MIN_MAX, false);
                 start_animation = false;
@@ -116,7 +116,7 @@ int PartsEyelid::calculate(int elapsed)
             }
 
             if (this->_lib_animation > 29 && flag_animation == 0) {
-                if ((false == this->_flag_EmotionKeep) || (this->eye_emotion != this->_next_eye_emotion)) {
+                if ((false == this->_flag_keep) || (this->eye_emotion != this->_next_eye_emotion)) {
                     flag_animation        = 1;
                     wink_anime_start_time = elapsed;
                 }
@@ -135,12 +135,14 @@ int PartsEyelid::calculate(int elapsed)
         }
     }
 
+    this->_progress = (int)(((30 - this->_lib_animation) / 30.0) * 100);
     if (this->_lib_animation < 29) {
         this->_send_animation = this->_lib_animation;
     } else {
         this->_send_animation = 58 - this->_lib_animation;
     }
-    return this->_send_animation;
+
+    return this->_progress;
 }
 
 // =============================

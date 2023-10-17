@@ -273,8 +273,11 @@ void PartsEyeball::load(StParameter param)
 // =============================
 void PartsEyeball::set_param(StParameter param, StVector left_eye_center, StVector right_eye_center)
 {
+    this->left_eye.descend  = param.left_eye.eyeball_descend;
+    this->right_eye.descend = param.right_eye.eyeball_descend;
     this->left_eye.setting(param.left_eye, left_eye_center.x + param.left_eye.eyeball.x, left_eye_center.y + param.left_eye.eyeball.y);
     this->right_eye.setting(param.right_eye, right_eye_center.x + param.right_eye.eyeball.x, right_eye_center.y + param.right_eye.eyeball.y);
+
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyeball Postion ==============\n");
     printf("  Left\n");

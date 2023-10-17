@@ -87,12 +87,14 @@ bool EyeWidget::reload_param()
         printf("    width: %d\n", this->param.left_eye.eyeball.width);
         printf("    height: %d\n", this->param.left_eye.eyeball.height);
         printf("    angle: %3.1f\n", this->param.left_eye.eyeball.angle);
+        printf("    descend: %3.1f\n", this->param.left_eye.eyeball_descend);
         printf("  right_eye:\n");
         printf("    x: %d\n", this->param.right_eye.eyeball.x);
         printf("    y: %d\n", this->param.right_eye.eyeball.y);
         printf("    width: %d\n", this->param.right_eye.eyeball.width);
         printf("    height: %d\n", this->param.right_eye.eyeball.height);
         printf("    angle: %3.1f\n", this->param.right_eye.eyeball.angle);
+        printf("    descend: %3.1f\n", this->param.right_eye.eyeball_descend);
 
 #if DEBUG_OUTPUT_PARAM_LV > 1
         printf("cornea:\n");
@@ -130,10 +132,16 @@ bool EyeWidget::reload_param()
 
 #if DEBUG_OUTPUT_PARAM_LV > 2
         printf("ciliary:\n");
-        printf("  color:\n");
-        printf("    r: %d\n", this->param.ciliary_color.r);
-        printf("    g: %d\n", this->param.ciliary_color.g);
-        printf("    b: %d\n", this->param.ciliary_color.b);
+        printf("  left_eye:\n");
+        printf("    color:\n");
+        printf("      r: %d\n", this->param.left_eye.ciliary_color.r);
+        printf("      g: %d\n", this->param.left_eye.ciliary_color.g);
+        printf("      b: %d\n", this->param.left_eye.ciliary_color.b);
+        printf("  right_eye:\n");
+        printf("    color:\n");
+        printf("      r: %d\n", this->param.right_eye.ciliary_color.r);
+        printf("      g: %d\n", this->param.right_eye.ciliary_color.g);
+        printf("      b: %d\n", this->param.right_eye.ciliary_color.b);
 #endif
 
 #if DEBUG_OUTPUT_PARAM_LV > 1
@@ -330,6 +338,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.left_eye.eyeball.y     = -settings["rectangle"]["left"]["eyeball"]["offset"].value("z", this->param.left_eye.eyeball.y);
                             this->param.left_eye.eyeball.angle = -settings["rectangle"]["left"]["eyeball"]["offset"].value("angle", this->param.left_eye.eyeball.angle);
                         }
+                        this->param.left_eye.eyeball_descend = -settings["rectangle"]["left"]["eyeball"].value("descend", this->param.left_eye.eyeball_descend);
                     }
                     if (true == settings["rectangle"]["left"].contains("cornea")) {
                         if (true == settings["rectangle"]["left"]["cornea"].contains("outside")) {
@@ -393,6 +402,7 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             this->param.right_eye.eyeball.y     = -settings["rectangle"]["right"]["eyeball"]["offset"].value("z", this->param.right_eye.eyeball.y);
                             this->param.right_eye.eyeball.angle = -settings["rectangle"]["right"]["eyeball"]["offset"].value("angle", this->param.right_eye.eyeball.angle);
                         }
+                        this->param.right_eye.eyeball_descend = -settings["rectangle"]["right"]["eyeball"].value("descend", this->param.right_eye.eyeball_descend);
                     }
                     if (true == settings["rectangle"]["right"].contains("cornea")) {
                         if (true == settings["rectangle"]["right"]["cornea"].contains("outside")) {

@@ -59,7 +59,6 @@ public:
     // =============================
     // PUBLIC : Variable
     // =============================
-    QColor color;
     StEyelid left_eye;
     StEyelid right_eye;
 
@@ -105,12 +104,10 @@ private:
     // =============================
     // PRIVATE : Variable
     // =============================
-    QPixmap _blank{ 1, 1 };
+    MIENS _next_eye_emotion = miens_close;
 
-    int _block_time     = 0;
-    int _send_animation = 0;
-    int _elapsed_next   = 0;
-    float _wink_value   = 3.0;
+    QPixmap _blank{ 1, 1 };
+    QColor _eyelid_color;
 
     float _eye_blink_time_quickly = 150.0f;            // ms
     float _eye_blink_time_min     = (500.0f - 100.0f); // ms
@@ -119,11 +116,17 @@ private:
     float _eye_blink_time_offset  = 0.0f;
     float _eye_blink_time         = (500.0f + 100.0f); // ms
 
-    MIENS _next_eye_emotion = miens_close;
+    int _block_time = 0;
+    int _progress   = 0; //<! progress : 100(open) ~ 0(close) ~ -100(open)
+    // =============================
 
-    int _lib_animation     = 0;
-    bool _thinking         = false;
-    bool _flag_EmotionKeep = false;
+    int _send_animation = 0;
+    int _elapsed_next   = 0;
+    float _wink_value   = 3.0;
+
+    int _lib_animation = 0;
+    bool _thinking     = false;
+    bool _flag_keep    = false;
 
     double _store_size = 0;
 };

@@ -111,9 +111,9 @@ void EyeWidget::_screen_calculate()
     /* ============================================= */
     // Calculation / Step 2
     /* ============================================= */
-    start_time       = this->current_time.elapsed();
-    int eyelid_index = this->eyelid->calculate(current);
-    this->eyeball->calculate(current, eyelid_index);
+    start_time          = this->current_time.elapsed();
+    int eyelid_progress = this->eyelid->calculate(current);
+    this->eyeball->calculate(eyelid_progress, current);
     this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP2, this->current_time.elapsed() - start_time);
 }
 
