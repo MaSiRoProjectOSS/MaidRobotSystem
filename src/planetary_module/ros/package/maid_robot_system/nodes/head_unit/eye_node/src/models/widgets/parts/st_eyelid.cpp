@@ -60,15 +60,16 @@ void StEyelid::set_elapsed(uint current_time)
 #if 1
 
 #else
+    int store_size   = this->store.size();
     int elapsedIndex = _elapsedIndex;
     _current_time    = current_time;
 
     if (_start_time < current_time) {
         elapsedIndex = (int)((current_time - _start_time) / _wink_time_millisecond);
 
-        if (EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX <= elapsedIndex) {
-            if ((EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX * 2) > elapsedIndex) {
-                elapsedIndex = EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX - elapsedIndex;
+        if (store_size <= elapsedIndex) {
+            if ((store_size * 2) > elapsedIndex) {
+                elapsedIndex = store_size - elapsedIndex;
             } else {
                 // finished wink
                 this->_fin_win();

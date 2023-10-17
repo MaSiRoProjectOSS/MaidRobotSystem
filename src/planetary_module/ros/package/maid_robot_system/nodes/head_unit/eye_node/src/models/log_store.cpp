@@ -45,11 +45,11 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
 {
     std::string result    = "";
     static double elapsed = current_time_msec;
+    char buffer[1024];
+    double cnt_update  = (double)this->_count_update;
+    double cnt_request = (double)this->_count_request;
     if (0 < this->_count_update) {
-        char buffer[1024];
         double total_spent_msec = (current_time_msec - elapsed);
-        double cnt_update       = (double)this->_count_update;
-        double cnt_request      = (double)this->_count_request;
         float p_spent_time_list[ST_INDEX_LOG::ST_INDEX_LOG_MAX];
         for (int i = 0; i < ST_INDEX_LOG::ST_INDEX_LOG_MAX; i++) {
             p_spent_time_list[i] = this->_spent_time_list[i] / cnt_update;
@@ -68,7 +68,7 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
                 sprintf(buffer,
                         "  Init                  [%7.3f ms]\n"
                         "  Calculate             [%7.3f ms]\n"
-                        "  DRAW - background     [%7.3f ms]\n"
+                        "  DRAW - foundation     [%7.3f ms]\n"
                         "  DRAW - eyeball        [%7.3f ms]\n"
                         "  DRAW - cornea outside [%7.3f ms]\n"
                         "  DRAW - cornea inside  [%7.3f ms]\n"
@@ -76,7 +76,7 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
                         "  FIN                   [%7.3f ms]\n",
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_INIT],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_PRE_CALCULATION],
-                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_BACKGROUND],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_FOUNDATION],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_EYEBALL],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_INSIDE],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_CORNEA_OUTSIDE],
@@ -103,7 +103,8 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
         }
         elapsed = current_time_msec;
     } else {
-        result = "not recorded.";
+        sprintf(buffer, "not recorded [%4d/%4d times] ", (int)cnt_update, (int)cnt_request);
+        result.append(buffer);
     }
 
     return result;

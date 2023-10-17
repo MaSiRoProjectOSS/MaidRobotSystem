@@ -29,6 +29,7 @@ public:
     StRectangle rect;
     StVector pos_center;
     bool exit_eyelid = false;
+    QColor ciliary_color;
 
 public:
     // =============================

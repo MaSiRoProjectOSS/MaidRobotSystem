@@ -36,42 +36,6 @@ void PartsEyeball::closing()
 {
 }
 
-void PartsEyeball::calculate(int elapsed, int send_animation)
-{
-    ENUM_STATE state     = this->_request_cornea_state;
-    float buf_dimensions = this->_dimensions;
-
-    if (this->_request_dimensions < buf_dimensions) {
-        buf_dimensions = this->_request_dimensions - EYEBALL_DIMENSIONS_INCREASE;
-
-        if (this->_request_dimensions > buf_dimensions) {
-            buf_dimensions = this->_request_dimensions;
-        }
-    } else if (this->_request_dimensions > buf_dimensions) {
-        buf_dimensions = this->_request_dimensions + EYEBALL_DIMENSIONS_INCREASE;
-
-        if (this->_request_dimensions < buf_dimensions) {
-            buf_dimensions = this->_request_dimensions;
-        }
-    }
-
-    this->_dimensions = buf_dimensions;
-
-    // left
-    this->left_eye.set_draw_pixel(send_animation, this->_dimensions, this->left_eye.calibration_angle_cos, this->left_eye.calibration_angle_sin);
-    left_eye.eyeball_center.setX(this->left_eye.draw_postion.x + (this->left_eye.draw_postion.width / 2.0));
-    left_eye.eyeball_center.setY(this->left_eye.draw_postion.y + (this->left_eye.draw_postion.height / 2.0));
-    // right
-    this->right_eye.set_draw_pixel(send_animation, this->_dimensions, this->right_eye.calibration_angle_cos, this->right_eye.calibration_angle_sin);
-    right_eye.eyeball_center.setX(this->right_eye.draw_postion.x + (this->right_eye.draw_postion.width / 2.0));
-    right_eye.eyeball_center.setY(this->right_eye.draw_postion.y + (this->right_eye.draw_postion.height / 2.0));
-
-    /* ============================================= */
-    // drawing
-    /* ============================================= */
-    this->_drawing(state);
-}
-
 void PartsEyeball::load(StParameter param)
 {
     if (true == std::filesystem::is_directory(param.path)) {

@@ -63,7 +63,6 @@ void StEyeball::eye_p_drive()
 // =============================
 void StEyeball::setting(StParameter::StEyeSettings param, int center_x, int center_y)
 {
-    this->color.setRgb(param.ciliary_color.r, param.ciliary_color.g, param.ciliary_color.b);
     this->rect_ciliary.setWidth(param.eyelid.width);
     this->rect_ciliary.setHeight(param.eyelid.height);
 

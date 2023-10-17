@@ -17,6 +17,7 @@
 #include "models/data_structure.hpp"
 #include "st_eyelid.hpp"
 
+#include <QPainter>
 #include <QPixmap>
 #include <sstream>
 #include <stdarg.h>
@@ -70,8 +71,10 @@ public:
     // =============================
     void init();
     void closing();
-    int calc_animation(int elapsed);
+    int calculate(int elapsed);
     void load(StParameter param);
+    void update_background(QPainter &painter, St2DRectangle screen_size);
+    void update(QPainter &painter);
 
 public:
     // =============================
@@ -88,8 +91,6 @@ public:
     // PUBLIC : Getter
     // =============================
     bool enable_motion();
-    QPixmap get_eye_id_right();
-    QPixmap get_eye_id_left();
     uint get_ms_time(int time_current, int time_check, int add_Value);
 
 private:
@@ -121,6 +122,8 @@ private:
     int _lib_animation     = 0;
     bool _thinking         = false;
     bool _flag_EmotionKeep = false;
+
+    double _store_size = 0;
 };
 
 } // namespace maid_robot_system

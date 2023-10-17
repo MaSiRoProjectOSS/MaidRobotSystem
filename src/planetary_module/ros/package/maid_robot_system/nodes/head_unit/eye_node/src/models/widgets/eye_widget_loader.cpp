@@ -776,9 +776,9 @@ void EyeWidget::_init()
         // load
         /* --------------------------------------------------- */
         this->eyelid->set_emotion(miens_close);
-        this->eyelid->calc_animation(0);
+        this->eyelid->calculate(0);
         this->last_ros_msg_time = this->current_time.elapsed();
-        this->eyelid->calc_animation(this->current_time.elapsed());
+        this->eyelid->calculate(this->current_time.elapsed());
         this->_thinking_next_time_notAccepted = current_time.elapsed() + EYE_BLINK_TIME_START_TIME_MS;
     }
 }

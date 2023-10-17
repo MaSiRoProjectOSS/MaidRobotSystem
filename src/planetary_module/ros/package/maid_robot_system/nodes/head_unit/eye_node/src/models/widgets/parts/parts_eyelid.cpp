@@ -16,8 +16,6 @@
 
 namespace maid_robot_system
 {
-#define EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX 30
-
 // =============================
 // Constructor
 // =============================
@@ -38,96 +36,6 @@ void PartsEyelid::closing()
 {
 }
 
-int PartsEyelid::calc_animation(int elapsed)
-{
-    static MIENS previous_emotion    = NEXT_EMOTION_INIT;
-    static bool start_animation      = false;
-    static int wink_anime_start_time = 0;
-    static int flag_animation        = 0;
-    this->left_eye.set_elapsed(elapsed);
-    this->right_eye.set_elapsed(elapsed);
-
-    if (this->_lib_animation == 0) {
-        switch (this->_next_eye_emotion) {
-            case miens_wink_left:
-                if (miens_wink_left == previous_emotion) {
-                    this->eye_emotion = miens_normal;
-                } else {
-                    start_animation   = true;
-                    this->eye_emotion = this->_next_eye_emotion;
-                    previous_emotion  = this->eye_emotion;
-                    this->set_on_the_way();
-                }
-
-                break;
-
-            case miens_wink_right:
-                if (miens_wink_right == previous_emotion) {
-                    this->eye_emotion = miens_normal;
-                } else {
-                    start_animation   = true;
-                    this->eye_emotion = this->_next_eye_emotion;
-                    previous_emotion  = this->eye_emotion;
-                    this->set_on_the_way();
-                }
-
-                break;
-
-            default:
-                this->eye_emotion = this->_next_eye_emotion;
-                previous_emotion  = this->eye_emotion;
-                break;
-        }
-
-        if (true == this->_thinking) {
-            this->_eye_blink_time = this->set_eye_blink_time(blink_type::BLINK_TYPE_MIN_MAX);
-            this->left_eye.wink(this->_eye_blink_time);
-            this->right_eye.wink(this->_eye_blink_time);
-            this->_thinking = false;
-        } else {
-            if (this->_elapsed_next <= elapsed) {
-                this->_elapsed_next = elapsed + this->set_eye_blink_time(blink_type::BLINK_TYPE_LONG);
-                start_animation     = true;
-            }
-        }
-
-        if ((true == this->_flag_EmotionKeep) || (true == start_animation)) {
-            wink_anime_start_time = elapsed;
-            this->set_eye_blink(blink_type::BLINK_TYPE_MIN_MAX, false);
-            start_animation = false;
-        }
-    } else {
-        if (flag_animation == 0) {
-            this->_lib_animation = get_ms_time(elapsed, wink_anime_start_time, 1.0);
-        }
-
-        if (this->_lib_animation > 29 && flag_animation == 0) {
-            if ((false == this->_flag_EmotionKeep) || (eye_emotion != this->_next_eye_emotion)) {
-                flag_animation        = 1;
-                wink_anime_start_time = elapsed;
-            }
-
-            this->_lib_animation = 29;
-        }
-
-        if (flag_animation == 1) {
-            this->_lib_animation = get_ms_time(elapsed, wink_anime_start_time, EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX - 1);
-        }
-
-        if (this->_lib_animation > 58) {
-            this->_lib_animation = 0;
-            flag_animation       = 0;
-        }
-    }
-
-    if (this->_lib_animation < 29) {
-        this->_send_animation = this->_lib_animation;
-    } else {
-        this->_send_animation = 58 - this->_lib_animation;
-    }
-    return this->_send_animation;
-}
-
 void PartsEyelid::load(StParameter param)
 {
     this->_eye_blink_time_quickly = param.blink_time_quickly;
@@ -139,6 +47,9 @@ void PartsEyelid::load(StParameter param)
 #if DEBUG_OUTPUT_LOAD_IMAGE
     printf("  ---- LOAD [Eyelid] ----\n");
 #endif
+    int buf_size   = 1000;
+    bool flag_size = false;
+
     if (0 < param.left_eye.image.eyelid.size()) {
         this->left_eye.exit_eyelid = false;
         this->left_eye.store.clear();
@@ -162,7 +73,10 @@ void PartsEyelid::load(StParameter param)
                 }
             }
             list.max = (int)list.data.size();
+
             if (0 < list.max) {
+                flag_size = true;
+                buf_size  = std::min(list.max, list.max);
                 this->left_eye.store.push_back(list);
             }
         }
@@ -195,6 +109,8 @@ void PartsEyelid::load(StParameter param)
             }
             list.max = (int)list.data.size();
             if (0 < list.max) {
+                flag_size = true;
+                buf_size  = std::min(list.max, list.max);
                 this->right_eye.store.push_back(list);
             }
         }
@@ -202,6 +118,8 @@ void PartsEyelid::load(StParameter param)
             this->right_eye.exit_eyelid = true;
         }
     }
+    printf("_store_size %3.1f\n", this->_store_size);
+    this->_store_size = (false == flag_size) ? 0 : buf_size;
 }
 
 // =============================
@@ -214,6 +132,8 @@ void PartsEyelid::set_param(StParameter param)
     this->_elapsed_next          = 0;
 
     this->color.setRgb(param.eyelid_color.r, param.eyelid_color.g, param.eyelid_color.b);
+    this->left_eye.ciliary_color.setRgb(param.left_eye.ciliary_color.r, param.left_eye.ciliary_color.g, param.left_eye.ciliary_color.b);
+    this->right_eye.ciliary_color.setRgb(param.right_eye.ciliary_color.r, param.right_eye.ciliary_color.g, param.right_eye.ciliary_color.b);
     this->_reset_position(param);
 #if DEBUG_OUTPUT_WIDGET
     printf("=============== Eyelid Postion ==============\n");
@@ -333,90 +253,9 @@ bool PartsEyelid::enable_motion()
         return false;
     }
 }
-QPixmap PartsEyelid::get_eye_id_right()
-{
-    return this->_get_eye_id(false);
-}
-QPixmap PartsEyelid::get_eye_id_left()
-{
-    return this->_get_eye_id(true);
-}
 uint PartsEyelid::get_ms_time(int time_current, int time_check, int add_Value)
 {
-    return (uint)((((time_current - time_check) / (this->_eye_blink_time / 2.0)) * EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX) + add_Value);
-}
-
-// =============================
-// PRIVATE : Function
-// =============================
-QPixmap PartsEyelid::_get_eye_id(bool is_left)
-{
-    if (this->_send_animation >= EYE_WIDGET_EYELID_IMAGE_ARRAY_MAX) {
-        this->_send_animation = 0;
-    }
-
-    int index_elapsed = this->_send_animation;
-    int select_lid    = (int)INDEX_LIP_NORMAL;
-
-    switch (eye_emotion) {
-        case MIENS::miens_close_left:
-            index_elapsed = (int)((is_left) ? this->_send_animation : (this->_send_animation / this->_wink_value));
-            select_lid    = (int)INDEX_LIP_SMILE;
-            break;
-
-        case MIENS::miens_close_right:
-            index_elapsed = (int)((is_left) ? (this->_send_animation / this->_wink_value) : this->_send_animation);
-            select_lid    = (int)INDEX_LIP_SMILE;
-            break;
-
-        case MIENS::miens_wink_left:
-            index_elapsed = (int)((is_left) ? this->_send_animation : (this->_send_animation / 4));
-            select_lid    = (int)((is_left) ? INDEX_LIP_NORMAL : INDEX_LIP_SMILE);
-            break;
-
-        case MIENS::miens_wink_right:
-            index_elapsed = (int)((is_left) ? (this->_send_animation / 4) : this->_send_animation);
-            select_lid    = (int)((is_left) ? INDEX_LIP_SMILE : INDEX_LIP_NORMAL);
-            break;
-
-        case MIENS::miens_smile:
-            index_elapsed = this->_send_animation;
-            select_lid    = (int)INDEX_LIP_SMILE;
-            break;
-
-        case MIENS::miens_normal:
-        case MIENS::miens_close:
-        default:
-            index_elapsed = this->_send_animation;
-            select_lid    = (int)INDEX_LIP_NORMAL;
-            break;
-            break;
-    }
-    if (is_left) {
-        if ((int)this->left_eye.store.size() == 0) {
-            return this->_blank;
-        } else {
-            if ((int)this->left_eye.store.size() <= select_lid) {
-                select_lid = 0;
-            }
-            if (this->left_eye.store[select_lid].max <= index_elapsed) {
-                index_elapsed = 0;
-            }
-            return this->left_eye.store[select_lid].data[index_elapsed];
-        }
-    } else {
-        if (this->right_eye.store.size() == 0) {
-            return this->_blank;
-        } else {
-            if ((int)this->right_eye.store.size() <= select_lid) {
-                select_lid = 0;
-            }
-            if (this->right_eye.store[select_lid].max <= index_elapsed) {
-                index_elapsed = 0;
-            }
-            return this->right_eye.store[select_lid].data[index_elapsed];
-        }
-    }
+    return (uint)((((time_current - time_check) / (this->_eye_blink_time / 2.0)) * this->_store_size) + add_Value);
 }
 
 void PartsEyelid::_reset_position(StParameter param)

@@ -56,9 +56,11 @@ add_executable(${NODE_NAME}
   src/models/log_store.cpp
 
   src/models/widgets/parts/parts_eyeball.cpp
+  src/models/widgets/parts/parts_eyeball_paint.cpp
   src/models/widgets/parts/st_eyeball.cpp
 
   src/models/widgets/parts/parts_eyelid.cpp
+  src/models/widgets/parts/parts_eyelid_paint.cpp
   src/models/widgets/parts/st_eyelid.cpp
 
   src/models/widgets/eye_widget_gl_events.cpp

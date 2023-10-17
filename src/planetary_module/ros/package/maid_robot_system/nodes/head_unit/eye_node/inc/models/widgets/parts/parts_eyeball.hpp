@@ -16,6 +16,7 @@
 #include "models/data_structure.hpp"
 #include "st_eyeball.hpp"
 
+#include <QPainter>
 #include <QPixmap>
 #include <cmath>
 #include <sstream>
@@ -57,6 +58,10 @@ public:
     void closing();
     void calculate(int elapsed, int send_animation);
     void load(StParameter param);
+    void update_background(QPainter &painter);
+    void update_eyeball(QPainter &painter);
+    void update_cornea_outside(QPainter &painter);
+    void update_cornea_inside(QPainter &painter);
 
 public:
     // =============================

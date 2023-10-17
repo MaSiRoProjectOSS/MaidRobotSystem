@@ -40,6 +40,9 @@ void EyeWidget::resizeGL(int w, int h)
 
 void EyeWidget::paintGL()
 {
+#if DEBUG_OUTPUT_OPEN_GL
+    // printf(" * paintGL\n");
+#endif
     if (true == this->_flag_reload) {
         this->_flag_reload = false;
         this->load();
