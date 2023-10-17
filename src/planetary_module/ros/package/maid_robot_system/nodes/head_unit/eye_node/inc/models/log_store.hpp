@@ -27,7 +27,8 @@ public:
     typedef enum
     {
         ST_INDEX_INIT,
-        ST_INDEX_PRE_CALCULATION,
+        ST_INDEX_CALCULATION_STEP1,
+        ST_INDEX_CALCULATION_STEP2,
         ST_INDEX_DRAW_FOUNDATION,
         ST_INDEX_DRAW_EYEBALL,
         ST_INDEX_DRAW_CORNEA_INSIDE,
@@ -65,7 +66,7 @@ private:
     // PRIVATE : Variable
     // =============================
     int _spent_time_list[ST_INDEX_LOG_MAX];
-    int _count_update         = 0;
+    int _count_update  = 0;
     int _count_request = 0;
 };
 

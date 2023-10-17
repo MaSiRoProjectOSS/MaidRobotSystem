@@ -12,12 +12,16 @@ namespace maid_robot_system
 {
 #define DEBUG_VIEW 1
 
-void EyeWidget::calculate()
+void EyeWidget::_screen_calculate()
 {
     const int min_per_eye_distance = 8;
     const int limit_y              = 190;
     static int previous            = 0;
-    int current                    = current_time.elapsed();
+    int current                    = this->current_time.elapsed();
+    /* ============================================= */
+    // Calculation / Step 1
+    /* ============================================= */
+    int start_time = current;
     if (previous < this->last_ros_msg_time) {
         previous              = this->last_ros_msg_time;
         float get_target_y    = ((-this->_request_left.z / 200.0) * param.left_eye.eyelid.height);
@@ -90,94 +94,89 @@ void EyeWidget::calculate()
     } else {
         if ((0 != this->eyeball->right_eye.target.x) || (0 != this->eyeball->right_eye.target.y) //
             || (0 != this->eyeball->left_eye.target.x) || (0 != this->eyeball->left_eye.target.y)) {
-            int elapsed_times = (current - this->last_ros_msg_time);
-
-            if (LOST_ROS_MSG_TIMEOUT_SECONDS < elapsed_times) {
+            if (LOST_ROS_MSG_TIMEOUT_SECONDS < (current - this->last_ros_msg_time)) {
                 this->eyeball->set_default();
             }
         }
     }
     //********************************************************************************//
     if (true == this->flag_voice_id) {
-        int voiceId_time = (current - this->last_voiceId_time);
-        if (VOICE_MESSAGE_TIMEOUT_MS < voiceId_time) {
+        if (VOICE_MESSAGE_TIMEOUT_MS < (current - this->last_voiceId_time)) {
             this->flag_voice_id = false;
             this->eyeball->set_state_cornea(PartsEyeball::CorneaState::Normal);
         }
-        if (0 > voiceId_time) {
-            voiceId_time = current;
-        }
     }
+    //********************************************************************************//
+    this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP1, this->current_time.elapsed() - start_time);
+    /* ============================================= */
+    // Calculation / Step 2
+    /* ============================================= */
+    start_time       = this->current_time.elapsed();
+    int eyelid_index = this->eyelid->calculate(current);
+    this->eyeball->calculate(current, eyelid_index);
+    this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP2, this->current_time.elapsed() - start_time);
 }
 
-void EyeWidget::_update_screen()
+void EyeWidget::_screen_update()
 {
-    int current    = current_time.elapsed();
-    int start_time = current;
+    int start_time = this->current_time.elapsed();
     QPainter painter(this);
-
+    /* ============================================= */
+    // BEGIN
+    /* ============================================= */
     if (true != painter.isActive()) {
         painter.begin(this);
     }
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
-
     // painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
     painter.scale(this->param.screen_resolution, this->param.screen_resolution);
-
-    this->logger->set_index(this->logger->ST_INDEX_INIT, current_time.elapsed() - start_time);
-    /* ============================================= */
-    // Pre-calculation
-    /* ============================================= */
-    start_time       = current_time.elapsed();
-    int eyelid_index = this->eyelid->calculate(current);
-    this->eyeball->calculate(current, eyelid_index);
-    this->logger->set_index(this->logger->ST_INDEX_PRE_CALCULATION, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_INIT, this->current_time.elapsed() - start_time);
 
     /* ============================================= */
     // Draw : foundation
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     this->eyelid->update_background(painter, this->param.screen_size);
     this->eyeball->update_background(painter);
-    this->logger->set_index(this->logger->ST_INDEX_DRAW_FOUNDATION, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_FOUNDATION, this->current_time.elapsed() - start_time);
 
     /* ============================================= */
     // Draw : eye
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     this->eyeball->update_eyeball(painter);
-    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYEBALL, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYEBALL, this->current_time.elapsed() - start_time);
 
 #if DRAW_CORNEA_OUTSIDE
     /* ============================================= */
     // Draw : cornea outside
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     this->eyeball->update_cornea_outside(painter);
-    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_OUTSIDE, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_OUTSIDE, this->current_time.elapsed() - start_time);
 #endif
 #if DRAW_CORNEA_INSIDE
     /* ============================================= */
     // Draw : cornea inside
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     this->eyeball->update_cornea_inside(painter);
-    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_INSIDE, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_CORNEA_INSIDE, this->current_time.elapsed() - start_time);
 #endif
     /* ============================================= */
     // Draw : eyelid
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     this->eyelid->update(painter);
-    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYELID, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_DRAW_EYELID, this->current_time.elapsed() - start_time);
 
     /* ============================================= */
-    // final
+    // END
     /* ============================================= */
-    start_time = current_time.elapsed();
+    start_time = this->current_time.elapsed();
     //painter.endNativePainting();
     painter.end();
-    this->logger->set_index(this->logger->ST_INDEX_FIN, current_time.elapsed() - start_time);
+    this->logger->set_index(this->logger->ST_INDEX_FIN, this->current_time.elapsed() - start_time);
     //********************************************************************************//
 }
 

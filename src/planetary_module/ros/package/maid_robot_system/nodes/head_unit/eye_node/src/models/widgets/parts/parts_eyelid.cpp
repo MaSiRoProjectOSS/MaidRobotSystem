@@ -29,8 +29,24 @@ PartsEyelid::~PartsEyelid()
 // =============================
 // PUBLIC : Function
 // =============================
-void PartsEyelid::init()
+void PartsEyelid::init(MIENS start_emotion, MIENS next_emotion, int transition_time)
 {
+    switch (start_emotion) {
+        case MIENS::miens_smile:
+        case MIENS::miens_close_left:
+        case MIENS::miens_close_right:
+        case MIENS::miens_close:
+        case MIENS::miens_wink_left:
+        case MIENS::miens_wink_right:
+            this->_lib_animation = 29;
+            break;
+        case MIENS::miens_normal:
+        default:
+            break;
+    }
+
+    this->not_accepted(transition_time);
+    this->set_emotion(next_emotion);
 }
 void PartsEyelid::closing()
 {
@@ -171,6 +187,11 @@ double PartsEyelid::set_eye_blink_time(blink_type type)
         default:
             return func_rand(this->_eye_blink_time_offset + this->_eye_blink_time_min, this->_eye_blink_time_offset + this->_eye_blink_time_limit);
     }
+}
+
+void PartsEyelid::not_accepted(int elapsed)
+{
+    this->_block_time = elapsed;
 }
 
 void PartsEyelid::set_emotion(MIENS eye_emotion)

@@ -14,7 +14,7 @@ void EyeWidget::cornea_order()
 {
     this->eyeball->set_state_cornea(PartsEyeball::CorneaState::Receiving);
 
-    this->last_voiceId_time = current_time.elapsed();
+    this->last_voiceId_time = this->current_time.elapsed();
     this->flag_voice_id     = true;
 }
 
@@ -32,9 +32,7 @@ void EyeWidget::stare(float distance, float left_y, float left_z, float right_y,
     this->_request_left.set(0, left_y, left_z);
     this->_request_right.set(0, right_y, right_z);
     this->_request_distance = distance;
-
-    /* ============================================= */
-    this->last_ros_msg_time = current_time.elapsed();
+    this->last_ros_msg_time = this->current_time.elapsed();
 }
 
 bool EyeWidget::is_start()

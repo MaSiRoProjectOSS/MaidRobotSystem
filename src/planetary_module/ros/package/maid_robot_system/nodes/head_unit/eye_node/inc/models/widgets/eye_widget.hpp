@@ -77,7 +77,6 @@ public:
     // PUBLIC : Function
     // =============================
     bool exec_start();
-    void calculate();
     void closing();
     bool is_start();
     bool request_update();
@@ -112,8 +111,8 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    void _init();
-    void _update_screen();
+    void _screen_calculate();
+    void _screen_update();
     std::string _read_file(const std::string &path);
     std::string _miens_text(MIENS value);
 

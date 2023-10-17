@@ -194,6 +194,19 @@
                 "--once"
             ]
         },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : keep_normal",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_keep_normal.yaml",
+                "--once"
+            ]
+        },
         ////////////////////////////////////////////////
         // eye_node : distance
         ////////////////////////////////////////////////

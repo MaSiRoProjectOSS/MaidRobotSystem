@@ -69,9 +69,10 @@ public:
     // =============================
     // PUBLIC : Function
     // =============================
-    void init();
+    void init(MIENS start_emotion, MIENS next_emotion, int transition_time);
     void closing();
     int calculate(int elapsed);
+    void not_accepted(int elapsed);
     void load(StParameter param);
     void update_background(QPainter &painter, St2DRectangle screen_size);
     void update(QPainter &painter);
@@ -106,6 +107,7 @@ private:
     // =============================
     QPixmap _blank{ 1, 1 };
 
+    int _block_time     = 0;
     int _send_animation = 0;
     int _elapsed_next   = 0;
     float _wink_value   = 3.0;

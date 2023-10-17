@@ -758,8 +758,9 @@ bool EyeWidget::set_setting_file(std::string json_file)
     return result;
 }
 
-void EyeWidget::_init()
+bool EyeWidget::exec_start()
 {
+    this->_flag_start = true;
     if (false == this->_flag_initialized) {
         this->_flag_initialized = true;
 
@@ -775,20 +776,6 @@ void EyeWidget::_init()
         /* --------------------------------------------------- */
         // load
         /* --------------------------------------------------- */
-        this->eyelid->set_emotion(miens_close);
-        this->eyelid->calculate(0);
-        this->last_ros_msg_time = this->current_time.elapsed();
-        this->eyelid->calculate(this->current_time.elapsed());
-        this->_thinking_next_time_notAccepted = current_time.elapsed() + EYE_BLINK_TIME_START_TIME_MS;
-        this->eyelid->set_emotion(NEXT_EMOTION_INIT);
-    }
-}
-
-bool EyeWidget::exec_start()
-{
-    this->_flag_start = true;
-    if (false == this->_flag_initialized) {
-        this->_init();
         this->reload_param();
     }
     this->_timer_start->start(100);
@@ -802,9 +789,6 @@ void EyeWidget::closing()
     this->_flag_running = false;
     if (true == this->_flag_initialized) {
         this->_flag_initialized = false;
-#if LOGGER_ROS_INFO_DETAIL
-        printf("\n==============\n CLOSE APP.\n==============\n");
-#endif
     }
 }
 

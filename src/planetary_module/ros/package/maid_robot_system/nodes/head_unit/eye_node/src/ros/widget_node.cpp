@@ -35,7 +35,7 @@ namespace maid_robot_system
 bool WidgetNode::exec_start()
 {
 #if DEBUG_OUTPUT_WIDGET
-    printf("start...\n");
+    printf("[Widget] start...\n");
 #endif
     return this->_widget->exec_start();
 }
@@ -46,7 +46,7 @@ bool WidgetNode::closing()
     this->_widget->closing();
     this->_app->closeAllWindows();
 #if DEBUG_OUTPUT_WIDGET
-    printf("closing...\n");
+    printf("[Widget] closing...\n");
 #endif
     result = true;
     return result;
