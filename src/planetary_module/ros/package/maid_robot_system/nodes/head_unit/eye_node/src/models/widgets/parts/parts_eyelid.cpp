@@ -118,7 +118,6 @@ void PartsEyelid::load(StParameter param)
             this->right_eye.exit_eyelid = true;
         }
     }
-    printf("_store_size %3.1f\n", this->_store_size);
     this->_store_size = (false == flag_size) ? 0 : buf_size;
 }
 

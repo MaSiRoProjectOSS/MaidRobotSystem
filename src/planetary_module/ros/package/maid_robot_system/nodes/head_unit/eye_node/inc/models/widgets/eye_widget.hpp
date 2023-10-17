@@ -93,7 +93,8 @@ public:
     // =============================
     void cornea_order();
     void emotion(MIENS value);
-    void stare(float size, float distance, float left_y, float left_z, float right_y, float right_z);
+    void dimensions(float dimensions);
+    void stare(float distance, float left_y, float left_z, float right_y, float right_z);
 
 public:
     // =============================
@@ -136,9 +137,12 @@ private:
     int last_ros_msg_time;
     int last_voiceId_time;
 
-    bool flag_first_request                 = false;
     bool flag_voice_id                      = false;
     control_state thinking_flag_notAccepted = control_state::STATE_FREE;
+
+    StVector _request_left;
+    StVector _request_right;
+    float _request_distance;
 
 private:
     // =============================

@@ -28,7 +28,7 @@
 #define EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER (6000.0)
 /* ============================================= */
 
-#define LOST_ROS_MSG_TIMEOUT_SECONDS (1.5)
+#define LOST_ROS_MSG_TIMEOUT_SECONDS (2.5 * 1000)
 #define EYE_BLINK_TIME_START_TIME_MS (1000 * 10)
 #define VOICE_MESSAGE_TIMEOUT_MS     (1000 * 3)
 /* ============================================= */

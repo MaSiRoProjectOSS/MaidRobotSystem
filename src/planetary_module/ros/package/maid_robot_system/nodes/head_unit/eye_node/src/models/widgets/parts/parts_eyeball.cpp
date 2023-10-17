@@ -276,25 +276,25 @@ void PartsEyeball::set_param(StParameter param, StVector left_eye_center, StVect
     this->left_eye.setting(param.left_eye, left_eye_center.x + param.left_eye.eyeball.x, left_eye_center.y + param.left_eye.eyeball.y);
     this->right_eye.setting(param.right_eye, right_eye_center.x + param.right_eye.eyeball.x, right_eye_center.y + param.right_eye.eyeball.y);
 #if DEBUG_OUTPUT_WIDGET
-    // printf("============== Eyeball ===============\n");
+    printf("=============== Eyeball Postion ==============\n");
     printf("  Left\n");
-    printf("    Center (x,y) = (%d,%d)\n", this->left_eye.center.x, this->left_eye.center.y);
-    printf("    Size   (w,h) = (%d,%d)\n", this->left_eye.size.width, this->left_eye.size.height);
+    printf("    Center (x,y) = (%3.1f,%3.1f)\n", this->left_eye.center.x, this->left_eye.center.y);
+    printf("    Size   (w,h) = (%3.1f,%3.1f)\n", this->left_eye.size.width, this->left_eye.size.height);
     printf("  Right\n");
-    printf("    Center (x,y) = (%d,%d)\n", this->right_eye.center.x, this->right_eye.center.y);
-    printf("    Size   (w,h) = (%d,%d)\n", this->right_eye.size.width, this->right_eye.size.height);
+    printf("    Center (x,y) = (%3.1f,%3.1f)\n", this->right_eye.center.x, this->right_eye.center.y);
+    printf("    Size   (w,h) = (%3.1f,%3.1f)\n", this->right_eye.size.width, this->right_eye.size.height);
 #endif
     /* ============================================= */
 }
 
-void PartsEyeball::set_dimensions(float value)
+void PartsEyeball::set_dimensions(float dimensions)
 {
-    if (EYEBALL_DIMENSIONS_MIN > value) {
+    if (EYEBALL_DIMENSIONS_MIN > dimensions) {
         this->_request_dimensions = EYEBALL_DIMENSIONS_MIN;
-    } else if (EYEBALL_DIMENSIONS_MAX < value) {
+    } else if (EYEBALL_DIMENSIONS_MAX < dimensions) {
         this->_request_dimensions = EYEBALL_DIMENSIONS_MAX;
     } else {
-        this->_request_dimensions = value;
+        this->_request_dimensions = dimensions;
     }
 }
 

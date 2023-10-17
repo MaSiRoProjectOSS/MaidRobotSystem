@@ -199,13 +199,12 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
             this->_widget->emotion(MIENS::miens_normal);
             break;
     }
-    (void)this->_widget->set_msg_eye(msg.size,
-                                     msg.distance,
-
-                                     msg.left_y,
-                                     msg.left_z,
-                                     msg.right_y,
-                                     msg.right_z);
+    (void)this->_widget->dimensions(msg.dimensions);
+    (void)this->_widget->stare(msg.distance, //
+                               msg.left_y,
+                               msg.left_z,
+                               msg.right_y,
+                               msg.right_z);
 }
 
 // =============================

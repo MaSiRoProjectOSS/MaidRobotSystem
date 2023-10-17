@@ -16,7 +16,7 @@ int32 EFFECT_CORNEA_ORDER  = 1
 
 int32       emotions
 int32       cornea_effect
-float32     size
+float32     dimensions
 float32     distance
 
 float32     left_y

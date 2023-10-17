@@ -14,23 +14,87 @@ namespace maid_robot_system
 
 void EyeWidget::calculate()
 {
-    int current = current_time.elapsed();
-    if ((0 != this->eyeball->right_eye.target.x) || (0 != this->eyeball->right_eye.target.y)  //
-        || (0 != this->eyeball->left_eye.target.x) || (0 != this->eyeball->left_eye.target.y) //
-        || (false == flag_first_request)) {
-        int elapsed_times = (current - this->last_ros_msg_time);
+    const int min_per_eye_distance = 8;
+    const int limit_y              = 190;
+    static int previous            = 0;
+    int current                    = current_time.elapsed();
+    if (previous < this->last_ros_msg_time) {
+        previous              = this->last_ros_msg_time;
+        float get_target_y    = ((-this->_request_left.z / 200.0) * param.left_eye.eyelid.height);
+        float get_target_x    = ((-this->_request_left.y / 230.0) * param.left_eye.eyelid.width);
+        float distance_change = min_per_eye_distance - ((this->_request_distance / 1500) * min_per_eye_distance);
 
-        if ((LOST_ROS_MSG_TIMEOUT_SECONDS * 1000) < elapsed_times) {
-            if (false == flag_first_request) {
-                this->eyelid->set_emotion(NEXT_EMOTION_INIT);
-                flag_first_request = true;
+        if (distance_change < 0) {
+            distance_change = 0;
+        }
+        if (distance_change > min_per_eye_distance) {
+            distance_change = min_per_eye_distance;
+        }
+        if (get_target_y > limit_y) {
+            get_target_y = limit_y;
+        }
+        if (get_target_y < -limit_y) {
+            get_target_y = -limit_y;
+        }
+
+        if (abs(get_target_x) < 500 && abs(get_target_y) < 400) {
+            switch (this->thinking_flag_notAccepted) {
+                case control_state::STATE_NOT_ACCEPTED:
+                    if (this->_thinking_next_time_notAccepted < current) {
+                        this->thinking_flag_notAccepted = control_state::STATE_FREE;
+#if DEBUG_OUTPUT_WIDGET
+                        printf("Thinking blink : FREE\n");
+#endif
+                    }
+                    break;
+                case control_state::STATE_ACCEPTED:
+                    if (this->_thinking_next_time_notAccepted < current) {
+                        this->eyelid->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
+                        this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
+                        this->_thinking_next_time_notAccepted
+                                = current + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
+#if DEBUG_OUTPUT_WIDGET
+                        printf("Thinking blink : NOT ACCEPTED\n");
+#endif
+                        break;
+                    }
+                case control_state::STATE_FREE:
+                default:
+                    if (abs(this->eyeball->right_eye.target.y - get_target_y) > 150 || abs(this->eyeball->right_eye.target.x - get_target_x) > 150) {
+                        this->eyelid->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
+
+                        if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
+                            this->_thinking_next_time_notAccepted
+                                    = current + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
+#if DEBUG_OUTPUT_WIDGET
+                            printf("Thinking blink : ACCEPTED\n");
+#endif
+                        }
+
+                        this->thinking_flag_notAccepted = control_state::STATE_ACCEPTED;
+                    }
+
+                    break;
             }
 
-            this->eyeball->set_default();
-            this->last_ros_msg_time = current;
+            if (abs(this->eyeball->right_eye.target.x - get_target_x) > 0) {
+                this->eyeball->left_eye.target.x  = get_target_x - ((param.left_eye.eyeball.width * distance_change) / 100.0);
+                this->eyeball->right_eye.target.x = get_target_x + ((param.right_eye.eyeball.width * distance_change) / 100.0);
+            }
+
+            if (abs(this->eyeball->right_eye.target.y - get_target_y) > 0) {
+                this->eyeball->right_eye.target.y = get_target_y;
+                this->eyeball->left_eye.target.y  = get_target_y;
+            }
         }
-        if (0 > elapsed_times) {
-            this->last_ros_msg_time = current;
+    } else {
+        if ((0 != this->eyeball->right_eye.target.x) || (0 != this->eyeball->right_eye.target.y) //
+            || (0 != this->eyeball->left_eye.target.x) || (0 != this->eyeball->left_eye.target.y)) {
+            int elapsed_times = (current - this->last_ros_msg_time);
+
+            if (LOST_ROS_MSG_TIMEOUT_SECONDS < elapsed_times) {
+                this->eyeball->set_default();
+            }
         }
     }
     //********************************************************************************//
@@ -44,7 +108,6 @@ void EyeWidget::calculate()
             voiceId_time = current;
         }
     }
-    this->update();
 }
 
 void EyeWidget::_update_screen()

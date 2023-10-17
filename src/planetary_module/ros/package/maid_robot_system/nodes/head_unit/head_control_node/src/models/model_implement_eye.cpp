@@ -15,17 +15,17 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
 {
     bool result = false;
 
-    static int emotions = 0;
-    static int size     = 0;
-    static int distance = 0;
-    static int left_y   = 0;
-    static int left_z   = 0;
-    static int right_y  = 0;
-    static int right_z  = 0;
+    static int emotions   = 0;
+    static int dimensions = 0;
+    static int distance   = 0;
+    static int left_y     = 0;
+    static int left_z     = 0;
+    static int right_y    = 0;
+    static int right_z    = 0;
     if (emotions != this->_msg_eye.emotions) {
         result = true;
     }
-    if (size != this->_msg_eye.size) {
+    if (dimensions != this->_msg_eye.dimensions) {
         result = true;
     }
     if (distance != this->_msg_eye.distance) {
@@ -44,24 +44,24 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
         result = true;
     }
     if (true == result) {
-        emotions = this->_msg_eye.emotions;
-        size     = this->_msg_eye.size;
-        distance = this->_msg_eye.distance;
-        left_y   = this->_msg_eye.left_y;
-        left_z   = this->_msg_eye.left_z;
-        right_y  = this->_msg_eye.right_y;
-        right_z  = this->_msg_eye.right_z;
+        emotions   = this->_msg_eye.emotions;
+        dimensions = this->_msg_eye.dimensions;
+        distance   = this->_msg_eye.distance;
+        left_y     = this->_msg_eye.left_y;
+        left_z     = this->_msg_eye.left_z;
+        right_y    = this->_msg_eye.right_y;
+        right_z    = this->_msg_eye.right_z;
     }
 
-    msg.emotions = emotions;
-    msg.size     = size;
-    msg.distance = distance;
-    msg.left_y   = left_y;
-    msg.left_z   = left_z;
-    msg.right_y  = right_y;
-    msg.right_z  = right_z;
+    msg.emotions   = emotions;
+    msg.dimensions = dimensions;
+    msg.distance   = distance;
+    msg.left_y     = left_y;
+    msg.left_z     = left_z;
+    msg.right_y    = right_y;
+    msg.right_z    = right_z;
 }
-void ModelImplement::_calculate_eye(double x, double y, double size, double distance)
+void ModelImplement::_calculate_eye(double x, double y, double dimensions, double distance)
 {
     // this->_msg_eye.emotions = maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_LEFT;
     // this->_msg_eye.emotions = maid_robot_system_interfaces::msg::MrsEye::EMOTION_CLOSE_RIGHT;
@@ -86,7 +86,9 @@ void ModelImplement::_calculate_eye(double x, double y, double size, double dist
 #endif
         if (this->_temp_overall.count_continue_eyelid_wink <= 0) {
             this->_temp_overall.flag_eyelid_wink = false;
+#if DEBUG_OUTPUT_WIDGET
             printf("<WINK> Clear\n");
+#endif
         } else {
             this->_temp_overall.count_continue_eyelid_wink--;
         }
@@ -106,14 +108,14 @@ void ModelImplement::_calculate_eye(double x, double y, double size, double dist
     }
 
     // ===========================================
-    // Postion and size
+    // Postion and dimensions
     // ===========================================
-    this->_msg_eye.left_y   = x;        // Eye position X coordinate (left)
-    this->_msg_eye.left_z   = -y;       // Eye position Y coordinate (left)
-    this->_msg_eye.right_y  = x;        // Eye position X coordinate (right)
-    this->_msg_eye.right_z  = -y;       // Eye position Y coordinate (right)
-    this->_msg_eye.size     = size;     // Eyeball size
-    this->_msg_eye.distance = distance; // About the distance from the eyeball
+    this->_msg_eye.left_y     = x;          // Eye position X coordinate (left)
+    this->_msg_eye.left_z     = -y;         // Eye position Y coordinate (left)
+    this->_msg_eye.right_y    = x;          // Eye position X coordinate (right)
+    this->_msg_eye.right_z    = -y;         // Eye position Y coordinate (right)
+    this->_msg_eye.dimensions = dimensions; // Eyeball dimensions
+    this->_msg_eye.distance   = distance;   // About the distance from the eyeball
 }
 
 bool ModelImplement::set_value_tiredness(float data, double seconds)

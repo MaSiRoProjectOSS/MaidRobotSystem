@@ -780,6 +780,7 @@ void EyeWidget::_init()
         this->last_ros_msg_time = this->current_time.elapsed();
         this->eyelid->calculate(this->current_time.elapsed());
         this->_thinking_next_time_notAccepted = current_time.elapsed() + EYE_BLINK_TIME_START_TIME_MS;
+        this->eyelid->set_emotion(NEXT_EMOTION_INIT);
     }
 }
 
