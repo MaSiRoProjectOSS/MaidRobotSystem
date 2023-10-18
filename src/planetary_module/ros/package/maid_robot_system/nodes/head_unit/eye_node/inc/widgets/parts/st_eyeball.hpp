@@ -7,6 +7,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
 #include "models/data_structure.hpp"
 

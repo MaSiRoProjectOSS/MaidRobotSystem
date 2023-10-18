@@ -10,8 +10,6 @@
 
 namespace maid_robot_system
 {
-#define DEBUG_VIEW 1
-
 void EyeWidget::_screen_calculate()
 {
     const int min_per_eye_distance = 8;

@@ -17,10 +17,6 @@
 
 namespace maid_robot_system
 {
-#ifndef DEBUG_OUTPUT_PARAM_LV
-#define DEBUG_OUTPUT_PARAM_LV 0
-#endif
-
 bool EyeWidget::load()
 {
     bool result = false;
