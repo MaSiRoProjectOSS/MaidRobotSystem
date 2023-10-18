@@ -101,7 +101,7 @@ void EyeWidget::_screen_calculate()
     if (true == this->flag_voice_id) {
         if (VOICE_MESSAGE_TIMEOUT_MS < (current - this->last_voiceId_time)) {
             this->flag_voice_id = false;
-            this->eyeball->set_state_cornea(PartsEyeball::CorneaState::Normal);
+            this->eyeball->set_state_cornea(CORNEA_STATE_ID_NORMAL);
         }
     }
     //********************************************************************************//

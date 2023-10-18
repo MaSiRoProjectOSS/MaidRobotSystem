@@ -25,15 +25,18 @@ public:
         std::vector<StImageMap> vitreous;
 #if DRAW_CORNEA_OUTSIDE
         std::vector<StImageMap> cornea_outside;
-        QMatrix matrix_cornea_outside;
+        QTransform matrix_cornea_outside;
 #endif
 #if DRAW_CORNEA_INSIDE
         std::vector<StImageMap> cornea_inside;
-        QMatrix matrix_cornea_inside;
+        QTransform matrix_cornea_inside;
 #endif
         bool exit_vitreous       = false;
         bool exit_cornea_outside = false;
         bool exit_cornea_inside  = false;
+
+        QPixmap buf_cornea_outside{ 1, 1 };
+        QPixmap buf_cornea_inside{ 1, 1 };
     };
 
 public:
@@ -52,6 +55,11 @@ public:
     QPixmap eyeball{ 1, 1 };
     QPixmap cornea_outside{ 1, 1 };
     QPixmap cornea_inside{ 1, 1 };
+    double speed_cornea_outside   = 0;
+    double speed_cornea_inside    = 0;
+    StVector scale_cornea_outside = 0;
+    StVector scale_cornea_inside  = 0;
+
     StImageStorage store;
     uint elapsed = 0;
     StVector pos;
@@ -68,8 +76,8 @@ public:
 
     int ini_rotation;
 
-    StVector draw_cornea_anime;
-    StVector draw_cornea_anime2;
+    StRectangle draw_cornea_anime;
+    StRectangle draw_cornea_anime2;
     StVector size_cornea_anime;
     StVector size_cornea_anime2;
     int cornea_outside_angle = 0;

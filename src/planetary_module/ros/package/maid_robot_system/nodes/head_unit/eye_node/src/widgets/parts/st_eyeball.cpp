@@ -17,6 +17,12 @@ namespace maid_robot_system
 StEyeball::StEyeball()
 {
     this->rect_ciliary.setRect(0, 0, 100, 100);
+#if DRAW_CORNEA_OUTSIDE
+    this->store.matrix_cornea_outside.reset();
+#endif
+#if DRAW_CORNEA_INSIDE
+    this->store.matrix_cornea_inside.reset();
+#endif
 }
 StEyeball::~StEyeball()
 {

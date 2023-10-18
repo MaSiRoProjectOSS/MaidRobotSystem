@@ -1,5 +1,12 @@
 {
     "TODO": [
+        "優先度づけ",
+        "  * corneaの描画位置がずれている",
+        "  * 白目部分のrectangle対応",
+        "  * もっと高速に描画できない？",
+        "  * index計算をパーセントに",
+        "  * size変化が急激すぎる",
+        "",
         "白目部分の回転が出来てない（肌を削除する関係上、必須）",
         "  * 白目は、毎回書いているけど、image化する？viewpointで対応？",
         "回転すると瞳の大きさも変わる。描画範囲で指定しているからと思われる",
@@ -19,6 +26,10 @@
         "瞳操作メッセージの送信",
         "サイズは、倍速をつける？最低速度をつける方針でいく",
         "  * 急激なサイズ変更するときは、瞬きする",
+        "エフェクト対応する",
+        "  * inside とかじゃなくて、設定された配列で管理",
+        "Keep_openの対応をする",
+        "rectangleとimageは一緒にする",
         ""
     ],
     "description": [
@@ -33,7 +44,7 @@
     "name": "Ayame",
     "path": "/opt/MaidRobotSystem/data/cast/Ayame/",
     "display": {
-        "resolution": 0.5
+        "resolution": 1.0
     },
     "rectangle": {
         "left": {
@@ -49,7 +60,7 @@
                 }
             },
             "eyeball": {
-                "descend": -0.3,
+                "descend": -0.2,
                 "size_rate": {
                     "width": 0.8,
                     "height": 1
@@ -65,8 +76,8 @@
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.8,
-                        "height": 0.6
+                        "width": 0.7,
+                        "height": 0.5
                     },
                     "speed": 1.0
                 },
@@ -74,10 +85,10 @@
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.5,
+                        "width": 0.4,
                         "height": 0.3
                     },
-                    "speed": 1.0
+                    "speed": -1.0
                 }
             }
         },
@@ -94,7 +105,7 @@
                 }
             },
             "eyeball": {
-                "descend": -0.3,
+                "descend": -0.2,
                 "size_rate": {
                     "width": 0.8,
                     "height": 1
@@ -110,16 +121,16 @@
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.8,
-                        "height": 0.6
+                        "width": 0.7,
+                        "height": 0.5
                     },
-                    "speed": 1.0
+                    "speed": -1.0
                 },
                 "inside": {
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.5,
+                        "width": 0.4,
                         "height": 0.3
                     },
                     "speed": 1.0
@@ -387,5 +398,117 @@
                 ]
             }
         }
+    },
+    "effect": {
+        "cornea": [
+            {
+                "id": 0,
+                "next_id": -1,
+                "term_ms": {
+                    "default": 5000,
+                    "rand": 10
+                },
+                "outside": {
+                    "rotate": 0.0,
+                    "move": [
+                        {
+                            "y": 0,
+                            "z": 0
+                        },
+                        {
+                            "y": 0,
+                            "z": 0
+                        }
+                    ],
+                    "zoom": [
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        },
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        }
+                    ]
+                },
+                "inside": {
+                    "rotate": 0.0,
+                    "move": [
+                        {
+                            "y": 0,
+                            "z": 0
+                        },
+                        {
+                            "y": 0,
+                            "z": 0
+                        }
+                    ],
+                    "zoom": [
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        },
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        }
+                    ]
+                }
+            },
+            {
+                "id": 1,
+                "next_id": 0,
+                "term_ms": {
+                    "default": 5000,
+                    "rand": 10
+                },
+                "outside": {
+                    "rotate": 0.0,
+                    "move": [
+                        {
+                            "y": 0,
+                            "z": 0
+                        },
+                        {
+                            "y": 0,
+                            "z": 0
+                        }
+                    ],
+                    "zoom": [
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        },
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        }
+                    ]
+                },
+                "inside": {
+                    "rotate": 0.0,
+                    "move": [
+                        {
+                            "y": 0,
+                            "z": 0
+                        },
+                        {
+                            "y": 0,
+                            "z": 0
+                        }
+                    ],
+                    "zoom": [
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        },
+                        {
+                            "width": 1.0,
+                            "height": 1.0
+                        }
+                    ]
+                }
+            }
+        ]
     }
 }

@@ -93,6 +93,9 @@ void PartsEyelid::load(StParameter param)
         }
         if (0 < (int)this->left_eye.store.size()) {
             this->left_eye.exit_eyelid = true;
+#if DEBUG_OUTPUT_LOAD_IMAGE
+            printf("    left_eye/eyelid\n");
+#endif
         }
     }
 
@@ -127,6 +130,9 @@ void PartsEyelid::load(StParameter param)
         }
         if (0 < (int)this->right_eye.store.size()) {
             this->right_eye.exit_eyelid = true;
+#if DEBUG_OUTPUT_LOAD_IMAGE
+            printf("    right_eye/eyelid\n");
+#endif
         }
     }
     this->_store_size = (false == flag_size) ? 0 : buf_size;

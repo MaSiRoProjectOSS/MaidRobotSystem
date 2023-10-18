@@ -27,6 +27,7 @@
 #include <QPixmap>
 #include <QTime>
 #include <QTimer>
+#include <QTranslator>
 #include <QVector>
 #include <QWidget>
 #include <functional>

@@ -12,7 +12,7 @@ namespace maid_robot_system
 {
 void EyeWidget::cornea_order()
 {
-    this->eyeball->set_state_cornea(PartsEyeball::CorneaState::Receiving);
+    this->eyeball->set_state_cornea(CORNEA_STATE_ID_RECEIVING);
 
     this->last_voiceId_time = this->current_time.elapsed();
     this->flag_voice_id     = true;

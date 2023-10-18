@@ -24,17 +24,12 @@
 #include <string>
 #include <vector>
 
+#define CORNEA_STATE_ID_NORMAL    0
+#define CORNEA_STATE_ID_RECEIVING 1
+
 namespace maid_robot_system
 {
 class PartsEyeball {
-public:
-    typedef enum ENUM_STATE
-    {
-        Normal,
-        Receiving,
-
-    } CorneaState;
-
 public:
     // =============================
     // Constructor
@@ -68,22 +63,22 @@ public:
     // =============================
     void set_param(StParameter param, StVector left_eye_center, StVector right_eye_center);
     void set_dimensions(float value);
-    void set_state_cornea(CorneaState state);
+    int set_state_cornea(int id);
+    int set_state_eyeball(int id);
     void set_default();
 
 private:
     // =============================
     // PRIVATE : Function
     // =============================
-    void _drawing(ENUM_STATE state);
-    int _get_index(ENUM_STATE state);
 
 private:
     // =============================
     // PRIVATE : Variable
     // =============================
     QPixmap _blank{ 1, 1 };
-    ENUM_STATE _request_cornea_state;
+    int _request_eyeball_id   = 0;
+    int _request_cornea_id    = CORNEA_STATE_ID_NORMAL;
     float _request_dimensions = EYEBALL_DIMENSIONS_DEFAULT;
     float _dimensions         = EYEBALL_DIMENSIONS_DEFAULT;
 };

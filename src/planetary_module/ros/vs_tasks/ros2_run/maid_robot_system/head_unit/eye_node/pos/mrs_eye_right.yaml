@@ -2,7 +2,7 @@ emotions: 0
 cornea_effect: 0
 dimensions: 1.0
 distance: 1.0
-left_y: 100.0
+left_y: 50.0
 left_z: 0.0
-right_y: 100.0
+right_y: 50.0
 right_z: 0.0

@@ -40,6 +40,9 @@ void EyeWidget::resizeGL(int w, int h)
 #endif
     this->reload_param();
     this->_flag_reload = true;
+#if DEBUG_OUTPUT_OPEN_GL
+    printf("* resizeGL end\n");
+#endif
 }
 
 void EyeWidget::paintGL()
@@ -49,7 +52,13 @@ void EyeWidget::paintGL()
 #endif
     if (true == this->_flag_reload) {
         this->_flag_reload = false;
+        this->eyeball->set_state_eyeball(-2);
+        this->eyeball->set_state_cornea(-2);
+
         this->load();
+#if DEBUG_OUTPUT_OPEN_GL
+        printf("* paintGL : load image\n");
+#endif
     }
     int current = this->current_time.elapsed();
     this->_screen_calculate();
