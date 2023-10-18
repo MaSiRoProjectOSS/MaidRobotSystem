@@ -6,7 +6,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "models/widgets/eye_widget.hpp"
+#include "widgets/eye_widget.hpp"
 
 #include <exception>
 #include <filesystem>

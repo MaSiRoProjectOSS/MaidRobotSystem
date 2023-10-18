@@ -6,7 +6,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "models/widgets/parts/parts_eyelid.hpp"
+#include "widgets/parts/parts_eyelid.hpp"
 
 #include <filesystem>
 #include <iomanip>
@@ -162,6 +162,10 @@ void PartsEyelid::set_param(StParameter param)
 #endif
 }
 
+void PartsEyelid::blink()
+{
+    this->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_QUICKLY, true);
+}
 void PartsEyelid::set_eye_blink(blink_type eye_emotion, bool start_flag)
 {
     this->_eye_blink_time = this->set_eye_blink_time(eye_emotion);

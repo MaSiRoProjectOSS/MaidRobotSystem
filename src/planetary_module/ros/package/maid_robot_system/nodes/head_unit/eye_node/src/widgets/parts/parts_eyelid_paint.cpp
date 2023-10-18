@@ -6,7 +6,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "models/widgets/parts/parts_eyelid.hpp"
+#include "widgets/parts/parts_eyelid.hpp"
 
 namespace maid_robot_system
 {

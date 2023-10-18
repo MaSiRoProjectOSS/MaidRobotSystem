@@ -7,7 +7,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2023-.
  *
  */
-#include "models/widgets/parts/st_eyeball.hpp"
+#include "widgets/parts/st_eyeball.hpp"
 
 namespace maid_robot_system
 {

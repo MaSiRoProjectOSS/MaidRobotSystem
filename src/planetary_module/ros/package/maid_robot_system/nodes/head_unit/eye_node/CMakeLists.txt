@@ -55,20 +55,20 @@ add_executable(${NODE_NAME}
 
   src/models/log_store.cpp
 
-  src/models/widgets/parts/parts_eyeball.cpp
-  src/models/widgets/parts/parts_eyeball_paint.cpp
-  src/models/widgets/parts/st_eyeball.cpp
+  src/widgets/parts/parts_eyeball.cpp
+  src/widgets/parts/parts_eyeball_paint.cpp
+  src/widgets/parts/st_eyeball.cpp
 
-  src/models/widgets/parts/parts_eyelid.cpp
-  src/models/widgets/parts/parts_eyelid_paint.cpp
-  src/models/widgets/parts/st_eyelid.cpp
+  src/widgets/parts/parts_eyelid.cpp
+  src/widgets/parts/parts_eyelid_paint.cpp
+  src/widgets/parts/st_eyelid.cpp
 
-  src/models/widgets/eye_widget_gl_events.cpp
-  src/models/widgets/eye_widget_loader.cpp
-  src/models/widgets/eye_widget_log.cpp
-  src/models/widgets/eye_widget_paint.cpp
-  src/models/widgets/eye_widget_private.cpp
-  src/models/widgets/eye_widget_public.cpp
+  src/widgets/eye_widget_gl_events.cpp
+  src/widgets/eye_widget_loader.cpp
+  src/widgets/eye_widget_log.cpp
+  src/widgets/eye_widget_paint.cpp
+  src/widgets/eye_widget_private.cpp
+  src/widgets/eye_widget_public.cpp
 )
 
 target_include_directories(${NODE_NAME}

@@ -6,7 +6,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2020-.
  *
  */
-#include "models/widgets/parts/parts_eyeball.hpp"
+#include "widgets/parts/parts_eyeball.hpp"
 
 #include <filesystem>
 

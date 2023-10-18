@@ -12,9 +12,8 @@
 
 #include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
-#include "models/calibration.hpp"
 #include "models/data_structure.hpp"
-#include "models/widgets/eye_widget.hpp"
+#include "widgets/eye_widget.hpp"
 
 #include <QApplication>
 #include <string>

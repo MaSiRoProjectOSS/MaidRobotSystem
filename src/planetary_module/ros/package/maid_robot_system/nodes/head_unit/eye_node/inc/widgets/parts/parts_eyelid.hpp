@@ -13,7 +13,6 @@
 #include "maid_robot_system/common_structure.hpp"
 #include "maid_robot_system/emotion.hpp"
 #include "math.h"
-#include "models/calibration.hpp"
 #include "models/data_structure.hpp"
 #include "st_eyelid.hpp"
 
@@ -75,6 +74,7 @@ public:
     void load(StParameter param);
     void update_background(QPainter &painter, St2DRectangle screen_size);
     void update(QPainter &painter);
+    void blink();
 
 public:
     // =============================

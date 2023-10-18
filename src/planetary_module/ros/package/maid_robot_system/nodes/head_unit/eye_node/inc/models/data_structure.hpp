@@ -10,7 +10,7 @@
 #ifndef MRS_EYE_NODE_DATA_STRUCTURE_HPP
 #define MRS_EYE_NODE_DATA_STRUCTURE_HPP
 
-#include "calibration.hpp"
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
 
 #include <QPixmap>
