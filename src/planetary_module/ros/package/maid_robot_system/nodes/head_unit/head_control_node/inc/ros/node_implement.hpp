@@ -89,9 +89,9 @@ private:
     // =============================
     // CONST
     // =============================
-    const int CONFIG_QOS               = 255;
-    const int CONFIG_SUBSCRIPTION_SIZE = 2;
-    const std::chrono::milliseconds TP_MSEC{ 16 };
+    const rclcpp::QoS DEPTH_PUBLISHER    = rclcpp::QoS(5);
+    const rclcpp::QoS DEPTH_SUBSCRIPTION = rclcpp::QoS(2);
+    const std::chrono::milliseconds PERIOD_MSEC{ 16 };
 
     // =============================
     // ROS Topic / Service / Action

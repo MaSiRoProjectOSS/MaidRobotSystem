@@ -69,11 +69,10 @@ private:
     // =============================
     // CONST
     // =============================
-    const int CONFIG_QOS               = 255;
-    const int CONFIG_SUBSCRIPTION_SIZE = 5;
-    const std::chrono::milliseconds TP_MSEC{ 1000 / DRAWING_MAX_FPS };
+    const rclcpp::QoS DEPTH_SUBSCRIPTION = rclcpp::QoS(5);
+    const std::chrono::milliseconds PERIOD_MSEC{ 1000 / DRAWING_MAX_FPS };
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-    const std::chrono::milliseconds TP_OUTPUT_STATE_MSEC{ LOGGER_ROS_INFO_OUTPUT_REPORT_TIME };
+    const std::chrono::milliseconds PERIOD_OUTPUT_REPORT_MSEC{ LOGGER_ROS_INFO_OUTPUT_REPORT_TIME };
 #endif
 
 private:

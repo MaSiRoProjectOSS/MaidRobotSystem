@@ -37,12 +37,12 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
         this->_sub_mrs_eye =                                                          //
                 this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
                         this->MRS_TOPIC_INPUT,                                        //
-                        this->CONFIG_SUBSCRIPTION_SIZE,                               //
+                        this->DEPTH_SUBSCRIPTION,                                     //
                         std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
-        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
+        this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&InteractionNode::_callback_timer, this));
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-        this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
+        this->_ros_output_state = this->create_wall_timer(this->PERIOD_OUTPUT_REPORT_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
 #endif
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");

@@ -76,10 +76,10 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     // set publisher
     this->_pub_text = this->create_publisher<std_msgs::msg::String>( //
             this->MRS_OUTPUT_VOICE_TEXT,                             //
-            rclcpp::QoS(this->CONFIG_QOS)                            //
+            this->DEPTH_PUBLISHER                                    //
     );
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()
