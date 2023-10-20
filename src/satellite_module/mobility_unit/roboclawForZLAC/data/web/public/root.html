@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link href='general.css' rel='stylesheet' type='text/css' media='all'>
+    <link href='custom.css' rel='stylesheet' type='text/css' media='all'>
+    <script type='text/javascript' src='ajax.js'></script>
+    <script type='text/javascript' src='top.js'></script>
+    <title>Roboclaw for ZLAC</title>
+</head>
+
+<body>
+    <h1>Roboclaw for ZLAC</h1>
+    <div class="switchStop" onclick="JS_Ctrl.stop('swEmergency')">
+        <input type="checkbox" id="swEmergency" disabled="dis">
+        <label for="swEmergency">
+            <span>Emergency</span>
+            <div class="swImg"></div>
+        </label>
+    </div>
+    <div class="switchButton" onclick="JS_Ctrl.log_filter()">
+        <input type="checkbox" id="swFilterDirect" disabled="dis">
+        <label for="swFilterDirect">
+            <span>Log filter</span>
+            <div class="swImg"></div>
+        </label>
+    </div>
+    <div class="switchButton" onclick="JS_Ctrl.log_ch()">
+        <input type="checkbox" id="swLogSize" disabled="dis">
+        <label for="swFilterDirect">
+            <span id="sfd_cnt">Log Size : 25</span>
+            <div class="swImg">
+                <div class="initial_txt"></div>
+            </div>
+        </label>
+    </div>
+    <div class="next_line"></div>
+    <hr class="hr3">
+    <article class='article_left'>
+        <table>
+            <thead>
+                <tr>
+                    <th>ERROR</th>
+                    <th>LEFT</th>
+                    <th>RIGHT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>stop_state</td>
+                    <td id='l_ess' class='dl'>-</td>
+                    <td id='r_ess' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>startup_state</td>
+                    <td id='l_esu' class='dl'>-</td>
+                    <td id='r_esu' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>over_current</td>
+                    <td id='l_ec' class='dl'>-</td>
+                    <td id='r_ec' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>encoder_error</td>
+                    <td id='l_ee' class='dl'>-</td>
+                    <td id='r_ee' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>overheat</td>
+                    <td id='l_eh' class='dl'>-</td>
+                    <td id='r_eh' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>voltage[over]</td>
+                    <td id='l_eov' class='dl'>-</td>
+                    <td id='r_eov' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>voltage[under]</td>
+                    <td id='l_euv' class='dl'>-</td>
+                    <td id='r_euv' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>overload</td>
+                    <td id='l_eol' class='dl'>-</td>
+                    <td id='r_eol' class='dr'>-</td>
+                </tr>
+                <tr>
+                    <td>not_connection</td>
+                    <td id='l_enc' class='dl'>-</td>
+                    <td id='r_enc' class='dr'>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+    <article class='article_left'>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan='2'>INFORMATION</th>
+                    <th>[unit]</th>
+                    <th class="tb_val_width">LEFT</th>
+                    <th class="tb_val_width">RIGHT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan='2'>update time</td>
+                    <td>[s]</td>
+                    <td id='l_it' class='dl'>0:0:0</td>
+                    <td id='r_it' class='dr'>0:0:0</td>
+                </tr>
+                <tr>
+                    <td colspan='2'>current</td>
+                    <td>[mA]</td>
+                    <td id='l_ic' class='dl'>0</td>
+                    <td id='r_ic' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td colspan='2'>voltage</td>
+                    <td>[mV]</td>
+                    <td id='l_iv' class='dl'>0</td>
+                    <td id='r_iv' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td rowspan='2'>speed</td>
+                    <td>request</td>
+                    <td>[rpm]</td>
+                    <td id='l_sr' class='dl'>0</td>
+                    <td id='r_sr' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td>current</td>
+                    <td>[rpm]</td>
+                    <td id='l_sc' class='dl'>0</td>
+                    <td id='r_sc' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td rowspan='5'>position</td>
+                    <td>request</td>
+                    <td>[pos]</td>
+                    <td id='l_pr' class='dl'>0</td>
+                    <td id='r_pr' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td>given</td>
+                    <td>[pos]</td>
+                    <td id='l_pg' class='dl'>0</td>
+                    <td id='r_pg' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td rowspan='2'>feedback</td>
+                    <td>[pos]</td>
+                    <td id='l_pf' class='dl'>0</td>
+                    <td id='r_pf' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td>[deg]</td>
+                    <td id='l_pfd' class='dl'>0</td>
+                    <td id='r_pfd' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td>speed</td>
+                    <td>[rpm]</td>
+                    <td id='l_ps' class='dl'>0</td>
+                    <td id='r_ps' class='dr'>0</td>
+                </tr>
+                <tr>
+                    <td rowspan='1'>torque</td>
+                    <td>request</td>
+                    <td>[mA]</td>
+                    <td id='l_tr' class='dl'>0</td>
+                    <td id='r_tr' class='dr'>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+    <article class='article_left'>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan='2'>CONFIGURATION(1)</th>
+                    <th>[unit]</th>
+                    <th class="tb_val_width">VALUE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan='2'>MODE</td>
+                    <td>[-]</td>
+                    <td id='c_mo'>--</td>
+                </tr>
+                <tr>
+                    <td colspan='2'>RATED CURRENT</td>
+                    <td>[mW]</td>
+                    <td id='c_ma'>--</td>
+                </tr>
+                <tr>
+                    <td colspan='2'>RUNNING</td>
+                    <td>[-]</td>
+                    <td id='c_fr'>--</td>
+                </tr>
+                <tr>
+                    <td rowspan='3'>SPEED</td>
+                    <td>LIMIT</td>
+                    <td>[rpm]</td>
+                    <td id='c_sm'>--</td>
+                </tr>
+                <tr>
+                    <td>ACCELERATION</td>
+                    <td>[ms]</td>
+                    <td id='c_sa'>0</td>
+                </tr>
+                <tr>
+                    <td>DECELERATION</td>
+                    <td>[ms]</td>
+                    <td id='c_sd'>0</td>
+                </tr>
+                <tr>
+                    <td rowspan='2'>POSITION</td>
+                    <td>ABSOLUTE</td>
+                    <td>[-]</td>
+                    <td id='c_pa'>--</td>
+                </tr>
+                <tr>
+                    <td>LIMIT</td>
+                    <td>[rpm]</td>
+                    <td id='c_pl'>--</td>
+                </tr>
+                <tr>
+                    <td rowspan='1'>TORQUE</td>
+                    <td>LIMIT</td>
+                    <td>[mA]</td>
+                    <td id='c_tm'>--</td>
+                </tr>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan='2'>CONFIGURATION(2)</th>
+                    <th class="tb_val_width">LEFT</th>
+                    <th class="tb_val_width">RIGHT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan='4'>GAIN</td>
+                    <td>proportional</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkp' onclick="JS_Ctrl.set_gain(this,'kp',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkp' onclick="JS_Ctrl.set_gain(this,'kp',1)"></td>
+                </tr>
+                <tr>
+                    <td>integral</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gki' onclick="JS_Ctrl.set_gain(this,'ki',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gki' onclick="JS_Ctrl.set_gain(this,'ki',1)"></td>
+                </tr>
+                <tr>
+                    <td>differential</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkd' onclick="JS_Ctrl.set_gain(this,'kd',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkd' onclick="JS_Ctrl.set_gain(this,'kd',1)"></td>
+                </tr>
+                <tr>
+                    <td>feed_forward</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkf' onclick="JS_Ctrl.set_gain(this,'kf',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkf' onclick="JS_Ctrl.set_gain(this,'kf',1)"></td>
+                </tr>
+                <tr>
+                    <td colspan='2'>INVERTED</td>
+                    <td id='l_c_iLe' onclick="JS_Ctrl.set_inverted(this,0)">N</td>
+                    <td id='r_c_iLe' onclick="JS_Ctrl.set_inverted(this,1)">N</td>
+                </tr>
+                <tr>
+                    <td colspan='4'>
+                        <button title="" placeholder="" type="button" onclick="JS_Ctrl.save_config()">SAVE</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </article>
+    <br>
+    <hr class="hr3">
+    <article class='article_left'>
+        <p>DIRECT log</p>
+        <div>
+            <ul id="log_ul_d"></ul>
+        </div>
+    </article>
+    <article class='article_left'>
+        <p>LEFT log</p>
+        <div>
+            <ul id="log_ul_l"></ul>
+        </div>
+    </article>
+    <article class='article_left'>
+        <p>RIGHT log</p>
+        <div>
+            <ul id="log_ul_r"></ul>
+        </div>
+    </article>
+    <article class='article_left'>
+        <p>SYSTEM log</p>
+        <div>
+            <ul id="log_ul_s"></ul>
+        </div>
+    </article>
+</body>
+
+</html>

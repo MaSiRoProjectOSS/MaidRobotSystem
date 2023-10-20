@@ -1,0 +1,64 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.encoding": "utf8",
+		"files.eol": "\n",
+		"doxdocgen.file.versionTag": "@version 0.23.1",
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) {year} / MaSiRo Project."
+		],
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"editor.formatOnSave": true,
+		"markdown-preview-enhanced.singlePreview": false,
+		"markdown-preview-enhanced.scrollSync": true,
+		"search.exclude": {
+			"*.html": true,
+			"__*": true
+		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/.*": false,
+			".vscode": false
+		},
+		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"editor.rulers": [
+			120
+		],
+		"files.associations": {
+			"xtree": "cpp",
+			"*.tcc": "cpp",
+			"string": "cpp"
+		},
+		"cSpell.words": [
+			"Consolas",
+			"CRGB",
+			"darkgrey",
+			"doxdocgen",
+			"doxygen",
+			"endregion",
+			"ensp",
+			"fastled",
+			"fillpix",
+			"forbeslindesay",
+			"nosniff",
+			"onchange",
+			"onclick",
+			"onunload",
+			"PROGMEM",
+			"roboclaw",
+			"taskrunner",
+			"zlac"
+		],
+		"forbeslindesay-taskrunner.source": "Workspace",
+		"forbeslindesay-taskrunner.prefix": "RoboClaw : "
+	}
+}
