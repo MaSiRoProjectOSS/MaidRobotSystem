@@ -10,16 +10,15 @@
 
 namespace maid_robot_system
 {
-void EyeWidget::_screen_calculate()
+void EyeWidget::_screen_calculate(int elapsed, int from_last_time)
 {
     const int min_per_eye_distance = 8;
     const int limit_y              = 190;
     static int previous            = 0;
-    int current                    = this->current_time.elapsed();
     /* ============================================= */
-    // Calculation / Step 1
+    // Calculation / Step 0
     /* ============================================= */
-    int start_time = current;
+    int start_time = elapsed;
     if (previous < this->last_ros_msg_time) {
         previous              = this->last_ros_msg_time;
         float get_target_y    = ((-this->_request_left.z / 200.0) * param.left_eye.eyelid.height);
@@ -42,7 +41,7 @@ void EyeWidget::_screen_calculate()
         if (abs(get_target_x) < 500 && abs(get_target_y) < 400) {
             switch (this->thinking_flag_notAccepted) {
                 case control_state::STATE_NOT_ACCEPTED:
-                    if (this->_thinking_next_time_notAccepted < current) {
+                    if (this->_thinking_next_time_notAccepted < elapsed) {
                         this->thinking_flag_notAccepted = control_state::STATE_FREE;
 #if DEBUG_OUTPUT_WIDGET
                         printf("Thinking blink : FREE\n");
@@ -50,11 +49,11 @@ void EyeWidget::_screen_calculate()
                     }
                     break;
                 case control_state::STATE_ACCEPTED:
-                    if (this->_thinking_next_time_notAccepted < current) {
+                    if (this->_thinking_next_time_notAccepted < elapsed) {
                         this->eyelid->set_eye_blink(PartsEyelid::blink_type::BLINK_TYPE_MIN_MAX, false);
                         this->thinking_flag_notAccepted = control_state::STATE_NOT_ACCEPTED;
                         this->_thinking_next_time_notAccepted
-                                = current + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
+                                = elapsed + (int)func_rand(EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_NOT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                         printf("Thinking blink : NOT ACCEPTED\n");
 #endif
@@ -67,7 +66,7 @@ void EyeWidget::_screen_calculate()
 
                         if (control_state::STATE_FREE == this->thinking_flag_notAccepted) {
                             this->_thinking_next_time_notAccepted
-                                    = current + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
+                                    = elapsed + (int)func_rand(EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_LOWER, EYE_BLINK_FREQUENT_ACCEPTED_MILLISECOND_UPPER);
 #if DEBUG_OUTPUT_WIDGET
                             printf("Thinking blink : ACCEPTED\n");
 #endif
@@ -92,26 +91,31 @@ void EyeWidget::_screen_calculate()
     } else {
         if ((0 != this->eyeball->right_eye.target.x) || (0 != this->eyeball->right_eye.target.y) //
             || (0 != this->eyeball->left_eye.target.x) || (0 != this->eyeball->left_eye.target.y)) {
-            if (LOST_ROS_MSG_TIMEOUT_SECONDS < (current - this->last_ros_msg_time)) {
+            if (LOST_ROS_MSG_TIMEOUT_SECONDS < (elapsed - this->last_ros_msg_time)) {
                 this->eyeball->set_default();
             }
         }
     }
     //********************************************************************************//
     if (true == this->flag_voice_id) {
-        if (VOICE_MESSAGE_TIMEOUT_MS < (current - this->last_voiceId_time)) {
+        if (VOICE_MESSAGE_TIMEOUT_MS < (elapsed - this->last_voiceId_time)) {
             this->flag_voice_id = false;
             this->eyeball->set_state_cornea(CORNEA_STATE_ID_NORMAL);
         }
     }
     //********************************************************************************//
+    this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP0, this->current_time.elapsed() - start_time);
+    /* ============================================= */
+    // Calculation / Step 1
+    /* ============================================= */
+    start_time          = this->current_time.elapsed();
+    int eyelid_progress = this->eyelid->calculate(elapsed);
     this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP1, this->current_time.elapsed() - start_time);
     /* ============================================= */
     // Calculation / Step 2
     /* ============================================= */
-    start_time          = this->current_time.elapsed();
-    int eyelid_progress = this->eyelid->calculate(current);
-    this->eyeball->calculate(eyelid_progress, current);
+    start_time = this->current_time.elapsed();
+    this->eyeball->calculate(eyelid_progress, elapsed);
     this->logger->set_index(this->logger->ST_INDEX_CALCULATION_STEP2, this->current_time.elapsed() - start_time);
 }
 
@@ -126,8 +130,7 @@ void EyeWidget::_screen_update()
         painter.begin(this);
     }
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
-    painter.setViewTransformEnabled(true);
-    // painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
+    // painter.setViewTransformEnabled(true);
     painter.scale(this->param.screen_resolution, this->param.screen_resolution);
     this->logger->set_index(this->logger->ST_INDEX_INIT, this->current_time.elapsed() - start_time);
 

@@ -352,8 +352,6 @@ int PartsEyeball::set_state_eyeball(int id)
 
 void PartsEyeball::set_default()
 {
-    this->right_eye.target.set(0, 0, 0);
-    this->left_eye.target.set(0, 0, 0);
     this->set_dimensions(EYEBALL_DIMENSIONS_DEFAULT);
 }
 

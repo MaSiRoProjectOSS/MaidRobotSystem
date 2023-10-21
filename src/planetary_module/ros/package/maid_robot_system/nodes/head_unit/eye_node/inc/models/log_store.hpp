@@ -26,6 +26,7 @@ public:
     typedef enum
     {
         ST_INDEX_INIT,
+        ST_INDEX_CALCULATION_STEP0,
         ST_INDEX_CALCULATION_STEP1,
         ST_INDEX_CALCULATION_STEP2,
         ST_INDEX_DRAW_FOUNDATION,

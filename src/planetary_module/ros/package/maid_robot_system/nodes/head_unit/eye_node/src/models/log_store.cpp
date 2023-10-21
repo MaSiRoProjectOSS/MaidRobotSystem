@@ -69,6 +69,7 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
                         "  Init                  [%7.3f ms]\n"
                         "  Calculate[0]          [%7.3f ms]\n"
                         "  Calculate[1]          [%7.3f ms]\n"
+                        "  Calculate[2]          [%7.3f ms]\n"
                         "  DRAW - foundation     [%7.3f ms]\n"
                         "  DRAW - eyeball        [%7.3f ms]\n"
                         "  DRAW - cornea outside [%7.3f ms]\n"
@@ -76,6 +77,7 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
                         "  DRAW - eyelid         [%7.3f ms]\n"
                         "  FIN                   [%7.3f ms]\n",
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_INIT],
+                        p_spent_time_list[ST_INDEX_LOG::ST_INDEX_CALCULATION_STEP0],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_CALCULATION_STEP1],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_CALCULATION_STEP2],
                         p_spent_time_list[ST_INDEX_LOG::ST_INDEX_DRAW_FOUNDATION],

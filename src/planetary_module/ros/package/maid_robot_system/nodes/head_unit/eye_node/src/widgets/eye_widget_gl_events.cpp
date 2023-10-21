@@ -60,10 +60,12 @@ void EyeWidget::paintGL()
         printf("* paintGL : load image\n");
 #endif
     }
-    int current = this->current_time.elapsed();
-    this->_screen_calculate();
+    int current               = this->current_time.elapsed();
+    static int from_last_time = current;
+    this->_screen_calculate(current, current- from_last_time);
     this->_screen_update();
     this->logger->set_index(this->logger->ST_INDEX_UPDATE, this->current_time.elapsed() - current);
+    from_last_time = current;
 }
 
 } // namespace maid_robot_system

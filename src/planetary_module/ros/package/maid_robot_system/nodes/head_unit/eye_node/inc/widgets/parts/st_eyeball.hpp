@@ -68,8 +68,6 @@ public:
     StVector scale_cornea_inside  = 0;
 
     StImageStorage store;
-    uint elapsed = 0;
-    StVector pos;
     QPointF eyeball_center;
     double calibration_angle     = 0.0;
     double calibration_angle_cos = 0.0;
@@ -79,14 +77,6 @@ public:
     StVector target;
     StVector center;
     StRectangle size;
-    StVector cornea;
-
-    int ini_rotation;
-
-    StVector size_cornea_anime;
-    StVector size_cornea_anime2;
-    int cornea_outside_angle = 0;
-    int cornea_inside_angle  = 0;
 
     int wink_eye_up = 0;
 

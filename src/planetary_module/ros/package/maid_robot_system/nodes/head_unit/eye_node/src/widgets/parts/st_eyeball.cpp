@@ -40,28 +40,6 @@ void StEyeball::eye_p_drive()
     if (target.y != now.y) {
         now.y += (target.y - now.y) * 0.4;
     }
-
-    // cornea_outside_angle
-    cornea_outside_angle++;
-
-    if (360 <= cornea_outside_angle) {
-        cornea_outside_angle = cornea_outside_angle - 360;
-    }
-
-    if (0 > cornea_outside_angle) {
-        cornea_outside_angle = cornea_outside_angle + 360;
-    }
-
-    // cornea_inside_angle
-    cornea_inside_angle -= func_rand(1, 3);
-
-    if (360 <= cornea_inside_angle) {
-        cornea_inside_angle = cornea_inside_angle - 360;
-    }
-
-    if (0 > cornea_inside_angle) {
-        cornea_inside_angle = cornea_inside_angle + 360;
-    }
 }
 
 // =============================
@@ -81,7 +59,6 @@ void StEyeball::setting(StParameter::StEyeSettings param, int center_x, int cent
     center.set(center_x, center_y, 0);
     size.set_size(param.eyeball.width, param.eyeball.height);
     draw_postion.set_size(param.eyeball.width, param.eyeball.height);
-    size_cornea_anime.set(550, 550, 0);
 }
 
 void StEyeball::set_draw_pixel(int progress, double dimensions, double calibration_angle_cos, double calibration_angle_sin)
@@ -92,7 +69,6 @@ void StEyeball::set_draw_pixel(int progress, double dimensions, double calibrati
     double size_width  = dimensions * (this->size.width * (1.0 - (abs(now.x) / (this->size.width * 1.3))));
     double size_height = dimensions * (this->size.height * (1.0 - (abs(now.y) / (this->size.height * 1.3))));
     draw_postion.set_size(size_width * calibration_angle_cos + size_height * calibration_angle_sin, size_width * calibration_angle_sin + size_height * calibration_angle_cos);
-    cornea.set(center.x + now.x, center.y + now.y, 0);
     draw_postion.set_axis(center.x + now.x - (draw_postion.width / 2.0), center.y + now.y - (draw_postion.height / 2.0) - wink_eye_up);
     eye_p_drive();
 }

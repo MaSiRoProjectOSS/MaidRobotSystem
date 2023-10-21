@@ -111,7 +111,7 @@ private:
     // =============================
     // PRIVATE : Function
     // =============================
-    void _screen_calculate();
+    void _screen_calculate(int elapsed, int from_last_time);
     void _screen_update();
     std::string _read_file(const std::string &path);
     std::string _miens_text(MIENS value);
