@@ -126,6 +126,7 @@ void EyeWidget::_screen_update()
         painter.begin(this);
     }
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.setViewTransformEnabled(true);
     // painter.setViewport(0,0,this->window_size_x * 0.5, this->window_size_y * 0.5);
     painter.scale(this->param.screen_resolution, this->param.screen_resolution);
     this->logger->set_index(this->logger->ST_INDEX_INIT, this->current_time.elapsed() - start_time);

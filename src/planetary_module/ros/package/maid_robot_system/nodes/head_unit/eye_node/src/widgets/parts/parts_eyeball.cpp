@@ -144,9 +144,7 @@ void PartsEyeball::load(StParameter param)
                         }
 
                         matrix.rotate(param.left_eye.eyeball.angle + param.left_eye.eyelid.angle);
-                        buff = buff.scaled((param.left_eye.eyeball.width * param.left_eye.cornea_outside.scale.x),
-                                           (param.left_eye.eyeball.height * param.left_eye.cornea_outside.scale.y),
-                                           Qt::IgnoreAspectRatio);
+                        buff = buff.scaled(param.left_eye.eyeball.width, param.left_eye.eyeball.height, Qt::KeepAspectRatio);
 
                         buff = buff.transformed(matrix);
                         list.data.push_back(buff);
@@ -186,9 +184,7 @@ void PartsEyeball::load(StParameter param)
                         }
 
                         matrix.rotate(param.right_eye.eyeball.angle + param.right_eye.eyelid.angle);
-                        buff = buff.scaled((param.right_eye.eyeball.width * param.right_eye.cornea_outside.scale.x),
-                                           (param.right_eye.eyeball.height * param.right_eye.cornea_outside.scale.y),
-                                           Qt::IgnoreAspectRatio);
+                        buff = buff.scaled(param.right_eye.eyeball.width, param.left_eye.eyeball.height, Qt::KeepAspectRatio);
 
                         buff = buff.transformed(matrix);
                         list.data.push_back(buff);
@@ -233,9 +229,7 @@ void PartsEyeball::load(StParameter param)
                         }
 
                         matrix.rotate(param.left_eye.eyeball.angle + param.left_eye.eyelid.angle);
-                        buff = buff.scaled((param.left_eye.eyeball.width * param.left_eye.cornea_inside.scale.x),
-                                           (param.left_eye.eyeball.height * param.left_eye.cornea_inside.scale.y),
-                                           Qt::IgnoreAspectRatio);
+                        buff = buff.scaled(param.left_eye.eyeball.width, param.left_eye.eyeball.height, Qt::KeepAspectRatio);
 
                         buff = buff.transformed(matrix);
                         list.data.push_back(buff);
@@ -275,9 +269,7 @@ void PartsEyeball::load(StParameter param)
                         }
 
                         matrix.rotate(param.right_eye.eyeball.angle + param.right_eye.eyelid.angle);
-                        buff = buff.scaled((param.right_eye.eyeball.width * param.right_eye.cornea_inside.scale.x),
-                                           (param.right_eye.eyeball.height * param.right_eye.cornea_inside.scale.y),
-                                           Qt::IgnoreAspectRatio);
+                        buff = buff.scaled(param.right_eye.eyeball.width, param.left_eye.eyeball.height, Qt::KeepAspectRatio);
 
                         buff = buff.transformed(matrix);
                         list.data.push_back(buff);

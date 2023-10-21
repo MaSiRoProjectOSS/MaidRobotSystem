@@ -55,6 +55,13 @@ public:
     QPixmap eyeball{ 1, 1 };
     QPixmap cornea_outside{ 1, 1 };
     QPixmap cornea_inside{ 1, 1 };
+    QRectF target_cornea_outside;
+    QRectF target_cornea_inside;
+    QRectF source_cornea_outside;
+    QRectF source_cornea_inside;
+    StRectangle size_cornea_outside;
+    StRectangle size_cornea_inside;
+
     double speed_cornea_outside   = 0;
     double speed_cornea_inside    = 0;
     StVector scale_cornea_outside = 0;
@@ -76,8 +83,6 @@ public:
 
     int ini_rotation;
 
-    StRectangle draw_cornea_anime;
-    StRectangle draw_cornea_anime2;
     StVector size_cornea_anime;
     StVector size_cornea_anime2;
     int cornea_outside_angle = 0;

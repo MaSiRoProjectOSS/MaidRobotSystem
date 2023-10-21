@@ -1,7 +1,6 @@
 {
     "TODO": [
         "優先度づけ",
-        "  * corneaの描画位置がずれている",
         "  * 白目部分のrectangle対応",
         "  * もっと高速に描画できない？",
         "  * index計算をパーセントに",
@@ -9,27 +8,24 @@
         "",
         "白目部分の回転が出来てない（肌を削除する関係上、必須）",
         "  * 白目は、毎回書いているけど、image化する？viewpointで対応？",
-        "回転すると瞳の大きさも変わる。描画範囲で指定しているからと思われる",
-        "  * eyeball の回転対応が悪い。（拡大してない）",
         "OpenGL ES対応が不十分",
-        "* 通常に戻す作業",
-        "  * index計算はパーセントによる計算に変える。indexの取得は設定数によって問題が発生する。",
+        "* index計算はパーセントによる計算に変える。indexの取得は設定数によって問題が発生する。",
         "    * 計算式は決定した。パーセントからindexを求めるようにする",
         "      * 100 ->    0(Open  -> Close)",
         "      * 0   -> -100(Close -> Open)",
-        "corneaの対応",
-        "  * 回転中心位置がおかしい",
-        "  * 比率が一致してない",
         "",
         "QMovieの対応",
         "キャンバス対応はできない？",
-        "瞳操作メッセージの送信",
         "サイズは、倍速をつける？最低速度をつける方針でいく",
         "  * 急激なサイズ変更するときは、瞬きする",
         "エフェクト対応する",
         "  * inside とかじゃなくて、設定された配列で管理",
         "Keep_openの対応をする",
-        "rectangleとimageは一緒にする",
+        "jsonのrectangleとimageは一緒にする",
+        "",
+        "画像データを作成する",
+        "",
+        "",
         ""
     ],
     "description": [
@@ -45,6 +41,13 @@
     "path": "/opt/MaidRobotSystem/data/cast/Ayame/",
     "display": {
         "resolution": 1.0
+    },
+    "blink_time": {
+        "quickly_ms": 150,
+        "min_ms": 400,
+        "max_ms": 600,
+        "limit_ms": 15000,
+        "offset_ms": 0
     },
     "rectangle": {
         "left": {
@@ -76,8 +79,8 @@
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.7,
-                        "height": 0.5
+                        "width": 0.6,
+                        "height": 0.95
                     },
                     "speed": 1.0
                 },
@@ -86,7 +89,7 @@
                     "alpha": 255,
                     "size_rate": {
                         "width": 0.4,
-                        "height": 0.3
+                        "height": 0.4
                     },
                     "speed": -1.0
                 }
@@ -121,8 +124,8 @@
                     "enable": true,
                     "alpha": 255,
                     "size_rate": {
-                        "width": 0.7,
-                        "height": 0.5
+                        "width": 0.6,
+                        "height": 0.95
                     },
                     "speed": -1.0
                 },
@@ -131,19 +134,12 @@
                     "alpha": 255,
                     "size_rate": {
                         "width": 0.4,
-                        "height": 0.3
+                        "height": 0.4
                     },
                     "speed": 1.0
                 }
             }
         }
-    },
-    "blink_time": {
-        "quickly_ms": 150,
-        "min_ms": 400,
-        "max_ms": 600,
-        "limit_ms": 15000,
-        "offset_ms": 0
     },
     "image": {
         "left": {
