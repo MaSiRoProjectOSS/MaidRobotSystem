@@ -36,9 +36,10 @@ pip install protobuf==3.20.*
 echo "export DISPLAY=:0" >> ~/.profile
 source ~/.profile
 
+sudo pip install mediapipe
 
 sudo apt install -y build-essential libfontconfig1 mesa-common-dev libglu1-mesa-dev qt*5-dev qml-module-qtquick-controls qml-module-qtquick-controls2
-sudo apt install -y install nlohmann-json3-dev
+sudo apt install -y nlohmann-json3-dev
 ```
 
 ```bash
@@ -56,3 +57,36 @@ export QT_QPA_PLATFORM=offscreen
   * DEBUGはログ内容が多すぎるため、```RCLCPP_INFO_EXPRESSION()```でログ出力を制御することを推奨する。
 
 
+```bash
+cvVersion="4.2.0"
+
+git clone https://github.com/opencv/opencv.git
+cd opencv
+git checkout $cvVersion
+cd ..
+
+git clone https://github.com/opencv/opencv_contrib.git
+cd opencv_contrib
+git checkout $cvVersion
+cd ..
+
+
+cd opencv
+mkdir build
+cd build
+cmake \
+    -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D OPENCV_GENERATE_PKGCONFIG=ON \
+    -D ENABLE_NEON=ON \
+    -D WITH_TBB=ON \
+    -D WITH_V4L=ON \
+    -D WITH_GSTREAMER=ON \
+    -D WITH_FFMPEG=ON \
+    -D WITH_QT=ON \
+    -D WITH_GTK=ON \
+    -D WITH_GTK3=ON \
+    -D WITH_CUDA=ON \
+    -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+    ..
+```
