@@ -21,7 +21,11 @@
  */
 static double func_rand(double min, double max)
 {
-    return min + ((max - min) * ((double)rand() / (1.0 + (double)RAND_MAX)));
+    if (min == max) {
+        return min;
+    } else {
+        return min + ((max - min) * ((double)rand() / (1.0 + (double)RAND_MAX)));
+    }
 }
 
 class StVector {

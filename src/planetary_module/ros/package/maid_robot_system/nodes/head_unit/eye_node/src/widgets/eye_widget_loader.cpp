@@ -341,10 +341,14 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                       = "Get value / left.cornea.outside";
                             this->param.left_eye.cornea_outside.enable = //
                                     settings["rectangle"]["left"]["cornea"]["outside"].value("enable", this->param.left_eye.cornea_outside.enable);
-                            this->param.left_eye.cornea_outside.speed = //
-                                    -settings["rectangle"]["left"]["cornea"]["outside"].value("speed", this->param.left_eye.cornea_outside.speed);
                             this->param.left_eye.cornea_outside.alpha = //
                                     settings["rectangle"]["left"]["cornea"]["outside"].value("alpha", this->param.left_eye.cornea_outside.alpha);
+                            if (true == settings["rectangle"]["left"]["cornea"]["outside"].contains("speed")) {
+                                this->param.left_eye.cornea_outside.speed_min = //
+                                        -settings["rectangle"]["left"]["cornea"]["outside"]["speed"].value("min", this->param.left_eye.cornea_outside.speed_min);
+                                this->param.left_eye.cornea_outside.speed_max = //
+                                        -settings["rectangle"]["left"]["cornea"]["outside"]["speed"].value("max", this->param.left_eye.cornea_outside.speed_max);
+                            }
                             if (true == settings["rectangle"]["left"]["cornea"]["outside"].contains("size_rate")) {
                                 this->param.left_eye.cornea_outside.scale.x = //
                                         settings["rectangle"]["left"]["cornea"]["outside"]["size_rate"].value("width", this->param.left_eye.cornea_outside.scale.x);
@@ -358,10 +362,14 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                      = "Get value / left.cornea.inside";
                             this->param.left_eye.cornea_inside.enable = //
                                     settings["rectangle"]["left"]["cornea"]["inside"].value("enable", this->param.left_eye.cornea_inside.enable);
-                            this->param.left_eye.cornea_inside.speed = //
-                                    -settings["rectangle"]["left"]["cornea"]["inside"].value("speed", this->param.left_eye.cornea_inside.speed);
                             this->param.left_eye.cornea_inside.alpha = //
                                     settings["rectangle"]["left"]["cornea"]["inside"].value("alpha", this->param.left_eye.cornea_inside.alpha);
+                            if (true == settings["rectangle"]["left"]["cornea"]["inside"].contains("speed")) {
+                                this->param.left_eye.cornea_inside.speed_min = //
+                                        -settings["rectangle"]["left"]["cornea"]["inside"]["speed"].value("min", this->param.left_eye.cornea_inside.speed_min);
+                                this->param.left_eye.cornea_inside.speed_max = //
+                                        -settings["rectangle"]["left"]["cornea"]["inside"]["speed"].value("max", this->param.left_eye.cornea_inside.speed_max);
+                            }
                             if (true == settings["rectangle"]["left"]["cornea"]["inside"].contains("size_rate")) {
                                 this->param.left_eye.cornea_inside.scale.x = //
                                         settings["rectangle"]["left"]["cornea"]["inside"]["size_rate"].value("width", this->param.left_eye.cornea_inside.scale.x);
@@ -405,10 +413,14 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                        = "Get value / right.cornea.outside";
                             this->param.right_eye.cornea_outside.enable = //
                                     settings["rectangle"]["right"]["cornea"]["outside"].value("enable", this->param.right_eye.cornea_outside.enable);
-                            this->param.right_eye.cornea_outside.speed = //
-                                    -settings["rectangle"]["right"]["cornea"]["outside"].value("speed", this->param.right_eye.cornea_outside.speed);
                             this->param.right_eye.cornea_outside.alpha = //
                                     settings["rectangle"]["right"]["cornea"]["outside"].value("alpha", this->param.right_eye.cornea_outside.alpha);
+                            if (true == settings["rectangle"]["right"]["cornea"]["outside"].contains("speed")) {
+                                this->param.right_eye.cornea_outside.speed_min = //
+                                        -settings["rectangle"]["right"]["cornea"]["outside"]["speed"].value("min", this->param.right_eye.cornea_outside.speed_min);
+                                this->param.right_eye.cornea_outside.speed_max = //
+                                        -settings["rectangle"]["right"]["cornea"]["outside"]["speed"].value("max", this->param.right_eye.cornea_outside.speed_max);
+                            }
                             if (true == settings["rectangle"]["right"]["cornea"]["outside"].contains("size_rate")) {
                                 this->param.right_eye.cornea_outside.scale.x = //
                                         settings["rectangle"]["right"]["cornea"]["outside"]["size_rate"].value("width", this->param.right_eye.cornea_outside.scale.x);
@@ -422,10 +434,14 @@ bool EyeWidget::set_setting_file(std::string json_file)
                             step                                       = "Get value / right.cornea.inside";
                             this->param.right_eye.cornea_inside.enable = //
                                     settings["rectangle"]["right"]["cornea"]["inside"].value("enable", this->param.right_eye.cornea_inside.enable);
-                            this->param.right_eye.cornea_inside.speed = //
-                                    -settings["rectangle"]["right"]["cornea"]["inside"].value("speed", this->param.right_eye.cornea_inside.speed);
                             this->param.right_eye.cornea_inside.alpha = //
                                     settings["rectangle"]["right"]["cornea"]["inside"].value("alpha", this->param.right_eye.cornea_inside.alpha);
+                            if (true == settings["rectangle"]["right"]["cornea"]["inside"].contains("speed")) {
+                                this->param.right_eye.cornea_inside.speed_min = //
+                                        -settings["rectangle"]["right"]["cornea"]["inside"]["speed"].value("min", this->param.right_eye.cornea_inside.speed_min);
+                                this->param.right_eye.cornea_inside.speed_max = //
+                                        -settings["rectangle"]["right"]["cornea"]["inside"]["speed"].value("max", this->param.right_eye.cornea_inside.speed_max);
+                            }
                             if (true == settings["rectangle"]["right"]["cornea"]["inside"].contains("size_rate")) {
                                 this->param.right_eye.cornea_inside.scale.x = //
                                         settings["rectangle"]["right"]["cornea"]["inside"]["size_rate"].value("width", this->param.right_eye.cornea_inside.scale.x);

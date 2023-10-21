@@ -64,8 +64,10 @@ public:
     StRectangle size_cornea_outside;
     StRectangle size_cornea_inside;
 
-    double speed_cornea_outside   = 0;
-    double speed_cornea_inside    = 0;
+    double speed_min_cornea_outside   = 0;
+    double speed_min_cornea_inside    = 0;
+    double speed_max_cornea_outside   = 0;
+    double speed_max_cornea_inside    = 0;
     StVector scale_cornea_outside = 0;
     StVector scale_cornea_inside  = 0;
 

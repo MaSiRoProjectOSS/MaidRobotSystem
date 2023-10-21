@@ -306,10 +306,15 @@ void PartsEyeball::set_param(StParameter param, StVector left_eye_center, StVect
     this->left_eye.setting(param.left_eye, left_eye_center.x + param.left_eye.eyeball.x, left_eye_center.y + param.left_eye.eyeball.y);
     this->right_eye.setting(param.right_eye, right_eye_center.x + param.right_eye.eyeball.x, right_eye_center.y + param.right_eye.eyeball.y);
 
-    this->left_eye.speed_cornea_outside  = param.left_eye.cornea_outside.speed;
-    this->left_eye.speed_cornea_inside   = param.left_eye.cornea_inside.speed;
-    this->right_eye.speed_cornea_outside = param.right_eye.cornea_outside.speed;
-    this->right_eye.speed_cornea_inside  = param.right_eye.cornea_inside.speed;
+    this->left_eye.speed_min_cornea_outside = param.left_eye.cornea_outside.speed_min;
+    this->left_eye.speed_min_cornea_inside  = param.left_eye.cornea_inside.speed_min;
+    this->left_eye.speed_max_cornea_outside = param.left_eye.cornea_outside.speed_max;
+    this->left_eye.speed_max_cornea_inside  = param.left_eye.cornea_inside.speed_max;
+
+    this->right_eye.speed_min_cornea_outside = param.right_eye.cornea_outside.speed_min;
+    this->right_eye.speed_min_cornea_inside  = param.right_eye.cornea_inside.speed_min;
+    this->right_eye.speed_max_cornea_outside = param.right_eye.cornea_outside.speed_max;
+    this->right_eye.speed_max_cornea_inside  = param.right_eye.cornea_inside.speed_max;
 
     this->left_eye.scale_cornea_outside.set(param.left_eye.cornea_outside.scale.x, param.left_eye.cornea_outside.scale.y, 0);
     this->left_eye.scale_cornea_inside.set(param.left_eye.cornea_inside.scale.x, param.left_eye.cornea_inside.scale.y, 0);

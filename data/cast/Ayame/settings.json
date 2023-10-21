@@ -40,7 +40,7 @@
     "name": "Ayame",
     "path": "/opt/MaidRobotSystem/data/cast/Ayame/",
     "display": {
-        "resolution": 1.0
+        "resolution": 0.5
     },
     "blink_time": {
         "quickly_ms": 150,
@@ -82,7 +82,10 @@
                         "width": 0.6,
                         "height": 0.95
                     },
-                    "speed": 1.0
+                    "speed": {
+                        "min": 0,
+                        "max": 2
+                    }
                 },
                 "inside": {
                     "enable": true,
@@ -91,7 +94,10 @@
                         "width": 0.4,
                         "height": 0.4
                     },
-                    "speed": -1.0
+                    "speed": {
+                        "min": -2,
+                        "max": 0
+                    }
                 }
             }
         },
@@ -127,7 +133,10 @@
                         "width": 0.6,
                         "height": 0.95
                     },
-                    "speed": -1.0
+                    "speed": {
+                        "min": -2,
+                        "max": 0
+                    }
                 },
                 "inside": {
                     "enable": true,
@@ -136,7 +145,10 @@
                         "width": 0.4,
                         "height": 0.4
                     },
-                    "speed": 1.0
+                    "speed": {
+                        "min": 0,
+                        "max": 2
+                    }
                 }
             }
         }
