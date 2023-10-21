@@ -193,10 +193,10 @@ void PartsEyeball::calculate(int progress, int elapsed)
     if (true == this->left_eye.store.exit_cornea_outside) {
         this->left_eye.store.matrix_cornea_outside.rotate(this->left_eye.speed_cornea_outside);
         this->left_eye.cornea_outside = this->left_eye.store.buf_cornea_outside.transformed(this->left_eye.store.matrix_cornea_outside);
-        this->left_eye.target_cornea_outside.setRect(this->left_eye.eyeball_center.x() - this->left_eye.size_cornea_outside.x, //
-                                                     this->left_eye.eyeball_center.y() - this->left_eye.size_cornea_outside.y,
-                                                     this->left_eye.size_cornea_outside.width,
-                                                     this->left_eye.size_cornea_outside.height);
+        this->left_eye.target_cornea_outside.setRect(this->left_eye.eyeball_center.x() - (this->left_eye.size_cornea_outside.x * this->_dimensions), //
+                                                     this->left_eye.eyeball_center.y() - (this->left_eye.size_cornea_outside.y * this->_dimensions),
+                                                     (this->left_eye.size_cornea_outside.width * this->_dimensions),
+                                                     (this->left_eye.size_cornea_outside.height * this->_dimensions));
 
         this->left_eye.source_cornea_outside.setRect((this->left_eye.cornea_outside.width() - this->left_eye.store.buf_cornea_outside.width()) / 2.0,   //
                                                      (this->left_eye.cornea_outside.height() - this->left_eye.store.buf_cornea_outside.height()) / 2.0, //
@@ -209,10 +209,10 @@ void PartsEyeball::calculate(int progress, int elapsed)
     if (true == this->right_eye.store.exit_cornea_outside) {
         this->right_eye.store.matrix_cornea_outside.rotate(this->right_eye.speed_cornea_outside);
         this->right_eye.cornea_outside = this->right_eye.store.buf_cornea_outside.transformed(this->right_eye.store.matrix_cornea_outside);
-        this->right_eye.target_cornea_outside.setRect(this->right_eye.eyeball_center.x() - this->right_eye.size_cornea_outside.x, //
-                                                      this->right_eye.eyeball_center.y() - this->right_eye.size_cornea_outside.y,
-                                                      this->right_eye.size_cornea_outside.width,
-                                                      this->right_eye.size_cornea_outside.height);
+        this->right_eye.target_cornea_outside.setRect(this->right_eye.eyeball_center.x() - (this->right_eye.size_cornea_outside.x * this->_dimensions), //
+                                                      this->right_eye.eyeball_center.y() - (this->right_eye.size_cornea_outside.y * this->_dimensions),
+                                                      (this->right_eye.size_cornea_outside.width * this->_dimensions),
+                                                      (this->right_eye.size_cornea_outside.height * this->_dimensions));
 
         this->right_eye.source_cornea_outside.setRect((this->right_eye.cornea_outside.width() - this->right_eye.store.buf_cornea_outside.width()) / 2.0,   //
                                                       (this->right_eye.cornea_outside.height() - this->right_eye.store.buf_cornea_outside.height()) / 2.0, //
@@ -228,10 +228,10 @@ void PartsEyeball::calculate(int progress, int elapsed)
     if (true == this->left_eye.store.exit_cornea_inside) {
         this->left_eye.store.matrix_cornea_inside.rotate(this->left_eye.speed_cornea_inside);
         this->left_eye.cornea_inside = this->left_eye.store.buf_cornea_inside.transformed(this->left_eye.store.matrix_cornea_inside);
-        this->left_eye.target_cornea_inside.setRect(this->left_eye.eyeball_center.x() - this->left_eye.size_cornea_inside.x, //
-                                                    this->left_eye.eyeball_center.y() - this->left_eye.size_cornea_inside.y,
-                                                    this->left_eye.size_cornea_inside.width,
-                                                    this->left_eye.size_cornea_inside.height);
+        this->left_eye.target_cornea_inside.setRect(this->left_eye.eyeball_center.x() - (this->left_eye.size_cornea_inside.x * this->_dimensions), //
+                                                    this->left_eye.eyeball_center.y() - (this->left_eye.size_cornea_inside.y * this->_dimensions),
+                                                    (this->left_eye.size_cornea_inside.width * this->_dimensions),
+                                                    (this->left_eye.size_cornea_inside.height * this->_dimensions));
 
         this->left_eye.source_cornea_inside.setRect((this->left_eye.cornea_inside.width() - this->left_eye.store.buf_cornea_inside.width()) / 2.0,   //
                                                     (this->left_eye.cornea_inside.height() - this->left_eye.store.buf_cornea_inside.height()) / 2.0, //
@@ -244,10 +244,10 @@ void PartsEyeball::calculate(int progress, int elapsed)
     if (true == this->right_eye.store.exit_cornea_inside) {
         this->right_eye.store.matrix_cornea_inside.rotate(this->right_eye.speed_cornea_inside);
         this->right_eye.cornea_inside = this->right_eye.store.buf_cornea_inside.transformed(this->right_eye.store.matrix_cornea_inside);
-        this->right_eye.target_cornea_inside.setRect(this->right_eye.eyeball_center.x() - this->right_eye.size_cornea_inside.x, //
-                                                     this->right_eye.eyeball_center.y() - this->right_eye.size_cornea_inside.y,
-                                                     this->right_eye.size_cornea_inside.width,
-                                                     this->right_eye.size_cornea_inside.height);
+        this->right_eye.target_cornea_inside.setRect(this->right_eye.eyeball_center.x() - (this->right_eye.size_cornea_inside.x * this->_dimensions), //
+                                                     this->right_eye.eyeball_center.y() - (this->right_eye.size_cornea_inside.y * this->_dimensions),
+                                                     (this->right_eye.size_cornea_inside.width * this->_dimensions),
+                                                     (this->right_eye.size_cornea_inside.height * this->_dimensions));
 
         this->right_eye.source_cornea_inside.setRect((this->right_eye.cornea_inside.width() - this->right_eye.store.buf_cornea_inside.width()) / 2.0, //
                                                      (this->right_eye.cornea_inside.height() - this->right_eye.store.buf_cornea_inside.height()) / 2.0,
