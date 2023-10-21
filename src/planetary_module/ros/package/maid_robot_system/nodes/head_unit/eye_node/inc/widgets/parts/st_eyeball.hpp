@@ -37,6 +37,8 @@ public:
 
         QPixmap buf_cornea_outside{ 1, 1 };
         QPixmap buf_cornea_inside{ 1, 1 };
+        StRectangle rect_cornea_outside;
+        StRectangle rect_cornea_inside;
     };
 
 public:
@@ -68,7 +70,7 @@ public:
     StVector scale_cornea_inside  = 0;
 
     StImageStorage store;
-    QPointF eyeball_center;
+    StVector eyeball_center;
     double calibration_angle     = 0.0;
     double calibration_angle_cos = 0.0;
     double calibration_angle_sin = 0.0;

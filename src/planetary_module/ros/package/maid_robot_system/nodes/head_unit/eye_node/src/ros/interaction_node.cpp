@@ -221,7 +221,12 @@ void InteractionNode::_callback_timer()
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
 void InteractionNode::_callback_output_state()
 {
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), this->_is_notify_enable, "%s", this->_widget->output_message(this->_is_notify_verbose).c_str());
+    if (false == this->_widget->is_response()) {
+        RCLCPP_ERROR(this->get_logger(), "There is no response from the widget.");
+        this->_widget->respawn();
+    } else {
+        RCLCPP_INFO_EXPRESSION(this->get_logger(), this->_is_notify_enable, "%s", this->_widget->output_message(this->_is_notify_verbose).c_str());
+    }
 }
 #endif
 

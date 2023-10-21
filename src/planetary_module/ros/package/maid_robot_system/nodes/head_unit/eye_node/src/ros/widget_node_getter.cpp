@@ -25,10 +25,6 @@ bool WidgetNode::request_update()
 {
     return this->_widget->request_update();
 }
-int WidgetNode::running_exec()
-{
-    return this->_app->exec();
-}
 
 std::string WidgetNode::output_message(bool verbose)
 {

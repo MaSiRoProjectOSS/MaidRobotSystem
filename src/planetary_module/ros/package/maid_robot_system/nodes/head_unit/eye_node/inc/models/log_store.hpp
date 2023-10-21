@@ -54,6 +54,7 @@ public:
     // =============================
     void set_index(ST_INDEX_LOG index, int spent_time);
     std::string get_message(std::string miens_text, double current_time_msec, bool verbose);
+    int get_response_percent();
 
 private:
     // =============================
@@ -68,6 +69,7 @@ private:
     int _spent_time_list[ST_INDEX_LOG_MAX];
     int _count_update  = 0;
     int _count_request = 0;
+    double _percent    = 0;
 };
 
 } // namespace maid_robot_system

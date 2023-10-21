@@ -37,6 +37,7 @@ public:
     // file : widget_node.cpp
     // =============================
     bool exec_start();
+    void respawn();
     bool closing();
 
 public:
@@ -81,6 +82,8 @@ public:
     bool set_ciliary_color_g(int value);
     bool set_ciliary_color_b(int value);
 
+    bool is_response();
+
 private:
     // =============================
     // PRIVATE : Function
@@ -94,6 +97,8 @@ private:
     // =============================
     QApplication *_app;
     EyeWidget *_widget = nullptr;
+
+    volatile bool _is_running = false;
 };
 
 } // namespace maid_robot_system

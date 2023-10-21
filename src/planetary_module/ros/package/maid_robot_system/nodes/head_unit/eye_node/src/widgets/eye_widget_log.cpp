@@ -48,4 +48,22 @@ std::string EyeWidget::output_message(bool verbose)
     return this->logger->get_message(this->_miens_text(this->eyelid->eye_emotion), this->current_time.elapsed(), verbose);
 }
 
+bool EyeWidget::is_response()
+{
+    static int times = 0;
+    bool result      = true;
+
+    if (COUNTER_TIMEOUT_QT_THRESHOLD_PERCENT <= this->logger->get_response_percent()) {
+        times = 0;
+    } else {
+        times++;
+    }
+    if (COUNTER_TIMEOUT_QT_TIMES <= times) {
+        times  = 0;
+        result = false;
+    }
+
+    return result;
+}
+
 } // namespace maid_robot_system

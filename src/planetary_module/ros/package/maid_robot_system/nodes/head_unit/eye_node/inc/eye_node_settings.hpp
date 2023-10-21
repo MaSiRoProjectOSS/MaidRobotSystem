@@ -14,8 +14,6 @@
 
 namespace maid_robot_system
 {
-#define DRAWING_MAX_FPS (60)
-
 #define DEBUG_OUTPUT_OPEN_GL    1
 #define DEBUG_OUTPUT_WIDGET     0
 #define DEBUG_OUTPUT_LOAD_IMAGE 0
@@ -30,6 +28,10 @@ namespace maid_robot_system
 #define LOGGER_ROS_INFO_CALL_FUNCTION        0
 
 /* ============================================= */
+#define DRAWING_MAX_FPS                      (60)
+#define COUNTER_TIMEOUT_QT_THRESHOLD_PERCENT (2)
+#define COUNTER_TIMEOUT_QT_TIMES             (3)
+
 #define DRAW_CORNEA_INSIDE  (1)
 #define DRAW_CORNEA_OUTSIDE (1)
 #define NEXT_EMOTION_INIT   (MIENS::miens_normal)

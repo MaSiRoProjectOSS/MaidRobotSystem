@@ -105,6 +105,7 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
         } else {
             result = "Measuring...";
         }
+
         elapsed = current_time_msec;
     } else {
         sprintf(buffer, "not recorded [%4d/%4d times] ", (int)cnt_update, (int)cnt_request);
@@ -112,6 +113,16 @@ std::string LogStore::get_message(std::string miens_text, double current_time_ms
     }
 
     return result;
+}
+
+int LogStore::get_response_percent()
+{
+    if (1 > this->_count_request) {
+        this->_percent = 0;
+    } else {
+        this->_percent = (double)this->_count_update / (double)this->_count_request;
+    }
+    return (int)(this->_percent * 100);
 }
 
 // =============================
