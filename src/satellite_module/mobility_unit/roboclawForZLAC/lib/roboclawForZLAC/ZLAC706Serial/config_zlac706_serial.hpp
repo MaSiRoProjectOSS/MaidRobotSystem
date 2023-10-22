@@ -102,7 +102,7 @@
 #define SETTING_FLAG_INVERT (true)
 #else
 #ifndef SETTING_FLAG_INVERT
-#define SETTING_FLAG_INVERT (false)
+#define SETTING_FLAG_INVERT (true)
 #else
 #define SETTING_FLAG_INVERT DEBUG_TEST_BOARD
 #endif

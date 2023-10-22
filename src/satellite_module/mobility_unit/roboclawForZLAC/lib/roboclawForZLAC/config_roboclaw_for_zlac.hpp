@@ -17,6 +17,10 @@
 
 /////////////////////////////////////////////////////////
 
+#ifndef BOARD_INPUT_BAUDRATE
+#define BOARD_INPUT_BAUDRATE (38400)
+#endif
+
 #ifndef ROBOCLAW_CURRENT_MODIFICATION
 #define ROBOCLAW_CURRENT_MODIFICATION (15000)
 #endif
@@ -45,6 +49,15 @@
 
 #ifndef ROBOCLAW_SETTING_SET_GAIN
 #define ROBOCLAW_SETTING_SET_GAIN (1)
+#endif
+
+#if DEBUG_ZLAC706_SERIAL
+#ifndef ROBOCLAW_SPEED_DECELERATION_MS
+#define ROBOCLAW_SPEED_DECELERATION_MS (1000)
+#endif
+#ifndef ROBOCLAW_SPEED_ACCELERATION_MS
+#define ROBOCLAW_SPEED_ACCELERATION_MS (1000)
+#endif
 #endif
 
 #endif
