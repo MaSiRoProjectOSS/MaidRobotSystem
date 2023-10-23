@@ -1,7 +1,7 @@
 # roboclawForZLAC
 
 これはZLAC-706を[roboclaw_ros](https://github.com/sonyccd/roboclaw_ros)で制御するためのプロジェクト。
-roboclawを繋ぐかわりにM5ATOMを接続し、その先のZLAC-706を制御する。
+roboclawを繋ぐかわりにM5ATOMを接続し、その先にZLAC-706を制御する。
 
 ```plantuml
 @startuml
@@ -72,8 +72,8 @@ ZLAC706_2 -- Motor_2 : M2A/M2B
 * roboclawForZLAC
   * PlatformIO
   * ライブラリ
-    * m5stack/M5Atom@^0.1.0
-    * fastled/FastLED@^3.5.0
+  	* m5stack/M5Atom@^0.1.0
+  	* fastled/FastLED@^3.5.0
 
 ## 変換基板の仕様について
 
@@ -133,19 +133,6 @@ G25 -- ETH_M2_8
 | Yellow   | 緊急停止中           |
 | Red      | エラー発生           |
 
-### WiFi接続
-
-ファイル```lib/web/web_setting.hpp```にてWiFi接続先を設定を記載してます。
-platformio.iniに下記の設定を追加することで、WiFi接続先を変更することができます。
-
-```ini
-build_flags =
-    ...(other setting)
-    -D SETTING_WIFI_MODE_AP=false
-    -D SETTING_WIFI_SSID_DEFAULT="\"ESP32_WEB_VIEWER\""
-    -D SETTING_WIFI_PASS_DEFAULT="\"password\""
-```
-
 
 ## 仕様
 
@@ -153,10 +140,6 @@ build_flags =
   * Serial(UART)
     * ボーレート : 57600
     * "**inverted**" uart signal
-
-
-
-
 
 
 ---

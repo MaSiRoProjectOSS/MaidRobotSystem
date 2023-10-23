@@ -15,7 +15,7 @@
 #include <Arduino.h>
 ////////////////////////////////////
 #ifndef SETTING_LOOP_TIME_SLEEP_DETECT
-#define SETTING_LOOP_TIME_SLEEP_DETECT 10
+#define SETTING_LOOP_TIME_SLEEP_DETECT (10)
 #endif
 ////////////////////////////////////
 const char *THREAD_MODEL_M5_NAME           = "ThreadModelM5";
@@ -29,46 +29,14 @@ const int THREAD_SEEK_INTERVAL_MODEL_M5  = 10;
 static CRGB request_color                = CRGB::Black;
 ////////////////////////////////////
 WebViewerCustom viewer;
-
-#if DEBUG_ZLAC706_SERIAL
-void message(LogCallback::OUTPUT_LOG_LEVEL level, //
-             const std::string message,
-             LogCallback::log_information info = LogCallback::log_information())
-{
-    char buffer[300];
-    unsigned long tm    = millis();
-    unsigned long tm_s  = tm / 1000;
-    unsigned long tm_ms = tm % 1000;
-
-    if (level == LogCallback::OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_MESSAGE) {
-        sprintf(buffer, "%s", message.c_str());
-#if 0
-    } else if (level >= LogCallback::OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_TRACE) {
-        return;
-#endif
-    } else if (level >= LogCallback::OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_WARN) {
-        if (0 < info.file_line) {
-            sprintf(buffer, "[%7ld.%03ld] [Error][%s() :  %s:%d] : %s", tm_s, tm_ms, info.function_name.c_str(), info.file_path.c_str(), info.file_line, message.c_str());
-        } else {
-            sprintf(buffer, "[%7ld.%03ld] [Error] : %s", tm_s, tm_ms, message.c_str());
-        }
-    } else {
-        if (0 < info.file_line) {
-            sprintf(buffer, "[%7ld.%03ld] [     ][%s() :  %s:%d] : %s", tm_s, tm_ms, info.function_name.c_str(), info.file_path.c_str(), info.file_line, message.c_str());
-        } else {
-            sprintf(buffer, "[%7ld.%03ld] [     ] : %s", tm_s, tm_ms, message.c_str());
-        }
-    }
-    Serial.println(buffer);
-}
-#endif
+volatile bool led_flash = true;
 
 void m5_led(CRGB color)
 {
     static CRGB current_color = CRGB::Black;
     if (color != current_color) {
         current_color = color;
-        (void)M5.dis.fillpix(color);
+        (void)M5.dis.fillpix(current_color);
     }
 }
 void m5_led_request(CRGB color)
@@ -85,19 +53,26 @@ void setup_m5()
     (void)M5.dis.begin();
     m5_led(CRGB::White);
 }
-volatile bool led_flash = true;
 
 void thread_model_m5(void *args)
 {
+    const unsigned long SETTING_DOUBLE_CLICK = (1000); // 1000 ms - Double click judgment time
+
     flag_thread_m5_initialized = true;
     static int cnt_flash       = 0;
     static int cnt_flash_max   = 1000 / THREAD_SEEK_INTERVAL_MODEL_M5;
 
     while (false == flag_thread_m5_fin) {
+        (void)M5.update();
         if (M5.Btn.wasPressed()) {
-            viewer.pressed();
+            static int click_time = 0;
+            if (click_time > millis()) {
+                viewer.pressed();
+            } else {
+                // one click
+                click_time = millis() + SETTING_DOUBLE_CLICK;
+            }
         }
-        // flash led
         if (false == led_flash) {
             (void)m5_led(request_color);
         } else {
@@ -136,9 +111,6 @@ void setup()
 {
     (void)setup_m5();
     ////////////////////////////////////////////////////////
-#if DEBUG_ZLAC706_SERIAL
-    viewer.set_callback_message(&message);
-#endif
     viewer.set_callback_led(&m5_led_request);
     viewer.set_callback_mode(&viewer_mode);
     viewer.init();

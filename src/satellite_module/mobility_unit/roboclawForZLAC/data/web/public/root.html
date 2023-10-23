@@ -13,30 +13,49 @@
 
 <body>
     <h1>Roboclaw for ZLAC</h1>
-    <div class="switchStop" onclick="JS_Ctrl.stop('swEmergency')">
-        <input type="checkbox" id="swEmergency" disabled="dis">
-        <label for="swEmergency">
-            <span>Emergency</span>
-            <div class="swImg"></div>
-        </label>
-    </div>
-    <div class="switchButton" onclick="JS_Ctrl.log_filter()">
-        <input type="checkbox" id="swFilterDirect" disabled="dis">
-        <label for="swFilterDirect">
-            <span>Log filter</span>
-            <div class="swImg"></div>
-        </label>
-    </div>
-    <div class="switchButton" onclick="JS_Ctrl.log_ch()">
-        <input type="checkbox" id="swLogSize" disabled="dis">
-        <label for="swFilterDirect">
-            <span id="sfd_cnt">Log Size : 25</span>
-            <div class="swImg">
-                <div class="initial_txt"></div>
-            </div>
-        </label>
-    </div>
-    <div class="next_line"></div>
+    <div>Time:&emsp;<label id="r_t"></label></div>
+    <article class='article_left'>
+        <div class="switchStop" onclick="JS_Ctrl.stop('swEmergency')">
+            <input type="checkbox" id="swEmergency" disabled="dis">
+            <label for="swEmergency">
+                <span>Emergency</span>
+                <div class="swImg"></div>
+            </label>
+        </div>
+        <div class="switchStop" onclick="JS_Ctrl.free_motor('swFree')">
+            <input type="checkbox" id="swFree" disabled="dis">
+            <label for="swFree">
+                <span>Free Motor</span>
+                <div class="swImg"></div>
+            </label>
+        </div>
+        <div class="switchButton" onclick="JS_Ctrl.log_filter()">
+            <input type="checkbox" id="swFilterDirect" disabled="dis">
+            <label for="swFilterDirect">
+                <span>Log filter</span>
+                <div class="swImg"></div>
+            </label>
+        </div>
+        <div class="switchButton" onclick="JS_Ctrl.log_ch()">
+            <input type="checkbox" id="swLogSize" disabled="dis">
+            <label for="swLogSize">
+                <span id="sfd_cnt">Log Size : 25</span>
+                <div class="swImg">
+                    <div class="initial_txt"></div>
+                </div>
+            </label>
+        </div>
+        <div class="switchButton" onclick="JS_Ctrl.up_en()">
+            <input type="checkbox" id="ajax_ref" disabled="dis" checked>
+            <label for="ajax_ref">
+                <span id="ref_tx">OBTAIN</span>
+                <div class="swImg">
+                    <div class="initial_txt"></div>
+                </div>
+            </label>
+        </div>
+    </article>
+    <br>
     <hr class="hr3">
     <article class='article_left'>
         <table>
@@ -204,20 +223,29 @@
                     <td id='c_fr'>--</td>
                 </tr>
                 <tr>
-                    <td rowspan='3'>SPEED</td>
+                    <td rowspan='4'>SPEED</td>
                     <td>LIMIT</td>
                     <td>[rpm]</td>
-                    <td id='c_sm'>--</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="255" value="0" step="10" id='c_sm' onchange="JS_Ctrl.set_gain(this,'limit',0)"></td>
                 </tr>
                 <tr>
                     <td>ACCELERATION</td>
                     <td>[ms]</td>
-                    <td id='c_sa'>0</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" value="0" step="100" id='c_sa' onchange="JS_Ctrl.set_gain(this,'acc',0)"></td>
                 </tr>
                 <tr>
                     <td>DECELERATION</td>
                     <td>[ms]</td>
-                    <td id='c_sd'>0</td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" value="0" step="100" id='c_sd' onchange="JS_Ctrl.set_gain(this,'dcc',0)"></td>
+                </tr>
+                <tr>
+                    <td colspan='3'>
+                        <button title="" placeholder="" type="button" onclick="JS_Ctrl.set_gain_v('limit',0,JS_Ctrl.kmph_to_rpm(3.2))">歩行（ゆっくり）<br>3.2 [Km/h]</button>
+                        <button title="" placeholder="" type="button" onclick="JS_Ctrl.set_gain_v('limit',0,JS_Ctrl.kmph_to_rpm(4.0))">歩行（普通）<br>4.0 [Km/h]</button>
+                        <button title="" placeholder="" type="button" onclick="JS_Ctrl.set_gain_v('limit',0,JS_Ctrl.kmph_to_rpm(5.6))">速歩<br>5.6 [Km/h]</button>
+                        <button title="" placeholder="" type="button" class="visibility_hidden" onclick="JS_Ctrl.set_gain_v('limit',0,JS_Ctrl.kmph_to_rpm(6.4))">ジョギング<br>6.4 [Km/h]</button>
+                        <button title="" placeholder="" type="button" class="visibility_hidden" onclick="JS_Ctrl.set_gain_v('limit',0,JS_Ctrl.kmph_to_rpm(10.8))">ランニング<br>10.8 [Km/h]</button>
+                    </td>
                 </tr>
                 <tr>
                     <td rowspan='2'>POSITION</td>
@@ -250,23 +278,23 @@
                 <tr>
                     <td rowspan='4'>GAIN</td>
                     <td>proportional</td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkp' onclick="JS_Ctrl.set_gain(this,'kp',0)"></td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkp' onclick="JS_Ctrl.set_gain(this,'kp',1)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='l_c_gkp' onchange="JS_Ctrl.set_gain(this,'kp',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='r_c_gkp' onchange="JS_Ctrl.set_gain(this,'kp',1)"></td>
                 </tr>
                 <tr>
                     <td>integral</td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gki' onclick="JS_Ctrl.set_gain(this,'ki',0)"></td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gki' onclick="JS_Ctrl.set_gain(this,'ki',1)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='l_c_gki' onchange="JS_Ctrl.set_gain(this,'ki',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='r_c_gki' onchange="JS_Ctrl.set_gain(this,'ki',1)"></td>
                 </tr>
                 <tr>
                     <td>differential</td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkd' onclick="JS_Ctrl.set_gain(this,'kd',0)"></td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkd' onclick="JS_Ctrl.set_gain(this,'kd',1)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='l_c_gkd' onchange="JS_Ctrl.set_gain(this,'kd',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='r_c_gkd' onchange="JS_Ctrl.set_gain(this,'kd',1)"></td>
                 </tr>
                 <tr>
                     <td>feed_forward</td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='l_c_gkf' onclick="JS_Ctrl.set_gain(this,'kf',0)"></td>
-                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" id='r_c_gkf' onclick="JS_Ctrl.set_gain(this,'kf',1)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='l_c_gkf' onchange="JS_Ctrl.set_gain(this,'kf',0)"></td>
+                    <td><input title="" placeholder="" type="number" name="tentacles" min="0" max="100000" value="0" step="100" id='r_c_gkf' onchange="JS_Ctrl.set_gain(this,'kf',1)"></td>
                 </tr>
                 <tr>
                     <td colspan='2'>INVERTED</td>

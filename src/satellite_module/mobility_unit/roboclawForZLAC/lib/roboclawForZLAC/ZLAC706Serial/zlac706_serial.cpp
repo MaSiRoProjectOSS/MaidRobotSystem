@@ -17,21 +17,12 @@
 ///////////////////////////////////////////////////////////////////
 #pragma region LOGGER
 #ifndef DEBUG_ZLAC706_SERIAL
-#define DEBUG_ZLAC706_SERIAL 0
+#define DEBUG_ZLAC706_SERIAL (0)
 #endif
 #ifndef DEBUG_TRACE
-#define DEBUG_TRACE 0
+#define DEBUG_TRACE (0)
 #endif
 
-#if DEBUG_ZLAC706_SERIAL
-#if DEBUG_TRACE
-#define LOG_TRACE(mess) this->log_trace((mess), __func__, __FILENAME__, __LINE__)
-#else
-#define LOG_TRACE(mess)
-#endif
-#else
-#define LOG_TRACE(mess)
-#endif
 #pragma endregion
 
 ///////////////////////////////////////////////////////////////////
@@ -62,13 +53,7 @@ ZLAC706Serial::~ZLAC706Serial()
 bool ZLAC706Serial::begin()
 {
     bool result = true;
-#if DEBUG_ZLAC706_SERIAL
-    this->output_log_enable();
-#if DEBUG_TRACE
-    this->output_log_level(OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_ALL);
-#endif
-#endif
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     delay(100);
     this->_clear_receive(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
     this->info.system.set(LOG_BEGIN, 0, 0);
@@ -79,7 +64,7 @@ bool ZLAC706Serial::begin()
 bool ZLAC706Serial::loop()
 {
     bool result = true;
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     return result;
 }
 bool ZLAC706Serial::setting_save()
@@ -89,9 +74,10 @@ bool ZLAC706Serial::setting_save()
     if (true == SPIFFS.begin(false)) {
         sprintf(buffer,
                 "%s\n%s\n"                 //
-                "%d\n%d\n%d\n%d\n%d\n%d\n" //
-                "%d\n%d\n%d\n%d\n%d\n%d\n" //
-                "%d\n%d\n%d\n%d\n"         //
+                "%d\n%d\n%d\n%d\n%d\n%d\n" // +6(8)
+                "%d\n%d\n%d\n%d\n%d\n%d\n" // +6(14)
+                "%d\n%d\n%d\n%d\n"         // +4(18)
+                "%d\n%d\n%d\n"             // +3(21)
                 ,                          //
 
                 info.left.interval ? "t" : "f",
@@ -114,7 +100,12 @@ bool ZLAC706Serial::setting_save()
                 info.left.current_proportional_gain,  // s_ckp
                 info.right.current_proportional_gain, // s_ckp
                 info.left.current_integral_gain,      // s_cki
-                info.right.current_integral_gain      // s_cki
+                info.right.current_integral_gain,     // s_cki
+
+                info.acceleration_ms, //
+                info.deceleration_ms, //
+                info.SPEED_LIMIT      //
+
         );
         File dataFile = SPIFFS.open(SETTING_ZLAC_SETTING_FILE, FILE_WRITE);
         if (!dataFile) {
@@ -143,22 +134,26 @@ bool ZLAC706Serial::setting_load()
             } else {
                 result     = true;
                 totalBytes = dataFile.size();
-                while (dataFile.available()) {
+                while (0 < dataFile.available()) {
                     String word = dataFile.readStringUntil('\n');
                     switch (line) {
                         case 0:
+#if SETTING_LOAD_FILE_SETTING_INTERVAL
                             if (true == word.equals("t")) {
                                 this->info.left.interval = true;
                             } else {
                                 this->info.left.interval = false;
                             }
+#endif
                             break;
                         case 1:
+#if SETTING_LOAD_FILE_SETTING_INTERVAL
                             if (true == word.equals("t")) {
                                 this->info.right.interval = true;
                             } else {
                                 this->info.right.interval = false;
                             }
+#endif
                             break;
                         case 2:
                             info.left.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
@@ -210,11 +205,20 @@ bool ZLAC706Serial::setting_load()
                         case 17:
                             info.right.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
                             break;
+                        case 18:
+                            info.acceleration_ms = this->_to_int(word, SETTING_SPEED_ACCELERATION_MS);
+                            break;
+                        case 19:
+                            info.deceleration_ms = this->_to_int(word, SETTING_SPEED_DECELERATION_MS);
+                            break;
+                        case 20:
+                            info.SPEED_LIMIT = this->_to_int(word, SETTING_SYSTEM_SPEED_LIMIT_RPM);
+                            break;
                         default:
                             break;
                     }
                     line++;
-                    if (17 < line) {
+                    if (20 < line) {
                         break;
                     }
                 }
@@ -228,12 +232,11 @@ bool ZLAC706Serial::setting_load()
 }
 int ZLAC706Serial::_to_int(String data, int default_value)
 {
+    int value = default_value;
     if (true != data.isEmpty()) {
-        int value = std::stoi(data.c_str());
-        return value;
-    } else {
-        return default_value;
+        value = std::stoi(data.c_str());
     }
+    return value;
 }
 #pragma endregion
 
@@ -305,7 +308,7 @@ bool ZLAC706Serial::is_error()
         this->cmd_get_alarm_status();
     }
 #if SETTING_MOTOR_ENABLE_LEFT
-    // result |= error_left.stop_state || error_left.startup_state;
+    // result_01 |= this->info.left.error.stop_state || this->info.left.error.startup_state;
     result_01 |= this->info.left.error.over_current || this->info.left.error.over_voltage || this->info.left.error.under_voltage;
     result_01 |= this->info.left.error.encoder_error || this->info.left.error.overheat || this->info.left.error.overload;
     result_01 |= this->info.left.error.not_connection;
@@ -313,7 +316,7 @@ bool ZLAC706Serial::is_error()
     result_02 |= false;
 #endif
 #if SETTING_MOTOR_ENABLE_RIGHT
-    // result |= error_right.stop_state || error_right.startup_state;
+    // result_02 |= this->info.right.error.stop_state || this->info.right.error.startup_state;
     result_02 |= this->info.right.error.over_current || this->info.right.error.over_voltage || this->info.right.error.under_voltage;
     result_02 |= this->info.right.error.encoder_error || this->info.right.error.overheat || this->info.right.error.overload;
     result_02 |= this->info.right.error.not_connection;
@@ -383,7 +386,7 @@ void ZLAC706Serial::_clear_receive(DRIVER_TARGET target)
                 result_01 = true;
             }
             if (true == result_01) {
-                LOG_TRACE(debug_message.c_str());
+                log_v("%s", debug_message.c_str());
             }
 #else
             do {
@@ -409,7 +412,7 @@ void ZLAC706Serial::_clear_receive(DRIVER_TARGET target)
                 result_02 = true;
             }
             if (true == result_02) {
-                LOG_TRACE(debug_message.c_str());
+                log_v("%s", debug_message.c_str());
             }
 #else
             do {
@@ -436,7 +439,7 @@ void ZLAC706Serial::_clear_receive(DRIVER_TARGET target)
 #pragma region command_setting
 bool ZLAC706Serial::cmd_setting_proportional_gain(DRIVER_TARGET target, int value)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     char a1 = 0x00;
     switch (this->info.mode) {
         case DRIVER_MODE::POSITION_FROM_PULSE:
@@ -483,7 +486,7 @@ bool ZLAC706Serial::cmd_setting_proportional_gain(DRIVER_TARGET target, int valu
 }
 bool ZLAC706Serial::cmd_setting_integral_gain(DRIVER_TARGET target, int value)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     char a1 = 0x00;
     switch (this->info.mode) {
         case DRIVER_MODE::POSITION_FROM_PULSE:
@@ -521,7 +524,7 @@ bool ZLAC706Serial::cmd_setting_integral_gain(DRIVER_TARGET target, int value)
 }
 bool ZLAC706Serial::cmd_setting_differential_gain(DRIVER_TARGET target, int value)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result      = false;
     char buffer[100] = { 0 };
     char a1          = 0x00;
@@ -568,7 +571,7 @@ bool ZLAC706Serial::cmd_setting_differential_gain(DRIVER_TARGET target, int valu
 }
 bool ZLAC706Serial::cmd_setting_feed_forward_gain(DRIVER_TARGET target, int value)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result      = false;
     char buffer[100] = { 0 };
     char a1          = 0x00;
@@ -633,6 +636,14 @@ bool ZLAC706Serial::cmd_setting_dcc(DRIVER_TARGET target, int value)
     this->cmd_speed_set_acc_and_dec(this->info.acceleration_ms, this->info.deceleration_ms, target);
     return true;
 }
+bool ZLAC706Serial::cmd_setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value)
+{
+    if (0 > value) {
+        value = 0;
+    }
+    this->info.SPEED_LIMIT = value;
+    return true;
+}
 #pragma endregion
 
 ///////////////////////////////////////////////////////////////////
@@ -641,7 +652,7 @@ bool ZLAC706Serial::cmd_setting_dcc(DRIVER_TARGET target, int value)
 #pragma region command_controller
 bool ZLAC706Serial::cmd_motor_start(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result = true;
     if (false == this->info.flag.running) {
         result = this->_send_target(__func__, target, 0x00, 0x00, 0x01, true);
@@ -654,14 +665,15 @@ bool ZLAC706Serial::cmd_motor_start(DRIVER_TARGET target)
 }
 bool ZLAC706Serial::cmd_motor_stop(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result = true;
     if (true == this->info.flag.running) {
         result = this->_send_target(__func__, target, 0x00, 0x00, 0x00, true);
         if (true == result) {
             this->info.left.speed_rpm  = 0;
             this->info.right.speed_rpm = 0;
-            this->info.flag.running    = false;
+            this->speed_mps_request.set(0, 0, 0, 0);
+            this->info.flag.running = false;
         }
     }
 
@@ -698,7 +710,7 @@ bool ZLAC706Serial::cmd_speed_mode()
 
 bool ZLAC706Serial::cmd_mode_selection(DRIVER_MODE mode)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result      = false;
     char buffer[100] = { 0 };
     switch (mode) {
@@ -743,7 +755,7 @@ bool ZLAC706Serial::cmd_mode_selection(DRIVER_MODE mode)
 }
 bool ZLAC706Serial::cmd_speed_set_acc_and_dec(int acceleration_ms, int deceleration_ms, DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result      = false;
     char buffer[100] = { 0 };
     char a1          = 0x00;
@@ -777,7 +789,7 @@ bool ZLAC706Serial::cmd_speed_set_acc_and_dec(int acceleration_ms, int decelerat
 }
 bool ZLAC706Serial::cmd_position_set(long pos_l, int rpm_l, long pos_r, int rpm_r)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     static int MAX  = 6000;
     static int STEP = 16384;
     bool result_01  = true;
@@ -815,7 +827,7 @@ bool ZLAC706Serial::cmd_position_set(long pos_l, int rpm_l, long pos_r, int rpm_
 }
 bool ZLAC706Serial::cmd_torque_set(int value_l_mA, int value_r_mA)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01            = true;
     bool result_02            = true;
     static int start_value    = (600 * 7500) / 24000;
@@ -879,7 +891,7 @@ bool ZLAC706Serial::cmd_torque_set(int value_l_mA, int value_r_mA)
 }
 bool ZLAC706Serial::cmd_speed_set(int rpm_l, int rpm_r)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01 = true;
     bool result_02 = true;
     if (true == this->info.left.interval) {
@@ -906,6 +918,8 @@ bool ZLAC706Serial::cmd_speed_set(int rpm_l, int rpm_r)
     } else if (rpm_r < -this->info.SPEED_LIMIT) {
         rpm_r = -this->info.SPEED_LIMIT;
     }
+    this->speed_mps_request.set(this->rpm_to_mps(rpm_l), this->rpm_to_mps(rpm_r), 0, 0);
+
     int value_l = (rpm_l * 8192) / 3000;
     int value_r = (rpm_r * 8192) / 3000;
 
@@ -918,30 +932,30 @@ bool ZLAC706Serial::cmd_speed_set(int rpm_l, int rpm_r)
 }
 bool ZLAC706Serial::cmd_looking_for_z_signal(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     return this->_send_target(__func__, target, 0x53, 0x00, 0x00, true);
 }
 
 bool ZLAC706Serial::cmd_clear_fault(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     return this->_send_target(__func__, target, 0x4A, 0x00, 0x00, true);
 }
 bool ZLAC706Serial::cmd_position_set_absolute()
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     this->info.position_absolute = 1;
     return this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_ALL, 0x51, 0x00, 0x00, true);
 }
 bool ZLAC706Serial::cmd_position_set_relative()
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     this->info.position_absolute = 0;
     return this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_ALL, 0x51, 0x00, 0x01, true);
 }
 bool ZLAC706Serial::cmd_modify_the_rated_current(int value_mW, DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     this->info.rated_current_mW = value_mW;
     return this->_send_target(__func__, target, 0x2D, (value_mW >> 8) & 0xFF, (value_mW >> 0) & 0xFF, true);
 }
@@ -968,9 +982,7 @@ void ZLAC706Serial::cmd_get_all_status(DRIVER_TARGET target)
 }
 bool ZLAC706Serial::cmd_get_alarm_status(DRIVER_TARGET target)
 {
-#ifndef DEBUG_TRACE
-    LOG_TRACE(__func__);
-#endif
+    //log_v("%s", __func__);
     char buffer[255] = { 0 };
     int len          = 0;
     bool result_01   = true;
@@ -986,7 +998,7 @@ bool ZLAC706Serial::cmd_get_alarm_status(DRIVER_TARGET target)
             if (4 <= this->_receive(__func__, this->_serial_driver_1, 4, buffer, flag_output)) {
                 this->info.left.error.not_connection = false;
                 this->info.left.error.stop_state     = ((buffer[3] & 0x01) > 0) ? false : true;
-                this->info.left.error.startup_state  = ((buffer[3] & 0x80) > 0) ? true : false;
+                this->info.left.error.startup_state  = ((buffer[3] & 0x80) > 0) ? false : true;
 
                 this->info.left.error.over_current  = ((buffer[3] & 0x02) > 0) ? true : false;
                 this->info.left.error.over_voltage  = ((buffer[3] & 0x04) > 0) ? true : false;
@@ -1009,7 +1021,7 @@ bool ZLAC706Serial::cmd_get_alarm_status(DRIVER_TARGET target)
             if (4 <= this->_receive(__func__, this->_serial_driver_2, 4, buffer, flag_output)) {
                 this->info.right.error.not_connection = false;
                 this->info.right.error.stop_state     = ((buffer[3] & 0x01) > 0) ? false : true;
-                this->info.right.error.startup_state  = ((buffer[3] & 0x80) > 0) ? true : false;
+                this->info.right.error.startup_state  = ((buffer[3] & 0x80) > 0) ? false : true;
 
                 this->info.right.error.over_current  = ((buffer[3] & 0x02) > 0) ? true : false;
                 this->info.right.error.over_voltage  = ((buffer[3] & 0x04) > 0) ? true : false;
@@ -1040,6 +1052,9 @@ bool ZLAC706Serial::cmd_get_alarm_status(DRIVER_TARGET target)
 
 bool ZLAC706Serial::cmd_speed_heart_beat()
 {
+    static unsigned int TIME_LITTLE_HEART_BEAT_MS  = (10);
+    static unsigned long next_little_heart_beat_ms = 0;
+
     static unsigned int TIME_HEART_BEAT_MS  = (500);
     static unsigned long next_heart_beat_ms = 0;
     static unsigned int TIME_GET_STATE_MS   = (1500);
@@ -1062,6 +1077,11 @@ bool ZLAC706Serial::cmd_speed_heart_beat()
         if (true != this->is_connection()) {
             // do nothing
         } else {
+            if (next_little_heart_beat_ms <= current_time) {
+                next_little_heart_beat_ms = current_time + TIME_LITTLE_HEART_BEAT_MS;
+                this->cmd_get_position_feedback(DRIVER_TARGET::DRIVER_TARGET_ALL);
+            }
+
             if (next_heart_beat_ms <= current_time) {
                 if (false == this->info.flag.running) {
                     if (next_get_state_ms <= current_time) {
@@ -1069,9 +1089,7 @@ bool ZLAC706Serial::cmd_speed_heart_beat()
                         this->cmd_get_all_status();
                     }
                 } else {
-#ifndef DEBUG_TRACE
-                    LOG_TRACE(__func__);
-#endif
+                    //log_v("%s", __func__);
                     this->_clear_receive();
                     char buffer[4]     = { 0x80, 0x00, 0x80 };
                     char receive[100]  = { 0 };
@@ -1120,6 +1138,7 @@ bool ZLAC706Serial::cmd_speed_heart_beat()
                             result_02                              = true;
                         }
                     }
+                    this->speed_mps_feedback.set(this->rpm_to_mps(this->info.left.speed_rpm), this->rpm_to_mps(this->info.right.speed_rpm), 0, 0);
                 }
 
                 delay(this->INTERVAL_DRIVER_MS);
@@ -1131,7 +1150,7 @@ bool ZLAC706Serial::cmd_speed_heart_beat()
 
 bool ZLAC706Serial::cmd_get_bus_voltage(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01   = true;
     bool result_02   = true;
     char buffer[255] = { 0 };
@@ -1156,7 +1175,7 @@ bool ZLAC706Serial::cmd_get_bus_voltage(DRIVER_TARGET target)
 
 bool ZLAC706Serial::cmd_get_output_current(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01   = true;
     bool result_02   = true;
     char buffer[255] = { 0 };
@@ -1181,7 +1200,7 @@ bool ZLAC706Serial::cmd_get_output_current(DRIVER_TARGET target)
 
 bool ZLAC706Serial::cmd_get_motor_speed(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01   = true;
     bool result_02   = true;
     int get_value    = 0;
@@ -1203,13 +1222,14 @@ bool ZLAC706Serial::cmd_get_motor_speed(DRIVER_TARGET target)
                 result_02                  = true;
             }
         }
+        this->speed_mps_feedback.set(this->rpm_to_mps(this->info.left.speed_rpm), this->rpm_to_mps(this->info.right.speed_rpm), 0, 0);
     }
     return result_01 && result_02;
 }
 
 bool ZLAC706Serial::cmd_get_position_given(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01 = true;
     bool result_02 = true;
 
@@ -1235,7 +1255,7 @@ bool ZLAC706Serial::cmd_get_position_given(DRIVER_TARGET target)
 
 bool ZLAC706Serial::cmd_get_position_feedback(DRIVER_TARGET target)
 {
-    LOG_TRACE(__func__);
+    log_v("%s", __func__);
     bool result_01   = true;
     bool result_02   = true;
     char buffer[255] = { 0 };
@@ -1286,7 +1306,7 @@ bool ZLAC706Serial::_receive_wait(HardwareSerial *serial, int size)
 
 int ZLAC706Serial::_receive(const char *name, HardwareSerial *serial, int size, char *buffer, bool output_log)
 {
-    //LOG_TRACE(__func__);
+    //log_v("%s", __func__);
     char buf[100];
     int count               = 0;
     bool flag_timeout       = true;
@@ -1311,8 +1331,7 @@ int ZLAC706Serial::_receive(const char *name, HardwareSerial *serial, int size, 
     }
     if (true == flag_timeout) {
 #if DEBUG_ZLAC706_SERIAL
-        sprintf(buf, "Timeout : %d ms [%s]", (count - 1) * this->INTERVAL_DRIVER_MS, name);
-        this->log_warn(buf);
+        log_w("Timeout [%d] ms : size [%02d/%02d] :  (%s)", (count - 1) * this->INTERVAL_DRIVER_MS, index, size, name);
 #endif
     } else {
         if (true == output_log) {
@@ -1325,7 +1344,7 @@ int ZLAC706Serial::_receive(const char *name, HardwareSerial *serial, int size, 
                 sprintf(buf, " 0x%02X", buffer[i]);
                 debug_message_01.append(buf);
             }
-            LOG_TRACE(debug_message_01.c_str());
+            log_v("%s", debug_message_01.c_str());
 #endif
 #endif
         }
@@ -1349,7 +1368,7 @@ bool ZLAC706Serial::_send_target(const char *name, DRIVER_TARGET target, char a1
 
 bool ZLAC706Serial::_send(const char *name, DRIVER_TARGET target, HardwareSerial *serial, char a1, char a2, char a3, bool confirm, bool output_log)
 {
-    //LOG_TRACE(__func__);
+    //log_v("%s", __func__);
     unsigned int cs = a1 + a2 + a3;
     bool result     = true;
     char buffer[4]  = { a1, a2, a3, (char)(cs & 0xFF) };
@@ -1362,7 +1381,7 @@ bool ZLAC706Serial::_send(const char *name, DRIVER_TARGET target, HardwareSerial
             sprintf(buf, " 0x%02X", buffer[i]);
             debug_message.append(buf);
         }
-        LOG_TRACE(debug_message.c_str());
+        log_v("%s", debug_message.c_str());
 #endif
 #endif
     }
@@ -1412,4 +1431,13 @@ bool ZLAC706Serial::_confirm(const char *name, DRIVER_TARGET target, char cmd, b
     return result;
 }
 
+float ZLAC706Serial::rpm_to_mps(int value)
+{
+    return ((float)value * SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI) / (60.0 * 1000.0);
+}
+
+float ZLAC706Serial::mps_to_rpm(int value)
+{
+    return ((float)value * 60.0 * 1000.0) / (SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI);
+}
 #pragma endregion

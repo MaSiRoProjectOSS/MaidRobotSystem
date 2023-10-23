@@ -40,12 +40,13 @@ bool RoboClawForZlac::_check_crc(uint8_t id, uint8_t command, uint8_t *packet, i
     }
     return result;
 }
+
 void RoboClawForZlac::_receive()
 {
 #if DEBUG_ZLAC706_SERIAL
     // [[[not all api support]]]
 
-    const int SPEED_SPAN         = 2;
+    const int SPEED_SPAN         = 92;
     const int SPEED_SPAN_ACC_DCC = 100;
     const int POSITION_SPAN      = 512;
     const int TORQUE_SPAN        = 50;
@@ -54,8 +55,8 @@ void RoboClawForZlac::_receive()
     // DEBUG_ZLAC706_SERIAL_MODE_POSITION
     static int left            = 0;
     static int right           = 0;
-    static int acceleration_ms = ROBOCLAW_SPEED_ACCELERATION_MS;
-    static int deceleration_ms = ROBOCLAW_SPEED_DECELERATION_MS;
+    static int acceleration_ms = SETTING_SPEED_ACCELERATION_MS;
+    static int deceleration_ms = SETTING_SPEED_DECELERATION_MS;
     ///////////////////////////////////////////
     // DEBUG_ZLAC706_SERIAL_MODE_POSITION
     static long left_pos  = (4096) * 1;
@@ -183,6 +184,9 @@ void RoboClawForZlac::_receive()
         }
 #else
         switch (buffer[0]) {
+            case 'r':
+                this->reset();
+                break;
             case 'z':
                 acceleration_ms += SPEED_SPAN_ACC_DCC;
                 this->_zlac->cmd_speed_set_acc_and_dec(acceleration_ms, deceleration_ms);
@@ -194,7 +198,7 @@ void RoboClawForZlac::_receive()
                 }
                 this->_zlac->cmd_speed_set_acc_and_dec(acceleration_ms, deceleration_ms);
                 break;
-            case 'c':
+            case 'y':
                 deceleration_ms += SPEED_SPAN_ACC_DCC;
                 this->_zlac->cmd_speed_set_acc_and_dec(acceleration_ms, deceleration_ms);
                 break;
@@ -205,7 +209,7 @@ void RoboClawForZlac::_receive()
                 }
                 this->_zlac->cmd_speed_set_acc_and_dec(acceleration_ms, deceleration_ms);
                 break;
-            case 'r':
+            case 'c':
                 this->_zlac->cmd_clear_fault(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
                 break;
             case 'm':
@@ -418,37 +422,22 @@ void RoboClawForZlac::_receive()
                 /////////////////////////////
             case 'p':
                 this->_zlac->cmd_get_all_status();
-                //this->log_message("==============================");
-                sprintf(mess, "startup_state  : %s / %s", this->_zlac->info.left.error.startup_state ? "on " : "off", this->_zlac->info.right.error.startup_state ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "stop_state     : %s / %s", this->_zlac->info.left.error.stop_state ? "on " : "off", this->_zlac->info.right.error.stop_state ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "over_current   : %s / %s", this->_zlac->info.left.error.over_current ? "on " : "off", this->_zlac->info.right.error.over_current ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "over_voltage   : %s / %s", this->_zlac->info.left.error.over_voltage ? "on " : "off", this->_zlac->info.right.error.over_voltage ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "encoder_error  : %s / %s", this->_zlac->info.left.error.encoder_error ? "on " : "off", this->_zlac->info.right.error.encoder_error ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "overheat       : %s / %s", this->_zlac->info.left.error.overheat ? "on " : "off", this->_zlac->info.right.error.overheat ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "under_voltage  : %s / %s", this->_zlac->info.left.error.under_voltage ? "on " : "off", this->_zlac->info.right.error.under_voltage ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "overload       : %s / %s", this->_zlac->info.left.error.overload ? "on " : "off", this->_zlac->info.right.error.overload ? "on " : "off");
-                this->log_message(mess);
-                sprintf(mess, "not_connection : %s / %s", this->_zlac->info.left.error.not_connection ? "on " : "off", this->_zlac->info.right.error.not_connection ? "on " : "off");
-                this->log_message(mess);
-                this->log_message("------------------------------");
-                sprintf(mess, "voltage [%d V] [%d V]", this->_zlac->info.left.voltage, this->_zlac->info.right.voltage);
-                this->log_message(mess);
-                sprintf(mess, "current [%d mA] [%d mA]", this->_zlac->info.left.current, this->_zlac->info.right.current);
-                this->log_message(mess);
-                sprintf(mess, "speed [%d] [%d]", this->_zlac->info.left.speed_rpm, this->_zlac->info.right.speed_rpm);
-                this->log_message(mess);
-                sprintf(mess, "position_given [%d] [%d]", this->_zlac->info.left.position_given, this->_zlac->info.right.position_given);
-                this->log_message(mess);
-                sprintf(mess, "position_feedback [%d] [%d]", this->_zlac->info.left.position_feedback, this->_zlac->info.right.position_feedback);
-                this->log_message(mess);
-                this->log_message("==============================");
+                log_i("startup_state  : %s / %s", this->_zlac->info.left.error.startup_state ? "on " : "off", this->_zlac->info.right.error.startup_state ? "on " : "off");
+                log_i("stop_state     : %s / %s", this->_zlac->info.left.error.stop_state ? "on " : "off", this->_zlac->info.right.error.stop_state ? "on " : "off");
+                log_i("over_current   : %s / %s", this->_zlac->info.left.error.over_current ? "on " : "off", this->_zlac->info.right.error.over_current ? "on " : "off");
+                log_i("over_voltage   : %s / %s", this->_zlac->info.left.error.over_voltage ? "on " : "off", this->_zlac->info.right.error.over_voltage ? "on " : "off");
+                log_i("encoder_error  : %s / %s", this->_zlac->info.left.error.encoder_error ? "on " : "off", this->_zlac->info.right.error.encoder_error ? "on " : "off");
+                log_i("overheat       : %s / %s", this->_zlac->info.left.error.overheat ? "on " : "off", this->_zlac->info.right.error.overheat ? "on " : "off");
+                log_i("under_voltage  : %s / %s", this->_zlac->info.left.error.under_voltage ? "on " : "off", this->_zlac->info.right.error.under_voltage ? "on " : "off");
+                log_i("overload       : %s / %s", this->_zlac->info.left.error.overload ? "on " : "off", this->_zlac->info.right.error.overload ? "on " : "off");
+                log_i("not_connection : %s / %s", this->_zlac->info.left.error.not_connection ? "on " : "off", this->_zlac->info.right.error.not_connection ? "on " : "off");
+                log_i("%s", "------------------------------");
+                log_i("voltage [%d V] [%d V]", this->_zlac->info.left.voltage, this->_zlac->info.right.voltage);
+                log_i("current [%d mA] [%d mA]", this->_zlac->info.left.current, this->_zlac->info.right.current);
+                log_i("speed [%d] [%d]", this->_zlac->info.left.speed_rpm, this->_zlac->info.right.speed_rpm);
+                log_i("position_given [%d] [%d]", this->_zlac->info.left.position_given, this->_zlac->info.right.position_given);
+                log_i("position_feedback [%d] [%d]", this->_zlac->info.left.position_feedback, this->_zlac->info.right.position_feedback);
+                log_i("%s", "==============================");
                 break;
             default:
                 break;
@@ -510,7 +499,7 @@ void RoboClawForZlac::_receive()
 
 void RoboClawForZlac::_controller(uint8_t command, size_t command_size, uint8_t value[100], size_t value_size)
 {
-    this->log_trace(__func__);
+    log_v("%s", __func__);
     uint8_t buffer[255];
     unsigned int crc = 0;
     crc              = this->_crc_update(crc, this->_id);
@@ -601,25 +590,9 @@ bool RoboClawForZlac::update_id(int id)
     }
     return result;
 }
-void RoboClawForZlac::log_message_mode(bool enable)
+bool RoboClawForZlac::is_error_flag()
 {
-    if (true == enable) {
-        this->output_log_enable();
-    } else {
-        this->output_log_disable();
-    }
-#if DEBUG_ZLAC706_SERIAL
-    this->output_log_level(LogCallback::OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_TRACE);
-
-    if (nullptr != this->_zlac) {
-        this->_zlac->output_log_level(LogCallback::OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_TRACE);
-        if (true == enable) {
-            this->_zlac->output_log_enable();
-        } else {
-            this->_zlac->output_log_disable();
-        }
-    }
-#endif
+    return this->_zlac->is_error_flag();
 }
 #pragma endregion
 
@@ -650,6 +623,7 @@ bool RoboClawForZlac::reset()
 #elif DEBUG_ZLAC706_SERIAL_MODE == DEBUG_ZLAC706_SERIAL_MODE_TORQUE
         this->_zlac->cmd_torque_mode();
 #else
+        // this->_zlac->cmd_mode_selection(ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL);
         this->_zlac->cmd_speed_mode();
 #if ROBOCLAW_SETTING_SET_GAIN
         this->_zlac->cmd_setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.speed_proportional_gain);
@@ -661,9 +635,9 @@ bool RoboClawForZlac::reset()
         this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.speed_differential_gain);
 #endif
 #endif
-        // this->_zlac->cmd_mode_selection(ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL);
 
         this->_zlac->cmd_speed_set_acc_and_dec(this->_zlac->info.acceleration_ms, this->_zlac->info.deceleration_ms);
+        this->_zlac->cmd_looking_for_z_signal();
         this->_set_speed(0, 0);
         result = true;
     }
@@ -684,13 +658,12 @@ bool RoboClawForZlac::setup(HardwareSerial *input_serial, HardwareSerial *motor_
     try {
         if (false == this->_flag_initialized) {
             this->_input_serial = input_serial;
-            this->_input_serial->setTimeout(this->TIMEOUT_INPUT_SERIAL_MS);
+            //this->_input_serial->setTimeout(this->TIMEOUT_INPUT_SERIAL_MS);
+            this->_input_serial->setTimeout(150);
             this->_input_serial->begin(input_baud);
 
             this->_zlac->setup_serial_driver(motor_driver_left, motor_driver_right);
             this->_zlac->begin();
-
-            this->_set_log_level();
 
             this->_flag_initialized = true;
         }
@@ -706,56 +679,36 @@ bool RoboClawForZlac::loop()
     static unsigned long next_time_ms    = 0;
     static int ignore_cnt                = 0;
     bool result                          = true;
+    unsigned long current                = millis();
     if (true == this->_flag_setting) {
         ///////////////////////////////////////
         this->_receive();
         result = this->_zlac->cmd_speed_heart_beat();
         ///////////////////////////////////////
-        if (next_time_ms <= millis()) {
-            next_time_ms = millis() + TIME_INTERVAL_MS;
+        if (next_time_ms <= current) {
+            next_time_ms = current + TIME_INTERVAL_MS;
             if (false == this->_zlac->is_connection()) {
                 ignore_cnt++;
                 if (2 < ignore_cnt) {
                     result = this->reset();
-                    this->log_error("is not connection");
+                    log_e("is not connection");
                 }
             } else if (true == this->_zlac->is_error()) {
                 this->_zlac->cmd_clear_fault();
-                this->log_error("happened error");
+                log_e("happened error");
             } else {
                 ignore_cnt = 0;
             }
         }
     } else {
-        if (next_time_ms <= millis()) {
-            next_time_ms = millis() + TIME_INTERVAL_MS;
+        if (next_time_ms <= current) {
+            next_time_ms = current + TIME_INTERVAL_MS;
             result       = this->reset();
         } else {
             result = false;
         }
     }
     return !this->_zlac->is_error();
-}
-#pragma endregion
-
-///////////////////////////////////////////////////////////////////
-// Callback
-///////////////////////////////////////////////////////////////////
-#pragma region callback
-bool RoboClawForZlac::callback_message(MessageFunction callback)
-{
-    bool result = false;
-#if DEBUG_ZLAC706_SERIAL
-    if (nullptr != callback) {
-        if (nullptr != this->_zlac) {
-            (void)this->_zlac->set_callback_message(callback);
-            result = true;
-        }
-    }
-#else
-    result = true;
-#endif
-    return result;
 }
 #pragma endregion
 
@@ -780,15 +733,33 @@ RoboClawForZlac::roboclaw_state RoboClawForZlac::get_state()
 
     return state;
 }
+void RoboClawForZlac::set_log_update()
+{
+    this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_UPLOAD_DATA, 0, 0);
+}
+
 ZLAC706Serial::zlac_info RoboClawForZlac::get_zlac_info()
 {
     return this->_zlac->info;
 }
-void RoboClawForZlac::set_emergency(bool emergency)
+void RoboClawForZlac::set_emergency(bool flag)
 {
-    this->_zlac->info.flag.emergency = emergency;
-    this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_EMERGENCY, 0, ((true == emergency) ? 1 : 2));
-    this->_zlac->cmd_motor_stop();
+    this->_zlac->info.flag.emergency  = flag;
+    this->_zlac->info.flag.motor_free = false;
+    this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_EMERGENCY, 0, ((true == flag) ? 1 : 2));
+    this->reset();
+    this->_zlac->cmd_motor_start();
+}
+void RoboClawForZlac::set_motor_free(bool flag)
+{
+    if (false == this->_zlac->info.flag.emergency) {
+        this->_zlac->info.flag.motor_free = flag;
+        this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_MOTOR_FREE, 0, ((true == flag) ? 1 : 2));
+        this->reset();
+        this->_zlac->cmd_motor_start();
+        this->_set_speed(0, 0);
+        this->_zlac->cmd_motor_stop();
+    }
 }
 bool RoboClawForZlac::setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET target, int value)
 {
@@ -818,6 +789,10 @@ bool RoboClawForZlac::setting_dcc(ZLAC706Serial::DRIVER_TARGET target, int value
 {
     return this->_zlac->cmd_setting_dcc(target, value);
 }
+bool RoboClawForZlac::setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value)
+{
+    return this->_zlac->cmd_setting_limit(target, value);
+}
 bool RoboClawForZlac::setting_save()
 {
     return this->_zlac->setting_save();
@@ -832,24 +807,6 @@ bool RoboClawForZlac::_setting_load()
 // private function
 ///////////////////////////////////////////////////////////////////
 #pragma region private_function
-void RoboClawForZlac::_set_log_level()
-{
-#if DEBUG_ZLAC706_SERIAL
-    OUTPUT_LOG_LEVEL level = OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_DEBUG;
-    if (nullptr != this->_zlac) {
-        this->_zlac->output_log_level(level);
-    }
-    this->output_log_level(level);
-#else
-    if (nullptr != this->_zlac) {
-        this->_zlac->output_log_level(OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_OFF);
-        this->_zlac->output_log_disable();
-    }
-    this->output_log_level(OUTPUT_LOG_LEVEL::OUTPUT_LOG_LEVEL_OFF);
-    this->output_log_disable();
-#endif
-}
-
 bool RoboClawForZlac::_receive_wait(int size)
 {
     bool result             = false;
@@ -881,13 +838,7 @@ bool RoboClawForZlac::_check_id(uint8_t id)
 #endif
     if (false == result) {
         this->_zlac->cmd_clear_fault(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
-#if DEBUG_ZLAC706_SERIAL
-        char buffer[255];
-        sprintf(buffer, "Not id[0x%02X]", id);
-        this->log_warn(buffer);
-#else
-        this->log_warn("Not id");
-#endif
+        log_w("Not id[0x%02X]", id);
     }
     return result;
 }
@@ -911,7 +862,7 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t data[100], int size, b
             sprintf(buffer, " 0x%02X", send_data[i]);
             message.append(buffer);
         }
-        this->log_trace(message);
+        log_v("%s", message);
 #else
         this->_input_serial->write(send_data, length);
 #endif
@@ -923,7 +874,7 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t data[100], int size, b
             sprintf(buffer, " 0x%02X", data[i]);
             message.append(buffer);
         }
-        this->log_trace(message);
+        log_v("%s", message);
 #else
         this->_input_serial->write(data, size);
 #endif
@@ -943,12 +894,15 @@ unsigned int RoboClawForZlac::_crc_update(unsigned int crc, uint8_t data)
     return crc;
 }
 
-int RoboClawForZlac::_rpm_to_mps(int value)
+FourDimensionalChart *RoboClawForZlac::speed_mps_feedback()
 {
-    return (value * 60 * 1000) / (SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI);
+    return &this->_zlac->speed_mps_feedback;
 }
-
-int RoboClawForZlac::_mps_to_rpm(int value)
+FourDimensionalChart *RoboClawForZlac::speed_mps_request()
+{
+    return &this->_zlac->speed_mps_request;
+}
+int RoboClawForZlac::to_motor_value(int value)
 {
     return (value * SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI) / (60 * 1000);
 }
@@ -967,9 +921,10 @@ int RoboClawForZlac::_get_sign(double num)
 
 void RoboClawForZlac::_set_speed(int speed_left, int speed_right, bool enable_left, bool enable_right)
 {
-    log_trace(__func__);
-    static int left  = 0;
-    static int right = 0;
+    log_v("%s", __func__);
+    static int left        = 0;
+    static int right       = 0;
+    static bool flag_speed = false;
 
     if (true == this->_flag_initialized) {
         if (true == enable_left) {
@@ -979,25 +934,33 @@ void RoboClawForZlac::_set_speed(int speed_left, int speed_right, bool enable_le
             right = speed_right;
         }
 #if DEBUG_ZLAC706_SERIAL
-        char buffer[255];
-        sprintf(buffer, "%s left[%d],right[%d]", __func__, left, right);
-        log_debug(buffer);
+        log_d("%s left[%d],right[%d]", __func__, left, right);
 #endif
 
-        if ((1 >= abs(left)) && (1 >= abs(right))) {
-            this->_zlac->cmd_speed_set(0, 0);
-            this->_zlac->cmd_motor_stop();
+        if ((2 >= abs(left)) && (2 >= abs(right))) {
+            if (true == flag_speed) {
+                flag_speed = false;
+                this->_zlac->cmd_speed_set(0, 0);
+                this->_zlac->cmd_motor_stop();
+                //this->_zlac->cmd_speed_mode();
+            }
         } else {
-            this->_zlac->cmd_speed_set(this->_mps_to_rpm(left), this->_mps_to_rpm(right));
-            this->_zlac->cmd_motor_start();
+            this->_zlac->cmd_speed_set(this->to_motor_value(left), this->to_motor_value(right));
+            if (false == this->_zlac->info.flag.motor_free) {
+                if (false == flag_speed) {
+                    flag_speed = true;
+                    this->_zlac->cmd_motor_start();
+                }
+            }
         }
     }
 }
+
 #pragma endregion
 
 void RoboClawForZlac::_read_version(unsigned int crc)
 {
-    this->log_trace("ReadVersion");
+    log_v("ReadVersion");
     static String version_text = "RoboClaw for ZLAC";
     static const char *text    = version_text.c_str();
     uint8_t buffer[255];
@@ -1013,7 +976,7 @@ void RoboClawForZlac::_read_version(unsigned int crc)
 }
 void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("SpeedM1M2");
+    log_v("SpeedM1M2");
     int left  = (int32_t)((value[0] << 24) | (value[1] << 16) | (value[2] << 8) | (value[3] << 0));
     int right = (int32_t)((value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0));
 
@@ -1025,7 +988,7 @@ void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t v
 }
 void RoboClawForZlac::_forward_m1(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("ForwardM1");
+    log_v("ForwardM1");
     int left = (int32_t)(value[0]);
     this->_set_speed(left, 0, true, false);
 #if DEBUG_ZLAC706_SERIAL
@@ -1035,7 +998,7 @@ void RoboClawForZlac::_forward_m1(unsigned int crc, uint8_t value[100], size_t v
 }
 void RoboClawForZlac::_forward_m2(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("ForwardM2");
+    log_v("ForwardM2");
     int right = (int32_t)(value[0]);
     this->_set_speed(0, right, false, true);
 #if DEBUG_ZLAC706_SERIAL
@@ -1045,7 +1008,7 @@ void RoboClawForZlac::_forward_m2(unsigned int crc, uint8_t value[100], size_t v
 }
 void RoboClawForZlac::_backwards_m1(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("BackwardsM1");
+    log_v("BackwardsM1");
     int left = (int32_t)(value[0]);
     this->_set_speed(-left, 0, true, false);
 #if DEBUG_ZLAC706_SERIAL
@@ -1055,7 +1018,7 @@ void RoboClawForZlac::_backwards_m1(unsigned int crc, uint8_t value[100], size_t
 }
 void RoboClawForZlac::_backwards_m2(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("BackwardsM2");
+    log_v("BackwardsM2");
     int right = (int32_t)(value[0]);
     this->_set_speed(0, -right, false, true);
 #if DEBUG_ZLAC706_SERIAL
@@ -1065,7 +1028,7 @@ void RoboClawForZlac::_backwards_m2(unsigned int crc, uint8_t value[100], size_t
 }
 void RoboClawForZlac::_read_enc_m1(unsigned int crc)
 {
-    this->log_trace("ReadEncM1");
+    log_v("ReadEncM1");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
     int state           = 0; // TODO
@@ -1094,7 +1057,7 @@ void RoboClawForZlac::_read_enc_m1(unsigned int crc)
 }
 void RoboClawForZlac::_read_enc_m2(unsigned int crc)
 {
-    this->log_trace("ReadEncM2");
+    log_v("ReadEncM2");
     uint8_t buffer[255]  = { 0 };
     int length           = 0;
     static long previous = 0;
@@ -1126,7 +1089,7 @@ void RoboClawForZlac::_read_enc_m2(unsigned int crc)
 }
 void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size_t value_size)
 {
-    this->log_trace("ResetEncoders");
+    log_v("ResetEncoders");
     this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
     this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
 
@@ -1139,7 +1102,7 @@ void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size
 }
 void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc)
 {
-    this->log_trace("ReadMainBatteryVoltage");
+    log_v("ReadMainBatteryVoltage");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
     int voltage         = 0;
@@ -1159,7 +1122,7 @@ void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc)
 }
 void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc)
 {
-    this->log_trace("ReadLogicBatteryVoltage");
+    log_v("ReadLogicBatteryVoltage");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
     int voltage         = 0;
@@ -1180,7 +1143,7 @@ void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc)
 }
 void RoboClawForZlac::_read_temp(unsigned int crc)
 {
-    this->log_trace("ReadTemp");
+    log_v("ReadTemp");
     uint8_t buffer[255]       = { 0 };
     int length                = 0;
     static unsigned long temp = 20;
@@ -1192,7 +1155,7 @@ void RoboClawForZlac::_read_temp(unsigned int crc)
 }
 void RoboClawForZlac::_read_temp2(unsigned int crc)
 {
-    this->log_trace("ReadTemp2");
+    log_v("ReadTemp2");
     uint8_t buffer[255]       = { 0 };
     int length                = 0;
     static unsigned long temp = 20;
@@ -1205,7 +1168,7 @@ void RoboClawForZlac::_read_temp2(unsigned int crc)
 
 void RoboClawForZlac::_read_error(unsigned int crc)
 {
-    this->log_trace("ReadError");
+    log_v("ReadError");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
     this->_zlac->cmd_get_alarm_status();

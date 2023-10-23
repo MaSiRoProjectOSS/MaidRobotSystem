@@ -12,13 +12,12 @@
 #define ROBOCLAW_FOR_ZLAC_HPP
 #include "ZLAC706Serial/zlac706_serial.hpp"
 #include "config_roboclaw_for_zlac.hpp"
-#include "log_callback.hpp"
 
 #ifndef DRIVE_ID
 #define DRIVE_ID 0x80
 #endif
 
-class RoboClawForZlac : public LogCallback {
+class RoboClawForZlac {
 public:
     typedef enum roboclaw_state
     {
@@ -45,7 +44,9 @@ public:
     bool reset();
     roboclaw_state get_state();
     ZLAC706Serial::zlac_info get_zlac_info();
+    void set_log_update();
     void set_emergency(bool emergency);
+    void set_motor_free(bool emergency);
     bool setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
     bool setting_integral_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
     bool setting_differential_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
@@ -54,9 +55,14 @@ public:
     bool setting_acc(ZLAC706Serial::DRIVER_TARGET target, int value);
     bool setting_dcc(ZLAC706Serial::DRIVER_TARGET target, int value);
     bool setting_save();
+    bool setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value);
 
 public:
-    void log_message_mode(bool enable);
+    bool is_error_flag();
+
+    FourDimensionalChart *speed_mps_feedback();
+    FourDimensionalChart *speed_mps_request();
+    int to_motor_value(int value);
 
 private:
     const unsigned long TIMEOUT_INPUT_SERIAL_MS = 10;
@@ -65,15 +71,12 @@ private:
     ZLAC706Serial *_zlac;
     bool _flag_initialized = false;
     bool _flag_setting     = false;
-    void _set_log_level();
     void _receive();
     bool _check_id(uint8_t id);
     bool _receive_wait(int size);
 
     void _response(unsigned int crc, uint8_t data[100], int size, bool add_crc = true);
     unsigned int _crc_update(unsigned int crc, uint8_t data);
-    int _rpm_to_mps(int value);
-    int _mps_to_rpm(int value);
 
     bool _setting_load();
 
@@ -100,9 +103,6 @@ private:
     long _enc_postion    = 0;
     inline int _get_sign(double num);
     bool _check_crc(uint8_t id, uint8_t command, uint8_t *packet, int nBytes);
-
-protected:
-    bool callback_message(MessageFunction callback) override;
 
 private:
     unsigned long call_time = 0;

@@ -33,12 +33,8 @@
 		"editor.rulers": [
 			120
 		],
-		"files.associations": {
-			"xtree": "cpp",
-			"*.tcc": "cpp",
-			"string": "cpp"
-		},
 		"cSpell.words": [
+			"assy",
 			"Consolas",
 			"CRGB",
 			"darkgrey",
@@ -55,6 +51,7 @@
 			"onunload",
 			"PROGMEM",
 			"roboclaw",
+			"sntp",
 			"taskrunner",
 			"zlac"
 		],

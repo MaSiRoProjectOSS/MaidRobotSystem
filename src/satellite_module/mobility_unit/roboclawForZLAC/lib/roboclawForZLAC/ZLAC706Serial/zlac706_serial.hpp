@@ -11,12 +11,12 @@
 #ifndef ZLAC706_SERIAL_HPP
 #define ZLAC706_SERIAL_HPP
 
-#include "../log_callback.hpp"
 #include "config_zlac706_serial.hpp"
 
 #include <Arduino.h>
+#include <maid_robot_system/common/chart/four_dimensional.hpp>
 
-class ZLAC706Serial : public LogCallback {
+class ZLAC706Serial {
 public:
     typedef enum driver_target
     {
@@ -34,6 +34,8 @@ public:
         LOG_MODE,          // 5
         LOG_EMERGENCY,     // 6
         LOG_CRC_ERROR,     // 7
+        LOG_MOTOR_FREE,    // 8
+        LOG_UPLOAD_DATA,   // 9
         LOG_MAX
     } SYSTEM_LOG;
 
@@ -173,6 +175,7 @@ public:
         bool running    = false;
         bool emergency  = false;
         bool heart_beat = false;
+        bool motor_free = false;
     };
 
     struct zlac_info {
@@ -225,6 +228,7 @@ public:
     bool cmd_setting_inverted(DRIVER_TARGET target, bool value);
     bool cmd_setting_acc(DRIVER_TARGET target, int value);
     bool cmd_setting_dcc(DRIVER_TARGET target, int value);
+    bool cmd_setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value);
 
 public:
     bool cmd_modify_the_rated_current(int value_mW, DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL);
@@ -260,14 +264,20 @@ public:
     bool cmd_speed_set(int rpm_l, int rpm_r);
     bool cmd_speed_heart_beat();
 
+    FourDimensionalChart speed_mps_feedback;
+    FourDimensionalChart speed_mps_request;
+
+    float rpm_to_mps(int value);
+    float mps_to_rpm(int value);
+
 private:
     const unsigned long TIMEOUT_DRIVER_MS  = 50;
-    const unsigned long INTERVAL_DRIVER_MS = 5;
+    const unsigned long INTERVAL_DRIVER_MS = 1;
     bool _confirm(const char *name, DRIVER_TARGET target, char cmd, bool output_log = true);
-    bool _send_target(const char *name, DRIVER_TARGET target, char a1, char a2, char a3, bool confirm, bool output_log = true);
-    bool _send(const char *name, DRIVER_TARGET target, HardwareSerial *serial, char a1, char a2, char a3, bool confirm, bool output_log = true);
+    bool _send_target(const char *name, DRIVER_TARGET target, char a1, char a2, char a3, bool confirm, bool output_log = false);
+    bool _send(const char *name, DRIVER_TARGET target, HardwareSerial *serial, char a1, char a2, char a3, bool confirm, bool output_log = false);
 
-    int _receive(const char *name, HardwareSerial *serial, int size, char *buffer, bool output_log = true);
+    int _receive(const char *name, HardwareSerial *serial, int size, char *buffer, bool output_log = false);
     bool _receive_wait(HardwareSerial *serial, int size);
     //////////////////////////////////////
     void _clear_receive(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL);

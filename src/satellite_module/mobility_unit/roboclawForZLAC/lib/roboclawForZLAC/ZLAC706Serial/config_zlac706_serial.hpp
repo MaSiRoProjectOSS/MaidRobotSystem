@@ -98,22 +98,20 @@
 // CONTROL BOARD setting
 ///////////////////////////////////////////////////////////
 
-#ifndef DEBUG_TEST_BOARD
-#define SETTING_FLAG_INVERT (true)
-#else
 #ifndef SETTING_FLAG_INVERT
 #define SETTING_FLAG_INVERT (true)
-#else
-#define SETTING_FLAG_INVERT DEBUG_TEST_BOARD
-#endif
 #endif
 
 ///////////////////////////////////////////////////////////
 // Internal define
 ///////////////////////////////////////////////////////////
 
+#ifndef SETTING_LOAD_FILE_SETTING_INTERVAL
+#define SETTING_LOAD_FILE_SETTING_INTERVAL (0)
+#endif
+
 #ifndef SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI
-#define SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI (SETTING_SYSTEM_WHEEL_DIAMETER_MM * PI)
+#define SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI ((float)SETTING_SYSTEM_WHEEL_DIAMETER_MM * PI)
 #endif
 
 #endif
