@@ -9,3 +9,7 @@
 .initial_txt {
     font-size: initial;
 }
+
+.tb_fit_width {
+    width: 100%;
+}
