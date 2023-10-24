@@ -31,10 +31,12 @@
 		"files.encoding": "utf8",
 		"files.eol": "\n",
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"doxdocgen.file.versionTag": "@version 0.23.2",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
 		"doxdocgen.file.copyrightTag": [
 			"@copyright Copyright (c) MaSiRo Project. {year}-."
 		],
-		"doxdocgen.file.versionTag": "@version 0.23.2",
 		"cSpell.words": [
 			"Adafruit",
 			"doxdocgen",

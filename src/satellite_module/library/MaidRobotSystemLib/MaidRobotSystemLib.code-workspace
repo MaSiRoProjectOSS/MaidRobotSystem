@@ -6,10 +6,12 @@
 		}
 	],
 	"settings": {
-		"doxdocgen.file.copyrightTag": [
-			"@copyright Copyright (c) {year} / MaSiRo Project."
-		],
 		"doxdocgen.file.versionTag": "@version 0.23.4",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
 		"cSpell.words": [
 			"APIP",
 			"COMMU",
@@ -25,8 +27,6 @@
 			"PROGMEM",
 			"XIAO"
 		],
-		"doxdocgen.generic.useGitUserName": true,
-		"doxdocgen.generic.useGitUserEmail": true,
 		"files.watcherExclude": {
 			"**/.git/objects/**": true,
 			"**/.git/subtree-cache/**": true,
