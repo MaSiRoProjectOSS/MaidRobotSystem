@@ -1,0 +1,62 @@
+{
+	"folders": [
+		{
+			"name": "arm controller",
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.formatOnSave": true,
+		"markdown-preview-enhanced.singlePreview": false,
+		"markdown-preview-enhanced.scrollSync": true,
+		"search.exclude": {
+			"__*": true,
+			"**/.ino": true,
+			"**/*.cfg": true,
+			".pio": true,
+			"doxygen": true,
+			"**/Doxyfile": true
+		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/.*": false,
+			".vscode": false,
+			"CONTRIBUTING.md": true,
+			".gitignore": false
+		},
+		"files.encoding": "utf8",
+		"files.eol": "\n",
+		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"doxdocgen.file.versionTag": "@version 0.23.2",
+		"cSpell.words": [
+			"Adafruit",
+			"doxdocgen",
+			"Doxyfile",
+			"Doxygen",
+			"inatia",
+			"kasige",
+			"KBPS",
+			"KONDO",
+			"microros",
+			"onepose",
+			"ostream",
+			"RCAP",
+			"rclc",
+			"ROSIDL",
+			"seiso",
+			"strc",
+			"udekata",
+			"udemise",
+			"udeyoko",
+			"unazuku",
+			"xtree"
+		]
+	}
+}
