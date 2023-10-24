@@ -1,6 +1,7 @@
 {
 	"folders": [
 		{
+			"name": "roboclawForZLAC",
 			"path": "."
 		}
 	],
@@ -8,17 +9,20 @@
 		"files.encoding": "utf8",
 		"files.eol": "\n",
 		"doxdocgen.file.versionTag": "@version 0.23.1",
-		"doxdocgen.file.copyrightTag": [
-			"@copyright Copyright (c) {year} / MaSiRo Project."
-		],
 		"doxdocgen.generic.useGitUserName": true,
 		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
 		"editor.formatOnSave": true,
 		"markdown-preview-enhanced.singlePreview": false,
 		"markdown-preview-enhanced.scrollSync": true,
 		"search.exclude": {
 			"*.html": true,
-			"__*": true
+			"__*": true,
+			".pio/*": true,
+			"**/build": true,
+			"**/libdeps": true
 		},
 		"files.exclude": {
 			"**/.git": true,
