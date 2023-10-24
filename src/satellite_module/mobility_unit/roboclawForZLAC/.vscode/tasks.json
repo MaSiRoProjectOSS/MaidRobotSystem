@@ -1,0 +1,210 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "RoboClaw : motor : start : 2.5/0.0",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[2.5, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.0]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 2.0/0.0",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[2.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.0]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 1.0/0.0",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[1.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.0]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : -0.016000001/0.4375",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[-0.016000001, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.4375]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.416000009/-1.1875",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.416000009, 0.0, 0.0]'",
+                "'[0.0, 0.0, -1.1875]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.0/0.018465542",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.018465542]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.088/0.200000003",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.088, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.200000003]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.0/-0.024054538",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, -0.024054538]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.0/0.5",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.5]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.02/-0.3125",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.02, 0.0, 0.0]'",
+                "'[0.0, 0.0, -0.3125]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.012/-0.237499997",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.012, 0.0, 0.0]'",
+                "'[0.0, 0.0, -0.237499997]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : motor : start : 0.203999996/0.0",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "${config:task_parameter.topic-rate}",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.203999996, 0.0, 0.0]'",
+                "'[0.0, 0.0, 1.024999976]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : ROS : roscore",
+            "type": "shell",
+            "command": "roscore"
+        },
+        {
+            "label": "RoboClaw : ROS : RUN",
+            "type": "shell",
+            "command": "roslaunch roboclaw_node roboclaw.launch"
+        },
+        {
+            "label": "RoboClaw : motor : STOP",
+            "type": "shell",
+            "command": "rostopic",
+            "args": [
+                "pub",
+                "--once",
+                "/cmd_vel",
+                "geometry_msgs/Twist",
+                "--",
+                "'[0.0, 0.0, 0.0]'",
+                "'[0.0, 0.0, 0.0]'"
+            ]
+        },
+        {
+            "label": "RoboClaw : BUILD - pkg [roboclaw_node]",
+            "type": "shell",
+            "command": "/opt/masiro_ros_framework/.vscode/linux/project_make.sh",
+            "args": [
+                "/opt/masiro_ros_framework/ros_workspace",
+                "build",
+                "roboclaw_node",
+                ""
+            ]
+        }
+    ]
+}
