@@ -514,6 +514,14 @@ void RoboClawForZlac::_controller(uint8_t command, size_t command_size, uint8_t 
                 this->_zlac->info.direct.set(this->_id, command, value_size);
                 this->_read_version(crc);
                 break;
+            case 0x23: // roboclaw.SpeedM1
+                this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
+                this->_speed_m1(crc, value, value_size);
+                break;
+            case 0x24: // roboclaw.SpeedM2
+                this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
+                this->_speed_m2(crc, value, value_size);
+                break;
             case 0x25: // roboclaw.SpeedM1M2
                 this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
                 this->_speed_m1m2(crc, value, value_size);
@@ -904,7 +912,7 @@ FourDimensionalChart *RoboClawForZlac::speed_mps_request()
 }
 int RoboClawForZlac::to_motor_value(int value)
 {
-    return (value * SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI) / (60 * 1000);
+    return (value * 60);
 }
 #pragma endregion
 
@@ -981,6 +989,28 @@ void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t v
     int right = (int32_t)((value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0));
 
     this->_set_speed(left, right);
+#if DEBUG_ZLAC706_SERIAL
+#else
+    this->_input_serial->write(0xFF);
+#endif
+}
+void RoboClawForZlac::_speed_m1(unsigned int crc, uint8_t value[100], size_t value_size)
+{
+    log_v("SpeedM1");
+    int left = (int32_t)((value[0] << 24) | (value[1] << 16) | (value[2] << 8) | (value[3] << 0));
+
+    this->_set_speed(left, 0, true, false);
+#if DEBUG_ZLAC706_SERIAL
+#else
+    this->_input_serial->write(0xFF);
+#endif
+}
+void RoboClawForZlac::_speed_m2(unsigned int crc, uint8_t value[100], size_t value_size)
+{
+    log_v("SpeedM2");
+    int right = (int32_t)((value[0] << 24) | (value[1] << 16) | (value[2] << 8) | (value[3] << 0));
+
+    this->_set_speed(0, right, false, true);
 #if DEBUG_ZLAC706_SERIAL
 #else
     this->_input_serial->write(0xFF);

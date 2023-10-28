@@ -84,6 +84,8 @@ private:
     void _controller(uint8_t command, size_t command_size, uint8_t value[100], size_t value_size);
     void _read_version(unsigned int crc);
     void _speed_m1m2(unsigned int crc, uint8_t value[100], size_t value_size);
+    void _speed_m1(unsigned int crc, uint8_t value[100], size_t value_size);
+    void _speed_m2(unsigned int crc, uint8_t value[100], size_t value_size);
     void _reset_encoders(unsigned int crc, uint8_t value[100], size_t value_size);
     void _forward_m1(unsigned int crc, uint8_t value[100], size_t value_size);
     void _forward_m2(unsigned int crc, uint8_t value[100], size_t value_size);

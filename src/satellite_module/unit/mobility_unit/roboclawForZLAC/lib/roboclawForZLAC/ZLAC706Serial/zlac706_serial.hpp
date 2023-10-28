@@ -70,10 +70,17 @@ public:
         char v09 = 0;
     };
 
-    template <int LIST_SIZE = 20> class OrderList {
+    template <int LIST_SIZE = 20>
+    class OrderList {
     public:
-        OrderList() { this->reset(); }
-        void reset() { this->length = 0; }
+        OrderList()
+        {
+            this->reset();
+        }
+        void reset()
+        {
+            this->length = 0;
+        }
         void set(char a1,
                  char a2,
                  char a3, //
@@ -261,7 +268,7 @@ public:
     //////////////////////////////////////
     bool cmd_speed_mode();
     bool cmd_speed_set_acc_and_dec(int acceleration_ms, int deceleration_ms, DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL);
-    bool cmd_speed_set(int rpm_l, int rpm_r);
+    bool cmd_speed_set(int mili_rpm_l, int mili_rpm_r);
     bool cmd_speed_heart_beat();
 
     FourDimensionalChart speed_mps_feedback;

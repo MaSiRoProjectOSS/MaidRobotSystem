@@ -889,42 +889,42 @@ bool ZLAC706Serial::cmd_torque_set(int value_l_mA, int value_r_mA)
 
     return result_01 && result_02;
 }
-bool ZLAC706Serial::cmd_speed_set(int rpm_l, int rpm_r)
+bool ZLAC706Serial::cmd_speed_set(int mili_rpm_l, int mili_rpm_r)
 {
     log_v("%s", __func__);
     bool result_01 = true;
     bool result_02 = true;
     if (true == this->info.left.interval) {
-        rpm_l = -rpm_l;
+        mili_rpm_l = -mili_rpm_l;
     }
     if (true == this->info.right.interval) {
-        rpm_r = -rpm_r;
+        mili_rpm_r = -mili_rpm_r;
     }
 
     if ((true == this->info.flag.emergency) || (false == this->info.flag.heart_beat)) {
-        rpm_l = 0;
-        rpm_r = 0;
+        mili_rpm_l = 0;
+        mili_rpm_r = 0;
     }
-    this->info.left.speed_request_rpm  = rpm_l;
-    this->info.right.speed_request_rpm = rpm_r;
+    this->info.left.speed_request_rpm  = mili_rpm_l / 1000;
+    this->info.right.speed_request_rpm = mili_rpm_r / 1000;
 
-    if (this->info.SPEED_LIMIT < rpm_l) {
-        rpm_l = this->info.SPEED_LIMIT;
-    } else if (rpm_l < -this->info.SPEED_LIMIT) {
-        rpm_l = -this->info.SPEED_LIMIT;
+    if (this->info.SPEED_LIMIT < (mili_rpm_l / 1000)) {
+        mili_rpm_l = this->info.SPEED_LIMIT * 1000;
+    } else if ((mili_rpm_l / 1000) < -this->info.SPEED_LIMIT) {
+        mili_rpm_l = -this->info.SPEED_LIMIT * 1000;
     }
-    if (this->info.SPEED_LIMIT < rpm_r) {
-        rpm_r = this->info.SPEED_LIMIT;
-    } else if (rpm_r < -this->info.SPEED_LIMIT) {
-        rpm_r = -this->info.SPEED_LIMIT;
+    if (this->info.SPEED_LIMIT < (mili_rpm_r / 1000)) {
+        mili_rpm_r = this->info.SPEED_LIMIT * 1000;
+    } else if ((mili_rpm_r / 1000) < -this->info.SPEED_LIMIT) {
+        mili_rpm_r = -this->info.SPEED_LIMIT * 1000;
     }
-    this->speed_mps_request.set(this->rpm_to_mps(rpm_l), this->rpm_to_mps(rpm_r), 0, 0);
+    this->speed_mps_request.set(this->rpm_to_mps(mili_rpm_l / 1000), this->rpm_to_mps(mili_rpm_r / 1000), 0, 0);
 
-    int value_l = (rpm_l * 8192) / 3000;
-    int value_r = (rpm_r * 8192) / 3000;
+    int enc_per_s_l = (mili_rpm_l * 4096 * 4) / (60 * 1000);
+    int enc_per_s_r = (mili_rpm_r * 4096 * 4) / (60 * 1000);
 
-    this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_LEFT, 0x06, (value_l >> 8) & 0xFF, (value_l >> 0) & 0xFF, false);
-    this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_RIGHT, 0x06, (value_r >> 8) & 0xFF, (value_r >> 0) & 0xFF, false);
+    this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_LEFT, 0x06, (enc_per_s_l >> 8) & 0xFF, (enc_per_s_l >> 0) & 0xFF, false);
+    this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_RIGHT, 0x06, (enc_per_s_r >> 8) & 0xFF, (enc_per_s_r >> 0) & 0xFF, false);
 
     result_01 = this->_confirm(__func__, DRIVER_TARGET::DRIVER_TARGET_LEFT, 0x06);
     result_02 = this->_confirm(__func__, DRIVER_TARGET::DRIVER_TARGET_RIGHT, 0x06);
