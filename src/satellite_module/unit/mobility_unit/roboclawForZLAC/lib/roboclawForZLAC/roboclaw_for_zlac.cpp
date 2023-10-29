@@ -512,7 +512,7 @@ void RoboClawForZlac::_controller(uint8_t command, size_t command_size, uint8_t 
         switch (command) {
             case 0x15: // roboclaw.ReadVersion
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_version(crc);
+                this->_read_version(crc, command);
                 break;
             case 0x23: // roboclaw.SpeedM1
                 this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
@@ -525,6 +525,18 @@ void RoboClawForZlac::_controller(uint8_t command, size_t command_size, uint8_t 
             case 0x25: // roboclaw.SpeedM1M2
                 this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
                 this->_speed_m1m2(crc, value, value_size);
+                break;
+            case 0x4F:
+                this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
+                this->_get_speed_m1m2(crc, command);
+                break;
+            case 0x12: // GETM1SPEED
+                this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
+                this->_get_speed_m1(crc, command);
+                break;
+            case 0x13: // GETM2SPEED
+                this->_zlac->info.direct.set(this->_id, command, value_size, value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8], value[9]);
+                this->_get_speed_m2(crc, command);
                 break;
             case 0x14: // roboclaw.ResetEncoders
                 this->_zlac->info.direct.set(this->_id, command, value_size);
@@ -548,31 +560,31 @@ void RoboClawForZlac::_controller(uint8_t command, size_t command_size, uint8_t 
                 break;
             case 0x10: // roboclaw.ReadEncM1
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_enc_m1(crc);
+                this->_read_enc_m1(crc, command);
                 break;
             case 0x11: // roboclaw.ReadEncM2
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_enc_m2(crc);
+                this->_read_enc_m2(crc, command);
                 break;
             case 0x18: // roboclaw.ReadMainBatteryVoltage
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_main_battery_voltage(crc);
+                this->_read_main_battery_voltage(crc, command);
                 break;
             case 0x19: // roboclaw.ReadLogicBatteryVoltage
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_logic_battery_voltage(crc);
+                this->_read_logic_battery_voltage(crc, command);
                 break;
             case 0x52: // roboclaw.ReadTemp
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_temp(crc);
+                this->_read_temp(crc, command);
                 break;
             case 0x53: // roboclaw.ReadTemp2
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_temp2(crc);
+                this->_read_temp2(crc, command);
                 break;
             case 0x5A: // roboclaw.ReadError
                 this->_zlac->info.direct.set(this->_id, command, value_size);
-                this->_read_error(crc);
+                this->_read_error(crc, command);
                 break;
             default:
                 this->_zlac->info.direct.set(0, command, value_size);
@@ -850,7 +862,7 @@ bool RoboClawForZlac::_check_id(uint8_t id)
     }
     return result;
 }
-void RoboClawForZlac::_response(unsigned int crc, uint8_t data[100], int size, bool add_crc)
+void RoboClawForZlac::_response(unsigned int crc, uint8_t command, uint8_t data[100], int size, bool add_crc)
 {
     if (true == add_crc) {
         uint8_t send_data[100] = { 0 };
@@ -873,6 +885,20 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t data[100], int size, b
         log_v("%s", message);
 #else
         this->_input_serial->write(send_data, length);
+        this->_zlac->info.direct.set(this->_id,
+                                     command,
+                                     length,
+                                     send_data[0],
+                                     send_data[1],
+                                     send_data[2],
+                                     send_data[3], //
+                                     send_data[4],
+                                     send_data[5],
+                                     send_data[6],
+                                     send_data[7],
+                                     send_data[8],
+                                     send_data[9]);
+
 #endif
     } else {
 #if DEBUG_ZLAC706_SERIAL
@@ -885,6 +911,19 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t data[100], int size, b
         log_v("%s", message);
 #else
         this->_input_serial->write(data, size);
+        this->_zlac->info.direct.set(this->_id,
+                                     command,
+                                     size,
+                                     data[0],
+                                     data[1],
+                                     data[2],
+                                     data[3], //
+                                     data[4],
+                                     data[5],
+                                     data[6],
+                                     data[7],
+                                     data[8],
+                                     data[9]);
 #endif
     }
 }
@@ -912,7 +951,7 @@ FourDimensionalChart *RoboClawForZlac::speed_mps_request()
 }
 int RoboClawForZlac::to_motor_value(int value)
 {
-    return (value * 60);
+    return (value);
 }
 #pragma endregion
 
@@ -966,7 +1005,7 @@ void RoboClawForZlac::_set_speed(int speed_left, int speed_right, bool enable_le
 
 #pragma endregion
 
-void RoboClawForZlac::_read_version(unsigned int crc)
+void RoboClawForZlac::_read_version(unsigned int crc, uint8_t command)
 {
     log_v("ReadVersion");
     static String version_text = "RoboClaw for ZLAC";
@@ -980,7 +1019,7 @@ void RoboClawForZlac::_read_version(unsigned int crc)
     buffer[length++] = 10;
     buffer[length++] = 0;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
 void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t value_size)
 {
@@ -993,6 +1032,66 @@ void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t v
 #else
     this->_input_serial->write(0xFF);
 #endif
+}
+
+void RoboClawForZlac::_get_speed_m1m2(unsigned int crc, uint8_t command)
+{
+    log_v("GetSpeedM1M2");
+    uint8_t buffer[255] = { 0 };
+    int length          = 0;
+    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    int32_t rps_l    = (this->_zlac->info.left.speed_enc * 1000 * 60) / (4096 * 4);
+    int32_t rps_r    = (this->_zlac->info.right.speed_enc * 1000 * 60) / (4096 * 4);
+    buffer[length++] = (rps_l >> 24) & 0xFF;
+    buffer[length++] = (rps_l >> 16) & 0xFF;
+    buffer[length++] = (rps_l >> 8) & 0xFF;
+    buffer[length++] = (rps_l >> 0) & 0xFF;
+    buffer[length++] = (rps_r >> 24) & 0xFF;
+    buffer[length++] = (rps_r >> 16) & 0xFF;
+    buffer[length++] = (rps_r >> 8) & 0xFF;
+    buffer[length++] = (rps_r >> 0) & 0xFF;
+    /* Receive: [ISpeed1(4 bytes), ISpeed2(4 bytes), CRC(2 bytes)] */
+    this->_response(crc, command, buffer, length, true);
+}
+
+void RoboClawForZlac::_get_speed_m1(unsigned int crc, uint8_t command)
+{
+    log_v("GetSpeedM1");
+    uint8_t buffer[255] = { 0 };
+    int length          = 0;
+    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+
+    int32_t rps      = (this->_zlac->info.left.speed_enc * 1000 * 60) / (4096 * 4);
+    int state        = (rps > 0) ? 0 : 1;
+    buffer[length++] = (rps >> 24) & 0xFF;
+    buffer[length++] = (rps >> 16) & 0xFF;
+    buffer[length++] = (rps >> 8) & 0xFF;
+    buffer[length++] = (rps >> 0) & 0xFF;
+    buffer[length++] = (state >> 0) & 0xFF;
+
+    /* Receive: [Speed(4 bytes), Status, CRC(2 bytes)] */
+
+    this->_response(crc, command, buffer, length, true);
+}
+
+void RoboClawForZlac::_get_speed_m2(unsigned int crc, uint8_t command)
+{
+    log_v("GetSpeedM2");
+    uint8_t buffer[255] = { 0 };
+    int length          = 0;
+    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    int32_t rps      = (this->_zlac->info.right.speed_enc * 1000 * 60) / (4096 * 4);
+    int state        = (rps > 0) ? 0 : 1;
+    buffer[length++] = (rps >> 24) & 0xFF;
+    buffer[length++] = (rps >> 16) & 0xFF;
+    buffer[length++] = (rps >> 8) & 0xFF;
+    buffer[length++] = (rps >> 0) & 0xFF;
+    buffer[length++] = (state >> 0) & 0xFF;
+
+    /* Receive: [Speed(4 bytes), Status, CRC(2 bytes)] */
+
+    this->_response(crc, command, buffer, length, true);
 }
 void RoboClawForZlac::_speed_m1(unsigned int crc, uint8_t value[100], size_t value_size)
 {
@@ -1056,7 +1155,7 @@ void RoboClawForZlac::_backwards_m2(unsigned int crc, uint8_t value[100], size_t
     this->_input_serial->write(0xFF);
 #endif
 }
-void RoboClawForZlac::_read_enc_m1(unsigned int crc)
+void RoboClawForZlac::_read_enc_m1(unsigned int crc, uint8_t command)
 {
     log_v("ReadEncM1");
     uint8_t buffer[255] = { 0 };
@@ -1083,9 +1182,9 @@ void RoboClawForZlac::_read_enc_m1(unsigned int crc)
     Bit7 - Reserved
     */
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
-void RoboClawForZlac::_read_enc_m2(unsigned int crc)
+void RoboClawForZlac::_read_enc_m2(unsigned int crc, uint8_t command)
 {
     log_v("ReadEncM2");
     uint8_t buffer[255]  = { 0 };
@@ -1115,7 +1214,7 @@ void RoboClawForZlac::_read_enc_m2(unsigned int crc)
     Bit6 - Reserved
     Bit7 - Reserved
 */
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
 void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size_t value_size)
 {
@@ -1130,7 +1229,7 @@ void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size
     this->_input_serial->write(0xFF);
 #endif
 }
-void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc)
+void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc, uint8_t command)
 {
     log_v("ReadMainBatteryVoltage");
     uint8_t buffer[255] = { 0 };
@@ -1148,9 +1247,9 @@ void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc)
     buffer[length++] = (voltage >> 8) & 0xFF;
     buffer[length++] = (voltage >> 0) & 0xFF;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
-void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc)
+void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc, uint8_t command)
 {
     log_v("ReadLogicBatteryVoltage");
     uint8_t buffer[255] = { 0 };
@@ -1169,9 +1268,9 @@ void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc)
     buffer[length++] = (voltage >> 8) & 0xFF;
     buffer[length++] = (voltage >> 0) & 0xFF;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
-void RoboClawForZlac::_read_temp(unsigned int crc)
+void RoboClawForZlac::_read_temp(unsigned int crc, uint8_t command)
 {
     log_v("ReadTemp");
     uint8_t buffer[255]       = { 0 };
@@ -1181,9 +1280,9 @@ void RoboClawForZlac::_read_temp(unsigned int crc)
     buffer[length++] = (temp >> 8) & 0xFF;
     buffer[length++] = (temp >> 0) & 0xFF;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
-void RoboClawForZlac::_read_temp2(unsigned int crc)
+void RoboClawForZlac::_read_temp2(unsigned int crc, uint8_t command)
 {
     log_v("ReadTemp2");
     uint8_t buffer[255]       = { 0 };
@@ -1193,10 +1292,10 @@ void RoboClawForZlac::_read_temp2(unsigned int crc)
     buffer[length++] = (temp >> 8) & 0xFF;
     buffer[length++] = (temp >> 0) & 0xFF;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
 
-void RoboClawForZlac::_read_error(unsigned int crc)
+void RoboClawForZlac::_read_error(unsigned int crc, uint8_t command)
 {
     log_v("ReadError");
     uint8_t buffer[255] = { 0 };
@@ -1253,7 +1352,7 @@ void RoboClawForZlac::_read_error(unsigned int crc)
     buffer[length++] = (state >> 8) & 0xFF;
     buffer[length++] = (state >> 0) & 0xFF;
 
-    this->_response(crc, buffer, length, true);
+    this->_response(crc, command, buffer, length, true);
 }
 #pragma endregion
 

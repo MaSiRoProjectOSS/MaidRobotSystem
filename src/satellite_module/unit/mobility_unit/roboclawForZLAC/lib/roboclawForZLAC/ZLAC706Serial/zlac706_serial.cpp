@@ -889,39 +889,39 @@ bool ZLAC706Serial::cmd_torque_set(int value_l_mA, int value_r_mA)
 
     return result_01 && result_02;
 }
-bool ZLAC706Serial::cmd_speed_set(int mili_rpm_l, int mili_rpm_r)
+bool ZLAC706Serial::cmd_speed_set(int milli_rpm_l, int milli_rpm_r)
 {
     log_v("%s", __func__);
     bool result_01 = true;
     bool result_02 = true;
     if (true == this->info.left.interval) {
-        mili_rpm_l = -mili_rpm_l;
+        milli_rpm_l = -milli_rpm_l;
     }
     if (true == this->info.right.interval) {
-        mili_rpm_r = -mili_rpm_r;
+        milli_rpm_r = -milli_rpm_r;
     }
 
     if ((true == this->info.flag.emergency) || (false == this->info.flag.heart_beat)) {
-        mili_rpm_l = 0;
-        mili_rpm_r = 0;
+        milli_rpm_l = 0;
+        milli_rpm_r = 0;
     }
-    this->info.left.speed_request_rpm  = mili_rpm_l / 1000;
-    this->info.right.speed_request_rpm = mili_rpm_r / 1000;
+    this->info.left.speed_request_rpm  = milli_rpm_l;
+    this->info.right.speed_request_rpm = milli_rpm_r;
 
-    if (this->info.SPEED_LIMIT < (mili_rpm_l / 1000)) {
-        mili_rpm_l = this->info.SPEED_LIMIT * 1000;
-    } else if ((mili_rpm_l / 1000) < -this->info.SPEED_LIMIT) {
-        mili_rpm_l = -this->info.SPEED_LIMIT * 1000;
+    if (this->info.SPEED_LIMIT < (milli_rpm_l / 60)) {
+        milli_rpm_l = this->info.SPEED_LIMIT * 60;
+    } else if ((milli_rpm_l / 60) < -this->info.SPEED_LIMIT) {
+        milli_rpm_l = -this->info.SPEED_LIMIT * 60;
     }
-    if (this->info.SPEED_LIMIT < (mili_rpm_r / 1000)) {
-        mili_rpm_r = this->info.SPEED_LIMIT * 1000;
-    } else if ((mili_rpm_r / 1000) < -this->info.SPEED_LIMIT) {
-        mili_rpm_r = -this->info.SPEED_LIMIT * 1000;
+    if (this->info.SPEED_LIMIT < (milli_rpm_r / 60)) {
+        milli_rpm_r = this->info.SPEED_LIMIT * 60;
+    } else if ((milli_rpm_r / 60) < -this->info.SPEED_LIMIT) {
+        milli_rpm_r = -this->info.SPEED_LIMIT * 60;
     }
-    this->speed_mps_request.set(this->rpm_to_mps(mili_rpm_l / 1000), this->rpm_to_mps(mili_rpm_r / 1000), 0, 0);
+    this->speed_mps_request.set(this->rpm_to_mps(milli_rpm_l / 60), this->rpm_to_mps(milli_rpm_r / 60), 0, 0);
 
-    int enc_per_s_l = (mili_rpm_l * 4096 * 4) / (60 * 1000);
-    int enc_per_s_r = (mili_rpm_r * 4096 * 4) / (60 * 1000);
+    int enc_per_s_l = (milli_rpm_l * 4096 * 4) / (60 * 1000);
+    int enc_per_s_r = (milli_rpm_r * 4096 * 4) / (60 * 1000);
 
     this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_LEFT, 0x06, (enc_per_s_l >> 8) & 0xFF, (enc_per_s_l >> 0) & 0xFF, false);
     this->_send_target(__func__, DRIVER_TARGET::DRIVER_TARGET_RIGHT, 0x06, (enc_per_s_r >> 8) & 0xFF, (enc_per_s_r >> 0) & 0xFF, false);
@@ -1155,8 +1155,8 @@ bool ZLAC706Serial::cmd_get_bus_voltage(DRIVER_TARGET target)
     bool result_02   = true;
     char buffer[255] = { 0 };
     if (true == this->_send_target(__func__, target, 0x61, 0x00, 0x00, true)) {
-        result_01 = false;
         if ((DRIVER_TARGET::DRIVER_TARGET_LEFT == target) || (DRIVER_TARGET::DRIVER_TARGET_ALL == target)) {
+            result_01 = false;
             if (4 <= this->_receive(__func__, this->_serial_driver_1, 4, buffer)) {
                 this->info.left.voltage = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
                 result_01               = true;
@@ -1180,8 +1180,8 @@ bool ZLAC706Serial::cmd_get_output_current(DRIVER_TARGET target)
     bool result_02   = true;
     char buffer[255] = { 0 };
     if (true == this->_send_target(__func__, target, 0x62, 0x00, 0x00, true)) {
-        result_01 = false;
         if ((DRIVER_TARGET::DRIVER_TARGET_LEFT == target) || (DRIVER_TARGET::DRIVER_TARGET_ALL == target)) {
+            result_01 = false;
             if (4 <= this->_receive(__func__, this->_serial_driver_1, 4, buffer)) {
                 this->info.left.current = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
                 result_01               = true;
@@ -1201,25 +1201,40 @@ bool ZLAC706Serial::cmd_get_output_current(DRIVER_TARGET target)
 bool ZLAC706Serial::cmd_get_motor_speed(DRIVER_TARGET target)
 {
     log_v("%s", __func__);
+
+    static unsigned long next_time_l = 0;
+    static unsigned long next_time_r = 0;
+    unsigned long now_time           = millis();
+
     bool result_01   = true;
     bool result_02   = true;
     int get_value    = 0;
     char buffer[255] = { 0 };
     if (true == this->_send_target(__func__, target, 0x63, 0x00, 0x00, true)) {
-        result_01 = false;
         if ((DRIVER_TARGET::DRIVER_TARGET_LEFT == target) || (DRIVER_TARGET::DRIVER_TARGET_ALL == target)) {
-            if (4 <= this->_receive(__func__, this->_serial_driver_1, 4, buffer)) {
-                get_value                 = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
-                this->info.left.speed_rpm = (get_value * 3000) / 8192;
-                result_01                 = true;
+            if (now_time < next_time_l) {
+                result_01 = true;
+            } else {
+                result_01 = false;
+                if (4 <= this->_receive(__func__, this->_serial_driver_1, 4, buffer)) {
+                    this->info.left.speed_enc = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
+                    this->info.left.speed_rpm = (this->info.left.speed_enc * 3000) / 8192;
+                    result_01                 = true;
+                    next_time_l               = now_time + this->TIMEOUT_DRIVER_MS;
+                }
             }
         }
         if ((DRIVER_TARGET::DRIVER_TARGET_RIGHT == target) || (DRIVER_TARGET::DRIVER_TARGET_ALL == target)) {
-            result_02 = false;
-            if (4 <= this->_receive(__func__, this->_serial_driver_2, 4, buffer)) {
-                get_value                  = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
-                this->info.right.speed_rpm = (get_value * 3000) / 8192;
-                result_02                  = true;
+            if (now_time < next_time_r) {
+                result_02 = true;
+            } else {
+                result_02 = false;
+                if (4 <= this->_receive(__func__, this->_serial_driver_2, 4, buffer)) {
+                    this->info.right.speed_enc = (int16_t)((buffer[1] << 8) | (buffer[2] << 0));
+                    this->info.right.speed_rpm = (this->info.right.speed_enc * 3000) / 8192;
+                    result_02                  = true;
+                    next_time_r                = now_time + this->TIMEOUT_DRIVER_MS;
+                }
             }
         }
         this->speed_mps_feedback.set(this->rpm_to_mps(this->info.left.speed_rpm), this->rpm_to_mps(this->info.right.speed_rpm), 0, 0);

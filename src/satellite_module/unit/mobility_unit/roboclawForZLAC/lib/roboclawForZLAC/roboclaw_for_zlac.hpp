@@ -75,14 +75,14 @@ private:
     bool _check_id(uint8_t id);
     bool _receive_wait(int size);
 
-    void _response(unsigned int crc, uint8_t data[100], int size, bool add_crc = true);
+    void _response(unsigned int crc, uint8_t command, uint8_t data[100], int size, bool add_crc = true);
     unsigned int _crc_update(unsigned int crc, uint8_t data);
 
     bool _setting_load();
 
 private:
     void _controller(uint8_t command, size_t command_size, uint8_t value[100], size_t value_size);
-    void _read_version(unsigned int crc);
+    void _read_version(unsigned int crc, uint8_t command);
     void _speed_m1m2(unsigned int crc, uint8_t value[100], size_t value_size);
     void _speed_m1(unsigned int crc, uint8_t value[100], size_t value_size);
     void _speed_m2(unsigned int crc, uint8_t value[100], size_t value_size);
@@ -91,13 +91,17 @@ private:
     void _forward_m2(unsigned int crc, uint8_t value[100], size_t value_size);
     void _backwards_m1(unsigned int crc, uint8_t value[100], size_t value_size);
     void _backwards_m2(unsigned int crc, uint8_t value[100], size_t value_size);
-    void _read_enc_m1(unsigned int crc);
-    void _read_enc_m2(unsigned int crc);
-    void _read_error(unsigned int crc);
-    void _read_main_battery_voltage(unsigned int crc);
-    void _read_logic_battery_voltage(unsigned int crc);
-    void _read_temp(unsigned int crc);
-    void _read_temp2(unsigned int crc);
+    void _read_enc_m1(unsigned int crc, uint8_t command);
+    void _read_enc_m2(unsigned int crc, uint8_t command);
+    void _read_error(unsigned int crc, uint8_t command);
+    void _read_main_battery_voltage(unsigned int crc, uint8_t command);
+    void _read_logic_battery_voltage(unsigned int crc, uint8_t command);
+    void _read_temp(unsigned int crc, uint8_t command);
+    void _read_temp2(unsigned int crc, uint8_t command);
+
+    void _get_speed_m1(unsigned int crc, uint8_t command);
+    void _get_speed_m2(unsigned int crc, uint8_t command);
+    void _get_speed_m1m2(unsigned int crc, uint8_t command);
 
     void _set_speed(int speed_left, int speed_right, bool enable_left = true, bool enable_right = true);
 

@@ -153,6 +153,7 @@ public:
         OrderList<20> order;
         int voltage                 = 0;
         int current                 = 0;
+        int speed_enc               = 0;
         int speed_rpm               = 0;
         int speed_request_rpm       = 0;
         long position_request       = 0;
@@ -268,7 +269,7 @@ public:
     //////////////////////////////////////
     bool cmd_speed_mode();
     bool cmd_speed_set_acc_and_dec(int acceleration_ms, int deceleration_ms, DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL);
-    bool cmd_speed_set(int mili_rpm_l, int mili_rpm_r);
+    bool cmd_speed_set(int milli_rpm_l, int milli_rpm_r);
     bool cmd_speed_heart_beat();
 
     FourDimensionalChart speed_mps_feedback;

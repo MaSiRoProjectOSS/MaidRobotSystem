@@ -18,6 +18,8 @@ if (!JS_Ctrl) {
         loading: false,
         timerInterval: 500,
         ref_v: true,
+        lg_max: 10000,
+        lg_def: 25,
         kmph_to_rpm: function (v) {
             return Math.floor(((v * 1000 / 60)) / (0.206 * 3.1415));
         },
@@ -73,7 +75,7 @@ if (!JS_Ctrl) {
         log_ch: function () {
             var sw = document.getElementById("swLogSize");
             sw.checked = !sw.checked;
-            JS_Ctrl.l_max = (true == sw.checked) ? 1000 : 25;
+            JS_Ctrl.l_max = (true == sw.checked) ? JS_Ctrl.lg_max : JS_Ctrl.lg_def;
             document.getElementById("sfd_cnt").innerHTML = "Log Size : " + JS_Ctrl.l_max;
         },
         s_yn: function (elm, val) {
