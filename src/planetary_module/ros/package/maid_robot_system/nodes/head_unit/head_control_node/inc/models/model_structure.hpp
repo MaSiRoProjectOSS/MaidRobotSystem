@@ -53,7 +53,7 @@ public:
     int detected_type   = 0;
     double next_seconds = 0.0;
     // int emotion;
-    // int size;
+    // int dimensions;
     // bool flag_reversal;
     /////
     // int distance;

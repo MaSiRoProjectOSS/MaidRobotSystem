@@ -1,0 +1,46 @@
+{
+	"folders": [
+		{
+			"name": "leg controller",
+			"path": "."
+		}
+	],
+	"settings": {
+		"search.exclude": {
+			"__*": true,
+			"**/*.cfg": true,
+			"doxygen": true,
+			"**/build": true,
+			"**/libdeps": true
+		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/.*": false,
+			".vscode": false,
+			"CONTRIBUTING.md": true,
+			".gitignore": false
+		},
+		"files.encoding": "utf8",
+		"files.eol": "\n",
+		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"doxdocgen.file.versionTag": "@version 0.23.1",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"cSpell.words": [
+			"Adafruit",
+			"doxygen",
+			"endregion",
+			"MSGAVAIL",
+			"QPPS",
+			"Robo",
+			"ROBOCLAW"
+		]
+	}
+}

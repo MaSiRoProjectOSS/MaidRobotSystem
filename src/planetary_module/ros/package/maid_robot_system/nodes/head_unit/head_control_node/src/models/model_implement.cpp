@@ -18,7 +18,7 @@ bool ModelImplement::calculate(double seconds)
     bool result                = false;
     static double next_seconds = 0.0;
 
-    double size                  = this->_temp_overall.EYE_DEFAULT_SIZE;
+    double dimensions            = this->_temp_overall.EYE_DEFAULT_SIZE;
     double distance              = this->_temp_overall.EYE_DEFAULT_DISTANCE;
     static double target_angle_x = 0.0;
     static double target_angle_y = 0.0;
@@ -71,7 +71,7 @@ bool ModelImplement::calculate(double seconds)
     }
 
     if (true == result) {
-        this->_calculate_eye(target_angle_x, target_angle_y, size, distance);
+        this->_calculate_eye(target_angle_x, target_angle_y, dimensions, distance);
         this->_calculate_neck(target_angle_x, target_angle_y, target_roll);
 
         next_seconds = seconds + this->param.timeout_s_chased;

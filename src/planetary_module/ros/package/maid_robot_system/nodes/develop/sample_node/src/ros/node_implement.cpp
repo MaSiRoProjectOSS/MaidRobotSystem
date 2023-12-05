@@ -122,16 +122,16 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
         this->_pub_info =                                                             //
                 this->create_publisher<maid_robot_system_interfaces::msg::MrsSample>( //
                         this->MRS_TOPIC_OUTPUT,                                       //
-                        rclcpp::QoS(this->CONFIG_QOS)                                 //
+                        this->DEPTH_PUBLISHER                                         //
                 );
         // set subscription
         this->_sub_value =                                         //
                 this->create_subscription<std_msgs::msg::Float64>( //
                         this->MRS_TOPIC_INPUT,                     //
-                        this->CONFIG_SUBSCRIPTION_SIZE,            //
+                        this->DEPTH_SUBSCRIPTION,                  //
                         std::bind(&NodeImplement::_callback_message, this, _1));
 
-        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+        this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");
         throw new std::runtime_error("Failed to open.");

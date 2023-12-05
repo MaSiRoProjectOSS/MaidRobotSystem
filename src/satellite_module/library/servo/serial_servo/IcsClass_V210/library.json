@@ -1,0 +1,11 @@
+{
+    "name": "IcsClass_V210",
+    "version": "2.1",
+    "description": "This library where ICS device(servo motor etc...) is controlled using Serial(HardwareSerial) in Arduino.",
+    "keywords": "ICS device control",
+    "homepage": "http://kondo-robot.com/",
+    "authors": {
+        "name": "T.Nobuhara"
+    },
+    "license": "MIT"
+}

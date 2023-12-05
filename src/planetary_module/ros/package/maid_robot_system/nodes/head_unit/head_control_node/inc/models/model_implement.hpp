@@ -63,7 +63,7 @@ private:
     bool _tmp_clear();
     void _output_param();
 
-    void _calculate_eye(double x, double y, double size, double distance);
+    void _calculate_eye(double x, double y, double dimensions, double distance);
     void _calculate_neck(double x, double y, double roll);
 
 private:

@@ -241,52 +241,52 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     this->_pub_eye =                                                           //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsEye>( //
                     this->MRS_TOPIC_OUT_EYE,                                   //
-                    rclcpp::QoS(this->CONFIG_QOS)                              //
+                    this->DEPTH_PUBLISHER                                      //
             );
     this->_pub_neck =                                                           //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsNeck>( //
                     this->MRS_TOPIC_OUT_NECK,                                   //
-                    rclcpp::QoS(this->CONFIG_QOS)                               //
+                    this->DEPTH_PUBLISHER                                       //
             );
     this->_pub_lip =                                                           //
             this->create_publisher<maid_robot_system_interfaces::msg::MrsLip>( //
                     this->MRS_TOPIC_OUT_LIP,                                   //
-                    rclcpp::QoS(this->CONFIG_QOS)                              //
+                    this->DEPTH_PUBLISHER                                      //
             );
 
     // set subscription
     this->_sub_pose_left =                                                               //
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
                     this->MRS_TOPIC_IN_POSTURE_LEFT,                                     //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                                      //
+                    this->DEPTH_SUBSCRIPTION,                                            //
                     std::bind(&NodeImplement::_callback_pose_left, this, _1));
     this->_sub_pose_right =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::PoseDetection>( //
                     this->MRS_TOPIC_IN_POSTURE_RIGHT,                                    //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                                      //
+                    this->DEPTH_SUBSCRIPTION,                                            //
                     std::bind(&NodeImplement::_callback_pose_right, this, _1));
     this->_sub_ar_left =                                                             //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
                     this->MRS_TOPIC_IN_MARKS_LEFT,                                   //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                                  //
+                    this->DEPTH_SUBSCRIPTION,                                        //
                     std::bind(&NodeImplement::_callback_ar_left, this, _1));
     this->_sub_ar_right =                                                            //
             this->create_subscription<maid_robot_system_interfaces::msg::ArMarkers>( //
                     this->MRS_TOPIC_IN_MARKS_RIGHT,                                  //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                                  //
+                    this->DEPTH_SUBSCRIPTION,                                        //
                     std::bind(&NodeImplement::_callback_ar_right, this, _1));
     this->_sub_voice =                                                              //
             this->create_subscription<maid_robot_system_interfaces::msg::MrsVoice>( //
                     this->MRS_TOPIC_IN_VOICE,                                       //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                                 //
+                    this->DEPTH_SUBSCRIPTION,                                       //
                     std::bind(&NodeImplement::_callback_voice, this, _1));
     this->_sub_voltage =                                       //
             this->create_subscription<std_msgs::msg::Float64>( //
                     this->MRS_TOPIC_IN_VOLTAGE,                //
-                    this->CONFIG_SUBSCRIPTION_SIZE,            //
+                    this->DEPTH_SUBSCRIPTION,                  //
                     std::bind(&NodeImplement::_callback_voltage, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

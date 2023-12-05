@@ -16,13 +16,14 @@ namespace maid_robot_system
  */
 typedef enum miens_t
 {
-    miens_normal = 0,  //! ノーマル
-    miens_smile,       //! スマイル
-    miens_wink_left,   //! 左目ウィンク（ウィンク後、ノーマルへ）
-    miens_wink_right,  //! 右目ウィンク（ウィンク後、ノーマルへ）
-    miens_close_left,  //! 左目だけ閉じる
-    miens_close_right, //! 右目だけ閉じる
-    miens_close,       //! 両目閉じる
+    miens_normal = 0,  //!  0 : normal
+    miens_smile,       //!  1 : smile
+    miens_wink_left,   //!  2 : wink(left) to normal
+    miens_wink_right,  //!  3 : wink(right) to normal
+    miens_close_left,  //!  4 : close left eyes
+    miens_close_right, //!  5 : close right eyes
+    miens_close,       //!  6 : close both eyes
+    miens_keep_normal, //!  7 : don't blink
 } MIENS;
 
 /**
