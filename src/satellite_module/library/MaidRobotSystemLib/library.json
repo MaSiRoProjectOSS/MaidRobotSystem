@@ -1,0 +1,27 @@
+{
+    "name": "MaidRobotSystemLibrary",
+    "version": "0.23.4",
+    "description": "Maid Robot System Library",
+    "keywords": "Maid_Robot_System",
+    "homepage": "https://github.com/MaSiRoProjectOSS/MaidRobotSystemLib",
+    "authors": {
+        "name": "MaSiRo Project.",
+        "email": "masiro.to.akari@gmail.com",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystemLib"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystemLib.git"
+    },
+    "license": "MIT",
+    "dependencies": {},
+    "examples": [],
+    "export": {
+        "exclude": [
+            ".vscode/*",
+            "test/*",
+            "doc/*",
+            "examples/*"
+        ]
+    }
+}

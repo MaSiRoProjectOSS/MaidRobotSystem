@@ -1,0 +1,63 @@
+{
+	"folders": [
+		{
+			"name": "power_monitor",
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.encoding": "utf8",
+		"files.eol": "\n",
+		"doxdocgen.file.versionTag": "@version 0.23.1",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"search.exclude": {
+			"*.html": true,
+			"__*": true,
+			"doxygen": true,
+			"**/build": true,
+			"**/libdeps": true
+		},
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/.*": false,
+			".vscode": false
+		},
+		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"cSpell.words": [
+			"Adafruit",
+			"APIP",
+			"APSSID",
+			"APSTA",
+			"assy",
+			"Consolas",
+			"CRGB",
+			"darkgrey",
+			"doxdocgen",
+			"Doxyfile",
+			"doxygen",
+			"endregion",
+			"ensp",
+			"fastled",
+			"fillpix",
+			"forbeslindesay",
+			"nosniff",
+			"onchange",
+			"onclick",
+			"onunload",
+			"platformio",
+			"PROGMEM",
+			"roboclaw",
+			"sntp",
+			"taskrunner",
+			"zlac"
+		]
+	}
+}

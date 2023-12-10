@@ -155,8 +155,8 @@ TabWidth : 4
 ######################
 # clang-format 12
 ######################
-AllowShortEnumsOnASingleLine : false
-AlignOperands : AlignAfterOperator
+#AllowShortEnumsOnASingleLine : false
+#AlignOperands : AlignAfterOperator
 
 ######################
 # clang-format 13

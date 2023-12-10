@@ -1,0 +1,64 @@
+{
+	"folders": [
+		{
+			"name": "Maid Robot System : ROS2",
+			"path": "./src/planetary_module/ros"
+		}
+	],
+	"settings": {
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"maid_robot_system": {
+			"config_json": ""
+		},
+		"doxdocgen.file.versionTag": "@version 0.23.10",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/*.code-search": true,
+			"**/.pio/build": true,
+			"**/.git/**": true,
+			"**/__*": true,
+			"**/Doxyfile": true,
+			"**/Doxygen": true
+		},
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/node_modules/*/**": true,
+			"**/.hg/store/**": true,
+			"**/.pio": true,
+			"**/*.map": true,
+			"**/doxygen": true,
+			"**/Doxyfile": true,
+			"**/build": true
+		},
+		"cSpell.words": [
+			"aros",
+			"chgrp",
+			"colcon",
+			"doxygen",
+			"dsize",
+			"endgantt",
+			"gantt",
+			"imgmsg",
+			"shacklebone",
+			"startgantt",
+			"unstarted",
+			"usermod"
+		],
+		"forbeslindesay-taskrunner.separator": ":| : ",
+		"forbeslindesay-taskrunner.source": "Workspace",
+		"forbeslindesay-taskrunner.prefix": "",
+		"ros.distro": "rolling",
+		"ros2.rosRootDir": "/opt/ros/rolling",
+		"ros.rosSetupScript": "/opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh",
+		"markdown-preview-enhanced.configPath": "./.mume",
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.autopep8"
+		}
+	}
+}

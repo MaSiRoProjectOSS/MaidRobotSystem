@@ -46,6 +46,7 @@
 
 # Myproject
 data/streaming*.ogv
+data/tmp
 **/__*
 **/.mume
 **/VC.DB*

@@ -1,0 +1,18 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "build": true
+    },
+    "autopep8.args": [
+        "--max-line-length",
+        "240"
+    ],
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "editor.renderWhitespace": "all",
+    "editor.formatOnSave": true,
+    "maid_robot_system": {
+        "config_json": "--mrs_config=${workspaceFolder}/config/default.json"
+    }
+}

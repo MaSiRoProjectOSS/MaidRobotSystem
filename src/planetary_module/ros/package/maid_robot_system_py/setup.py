@@ -9,22 +9,21 @@ setup(
     version='0.23.7',
     packages=[package_name],
     data_files=[
-        # Add package.xml
+        # Install marker file in the package index
         ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+         ['resource/' + package_name]),
+        # Include our package.xml file
         (os.path.join('share', package_name), ['package.xml']),
         # Add sub files.
-        (os.path.join('lib', package_name, 'features', 'mp'), glob(
-            os.path.join(package_name, 'features', 'mp', '*.py'))),
-        (os.path.join('lib', package_name, 'features', 'ros'), glob(
-            os.path.join(package_name, 'features', 'ros', '*.py'))),
-        (os.path.join('lib', package_name, 'features'), glob(
-            os.path.join(package_name, 'features', '*.py'))),
         (os.path.join('lib', package_name, 'utils'), glob(
             os.path.join(package_name, 'utils', '*.py'))),
         # Include all launch files.
         (os.path.join('share', package_name, 'launch'),
-         glob(os.path.join('launch/*', '*.launch.py'))),
+         glob(os.path.join('launch', 'head_unit', 'input_device', '*.launch.py'))),
+        (os.path.join('share', package_name, 'launch'),
+         glob(os.path.join('launch', 'head_unit', 'recognizer', 'marker', '*.launch.py'))),
+        (os.path.join('share', package_name, 'launch'),
+         glob(os.path.join('launch', 'head_unit', 'recognizer', 'posture', '*.launch.py'))),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -35,10 +34,12 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'video_capture_node = maid_robot_system_py.video_capture_node:main',
-            'detect_ar_node = maid_robot_system_py.detect_ar_node:main',
-            'mediapipe_node = maid_robot_system_py.mediapipe_node:main',
-            'mediapipe_ext_node = maid_robot_system_py.mediapipe_ext_node:main'
+            'detect_ar_node = maid_robot_system_py.head_unit.recognizer.marker.detect_ar_node:main',
+            'mediapipe_node = maid_robot_system_py.head_unit.recognizer.posture.mediapipe_node:main',
+            'mediapipe_ext_node = maid_robot_system_py.head_unit.recognizer.posture.mediapipe_ext_node:main',
+            'photo_to_video_node = maid_robot_system_py.head_unit.input_device.photo_to_video_node:main',
+            'video_capture_node = maid_robot_system_py.head_unit.input_device.video_capture_node:main',
+            'video_topic_to_service = maid_robot_system_py.head_unit.input_device.video_topic_to_service:main'
         ],
     },
 )

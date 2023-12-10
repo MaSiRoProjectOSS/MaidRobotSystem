@@ -1,0 +1,295 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        ////////////////////////////////////////////////
+        // eye_node : pos
+        ////////////////////////////////////////////////
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : pos : plane",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/pos/mrs_eye_plane.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : pos : right",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/pos/mrs_eye_right.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : pos : left",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/pos/mrs_eye_left.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : pos : down",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/pos/mrs_eye_down.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : pos : up",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/pos/mrs_eye_up.yaml",
+                "--once"
+            ]
+        },
+        ////////////////////////////////////////////////
+        // eye_node : effect
+        ////////////////////////////////////////////////
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : effect : normal",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/effect/mrs_eye_effect_normal.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : effect : order",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/effect/mrs_eye_effect_order.yaml",
+                "--once"
+            ]
+        },
+        ////////////////////////////////////////////////
+        // eye_node : effect
+        ////////////////////////////////////////////////
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : normal",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_normal.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : close",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_close.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : smile",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_smile.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : close_left",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_close_left.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : close_right",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_close_right.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : wink_left",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_wink_left.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : wink_right",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_wink_right.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : emotion : keep_normal",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/emotion/mrs_eye_emotion_keep_normal.yaml",
+                "--once"
+            ]
+        },
+        ////////////////////////////////////////////////
+        // eye_node : distance
+        ////////////////////////////////////////////////
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : distance : plane",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/distance/mrs_eye_plane.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : distance : max",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/distance/mrs_eye_max.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : distance : min",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/distance/mrs_eye_min.yaml",
+                "--once"
+            ]
+        },
+        ////////////////////////////////////////////////
+        // eye_node : size
+        ////////////////////////////////////////////////
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : size : plane",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/size/mrs_eye_plane.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : size : max",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/size/mrs_eye_max.yaml",
+                "--once"
+            ]
+        },
+        {
+            "label": "WORK : ROS2 : vs_tasks : eye_node : size : min",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../../../../mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2_topic_pub",
+                "/maid_robot_system/Ayame/head_unit/logic/eye",
+                "maid_robot_system_interfaces/msg/MrsEye",
+                "${workspaceFolder}/size/mrs_eye_min.yaml",
+                "--once"
+            ]
+        }
+    ]
+}

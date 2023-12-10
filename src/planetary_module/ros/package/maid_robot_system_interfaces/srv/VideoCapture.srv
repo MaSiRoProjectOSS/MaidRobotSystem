@@ -1,3 +1,7 @@
+# MaSiRo Project.
+#     Date : 2023/10/01
+####################################################
+
 int32 ROTATE_CLOCKWISE_12_O_CLOCK = 0
 int32 ROTATE_CLOCKWISE_03_O_CLOCK = 1
 int32 ROTATE_CLOCKWISE_06_O_CLOCK = 2

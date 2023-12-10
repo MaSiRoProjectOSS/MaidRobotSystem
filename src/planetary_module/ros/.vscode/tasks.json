@@ -1,0 +1,420 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        //////////////////////////////////////////////////////////////
+        // ROS2 : INFO
+        //////////////////////////////////////////////////////////////
+        {
+            "label": "ROS2 : INFO : node",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "node",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : INFO : topic",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "topic",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : INFO : param",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "param",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : INFO : pkg maid_robot_system",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "pkg",
+                "executables",
+                "|",
+                "grep",
+                "maid_"
+            ]
+        },
+        //////////////////////////////////////////////////////////////
+        // maid_robot_system : BUILD : GENERAL
+        //////////////////////////////////////////////////////////////
+        {
+            "label": "maid_robot_system : BUILD : DEBUG",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_build",
+                "build",
+                "debug"
+            ]
+        },
+        {
+            "label": "maid_robot_system : BUILD : [ALL]",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_build",
+                "build",
+                "release"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "maid_robot_system : BUILD : CLEAN",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_build",
+                "clean"
+            ]
+        },
+        {
+            "label": "maid_robot_system : BUILD : REBUILD",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_build",
+                "rebuild"
+            ],
+            "dependsOn": [
+                "maid_robot_system : BUILD : CLEAN"
+            ]
+        },
+        //////////////////////////////////////////////////////////////
+        // script
+        //////////////////////////////////////////////////////////////
+        {
+            "label": "script : maid_robot_system : mrs_help",
+            "type": "shell",
+            "hide": true,
+            "isBackground": true,
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_help"
+            ]
+        },
+        {
+            "label": "script : maid_robot_system : mrs_env_print",
+            "type": "shell",
+            "hide": true,
+            "isBackground": true,
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "mrs_env_print"
+            ]
+        },
+        //////////////////////////////////////////////////////////////
+        // ROS2 : GENERAL / info
+        //////////////////////////////////////////////////////////////
+        {
+            "label": "ROS2 : COMMANDS : HELP : run",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "run",
+                "--help"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : HELP : launch",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "launch",
+                "--help"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : HELP : security",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "security",
+                "--help"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : multicast : receive",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "multicast",
+                "receive"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : multicast : send",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "multicast",
+                "send"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : topic",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "topic",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : service",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "service",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : pkg : list",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "pkg",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : pkg : executables",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "pkg",
+                "executables"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : param",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "param",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : node",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "node",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : lifecycle : nodes",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "lifecycle",
+                "nodes"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : interface : action",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "interface",
+                "list",
+                "-a"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : interface : service",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "interface",
+                "list",
+                "-s"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : interface : message",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "interface",
+                "list",
+                "-m"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : docto(wtf)",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "doctor",
+                "-r",
+                "hello"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : start",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "daemon",
+                "start"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : stop",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "daemon",
+                "stop"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : SURVEY : daemon : status",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "daemon",
+                "status"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : component",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "component",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : action",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "action",
+                "list"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : bag : storage",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "bag",
+                "list",
+                "storage"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : bag : converter",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "bag",
+                "list",
+                "converter"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : bag : compressor",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "bag",
+                "list",
+                "compressor"
+            ]
+        },
+        {
+            "label": "ROS2 : COMMANDS : LIST : bag : decompressor",
+            "type": "shell",
+            "command": "${workspaceFolder}/mrs.sh",
+            "args": [
+                "${config:maid_robot_system.config_json}",
+                "aros2",
+                "bag",
+                "list",
+                "decompressor"
+            ]
+        }
+    ]
+}
