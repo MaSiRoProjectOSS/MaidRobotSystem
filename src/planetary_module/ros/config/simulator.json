@@ -1,0 +1,56 @@
+{
+    "Description": {
+        "USAGE": "",
+        "CMD": "source /opt/MaidRobotSystem/src/planetary_module/ros/env.sh",
+        "CATION": "This is not allowed in text that '(', ')'"
+    },
+    "CAST": {
+        "MRS_CAST_NAME": "Ayame",
+        "MRS_CAST_ID": 1000,
+        "MRS_CAST_DATA": "/opt/MaidRobotSystem/data/cast/${MRS_CAST_NAME}/settings.json",
+        "MRS_V4L_LEFT_BY_PATH": "",
+        "MRS_V4L_LEFT_ID": 1,
+        "MRS_V4L_RIGHT_BY_PATH": "",
+        "MRS_V4L_RIGHT_ID": 3
+    },
+    "MRS": {
+        "DISPLAY": ":0",
+        "MRS_WORKSPACE": "/opt/MaidRobotSystem",
+        "MRS_DATA_FOLDER": "/opt/MaidRobotSystem/data",
+        "MRS_ROS_PACKAGE_FOLDER": "/opt/MaidRobotSystem/src/planetary_module/ros/package",
+        "MRS_ROS_OUTPUT_TYPE": "log",
+        "MRS_ROS_LOG_LEVEL": "WARN",
+        "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
+        "MRS_ROS_SPAWN": false,
+        "MRS_TYPE_INPUT_VIDEO_DEVICE": "/camera",
+        "MRS_PHOTO_LEFT": "",
+        "MRS_PHOTO_RIGHT": "",
+        "MRS_BUILD_LIB_QT5": "OFF",
+        "MRS_BUILD_LIB_QT6": "OFF",
+        "MRS_BUILD_HEAD_UNIT": "ON",
+        "MRS_BUILD_ARM_UNIT": "OFF",
+        "MRS_BUILD_WAIST_DOWN_UNIT": "OFF",
+        "MRS_BUILD_MOBILITY_UNIT": "OFF",
+        "MRS_BUILD_CLOUD_UNIT": "OFF",
+        "MRS_BUILD_MANAGEMENT_UNIT": "OFF",
+        "MRS_BUILD_DEVELOP": "ON"
+    },
+    "ROS_VARIABLES": {
+        "ROS_DISTRO": "humble",
+        "ROS_DOMAIN_ID": 0,
+        "ROS_LOCALHOST_ONLY": 0,
+        "ROS_LOG_DIR": "/tmp/.ros_log",
+        "ROS_HOME": "${MRS_WORKSPACE}",
+        "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity}] [{time}] {message}",
+        "RCUTILS_LOGGING_BUFFERED_STREAM": 1,
+        "RCUTILS_COLORIZED_OUTPUT": 1,
+        "RCUTILS_LOGGING_USE_STDOUT": 1
+    },
+    "BUILD": {
+        "BUILD_LOG_LEVEL": "WARNING",
+        "BUILD_CMAKE_ARGS": "",
+        "BUILD_TYPE": "RELEASE",
+        "BUILD_PARALLEL_WORKERS": "$(($(nproc)/2+1))",
+        "BUILD_COLCON_OPTION": "--symlink-install --parallel-workers ${BUILD_PARALLEL_WORKERS} --allow-overriding maid_robot_system_interfaces"
+    }
+}

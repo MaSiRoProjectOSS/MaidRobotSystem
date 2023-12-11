@@ -16,3 +16,5 @@ sudo python3 -m pip install --upgrade pip
 ## Jetson health monitoring
 #sudo apt install -y python-pip
 #sudo -H pip install jetson-stats
+
+sudo pip install mediapipe

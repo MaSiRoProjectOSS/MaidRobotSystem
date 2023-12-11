@@ -3,6 +3,10 @@
 		{
 			"name": "Maid Robot System : ROS2",
 			"path": "./src/planetary_module/ros"
+		},
+		{
+			"name": "simulator",
+			"path": "./src/planetary_module/ros/vs_tasks/simulator"
 		}
 	],
 	"settings": {
@@ -58,6 +62,12 @@
 		"ros.rosSetupScript": "/opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh",
 		"[python]": {
 			"editor.defaultFormatter": "ms-python.autopep8"
-		}
+		},
+		"python.autoComplete.extraPaths": [
+			"/opt/ros/rolling/lib/python3.8/site-packages"
+		],
+		"python.analysis.extraPaths": [
+			"/opt/ros/rolling/lib/python3.8/site-packages"
+		]
 	}
 }

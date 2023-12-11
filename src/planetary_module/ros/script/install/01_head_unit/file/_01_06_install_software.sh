@@ -30,3 +30,8 @@ fi
 ## Install JDK
 #sudo apt install -y openjdk-19-jdk
 sudo apt install -y openjdk-17-jdk
+
+## ROS packages
+sudo apt install -y libcv-bridge-dev python3-cv-bridge python3-image-geometry libimage-geometry-de
+sudo apt install -y ros-rolling-image-geometry ros-rolling-cv-bridge
+sudo apt install -y build-essential libfontconfig1 mesa-common-dev libglu1-mesa-dev qt*5-dev qml-module-qtquick-controls qml-module-qtquick-controls2
