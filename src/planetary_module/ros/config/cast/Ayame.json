@@ -38,7 +38,7 @@
         "ROS_DISTRO": "humble",
         "ROS_DOMAIN_ID": 0,
         "ROS_LOCALHOST_ONLY": 0,
-        "ROS_LOG_DIR": "${HOME}/.ros_log",
+        "ROS_LOG_DIR": "/tmp/.ros_log",
         "ROS_HOME": "${MRS_WORKSPACE}",
         "RCUTILS_CONSOLE_OUTPUT_FORMAT": "[{severity}] [{time}] {message}",
         "RCUTILS_LOGGING_BUFFERED_STREAM": 1,
