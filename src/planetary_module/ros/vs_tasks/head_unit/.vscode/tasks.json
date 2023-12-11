@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "simulator : run : maid_robot_system_simulator",
+            "type": "shell",
+            "command": "${workspaceFolder}/../../mrs.sh",
+            "args": [
+                "--mrs_config=/opt/MaidRobotSystem/src/planetary_module/ros/config/simulator.json",
+                "aros2",
+                "launch",
+                "maid_robot_system",
+                "maid_robot_system_simulator.launch.py"
+            ]
+        }
+    ]
+}

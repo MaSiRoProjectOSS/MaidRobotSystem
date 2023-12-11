@@ -28,11 +28,11 @@
         "MRS_BUILD_LIB_QT6": "OFF",
         "MRS_BUILD_HEAD_UNIT": "ON",
         "MRS_BUILD_ARM_UNIT": "ON",
-        "MRS_BUILD_WAIST_DOWN_UNIT": "ON",
-        "MRS_BUILD_MOBILITY_UNIT": "ON",
-        "MRS_BUILD_CLOUD_UNIT": "ON",
-        "MRS_BUILD_MANAGEMENT_UNIT": "ON",
-        "MRS_BUILD_DEVELOP": "ON"
+        "MRS_BUILD_WAIST_DOWN_UNIT": "OFF",
+        "MRS_BUILD_MOBILITY_UNIT": "OFF",
+        "MRS_BUILD_CLOUD_UNIT": "OFF",
+        "MRS_BUILD_MANAGEMENT_UNIT": "OFF",
+        "MRS_BUILD_DEVELOP": "OFF"
     },
     "ROS_VARIABLES": {
         "ROS_DISTRO": "humble",
