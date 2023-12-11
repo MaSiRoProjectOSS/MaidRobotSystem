@@ -19,7 +19,7 @@ sudo apt upgrade -y
 sudo apt-get install -y build-essential libfontconfig1 mesa-common-dev libglu1-mesa-dev qt*5-dev qml-module-qtquick-controls qml-module-qtquick-controls2
 
 ## Software for development environment
-sudo apt-get install -y graphviz doxygen clang-format llvm
+sudo apt-get install -y graphviz doxygen clang-format llvm jq fzf
 
 ## To be able to use exFAT format
 if "${INSTALL_ROS_UROS}"; then
@@ -28,6 +28,5 @@ if "${INSTALL_ROS_UROS}"; then
 fi
 
 ## Install JDK
-sudo apt install -y openjdk-19-jdk
-
-
+#sudo apt install -y openjdk-19-jdk
+sudo apt install -y openjdk-17-jdk

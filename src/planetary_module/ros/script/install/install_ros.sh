@@ -1,13 +1,13 @@
 #!/bin/bash
 
-source ../env.sh
+source ../../env.sh
 
 ## =======================================
 ## Settings
 ## =======================================
-ROS_DISTRO=humble
+ROS_DISTRO=${ROS_DISTRO:-rolling}
 INSTALL_ROS_DESKTOP=false
-INSTALL_ROS_DEVELOPMENT_TOOLS=false
+INSTALL_ROS_DEVELOPMENT_TOOLS=true
 INSTALL_ROS_DDS=true
 INSTALL_ROS_UROS=false
 
@@ -45,14 +45,14 @@ if [ ! -e "${MRS_WORKSPACE}" ]; then
 else
     sudo mkdir -p ${MRS_WORKSPACE}/.colcon
     if [ ! -e "/etc/apt/sources.list.d/ros2.list" ]; then
-        sudo apt update
-        sudo apt install -y software-properties-common
+        sudo apt update -q
+        sudo apt install -y -q software-properties-common
         sudo add-apt-repository universe
-        sudo apt install -y curl gnupg lsb-release
+        sudo apt install -y -q curl gnupg lsb-release
 
         sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-        sudo apt install -y locales
+        sudo apt install -y -q locales
         sudo locale-gen en_US en_US.UTF-8
         sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
     fi
@@ -63,28 +63,28 @@ else
     ## =======================================
     ## Update apt
     ## =======================================
-    sudo apt autoremove -y
-    sudo apt update
-    sudo apt upgrade -y
+    sudo apt autoremove -y -q
+    sudo apt update -q
+    sudo apt upgrade -y -q
 
-    sudo apt install -y build-essential python3-pip
-    sudo apt install -y ros-${ROS_DISTRO}-ros-base
+    sudo apt install -y -q build-essential python3-pip
+    sudo apt install -y -q ros-${ROS_DISTRO}-ros-base
     echo -e "${COLOR_ON_BLUE}   * Install : ros-${ROS_DISTRO}-ros-base${COLOR_OFF}"
     if "${INSTALL_ROS_DESKTOP}"; then
-        sudo apt install -y ros-${ROS_DISTRO}-desktop
+        sudo apt install -y -q ros-${ROS_DISTRO}-desktop
         echo -e "${COLOR_ON_BLUE}   * Install : ros-${ROS_DISTRO}-desktop${COLOR_OFF}"
     fi
     if "${INSTALL_ROS_DEVELOPMENT_TOOLS}"; then
-        sudo apt install -y ros-dev-tools
+        sudo apt install -y -q ros-dev-tools
         echo -e "${COLOR_ON_BLUE}   * Install : ros-dev-tools${COLOR_OFF}"
     fi
     if "${INSTALL_ROS_DDS}"; then
         sudo apt install -q -y rti-connext-dds-6.0.1
         echo -e "${COLOR_ON_BLUE}   * Install : rti-connext-dds-6.0.1${COLOR_OFF}"
-        source /opt/rti.com/rti_connext_dds-6.0.1/resource/scripts/rtisetenv_x64Linux4gcc7.3.0.bash;
+        #source /opt/rti.com/rti_connext_dds-6.0.1/resource/scripts/rtisetenv_x64Linux4gcc7.3.0.bash;
     fi
     sudo apt purge ros-${ROS_DISTRO}-examples-*
-    sudo apt install -y python3-rosdep libpython3-dev python3-pip
+    sudo apt install -y -q python3-rosdep libpython3-dev python3-pip
 
     source /opt/ros/${ROS_DISTRO}/setup.bash
     cd
@@ -104,12 +104,12 @@ fi
 echo -e "${COLOR_ON_BLUE}* Install of related software${COLOR_OFF}"
 
 # ROS
-sudo apt install -y ros-${ROS_DISTRO}-serial-driver
-sudo apt install -y ros-${ROS_DISTRO}-rosbridge-server
-sudo apt install -y python3-colcon-common-extensions
+sudo apt install -y -q ros-${ROS_DISTRO}-serial-driver
+sudo apt install -y -q ros-${ROS_DISTRO}-rosbridge-server
+sudo apt install -y -q python3-colcon-common-extensions
 
 # Application
-sudo apt install -y nlohmann-json3-dev
+sudo apt install -y -q nlohmann-json3-dev
 
 ## =======================================
 ## Install micro ros
@@ -119,7 +119,7 @@ if "${INSTALL_ROS_UROS}"; then
     # Setup
     #######################
     # ここでコンパイルするためのソフトをインストール
-    sudo apt install -y ros-cmake-modules
+    sudo apt install -y -q ros-cmake-modules
     # インストールするフォルダに移動
     mkdir -p ${MRS_WORKSPACE}/.colcon/src && cd ${MRS_WORKSPACE}/.colcon
     # mico-rosをインストールするためのsetupをダウンロード
