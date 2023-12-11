@@ -50,4 +50,5 @@ data/tmp
 **/__*
 **/.mume
 **/VC.DB*
+**/vc.db*
 **/doxygen
