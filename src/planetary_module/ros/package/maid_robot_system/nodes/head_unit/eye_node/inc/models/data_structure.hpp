@@ -10,7 +10,7 @@
 #ifndef MRS_EYE_NODE_DATA_STRUCTURE_HPP
 #define MRS_EYE_NODE_DATA_STRUCTURE_HPP
 
-#include "calibration.hpp"
+#include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
 
 #include <QPixmap>
@@ -56,22 +56,26 @@ public:
     };
     class StCornea {
     public:
-        bool enable    = true;
-        double speed   = 1.0;
-        StVector scale = 1.0;
-        int alpha      = 255;
-        void set(bool in_enable, double in_speed, double in_scale_x, double in_scale_y, int in_alpha)
+        bool enable      = true;
+        double speed_min = 1.0;
+        double speed_max = 1.0;
+        StVector scale   = 1.0;
+        int alpha        = 255;
+        void set(bool in_enable, double in_speed_min, double in_speed_max, double in_scale_x, double in_scale_y, int in_alpha)
         {
-            this->enable  = in_enable;
-            this->speed   = in_speed;
-            this->scale.x = in_scale_x;
-            this->scale.y = in_scale_y;
-            this->alpha   = in_alpha;
+            this->enable    = in_enable;
+            this->speed_min = in_speed_min;
+            this->speed_max = in_speed_max;
+            this->scale.x   = in_scale_x;
+            this->scale.y   = in_scale_y;
+            this->alpha     = in_alpha;
         }
     };
 
     class StEyeSettings {
     public:
+        // ciliary
+        StColor ciliary_color;
         // cornea
         StCornea cornea_outside;
         StCornea cornea_inside;
@@ -81,7 +85,7 @@ public:
         // eyeball
         St2DRectangle eyeball;
         StVector eyeball_scale;
-        StVector eyeball_center;
+        double eyeball_descend;
         // image
         StImageList image;
     };
@@ -96,7 +100,8 @@ public:
         // Settings : Screen
         this->brightness = 100;
         this->eyelid_color.set(255, 255, 255, 255);
-        this->ciliary_color.set(231, 183, 147, 255);
+        this->left_eye.ciliary_color.set(231, 183, 147, 255);
+        this->right_eye.ciliary_color.set(231, 183, 147, 255);
         this->screen_size.set(0, 0, 640, 480, 0);
         this->view_size.set(0, 0, 640, 480, 0);
         this->screen_resolution = 1.0;
@@ -113,17 +118,17 @@ public:
 
         // Settings : Parts : eyeball
         this->left_eye.eyeball.set(0, 320, 320, 480, 0);
-
         this->right_eye.eyeball.set(0, 0, 320, 480, 0);
-        this->left_eye.eyeball_center.set(0, 0, 0);
-        this->right_eye.eyeball_center.set(0, 0, 0);
+
+        this->left_eye.eyeball_descend  = 0.1;
+        this->right_eye.eyeball_descend = 0.1;
 
         // Settings : Parts : cornea
-        this->left_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 255);
-        this->left_eye.cornea_inside.set(true, 1.0, 0.8, 0.8, 255);
+        this->left_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 1.0, 255);
+        this->left_eye.cornea_inside.set(true, 1.0, 1.0, 0.8, 0.8, 255);
 
-        this->right_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 255);
-        this->right_eye.cornea_inside.set(true, 1.0, 0.8, 0.8, 255);
+        this->right_eye.cornea_outside.set(true, 1.0, 1.0, 1.0, 1.0, 255);
+        this->right_eye.cornea_inside.set(true, 1.0, 1.0, 0.8, 0.8, 255);
 
         // image
         this->left_eye.image.eyelid.clear();
@@ -160,7 +165,6 @@ public:
     // Settings
     // ----------------------------------- //
     StColor eyelid_color;
-    StColor ciliary_color;
     StEyeSettings left_eye;
     StEyeSettings right_eye;
 

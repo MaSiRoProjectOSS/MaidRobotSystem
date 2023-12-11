@@ -82,10 +82,10 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
     this->_sub_value =                                                            //
             this->create_subscription<maid_robot_system_interfaces::msg::MrsLip>( //
                     this->MRS_TOPIC_INPUT,                                        //
-                    this->CONFIG_SUBSCRIPTION_SIZE,                               //
+                    this->DEPTH_SUBSCRIPTION,                                     //
                     std::bind(&NodeImplement::_callback_message, this, _1));
 
-    this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&NodeImplement::_callback_timer, this));
+    this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
 }
 
 NodeImplement::~NodeImplement()

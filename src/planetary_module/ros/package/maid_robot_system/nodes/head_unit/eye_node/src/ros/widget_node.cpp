@@ -35,18 +35,37 @@ namespace maid_robot_system
 bool WidgetNode::exec_start()
 {
 #if DEBUG_OUTPUT_WIDGET
-    printf("start...\n");
+    printf("[Widget] start...\n");
 #endif
+    this->_is_running = true;
     return this->_widget->exec_start();
+}
+
+void WidgetNode::respawn()
+{
+    this->_app->closeAllWindows();
+}
+
+int WidgetNode::running_exec()
+{
+    int result = 0;
+    do {
+        result = this->_app->exec();
+        if (true == this->_is_running) {
+            result = this->_widget->exec_start();
+        }
+    } while (true == this->_is_running);
+    return result;
 }
 
 bool WidgetNode::closing()
 {
-    bool result = false;
+    bool result       = false;
+    this->_is_running = false;
     this->_widget->closing();
     this->_app->closeAllWindows();
 #if DEBUG_OUTPUT_WIDGET
-    printf("closing...\n");
+    printf("[Widget] closing...\n");
 #endif
     result = true;
     return result;
@@ -98,6 +117,11 @@ WidgetNode::WidgetNode(std::string node_name, int argc, char **argv)
     } catch (...) {
         throw new std::runtime_error("Failed to initialize widget.");
     }
+}
+
+bool WidgetNode::is_response()
+{
+    return this->_widget->is_response();
 }
 
 WidgetNode::~WidgetNode()

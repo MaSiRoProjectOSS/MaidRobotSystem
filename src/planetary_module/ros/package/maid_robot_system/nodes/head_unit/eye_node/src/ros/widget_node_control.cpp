@@ -23,10 +23,14 @@ void WidgetNode::emotion(MIENS value)
 {
     this->_widget->emotion(value);
 }
-
-void WidgetNode::set_msg_eye(float size, float distance, float left_x, float left_y, float right_x, float right_y)
+void WidgetNode::dimensions(float dimensions)
 {
-    this->_widget->stare(size, distance, left_x, left_y, right_x, right_y);
+    this->_widget->dimensions(dimensions);
+}
+
+void WidgetNode::stare(float distance, float left_y, float left_z, float right_y, float right_z)
+{
+    this->_widget->stare(distance, left_y, left_z, right_y, right_z);
 }
 
 } // namespace maid_robot_system

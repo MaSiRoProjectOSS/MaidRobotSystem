@@ -12,9 +12,8 @@
 
 #include "eye_node_settings.hpp"
 #include "maid_robot_system/common_structure.hpp"
-#include "models/calibration.hpp"
 #include "models/data_structure.hpp"
-#include "models/widgets/eye_widget.hpp"
+#include "widgets/eye_widget.hpp"
 
 #include <QApplication>
 #include <string>
@@ -38,6 +37,7 @@ public:
     // file : widget_node.cpp
     // =============================
     bool exec_start();
+    void respawn();
     bool closing();
 
 public:
@@ -47,14 +47,8 @@ public:
     // =============================
     void effect_cornea_order();
     void emotion(MIENS value);
-    void set_msg_eye(float size,
-                     float distance,
-
-                     float left_x,
-                     float left_y,
-
-                     float right_x,
-                     float right_y);
+    void dimensions(float dimensions);
+    void stare(float distance, float left_y, float left_z, float right_y, float right_z);
 
 public:
     // =============================
@@ -88,6 +82,8 @@ public:
     bool set_ciliary_color_g(int value);
     bool set_ciliary_color_b(int value);
 
+    bool is_response();
+
 private:
     // =============================
     // PRIVATE : Function
@@ -101,6 +97,8 @@ private:
     // =============================
     QApplication *_app;
     EyeWidget *_widget = nullptr;
+
+    volatile bool _is_running = false;
 };
 
 } // namespace maid_robot_system

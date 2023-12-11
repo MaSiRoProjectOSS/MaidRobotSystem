@@ -37,12 +37,12 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
         this->_sub_mrs_eye =                                                          //
                 this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
                         this->MRS_TOPIC_INPUT,                                        //
-                        this->CONFIG_SUBSCRIPTION_SIZE,                               //
+                        this->DEPTH_SUBSCRIPTION,                                     //
                         std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
-        this->_ros_timer = this->create_wall_timer(this->TP_MSEC, std::bind(&InteractionNode::_callback_timer, this));
+        this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&InteractionNode::_callback_timer, this));
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-        this->_ros_output_state = this->create_wall_timer(this->TP_OUTPUT_STATE_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
+        this->_ros_output_state = this->create_wall_timer(this->PERIOD_OUTPUT_REPORT_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
 #endif
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");
@@ -199,13 +199,12 @@ void InteractionNode::_callback_msg_mrs_eye(const maid_robot_system_interfaces::
             this->_widget->emotion(MIENS::miens_normal);
             break;
     }
-    (void)this->_widget->set_msg_eye(msg.size,
-                                     msg.distance,
-
-                                     msg.left_x,
-                                     msg.left_y,
-                                     msg.right_x,
-                                     msg.right_y);
+    (void)this->_widget->dimensions(msg.dimensions);
+    (void)this->_widget->stare(msg.distance, //
+                               msg.left_y,
+                               msg.left_z,
+                               msg.right_y,
+                               msg.right_z);
 }
 
 // =============================
@@ -222,7 +221,12 @@ void InteractionNode::_callback_timer()
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
 void InteractionNode::_callback_output_state()
 {
-    RCLCPP_INFO_EXPRESSION(this->get_logger(), this->_is_notify_enable, "%s", this->_widget->output_message(this->_is_notify_verbose).c_str());
+    if (false == this->_widget->is_response()) {
+        RCLCPP_ERROR(this->get_logger(), "There is no response from the widget.");
+        this->_widget->respawn();
+    } else {
+        RCLCPP_INFO_EXPRESSION(this->get_logger(), this->_is_notify_enable, "%s", this->_widget->output_message(this->_is_notify_verbose).c_str());
+    }
 }
 #endif
 

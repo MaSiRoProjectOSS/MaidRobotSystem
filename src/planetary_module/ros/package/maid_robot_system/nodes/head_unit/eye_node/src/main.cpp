@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     rclcpp::init(argc, argv);
     rclcpp::Node::SharedPtr log_node = rclcpp::Node::make_shared(logger_name);
     try {
+        RCLCPP_INFO(log_node->get_logger(), "<%s> %s", node_name.c_str(), "start");
         maid_robot_system::WidgetNode widget(widget_name, argc, argv);
         auto interaction_node = std::make_shared<maid_robot_system::InteractionNode>(node_name, widget);
         widget.exec_start();
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
         });
         widget.running_exec();
         ros_thread.join();
+        RCLCPP_INFO(log_node->get_logger(), "<%s> %s", node_name.c_str(), "end");
     } catch (char *e) {
         RCLCPP_ERROR(log_node->get_logger(), "<ERROR> %s", e);
     } catch (const std::logic_error &l_err) {
