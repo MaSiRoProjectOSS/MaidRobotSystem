@@ -44,10 +44,6 @@
 			"unstarted",
 			"usermod"
 		],
-		"forbeslindesay-taskrunner.source": "Workspace",
-		"markdown-preview-enhanced.configPath": "./.mume",
-		"[python]": {
-			"editor.defaultFormatter": "ms-python.autopep8"
-		}
+		"forbeslindesay-taskrunner.source": "Workspace"
 	}
 }

@@ -56,7 +56,6 @@
 		"ros.distro": "rolling",
 		"ros2.rosRootDir": "/opt/ros/rolling",
 		"ros.rosSetupScript": "/opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh",
-		"markdown-preview-enhanced.configPath": "./.mume",
 		"[python]": {
 			"editor.defaultFormatter": "ms-python.autopep8"
 		}
