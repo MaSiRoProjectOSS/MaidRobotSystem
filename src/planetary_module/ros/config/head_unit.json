@@ -20,7 +20,7 @@
         "MRS_ROS_OUTPUT_TYPE": "log",
         "MRS_ROS_LOG_LEVEL": "WARN",
         "MRS_ROS_NAMESPACE": "/maid_robot_system/${MRS_CAST_NAME}",
-        "MRS_ROS_SPAWN": true,
+        "MRS_ROS_SPAWN": false,
         "MRS_TYPE_INPUT_VIDEO_DEVICE": "/camera",
         "MRS_PHOTO_LEFT": "",
         "MRS_PHOTO_RIGHT": "",

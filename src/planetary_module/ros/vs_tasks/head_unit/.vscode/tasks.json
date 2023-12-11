@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "simulator : run : maid_robot_system_simulator",
+            "label": "head_unit : run",
             "type": "shell",
             "command": "${workspaceFolder}/../../mrs.sh",
             "args": [
@@ -10,7 +10,7 @@
                 "aros2",
                 "launch",
                 "maid_robot_system",
-                "maid_robot_system_simulator.launch.py"
+                "head_unit.launch.py"
             ]
         }
     ]
