@@ -62,7 +62,7 @@ private:
     // =============================
     // ROS : parameter
     // =============================
-    void _callback_param_init();
+    int _callback_param_init();
     OnSetParametersCallbackHandle::SharedPtr _handle_param;
 
 private:

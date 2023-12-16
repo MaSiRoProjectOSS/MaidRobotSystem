@@ -19,6 +19,12 @@ def generate_launch_description():
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/mediapipe_node.launch.py'))
     )
+    launch_mediapipe_ext_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system_py'),
+                'launch/mediapipe_ext_node.launch.py'))
+    )
     # video
     launch_video_topic_to_service = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -26,10 +32,20 @@ def generate_launch_description():
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/video_topic_to_service.launch.py'))
     )
+    # controller
+    launch_head_control_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/maid_robot_system/head_unit/head_control_node.launch.py'))
+    )
 
     return LaunchDescription([
         # # video
         launch_video_topic_to_service,
         # # mediapipe
-        launch_mediapipe_node
+        launch_mediapipe_node,
+        launch_mediapipe_ext_node,
+        # # controller
+        launch_head_control_node
     ])

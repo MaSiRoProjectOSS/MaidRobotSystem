@@ -120,7 +120,7 @@ class DetectARNode(Node):
     def _create_service_client(self):
         self._client = self.create_client(MrsSrv.VideoCapture, self._in_image_name)
         while not self._client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
+            self.get_logger().warning('service({}) not available, waiting again...'.format(self._client.srv_name))
         self._request = MrsSrv.VideoCapture.Request()
         self._request_image(self.get_clock().now().nanoseconds)
 

@@ -590,7 +590,7 @@ class VideoCaptureNode(Node):
                         os.makedirs(folder)
                     name = ""
                     if (msg.data is not None):
-                        if (msg.data is not ""):
+                        if (msg.data != ""):
                             name = "_" + msg.data
                     path = os.path.join(folder, time.strftime(
                         "%H%M%S", time.localtime()) + name + ".jpg")

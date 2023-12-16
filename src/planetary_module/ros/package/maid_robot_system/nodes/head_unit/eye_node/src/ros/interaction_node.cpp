@@ -31,19 +31,21 @@ InteractionNode::InteractionNode(std::string node_name, WidgetNode &widget) : No
     this->_widget = &widget;
     if (nullptr != this->_widget) {
         // set parameter
-        this->_callback_param_init();
+        if (0 == this->_callback_param_init()) {
+            // set subscription
+            this->_sub_mrs_eye =                                                          //
+                    this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
+                            this->MRS_TOPIC_INPUT,                                        //
+                            this->DEPTH_SUBSCRIPTION,                                     //
+                            std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
 
-        // set subscription
-        this->_sub_mrs_eye =                                                          //
-                this->create_subscription<maid_robot_system_interfaces::msg::MrsEye>( //
-                        this->MRS_TOPIC_INPUT,                                        //
-                        this->DEPTH_SUBSCRIPTION,                                     //
-                        std::bind(&InteractionNode::_callback_msg_mrs_eye, this, _1));
-
-        this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&InteractionNode::_callback_timer, this));
+            this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&InteractionNode::_callback_timer, this));
 #if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-        this->_ros_output_state = this->create_wall_timer(this->PERIOD_OUTPUT_REPORT_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
+            this->_ros_output_state = this->create_wall_timer(this->PERIOD_OUTPUT_REPORT_MSEC, std::bind(&InteractionNode::_callback_output_state, this));
 #endif
+        } else {
+            throw new std::runtime_error("Failed init param.");
+        }
     } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");
         throw new std::runtime_error("Failed to open.");
@@ -60,102 +62,115 @@ InteractionNode::~InteractionNode()
 // =============================
 // ROS : parameter
 // =============================
-void InteractionNode::_callback_param_init()
+int InteractionNode::_callback_param_init()
 {
-    // declare_parameter
-    this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, this->_widget->get_setting_file());
-    this->declare_parameter(this->MRS_PARAMETER_BRIGHTNESS, this->_widget->get_brightness());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_R, this->_widget->get_eyelid_color_r());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_G, this->_widget->get_eyelid_color_g());
-    this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_B, this->_widget->get_eyelid_color_b());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R, this->_widget->get_ciliary_color_r());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G, this->_widget->get_ciliary_color_g());
-    this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B, this->_widget->get_ciliary_color_b());
+    int result = 1;
+    try {
+        // declare_parameter
+        this->declare_parameter(this->MRS_PARAMETER_SETTING_FILE, this->_widget->get_setting_file());
+        this->declare_parameter(this->MRS_PARAMETER_BRIGHTNESS, this->_widget->get_brightness());
+        this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_R, this->_widget->get_eyelid_color_r());
+        this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_G, this->_widget->get_eyelid_color_g());
+        this->declare_parameter(this->MRS_PARAMETER_EYELID_COLOR_B, this->_widget->get_eyelid_color_b());
+        this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R, this->_widget->get_ciliary_color_r());
+        this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G, this->_widget->get_ciliary_color_g());
+        this->declare_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B, this->_widget->get_ciliary_color_b());
 
-    this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE, this->_is_notify_enable);
-    this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE, this->_is_notify_verbose);
+        this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE, this->_is_notify_enable);
+        this->declare_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE, this->_is_notify_verbose);
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this->_widget->set_brightness(this->get_parameter(this->MRS_PARAMETER_BRIGHTNESS).as_int());
-    this->_widget->set_eyelid_color_r(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_R).as_int());
-    this->_widget->set_eyelid_color_g(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_G).as_int());
-    this->_widget->set_eyelid_color_b(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_B).as_int());
-    this->_widget->set_ciliary_color_r(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R).as_int());
-    this->_widget->set_ciliary_color_g(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G).as_int());
-    this->_widget->set_ciliary_color_b(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B).as_int());
-    bool flag_load_file = this->_set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
-    if (false == flag_load_file) {
-        RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
-    }
-    this->_is_notify_enable  = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE).as_bool();
-    this->_is_notify_verbose = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE).as_bool();
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // make parameter callback
-    this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
-        auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
-
-        results->successful = false;
-        results->reason     = "";
-
-        for (auto &&param : params) {
-#if LOGGER_ROS_INFO_PARAMETER
-            RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
-#endif
-            switch (param.get_type()) {
-                case rclcpp::PARAMETER_STRING:
-                    if (param.get_name() == this->MRS_PARAMETER_SETTING_FILE) {
-                        results->successful = this->_set_setting_file(param.as_string());
-                        if (false == results->successful) {
-                            RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", param.as_string().c_str());
-                        }
-                    }
-                    break;
-                case rclcpp::PARAMETER_INTEGER:
-                    if (param.get_name() == this->MRS_PARAMETER_BRIGHTNESS) {
-                        results->successful = this->_widget->set_brightness(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_R) {
-                        results->successful = this->_widget->set_eyelid_color_r(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_G) {
-                        results->successful = this->_widget->set_eyelid_color_g(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_B) {
-                        results->successful = this->_widget->set_eyelid_color_b(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_R) {
-                        results->successful = this->_widget->set_ciliary_color_r(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_G) {
-                        results->successful = this->_widget->set_ciliary_color_g(param.as_int());
-                    } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_B) {
-                        results->successful = this->_widget->set_ciliary_color_b(param.as_int());
-                    }
-                    break;
-                case rclcpp::PARAMETER_BOOL:
-                    if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE) {
-#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-                        this->_is_notify_enable = param.as_bool();
-                        results->successful     = true;
-#endif
-                    } else if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE) {
-#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
-                        this->_is_notify_verbose = param.as_bool();
-                        results->successful      = true;
-#endif
-                    }
-                    break;
-                case rclcpp::PARAMETER_DOUBLE:
-                case rclcpp::PARAMETER_NOT_SET:
-                case rclcpp::PARAMETER_BYTE_ARRAY:
-                case rclcpp::PARAMETER_BOOL_ARRAY:
-                case rclcpp::PARAMETER_INTEGER_ARRAY:
-                case rclcpp::PARAMETER_DOUBLE_ARRAY:
-                case rclcpp::PARAMETER_STRING_ARRAY:
-                default:
-                    results->successful = false;
-                    results->reason     = "Wrong operation";
-                    break;
-            }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this->_widget->set_brightness(this->get_parameter(this->MRS_PARAMETER_BRIGHTNESS).as_int());
+        this->_widget->set_eyelid_color_r(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_R).as_int());
+        this->_widget->set_eyelid_color_g(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_G).as_int());
+        this->_widget->set_eyelid_color_b(this->get_parameter(this->MRS_PARAMETER_EYELID_COLOR_B).as_int());
+        this->_widget->set_ciliary_color_r(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_R).as_int());
+        this->_widget->set_ciliary_color_g(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_G).as_int());
+        this->_widget->set_ciliary_color_b(this->get_parameter(this->MRS_PARAMETER_CILIARY_COLOR_B).as_int());
+        bool flag_load_file = this->_set_setting_file(this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string());
+        if (false == flag_load_file) {
+            RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", this->get_parameter(this->MRS_PARAMETER_SETTING_FILE).as_string().c_str());
         }
-        return *results;
-    });
+        this->_is_notify_enable  = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE).as_bool();
+        this->_is_notify_verbose = this->get_parameter(this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE).as_bool();
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // make parameter callback
+        this->_handle_param = this->add_on_set_parameters_callback([this](const std::vector<rclcpp::Parameter> &params) -> rcl_interfaces::msg::SetParametersResult {
+            auto results = std::make_shared<rcl_interfaces::msg::SetParametersResult>();
+
+            results->successful = false;
+            results->reason     = "";
+
+            for (auto &&param : params) {
+#if LOGGER_ROS_INFO_PARAMETER
+                RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_PARAMETER, "get parameter : %s", param.get_name().c_str());
+#endif
+                switch (param.get_type()) {
+                    case rclcpp::PARAMETER_STRING:
+                        if (param.get_name() == this->MRS_PARAMETER_SETTING_FILE) {
+                            results->successful = this->_set_setting_file(param.as_string());
+                            if (false == results->successful) {
+                                RCLCPP_WARN(this->get_logger(), "Not found setting file : %s", param.as_string().c_str());
+                            }
+                        }
+                        break;
+                    case rclcpp::PARAMETER_INTEGER:
+                        if (param.get_name() == this->MRS_PARAMETER_BRIGHTNESS) {
+                            results->successful = this->_widget->set_brightness(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_R) {
+                            results->successful = this->_widget->set_eyelid_color_r(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_G) {
+                            results->successful = this->_widget->set_eyelid_color_g(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_EYELID_COLOR_B) {
+                            results->successful = this->_widget->set_eyelid_color_b(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_R) {
+                            results->successful = this->_widget->set_ciliary_color_r(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_G) {
+                            results->successful = this->_widget->set_ciliary_color_g(param.as_int());
+                        } else if (param.get_name() == this->MRS_PARAMETER_CILIARY_COLOR_B) {
+                            results->successful = this->_widget->set_ciliary_color_b(param.as_int());
+                        }
+                        break;
+                    case rclcpp::PARAMETER_BOOL:
+                        if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_ENABLE) {
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
+                            this->_is_notify_enable = param.as_bool();
+                            results->successful     = true;
+#endif
+                        } else if (param.get_name() == this->MRS_PARAMETER_NOTIFY_MESSAGE_VERBOSE) {
+#if LOGGER_ROS_INFO_OUTPUT_REPORT_TIME > 0
+                            this->_is_notify_verbose = param.as_bool();
+                            results->successful      = true;
+#endif
+                        }
+                        break;
+                    case rclcpp::PARAMETER_DOUBLE:
+                    case rclcpp::PARAMETER_NOT_SET:
+                    case rclcpp::PARAMETER_BYTE_ARRAY:
+                    case rclcpp::PARAMETER_BOOL_ARRAY:
+                    case rclcpp::PARAMETER_INTEGER_ARRAY:
+                    case rclcpp::PARAMETER_DOUBLE_ARRAY:
+                    case rclcpp::PARAMETER_STRING_ARRAY:
+                    default:
+                        results->successful = false;
+                        results->reason     = "Wrong operation";
+                        break;
+                }
+            }
+            return *results;
+        });
+        result = 0;
+    } catch (char *e) {
+        RCLCPP_ERROR(this->get_logger(), "<ERROR> %s", e);
+    } catch (const std::logic_error &l_err) {
+        RCLCPP_ERROR(this->get_logger(), "<LOGIC_ERROR> %s", l_err.what());
+    } catch (const std::runtime_error &r_err) {
+        RCLCPP_ERROR(this->get_logger(), "<RUNTIME_ERROR> %s", r_err.what());
+    } catch (...) {
+        RCLCPP_ERROR(this->get_logger(), "<ERROR> %s", "An unknown error has occurred.");
+    }
+    return result;
 }
 
 // =============================

@@ -220,8 +220,8 @@ class MediapipeExtNode(Node):
     ##################################################################
     def _create_service_client(self):
         self._client = self.create_client(MrsSrv.MediaPipePoseLandmarkDetection, self._in_srv_name)
-        while not self._client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
+        while not self._client.wait_for_service(timeout_sec=5.0):
+            self.get_logger().warning('service({}) not available, waiting again...'.format(self._client.srv_name))
         self._request = MrsSrv.MediaPipePoseLandmarkDetection.Request()
         self._request_image(self.get_clock().now().nanoseconds)
 

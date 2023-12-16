@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "${workspaceFolder}/../../mrs.sh",
             "args": [
-                "--mrs_config=/opt/MaidRobotSystem/src/planetary_module/ros/config/simulator.json",
+                "${config:maid_robot_system.config_json}",
                 "aros2",
                 "launch",
                 "maid_robot_system",

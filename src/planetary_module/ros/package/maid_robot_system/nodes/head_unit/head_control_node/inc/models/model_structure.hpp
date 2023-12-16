@@ -90,7 +90,7 @@ public:
     int lip_min = 0;
     int lip_max = 100;
 
-    int tiredness = 25;
+    double tiredness = 25.0;
 
     bool priority_to_the_right = true;
 

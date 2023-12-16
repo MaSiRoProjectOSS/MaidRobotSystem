@@ -199,6 +199,10 @@ class VideoCaptureNode(Node):
             # set instance
             self._bridge = CvBridge()
 
+            # blank image
+            self._blank_image = self._set_image(np.zeros((self._param.device.HEIGHT, self._param.device.WIDTH, 3), np.uint8))
+            self._image = None
+
             # create ros
             self._create_service()
             self._create_subscription()
@@ -278,12 +282,21 @@ class VideoCaptureNode(Node):
     def _callback_srv_video_capture(self,
                                     request: MrsSrv.VideoCapture.Request,
                                     response: MrsSrv.VideoCapture.Response):
-        with self._lock:
-            image = copy.deepcopy(self._image)
-        if (image is not None):
-            image = self._resize(image, request.resize_width, request.resize_height)
-        response.image = self._set_image(image)
-        return response
+        try:
+            image = None
+            with self._lock:
+                if (self._image is not None):
+                    image = copy.deepcopy(self._image)
+            if (image is not None):
+                image = self._resize(image, request.resize_width, request.resize_height)
+                response.image = self._set_image(image)
+            else:
+                response.image = self._blank_image
+            return response
+        except Exception as exception:
+            self.get_logger().error('Exception (_callback_srv_video_capture) : ' + str(exception))
+            response.image = self._blank_image
+            return response
 
     # ## video capture
     def _callback_video_capture(self, msg):

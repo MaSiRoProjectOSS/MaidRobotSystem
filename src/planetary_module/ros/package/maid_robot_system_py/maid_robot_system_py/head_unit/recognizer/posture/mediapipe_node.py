@@ -213,7 +213,7 @@ class MediapipeNode(Node):
         self._service_data = self.create_service(MrsSrv.MediaPipePoseLandmarkDetection, self._out_srv_name, self._callback_srv_data)
         self._client = self.create_client(MrsSrv.VideoCapture, self._in_srv_name)
         while not self._client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service({}) not available, waiting again...'.format(self._client.srv_name))
+            self.get_logger().warning('service({}) not available, waiting again...'.format(self._client.srv_name))
         self._request = MrsSrv.VideoCapture.Request()
         self._request_image(self.get_clock().now().nanoseconds)
 
@@ -268,55 +268,56 @@ class MediapipeNode(Node):
             if (self._response is not None):
                 if (self._response.done() is True):
                     msg = self._response.result()
-                    cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
-                    cv_image = self._area_cutting(cv_image,
-                                                  self._param.area_center_x, self._param.area_center_y,
-                                                  self._param.area_width, self._param.area_height)
-                    if ((self._param.upside_down is True) or (self._param.mirror is True)):
-                        if (self._param.upside_down is False):
-                            # mirror
-                            op_flip = 1
-                        elif ((self._param.mirror is False)):
-                            # upside_down
-                            op_flip = 0
+                    if (msg.image is not None):
+                        cv_image = self._bridge.imgmsg_to_cv2(msg.image, "bgr8")
+                        cv_image = self._area_cutting(cv_image,
+                                                    self._param.area_center_x, self._param.area_center_y,
+                                                    self._param.area_width, self._param.area_height)
+                        if ((self._param.upside_down is True) or (self._param.mirror is True)):
+                            if (self._param.upside_down is False):
+                                # mirror
+                                op_flip = 1
+                            elif ((self._param.mirror is False)):
+                                # upside_down
+                                op_flip = 0
+                            else:
+                                # upside_down and mirror
+                                op_flip = -1
+                            cv_image = cv.flip(cv_image, op_flip)
+                            if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK):
+                                pass
+                            if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_03_O_CLOCK):
+                                cv_image = cv.rotate(cv_image, cv.ROTATE_90_CLOCKWISE)
+                            if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_06_O_CLOCK):
+                                cv_image = cv.rotate(cv_image, cv.ROTATE_180)
+                            if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_09_O_CLOCK):
+                                cv_image = cv.rotate(cv_image, cv.ROTATE_90_COUNTERCLOCKWISE)
+                        pose_landmarks = self._ia.detect_holistic(cv_image,
+                                                                self._param.confidence_min_detection,
+                                                                self._param.confidence_min_tracking)
+                        self._msg.image = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")
+                        if pose_landmarks is not None:
+                            self._msg.data = self.repackaging(pose_landmarks,
+                                                            self._param.confidence_min_detection,
+                                                            self._param.confidence_min_tracking,
+                                                            self._param.confidence_visibility_th)
+                            self._pub.publish(self._msg.data)
+                            if (self._report_detected is True):
+                                if (self._msg.data.human_detected is not self._previous_human_detected):
+                                    self.get_logger().info('[{}] HUMAN_DETECTED'.format(self.get_name()))
+                                    self._previous_human_detected = self._msg.data.human_detected
                         else:
-                            # upside_down and mirror
-                            op_flip = -1
-                        cv_image = cv.flip(cv_image, op_flip)
-                        if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_12_O_CLOCK):
-                            pass
-                        if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_03_O_CLOCK):
-                            cv_image = cv.rotate(cv_image, cv.ROTATE_90_CLOCKWISE)
-                        if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_06_O_CLOCK):
-                            cv_image = cv.rotate(cv_image, cv.ROTATE_180)
-                        if (self._param.clockwise is MrsSrv.VideoCapture.Request.ROTATE_CLOCKWISE_09_O_CLOCK):
-                            cv_image = cv.rotate(cv_image, cv.ROTATE_90_COUNTERCLOCKWISE)
-                    pose_landmarks = self._ia.detect_holistic(cv_image,
-                                                              self._param.confidence_min_detection,
-                                                              self._param.confidence_min_tracking)
-                    self._msg.image = self._bridge.cv2_to_imgmsg(np.array(cv_image), "bgr8")
-                    if pose_landmarks is not None:
-                        self._msg.data = self.repackaging(pose_landmarks,
-                                                          self._param.confidence_min_detection,
-                                                          self._param.confidence_min_tracking,
-                                                          self._param.confidence_visibility_th)
-                        self._pub.publish(self._msg.data)
-                        if (self._report_detected is True):
-                            if (self._msg.data.human_detected is not self._previous_human_detected):
-                                self.get_logger().info('[{}] HUMAN_DETECTED'.format(self.get_name()))
-                                self._previous_human_detected = self._msg.data.human_detected
-                    else:
-                        self._msg.data.human_detected = False
-                        if (self._report_detected is True):
-                            if (self._msg.data.human_detected is not self._previous_human_detected):
-                                self._pub.publish(self._msg.data)
-                                self.get_logger().info('[{}] LOSE_TRACKING'.format(self.get_name()))
-                                self._previous_human_detected = self._msg.data.human_detected
-                    #####################################################
-                    self._request_image(current_ns)
-                    self._display_fps = self._fps_calc.get()
-                    self._elapsed.append(self.get_clock().now().nanoseconds - current_ns)
-                    #####################################################
+                            self._msg.data.human_detected = False
+                            if (self._report_detected is True):
+                                if (self._msg.data.human_detected is not self._previous_human_detected):
+                                    self._pub.publish(self._msg.data)
+                                    self.get_logger().info('[{}] LOSE_TRACKING'.format(self.get_name()))
+                                    self._previous_human_detected = self._msg.data.human_detected
+                        #####################################################
+                        self._request_image(current_ns)
+                        self._display_fps = self._fps_calc.get()
+                        self._elapsed.append(self.get_clock().now().nanoseconds - current_ns)
+                        #####################################################
 
             if (self._next_time <= current_ns):
                 self._request_image(current_ns)
