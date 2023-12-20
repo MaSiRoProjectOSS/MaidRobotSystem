@@ -19,16 +19,16 @@ void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &ms
     static float z = 0.0f;
     static float w = 0.0f;
 
-    if (!this->_is_zero(x - this->_msg_neck.x, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(x - this->_msg_neck.x, std::abs(this->_msg_neck.x) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(y - this->_msg_neck.y, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(y - this->_msg_neck.y, std::abs(this->_msg_neck.y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(z - this->_msg_neck.z, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(z - this->_msg_neck.z, std::abs(this->_msg_neck.z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(z - this->_msg_neck.z, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(z - this->_msg_neck.w, std::abs(this->_msg_neck.w) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
 

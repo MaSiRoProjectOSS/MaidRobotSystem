@@ -287,10 +287,9 @@ void ModelImplement::_output_param()
 
 bool ModelImplement::_is_zero(float value, float min_limit)
 {
-    bool return_value    = false;
-    float relative_limit = std::abs(value) * min_limit;
+    bool return_value = false;
 
-    if ((value <= relative_limit) && (value >= -relative_limit)) {
+    if ((value <= min_limit) && (value >= -min_limit)) {
         return_value = true;
     }
 

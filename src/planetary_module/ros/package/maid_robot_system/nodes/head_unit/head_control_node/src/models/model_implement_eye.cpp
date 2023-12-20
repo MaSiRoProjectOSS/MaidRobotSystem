@@ -26,22 +26,22 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
     if (emotions != this->_msg_eye.emotions) {
         result = true;
     }
-    if (!this->_is_zero(dimensions - this->_msg_eye.dimensions, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(dimensions - this->_msg_eye.dimensions, std::abs(this->_msg_eye.dimensions) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(distance - this->_msg_eye.distance, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(distance - this->_msg_eye.distance, std::abs(this->_msg_eye.distance) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(left_y - this->_msg_eye.left_y, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(left_y - this->_msg_eye.left_y, std::abs(this->_msg_eye.left_y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(left_z - this->_msg_eye.left_z, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(left_z - this->_msg_eye.left_z, std::abs(this->_msg_eye.left_z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(right_y - this->_msg_eye.right_y, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(right_y - this->_msg_eye.right_y, std::abs(this->_msg_eye.right_y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (!this->_is_zero(right_z - this->_msg_eye.right_z, this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
+    if (!this->_is_zero(right_z - this->_msg_eye.right_z, std::abs(this->_msg_eye.right_z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
 
