@@ -34,6 +34,8 @@ private:
     StTemporaryEye _temp_left;
     StTemporaryEye _temp_right;
 
+    const float _MINIMUM_LIMIT_OF_FLOAT_VALUE = 1e-6f;
+
 public:
     // =============================
     // PUBLIC : Function
@@ -65,6 +67,8 @@ private:
 
     void _calculate_eye(double x, double y, double dimensions, double distance);
     void _calculate_neck(double x, double y, double roll);
+
+    bool _is_zero(float value, float min_limit);
 
 private:
     // =============================
