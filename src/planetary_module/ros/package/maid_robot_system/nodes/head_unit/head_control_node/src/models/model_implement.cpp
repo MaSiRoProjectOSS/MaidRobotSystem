@@ -277,7 +277,7 @@ void ModelImplement::_output_param()
 
     printf("lip_min      : %d\n", this->param.lip_min);
     printf("lip_max      : %d\n", this->param.lip_max);
-    printf("tiredness    : %d\n", this->param.tiredness);
+    printf("tiredness    : %3.3f\n", this->param.tiredness);
 
     printf("priority            : %s\n", this->param.priority_to_the_right ? "right_hand" : "left_hand");
     printf("timeout_s_received  : %3.3f\n", this->param.timeout_s_received);

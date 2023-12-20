@@ -1,15 +1,22 @@
 {
 	"folders": [
 		{
-			"name": "Maid Robot System",
-			"path": "."
+			"name": "Maid Robot System : ROS2",
+			"path": "./src/planetary_module/ros"
+		},
+		{
+			"name": "simulator",
+			"path": "./src/planetary_module/ros/vs_tasks/simulator"
 		}
 	],
 	"settings": {
 		"doxdocgen.file.copyrightTag": [
 			"@copyright Copyright (c) MaSiRo Project. {year}-."
 		],
-		"doxdocgen.file.versionTag": "@version 0.23.4",
+		"maid_robot_system": {
+			"config_json": ""
+		},
+		"doxdocgen.file.versionTag": "@version 0.23.10",
 		"doxdocgen.generic.useGitUserName": true,
 		"doxdocgen.generic.useGitUserEmail": true,
 		"search.exclude": {
@@ -34,28 +41,25 @@
 			"**/build": true
 		},
 		"cSpell.words": [
+			"aros",
 			"chgrp",
 			"colcon",
 			"doxygen",
+			"dsize",
 			"endgantt",
 			"gantt",
+			"imgmsg",
 			"shacklebone",
 			"startgantt",
 			"unstarted",
 			"usermod"
 		],
+		"forbeslindesay-taskrunner.separator": ":| : ",
 		"forbeslindesay-taskrunner.source": "Workspace",
-		"python.autoComplete.extraPaths": [
-			"/home/masiro/MaidRobotSystem/.colcon/build/maid_robot_system_py",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_py/lib/python3.8/site-packages",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_interfaces/lib/python3.8/site-packages",
-			"/opt/ros/rolling/lib/python3.8/site-packages"
-		],
-		"python.analysis.extraPaths": [
-			"/home/masiro/MaidRobotSystem/.colcon/build/maid_robot_system_py",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_py/lib/python3.8/site-packages",
-			"/opt/MaidRobotSystem/.colcon/install/maid_robot_system_interfaces/lib/python3.8/site-packages",
-			"/opt/ros/rolling/lib/python3.8/site-packages"
-		]
+		"forbeslindesay-taskrunner.prefix": "",
+		"ros.distro": "humble",
+		"ros2.rosRootDir": "/opt/ros/humble",
+		"ros.rosSetupScript": "/opt/MaidRobotSystem/src/planetary_module/ros/script/env.sh"
+
 	}
 }

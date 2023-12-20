@@ -252,6 +252,7 @@ bool InteractionNode::_set_setting_file(std::string value)
 {
     bool result = false;
     try {
+        RCLCPP_INFO(this->get_logger(), "Load setting file : %s", value.c_str());
         result = this->_widget->set_setting_file(value);
     } catch (const std::logic_error &err) {
         result = false;

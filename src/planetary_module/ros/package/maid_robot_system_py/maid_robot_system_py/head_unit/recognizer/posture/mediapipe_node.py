@@ -311,7 +311,7 @@ class MediapipeNode(Node):
                             if (self._report_detected is True):
                                 if (self._msg.data.human_detected is not self._previous_human_detected):
                                     self._pub.publish(self._msg.data)
-                                    self.get_logger().info('[{}] LOSE_TRACKING'.format(self.get_name()))
+                                    self.get_logger().info('[{}] LOSE_TRACK'.format(self.get_name()))
                                     self._previous_human_detected = self._msg.data.human_detected
                         #####################################################
                         self._request_image(current_ns)
