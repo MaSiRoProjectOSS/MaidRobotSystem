@@ -24,7 +24,9 @@
 
 namespace maid_robot_system
 {
-#define DEBUG_MODEL_IMPLEMENT 1
+#ifndef DEBUG_MODEL_IMPLEMENT
+#define DEBUG_MODEL_IMPLEMENT 0
+#endif
 
 class ModelImplement {
 public:
