@@ -79,6 +79,7 @@ set(MSG_MRS_FILE
   msg/mrs/MrsNeck.msg
   msg/mrs/MrsLip.msg
   msg/mrs/MrsVoice.msg
+  msg/mrs/MrsHeadStatus.msg
 )
 
 #   SRV_FILES

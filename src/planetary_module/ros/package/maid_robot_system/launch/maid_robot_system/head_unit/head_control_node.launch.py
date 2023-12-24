@@ -35,7 +35,8 @@ def generate_launch_description():
             ('in/voltage', _ros_namespace + _ros_sub_input_wattmeter + '/voltage'),
             ('out/eye', _ros_namespace + _ros_sub_namespace + '/eye'),
             ('out/neck', _ros_namespace + _ros_sub_namespace + '/neck'),
-            ('out/lip', _ros_namespace + _ros_sub_namespace + '/lip')
+            ('out/lip', _ros_namespace + _ros_sub_namespace + '/lip'),
+            ('out/status', _ros_namespace + _ros_sub_namespace + '/status')
         ],
         parameters=[{
             "eye/left/offset/x": 0.0,

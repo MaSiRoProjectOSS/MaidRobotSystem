@@ -14,6 +14,7 @@
 #include "models/model_structure.hpp"
 
 #include <maid_robot_system_interfaces/msg/mrs_eye.hpp>
+#include <maid_robot_system_interfaces/msg/mrs_head_status.hpp>
 #include <maid_robot_system_interfaces/msg/mrs_lip.hpp>
 #include <maid_robot_system_interfaces/msg/mrs_neck.hpp>
 #include <maid_robot_system_interfaces/msg/pose_detection.hpp>
@@ -33,12 +34,14 @@ private:
     StTemporaryOverall _temp_overall;
     StTemporaryEye _temp_left;
     StTemporaryEye _temp_right;
+    bool _temp_detected_primary;
+    bool _temp_detected_secondary;
 
 public:
     // =============================
     // PUBLIC : Function
     // =============================
-    bool calculate(double seconds);
+    bool calculate(double time_sec);
     bool set_value_voice(std::string text, int command, double seconds);
     bool set_value_ar(ModelStructure::INPUT_TYPE type, int id, double seconds);
     bool set_value_pose(ModelStructure::INPUT_TYPE type, const maid_robot_system_interfaces::msg::PoseDetection msg, double seconds);
@@ -47,6 +50,7 @@ public:
     void get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg);
     void get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &msg);
     void get_msg_lip(maid_robot_system_interfaces::msg::MrsLip &msg);
+    void get_msg_head_state(maid_robot_system_interfaces::msg::MrsHeadStatus &msg);
 
 private:
     // =============================

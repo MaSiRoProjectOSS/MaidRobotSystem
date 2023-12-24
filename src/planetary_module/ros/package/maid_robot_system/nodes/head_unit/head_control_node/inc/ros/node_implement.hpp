@@ -44,6 +44,7 @@ private:
     maid_robot_system_interfaces::msg::MrsEye _msg_eye;
     maid_robot_system_interfaces::msg::MrsNeck _msg_neck;
     maid_robot_system_interfaces::msg::MrsLip _msg_lip;
+    maid_robot_system_interfaces::msg::MrsHeadStatus _msg_head_status;
 
 private:
     // =============================
@@ -52,6 +53,7 @@ private:
     rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsEye>::SharedPtr _pub_eye;
     rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsNeck>::SharedPtr _pub_neck;
     rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsLip>::SharedPtr _pub_lip;
+    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsHeadStatus>::SharedPtr _pub_head_status;
 
 private:
     // =============================
@@ -105,6 +107,7 @@ private:
     const std::string MRS_TOPIC_OUT_EYE          = "out/eye";
     const std::string MRS_TOPIC_OUT_NECK         = "out/neck";
     const std::string MRS_TOPIC_OUT_LIP          = "out/lip";
+    const std::string MRS_TOPIC_OUT_STATUS       = "out/status";
 
     // =============================
     // ROS PARAMETER
