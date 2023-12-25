@@ -13,7 +13,7 @@
 
 namespace maid_robot_system
 {
-bool ModelImplement::calculate(double seconds)
+bool ModelImplement::calculate(double time_sec)
 {
     bool result                = false;
     static double next_seconds = 0.0;
@@ -34,12 +34,14 @@ bool ModelImplement::calculate(double seconds)
         primary   = this->_temp_left;
         secondary = this->_temp_right;
     }
-    if (seconds >= primary.next_seconds) {
+    if (time_sec >= primary.next_seconds) {
         primary.detected = false;
     }
-    if (seconds >= secondary.next_seconds) {
+    if (time_sec >= secondary.next_seconds) {
         secondary.detected = false;
     }
+    this->_temp_detected_primary   = primary.detected;
+    this->_temp_detected_secondary = secondary.detected;
 
     // The decision formula was changed.
     // The previous formula was based on the average of two cameras.
@@ -74,12 +76,12 @@ bool ModelImplement::calculate(double seconds)
         this->_calculate_eye(target_angle_x, target_angle_y, dimensions, distance);
         this->_calculate_neck(target_angle_x, target_angle_y, target_roll);
 
-        next_seconds = seconds + this->param.timeout_s_chased;
+        next_seconds = time_sec + this->param.timeout_s_chased;
     } else {
-        if (seconds >= next_seconds) {
+        if (time_sec >= next_seconds) {
             this->_msg_clear();
 
-            next_seconds = seconds + this->param.timeout_s_chased;
+            next_seconds = time_sec + this->param.timeout_s_chased;
             result       = true;
 #if DEBUG_MODEL_IMPLEMENT
             printf("TIMEOUT\n");
@@ -105,6 +107,8 @@ bool ModelImplement::calculate(double seconds)
 bool ModelImplement::_msg_clear()
 {
     // _msg_eye
+    this->_temp_detected_primary   = false;
+    this->_temp_detected_secondary = false;
     this->_calculate_eye(0, 0, this->_temp_overall.EYE_DEFAULT_SIZE, this->_temp_overall.EYE_DEFAULT_DISTANCE);
     this->_msg_eye.emotions      = maid_robot_system_interfaces::msg::MrsEye::EMOTION_NORMAL;
     this->_msg_eye.cornea_effect = maid_robot_system_interfaces::msg::MrsEye::EFFECT_CORNEA_NORMAL;
@@ -167,6 +171,11 @@ bool ModelImplement::set_value_pose(ModelStructure::INPUT_TYPE type, const maid_
     return result;
 }
 
+void ModelImplement::get_msg_head_state(maid_robot_system_interfaces::msg::MrsHeadStatus &msg)
+{
+    msg.human_detected = this->_temp_detected_primary || this->_temp_detected_secondary;
+}
+
 // =============================
 // PRIVATE : Function
 // =============================
@@ -185,7 +194,7 @@ bool ModelImplement::_set_value_pose(const maid_robot_system_interfaces::msg::Po
         double y = msg.landmark.nose.y;
         double z = msg.landmark.nose.z;
 
-        temp.detected_type = 1;
+        temp.detected_type = StTemporaryEye::detected_type_t::DETECTED_TYPE_NOSE;
 
         if ((true == msg.landmark.right.eye.exist) && (true == msg.landmark.left.eye.exist)) {
             if (msg.landmark.right.eye.x != 0 and msg.landmark.left.eye.x != 0) {
@@ -211,7 +220,7 @@ bool ModelImplement::_set_value_pose(const maid_robot_system_interfaces::msg::Po
                         y = msg.landmark.left.index.y;
                         z = msg.landmark.left.index.z;
 
-                        temp.detected_type = 2;
+                        temp.detected_type = StTemporaryEye::detected_type_t::DETECTED_TYPE_LEFT_HAND;
                     }
                 }
             }
@@ -223,7 +232,7 @@ bool ModelImplement::_set_value_pose(const maid_robot_system_interfaces::msg::Po
                         y = msg.landmark.right.index.y;
                         z = msg.landmark.right.index.z;
 
-                        temp.detected_type = 3;
+                        temp.detected_type = StTemporaryEye::detected_type_t::DETECTED_TYPE_RIGHT_HAND;
                     }
                 }
             }
@@ -236,7 +245,7 @@ bool ModelImplement::_set_value_pose(const maid_robot_system_interfaces::msg::Po
 
     temp.detected = result;
     if (result != true) {
-        temp.detected_type = 0;
+        temp.detected_type = StTemporaryEye::detected_type_t::DETECTED_TYPE_NOT_DETECTED;
     }
     temp.next_seconds = seconds + this->param.timeout_s_received;
 
@@ -277,7 +286,7 @@ void ModelImplement::_output_param()
 
     printf("lip_min      : %d\n", this->param.lip_min);
     printf("lip_max      : %d\n", this->param.lip_max);
-    printf("tiredness    : %d\n", this->param.tiredness);
+    printf("tiredness    : %3.3f\n", this->param.tiredness);
 
     printf("priority            : %s\n", this->param.priority_to_the_right ? "right_hand" : "left_hand");
     printf("timeout_s_received  : %3.3f\n", this->param.timeout_s_received);

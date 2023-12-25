@@ -44,14 +44,23 @@ public:
 
 class StTemporaryEye {
 public:
-    double x           = 0;
-    double y           = 0;
-    double z           = 0;
+    typedef enum detected_type_t
+    {
+        DETECTED_TYPE_NOT_DETECTED,
+        DETECTED_TYPE_LEFT_HAND,
+        DETECTED_TYPE_RIGHT_HAND,
+        DETECTED_TYPE_NOSE
+    } DETECTED_TYPE;
+
+public:
+    double x           = 0.0;
+    double y           = 0.0;
+    double z           = 0.0;
     double target_roll = 0.0;
 
-    bool detected       = false;
-    int detected_type   = 0;
-    double next_seconds = 0.0;
+    bool detected                 = false;
+    detected_type_t detected_type = StTemporaryEye::detected_type_t::DETECTED_TYPE_NOT_DETECTED;
+    double next_seconds           = 0.0;
     // int emotion;
     // int dimensions;
     // bool flag_reversal;

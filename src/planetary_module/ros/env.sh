@@ -99,34 +99,8 @@ function mrs_env_print {
     local COLOR_ON_RED="\e[31m"
     local COLOR_OFF="\e[m"
     ## ================================
-    export MRS_CONFIG=${1:-${MRS_CONFIG}}
-    if [ ! -f "${MRS_CONFIG}" ]; then
-        local CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-        if [ -f "${CURRENT_DIR}/config/${MRS_CONFIG}" ]; then
-            export MRS_CONFIG=${CURRENT_DIR}/config/${MRS_CONFIG}
-        elif [ -f "${CURRENT_DIR}/config/default.json" ]; then
-            export MRS_CONFIG=${CURRENT_DIR}/config/default.json
-        else
-            export MRS_CONFIG=/opt/MaidRobotSystem/data/config.json
-        fi
-    fi
-    if [ -f ${MRS_CONFIG} ]; then
-        echo -e ${COLOR_ON_BLUE}"MRS_CONFIG: ${COLOR_ON_GREEN}${MRS_CONFIG}"${COLOR_OFF}
-        local CONFIG_ARRAY=("CAST" "MRS" "ROS_VARIABLES" "BUILD")
-        local JSON_DATA=$(cat ${MRS_CONFIG})
-        local CONFIG_RAW=""
-        for CONFIG_RAW in "${CONFIG_ARRAY[@]}"
-        do
-            echo -e "${COLOR_ON_BLUE}${CONFIG_RAW}:${COLOR_OFF}"
-            local JSON_KEY=$(echo ${JSON_DATA} | jq -c '.'$CONFIG_RAW)
-            if [ "null" != "${JSON_KEY}" ]; then
-                local EXPORTLIST=$(echo ${JSON_KEY} | jq -r ' to_entries[] | [.key, .value] | @tsv')
-                IFS=$'\n'
-                mrs_set_echo ${EXPORTLIST}
-            fi
-        done
-    fi
-    IFS=$' \t\n'
+    mrs_load_config ${1:-${MRS_CONFIG}}
+    printenv
 }
 
 function mrs_load_config {
@@ -153,6 +127,15 @@ function mrs_load_config {
         done
     fi
     IFS=$' \t\n'
+
+    local BUF_MRS_CAST_DATA=$(readlink -f ${MRS_CAST_DATA})
+    if [ "" == "${BUF_MRS_CAST_DATA}" ] ;then
+        BUF_MRS_CAST_DATA=$(readlink -f $(dirname ${MRS_CONFIG})/${MRS_CAST_DATA})
+    fi
+    if [ ! -f "${BUF_MRS_CAST_DATA}" ] ;then
+        BUF_MRS_CAST_DATA=${MRS_CAST_DATA}
+    fi
+    export MRS_CAST_DATA=${BUF_MRS_CAST_DATA}
 }
 
 function mrs_save_config {

@@ -228,14 +228,19 @@ int NodeImplement::_callback_param_init()
 void NodeImplement::_callback_timer()
 {
     bool result = this->_model.calculate(this->get_clock()->now().seconds());
+    // get message
     if (true == result) {
         this->_model.get_msg_eye(this->_msg_eye);
         this->_model.get_msg_neck(this->_msg_neck);
         this->_model.get_msg_lip(this->_msg_lip);
     }
+    this->_model.get_msg_head_state(this->_msg_head_status);
+
+    // publish
     this->_pub_eye->publish(this->_msg_eye);
     this->_pub_neck->publish(this->_msg_neck);
     this->_pub_lip->publish(this->_msg_lip);
+    this->_pub_head_status->publish(this->_msg_head_status);
 }
 
 // =============================
@@ -264,6 +269,11 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                 this->create_publisher<maid_robot_system_interfaces::msg::MrsLip>( //
                         this->MRS_TOPIC_OUT_LIP,                                   //
                         this->DEPTH_PUBLISHER                                      //
+                );
+        this->_pub_head_status =                                                          //
+                this->create_publisher<maid_robot_system_interfaces::msg::MrsHeadStatus>( //
+                        this->MRS_TOPIC_OUT_STATUS,                                       //
+                        this->DEPTH_PUBLISHER                                             //
                 );
 
         // set subscription
