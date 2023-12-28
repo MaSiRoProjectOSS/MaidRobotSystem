@@ -12,17 +12,19 @@
 #include <exception>
 #include <stdexcept>
 
+//
+#include <iostream>
+//
+
 using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::_callback_message(const std_msgs::msg::Float64 &msg)
+void NodeImplement::_callback_current_position_rotation(const geometry_msgs::msg::PoseStamped &msg)
 {
-    this->_model.set_value(msg.data);
-    // RCLCPP_INFO_EXPRESSION(this->get_logger(), LOGGER_ROS_INFO_GET_MESSAGE, "callback_message() : %3.1f", this->_model.calculate());
-    // RCLCPP_WARN(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
-    // RCLCPP_ERROR(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
-    // RCLCPP_FATAL(this->get_logger(), "callback_message() : %3.1f", this->_model.calculate());
+    this->_model.set_position_rotation(msg);
+
+    std::cout << "_callback_current_position_rotation" << std::endl;
 }
 
 int NodeImplement::_callback_param_init()
@@ -137,11 +139,11 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                             this->DEPTH_PUBLISHER                                         //
                     );
             // set subscription
-            this->_sub_value =                                         //
-                    this->create_subscription<std_msgs::msg::Float64>( //
-                            this->MRS_TOPIC_INPUT,                     //
-                            this->DEPTH_SUBSCRIPTION,                  //
-                            std::bind(&NodeImplement::_callback_message, this, _1));
+            this->_sub_value =                                                  //
+                    this->create_subscription<geometry_msgs::msg::PoseStamped>( //
+                            this->MRS_TOPIC_INPUT,                              //
+                            this->DEPTH_SUBSCRIPTION,                           //
+                            std::bind(&NodeImplement::_callback_current_position_rotation, this, _1));
 
             this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
         } else {

@@ -10,6 +10,7 @@
 #ifndef SAMPLE_NODE_IMPLEMENT_HPP
 #define SAMPLE_NODE_IMPLEMENT_HPP
 
+#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -54,9 +55,9 @@ private:
     // =============================
     // ROS : subscription
     // =============================
-    void _callback_message(const std_msgs::msg::Float64 &msg);
+    void _callback_current_position_rotation(const geometry_msgs::msg::PoseStamped &msg);
 
-    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr _sub_value;
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr _sub_value;
 
 private:
     // =============================
@@ -76,7 +77,7 @@ private:
     // =============================
     // CONST
     // =============================
-    const rclcpp::QoS DEPTH_PUBLISHER   = rclcpp::QoS(5);
+    const rclcpp::QoS DEPTH_PUBLISHER    = rclcpp::QoS(5);
     const rclcpp::QoS DEPTH_SUBSCRIPTION = rclcpp::QoS(5);
     const std::chrono::milliseconds PERIOD_MSEC{ 1000 };
 
