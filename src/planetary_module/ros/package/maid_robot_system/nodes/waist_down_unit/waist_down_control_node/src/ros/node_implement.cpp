@@ -12,10 +12,6 @@
 #include <exception>
 #include <stdexcept>
 
-//
-#include <iostream>
-//
-
 using std::placeholders::_1;
 
 namespace maid_robot_system
@@ -23,8 +19,6 @@ namespace maid_robot_system
 void NodeImplement::_callback_current_position_rotation(const geometry_msgs::msg::PoseStamped &msg)
 {
     this->_model.set_position_rotation(msg);
-
-    std::cout << "_callback_current_position_rotation" << std::endl;
 }
 
 int NodeImplement::_callback_param_init()

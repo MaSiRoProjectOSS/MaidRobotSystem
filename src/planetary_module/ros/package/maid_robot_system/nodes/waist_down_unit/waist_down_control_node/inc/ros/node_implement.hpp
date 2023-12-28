@@ -79,7 +79,7 @@ private:
     // =============================
     const rclcpp::QoS DEPTH_PUBLISHER    = rclcpp::QoS(5);
     const rclcpp::QoS DEPTH_SUBSCRIPTION = rclcpp::QoS(5);
-    const std::chrono::milliseconds PERIOD_MSEC{ 1000 };
+    const std::chrono::milliseconds PERIOD_MSEC{ 50 };
 
     // =============================
     // ROS Topic / Service / Action
