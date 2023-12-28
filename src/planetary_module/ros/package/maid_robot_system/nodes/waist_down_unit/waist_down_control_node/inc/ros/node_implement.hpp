@@ -55,9 +55,11 @@ private:
     // =============================
     // ROS : subscription
     // =============================
-    void _callback_current_position_rotation(const geometry_msgs::msg::PoseStamped &msg);
+    void _callback_robot_position_rotation(const geometry_msgs::msg::PoseStamped &msg);
+    void _callback_hand_position(const geometry_msgs::msg::Point &msg);
 
-    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr _sub_value;
+    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr _sub_robot_position_rotation;
+    rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr _sub_hand_position;
 
 private:
     // =============================
@@ -84,8 +86,9 @@ private:
     // =============================
     // ROS Topic / Service / Action
     // =============================
-    const std::string MRS_TOPIC_OUTPUT = "out";
-    const std::string MRS_TOPIC_INPUT  = "in";
+    const std::string MRS_TOPIC_OUTPUT                  = "out";
+    const std::string MRS_TOPIC_ROBOT_POSITION_ROTATION = "in/robot_position_rotation";
+    const std::string MRS_TOPIC_HAND_POSITION           = "in/hand_position";
 
     // =============================
     // ROS PARAMETER

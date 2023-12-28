@@ -16,9 +16,14 @@ using std::placeholders::_1;
 
 namespace maid_robot_system
 {
-void NodeImplement::_callback_current_position_rotation(const geometry_msgs::msg::PoseStamped &msg)
+void NodeImplement::_callback_robot_position_rotation(const geometry_msgs::msg::PoseStamped &msg)
 {
     this->_model.set_position_rotation(msg);
+}
+
+void NodeImplement::_callback_hand_position(const geometry_msgs::msg::Point &msg)
+{
+    this->_model.set_hand_position(msg);
 }
 
 int NodeImplement::_callback_param_init()
@@ -133,11 +138,17 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
                             this->DEPTH_PUBLISHER                                         //
                     );
             // set subscription
-            this->_sub_value =                                                  //
+            this->_sub_robot_position_rotation =                                //
                     this->create_subscription<geometry_msgs::msg::PoseStamped>( //
-                            this->MRS_TOPIC_INPUT,                              //
+                            this->MRS_TOPIC_ROBOT_POSITION_ROTATION,            //
                             this->DEPTH_SUBSCRIPTION,                           //
-                            std::bind(&NodeImplement::_callback_current_position_rotation, this, _1));
+                            std::bind(&NodeImplement::_callback_robot_position_rotation, this, _1));
+
+            this->_sub_hand_position =                                    //
+                    this->create_subscription<geometry_msgs::msg::Point>( //
+                            this->MRS_TOPIC_HAND_POSITION,                //
+                            this->DEPTH_SUBSCRIPTION,                     //
+                            std::bind(&NodeImplement::_callback_hand_position, this, _1));
 
             this->_ros_timer = this->create_wall_timer(this->PERIOD_MSEC, std::bind(&NodeImplement::_callback_timer, this));
         } else {

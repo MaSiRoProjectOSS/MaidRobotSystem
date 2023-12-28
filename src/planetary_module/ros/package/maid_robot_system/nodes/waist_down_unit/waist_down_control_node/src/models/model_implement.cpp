@@ -30,19 +30,28 @@ void ModelImplement::set_offset(double value)
 
 void ModelImplement::set_position_rotation(const geometry_msgs::msg::PoseStamped &msg)
 {
-    this->_position->x = (float)msg.pose.position.x;
-    this->_position->y = (float)msg.pose.position.y;
-    this->_position->z = (float)msg.pose.position.z;
+    this->_robot_position->x = (float)msg.pose.position.x;
+    this->_robot_position->y = (float)msg.pose.position.y;
+    this->_robot_position->z = (float)msg.pose.position.z;
 
-    this->_rotation->x = (float)msg.pose.orientation.x;
-    this->_rotation->y = (float)msg.pose.orientation.y;
-    this->_rotation->z = (float)msg.pose.orientation.z;
-    this->_rotation->w = (float)msg.pose.orientation.w;
+    this->_robot_rotation->x = (float)msg.pose.orientation.x;
+    this->_robot_rotation->y = (float)msg.pose.orientation.y;
+    this->_robot_rotation->z = (float)msg.pose.orientation.z;
+    this->_robot_rotation->w = (float)msg.pose.orientation.w;
+}
+
+void ModelImplement::set_hand_position(const geometry_msgs::msg::Point &msg)
+{
+    this->_hand_position->x = (float)msg.x;
+    this->_hand_position->y = (float)msg.y;
+    this->_hand_position->z = (float)msg.z;
 }
 
 bool ModelImplement::calculate()
 {
-    this->_handshake_follow(this->_position->x, this->_position->y, this->_position->z);
+    this->_get_hand_information();
+
+    this->_handshake_follow(this->_hand_r, this->_hand_sita, this->_hand_z);
 
     return true;
 }
@@ -78,7 +87,7 @@ void ModelImplement::_handshake_follow(float r, float sita, float z)
 
     v = v * (1.0f - this->_map(this->_constrain(std::abs(s_error), 0, this->_MAX_S_ERROR_TO_V), 0, this->_MAX_S_ERROR_TO_V, this->_V_MIN, this->_V_MAX) / (float)this->_V_MAX);
 
-    if (z > START_Z_UPPER) { /* If arm height is greater than certain value. */
+    if (z > this->_START_Z_UPPER) { /* If arm height is greater than certain value. */
         this->_z_count++;
     } else {
         this->_z_count -= this->_Z_COUNT_DECREASE_RATE;
@@ -109,6 +118,13 @@ void ModelImplement::_handshake_follow(float r, float sita, float z)
 
     this->_wheel_target_v = v;
     this->_wheel_target_w = w;
+}
+
+void ModelImplement::_get_hand_information()
+{
+    this->_hand_z    = this->_hand_position->z;
+    this->_hand_sita = std::atan2(this->_hand_position->y, this->_hand_position->x) / this->_PI * this->_SEMI_CIRCLE_DEGREE;
+    this->_hand_r    = std::sqrt(this->_hand_position->x * this->_hand_position->x + this->_hand_position->y * this->_hand_position->y);
 }
 
 float ModelImplement::_constrain(float value, float min, float max)

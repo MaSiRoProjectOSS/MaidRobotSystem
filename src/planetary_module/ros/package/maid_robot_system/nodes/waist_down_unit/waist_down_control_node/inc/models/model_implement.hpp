@@ -23,6 +23,8 @@ public:
     void set_times(double value);
     void set_offset(double value);
     void set_position_rotation(const geometry_msgs::msg::PoseStamped &msg);
+    void set_hand_position(const geometry_msgs::msg::Point &msg);
+
     bool calculate();
 
     double get_times();
@@ -34,6 +36,8 @@ private:
     // PRIVATE : Function
     // =============================
     void _handshake_follow(float r, float sita, float z);
+
+    void _get_hand_information();
 
     float _constrain(float value, float min, float max);
     float _map(float value, float from_low, float from_high, float to_low, float to_high);
@@ -59,8 +63,13 @@ private:
     int _max_speed        = 20000; /*!< max speed */
     float _max_turn_speed = 1.2;   /*!< max turn speed */
 
-    Vector3 *_position    = new Vector3(0.0f, 0.0f, 0.0f);
-    Quaternion *_rotation = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector3 *_robot_position    = new Vector3(0.0f, 0.0f, 0.0f);
+    Quaternion *_robot_rotation = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector3 *_hand_position     = new Vector3(0.0f, 0.0f, 0.0f);
+
+    float _hand_z    = 0; /*!<  */
+    float _hand_sita = 0; /*!<  */
+    float _hand_r    = 0; /*!<  */
 
     float _wheel_target_v = 0.0; /*!< wheel target v */
     float _wheel_target_w = 0.0; /*!< wheel target w */
@@ -78,6 +87,9 @@ private:
     // =============================
     // PRIVATE : Constant
     // =============================
+    const float _PI                 = 3.1415927; /*!<  */
+    const float _SEMI_CIRCLE_DEGREE = 180.0;     /*!<  */
+
     const int _MAX_S_ERROR_TO_V = 90; /*!<  */
 
     const int _R_V_FACTOR = 10;    /*!<  */
@@ -86,7 +98,7 @@ private:
     const int _V_MIN = 0;   /*!<  */
     const int _V_MAX = 100; /*!<  */
 
-    const int START_Z_UPPER = -200;
+    const float _START_Z_UPPER = 1.0;
 
     const int _Z_COUNT_DECREASE_RATE = 3;   /*!<  */
     const int _Z_COUNT_MIN           = 0;   /*!<  */

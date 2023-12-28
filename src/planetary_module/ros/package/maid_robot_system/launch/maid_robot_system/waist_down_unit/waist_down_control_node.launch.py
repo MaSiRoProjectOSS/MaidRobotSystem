@@ -7,21 +7,21 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     _ros_namespace = os.environ.get('MRS_ROS_NAMESPACE', '/maid_robot_system')
-    _ros_sub_namespace = '/waist_down_unit'
+    _ros_sub_namespace_waist_down = '/waist_down_unit' + '/controller'
+    _ros_sub_namespace_arm = '/arm_unit' + '/controller'
     _output_type = os.environ.get('MRS_ROS_OUTPUT_TYPE', 'log')
     _log_level = os.environ.get('MRS_ROS_LOG_LEVEL', 'INFO')
     _res_pawn = {'true': True, 'false': False}[os.getenv('MRS_ROS_SPAWN', 'false')]
 
-    _ros_sub_input = '/controller'
-
     launch_waist_down_control_node = Node(
-        namespace=_ros_namespace + _ros_sub_namespace,
+        namespace=_ros_namespace + _ros_sub_namespace_waist_down,
         package='maid_robot_system',
         executable='waist_down_control_node',
         output=_output_type,
         remappings=[
-            ('in', _ros_namespace + _ros_sub_namespace + _ros_sub_input + '/position_rotation'),
-            ('out', _ros_namespace + _ros_sub_namespace + _ros_sub_input + '/move_velocity_reference')
+            ('in/robot_position_rotation', _ros_namespace + _ros_sub_namespace_waist_down + '/robot_position_rotation'),
+            ('in/hand_position', _ros_namespace + _ros_sub_namespace_arm + '/hand_position'),
+            ('out', _ros_namespace + _ros_sub_namespace_waist_down + '/move_velocity_reference')
         ],
         parameters=[{
             "param": {
