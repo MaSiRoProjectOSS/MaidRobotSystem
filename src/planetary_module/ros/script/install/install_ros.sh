@@ -105,7 +105,7 @@ echo -e "${COLOR_ON_BLUE}* Install of related software${COLOR_OFF}"
 
 # ROS
 sudo apt install -y -q ros-${ROS_DISTRO}-serial-driver
-sudo apt install -y -q ros-${ROS_DISTRO}-rosbridge-server
+sudo apt install -y -q ros-${ROS_DISTRO}-rosbridge-server ros-${ROS_DISTRO}-cv-bridge
 sudo apt install -y -q python3-colcon-common-extensions
 
 # Application
