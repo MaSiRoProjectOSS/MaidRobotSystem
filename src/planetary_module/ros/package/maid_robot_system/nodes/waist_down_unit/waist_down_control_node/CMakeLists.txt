@@ -1,6 +1,6 @@
-# [node] waist_down_unit_control_node
+# [node] waist_down_control_node
 
-set(NODE_NAME waist_down_unit_control_node)
+set(NODE_NAME waist_down_control_node)
 
 add_definitions(
   -DNODE_NAME="${NODE_NAME}"
