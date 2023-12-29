@@ -93,7 +93,7 @@ private:
     // =============================
     // ROS Topic / Service / Action
     // =============================
-    const std::string MRS_TOPIC_OUTPUT                  = "out/move_velocity_reference";
+    const std::string MRS_TOPIC_MOVE_VELOCITY_REFERENCE = "out/move_velocity_reference";
     const std::string MRS_TOPIC_ROBOT_POSITION_ROTATION = "in/robot_position_rotation";
     const std::string MRS_TOPIC_HAND_POSITION           = "in/hand_position";
 

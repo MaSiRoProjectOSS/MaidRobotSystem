@@ -21,7 +21,7 @@ def generate_launch_description():
         remappings=[
             ('in/robot_position_rotation', _ros_namespace + _ros_sub_namespace_waist_down + '/robot_position_rotation'),
             ('in/hand_position', _ros_namespace + _ros_sub_namespace_arm + '/hand_position'),
-            ('out', _ros_namespace + _ros_sub_namespace_waist_down + '/move_velocity_reference')
+            ('out/move_velocity_reference', _ros_namespace + _ros_sub_namespace_waist_down + '/move_velocity_reference')
         ],
         parameters=[{
             "param": {

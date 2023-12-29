@@ -110,7 +110,7 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
             // set publisher
             this->_pub_move_velocity_reference =                       //
                     this->create_publisher<geometry_msgs::msg::Twist>( //
-                            this->MRS_TOPIC_OUTPUT,                    //
+                            this->MRS_TOPIC_MOVE_VELOCITY_REFERENCE,   //
                             this->DEPTH_PUBLISHER                      //
                     );
             // set subscription
