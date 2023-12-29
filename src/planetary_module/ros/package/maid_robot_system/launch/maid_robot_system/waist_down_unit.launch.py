@@ -12,6 +12,15 @@ from launch_ros.actions import PushRosNamespace
 
 
 def generate_launch_description():
+    # controller
+    launch_waist_down_control_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/maid_robot_system/waist_down_unit/waist_down_control_node.launch.py'))
+    )
 
     return LaunchDescription([
+        # # controller
+        launch_waist_down_control_node,
     ])

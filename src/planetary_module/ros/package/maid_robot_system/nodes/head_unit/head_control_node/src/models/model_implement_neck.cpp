@@ -13,23 +13,25 @@ namespace maid_robot_system
 {
 void ModelImplement::get_msg_neck(maid_robot_system_interfaces::msg::MrsNeck &msg)
 {
-    bool result  = false;
-    static int x = 0;
-    static int y = 0;
-    static int z = 0;
-    static int w = 0;
-    if (x != this->_msg_neck.x) {
+    bool result    = false;
+    static float x = 0.0f;
+    static float y = 0.0f;
+    static float z = 0.0f;
+    static float w = 0.0f;
+
+    if (!this->_is_zero(x - this->_msg_neck.x, std::abs(this->_msg_neck.x) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (y != this->_msg_neck.y) {
+    if (!this->_is_zero(y - this->_msg_neck.y, std::abs(this->_msg_neck.y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (z != this->_msg_neck.z) {
+    if (!this->_is_zero(z - this->_msg_neck.z, std::abs(this->_msg_neck.z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (w != this->_msg_neck.w) {
+    if (!this->_is_zero(z - this->_msg_neck.w, std::abs(this->_msg_neck.w) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
+
     if (true == result) {
         x = this->_msg_neck.x;
         y = this->_msg_neck.y;

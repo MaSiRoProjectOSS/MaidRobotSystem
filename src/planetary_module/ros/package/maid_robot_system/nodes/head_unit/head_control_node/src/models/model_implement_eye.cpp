@@ -15,34 +15,36 @@ void ModelImplement::get_msg_eye(maid_robot_system_interfaces::msg::MrsEye &msg)
 {
     bool result = false;
 
-    static int emotions   = 0;
-    static int dimensions = 0;
-    static int distance   = 0;
-    static int left_y     = 0;
-    static int left_z     = 0;
-    static int right_y    = 0;
-    static int right_z    = 0;
+    static int emotions     = 0;
+    static float dimensions = 0;
+    static float distance   = 0;
+    static float left_y     = 0;
+    static float left_z     = 0;
+    static float right_y    = 0;
+    static float right_z    = 0;
+
     if (emotions != this->_msg_eye.emotions) {
         result = true;
     }
-    if (dimensions != this->_msg_eye.dimensions) {
+    if (!this->_is_zero(dimensions - this->_msg_eye.dimensions, std::abs(this->_msg_eye.dimensions) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (distance != this->_msg_eye.distance) {
+    if (!this->_is_zero(distance - this->_msg_eye.distance, std::abs(this->_msg_eye.distance) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (left_y != this->_msg_eye.left_y) {
+    if (!this->_is_zero(left_y - this->_msg_eye.left_y, std::abs(this->_msg_eye.left_y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (left_z != this->_msg_eye.left_z) {
+    if (!this->_is_zero(left_z - this->_msg_eye.left_z, std::abs(this->_msg_eye.left_z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (right_y != this->_msg_eye.right_y) {
+    if (!this->_is_zero(right_y - this->_msg_eye.right_y, std::abs(this->_msg_eye.right_y) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
-    if (right_z != this->_msg_eye.right_z) {
+    if (!this->_is_zero(right_z - this->_msg_eye.right_z, std::abs(this->_msg_eye.right_z) * this->_MINIMUM_LIMIT_OF_FLOAT_VALUE)) {
         result = true;
     }
+
     if (true == result) {
         emotions   = this->_msg_eye.emotions;
         dimensions = this->_msg_eye.dimensions;

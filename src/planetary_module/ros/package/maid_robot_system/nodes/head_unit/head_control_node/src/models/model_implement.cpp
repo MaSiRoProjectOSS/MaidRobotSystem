@@ -293,4 +293,16 @@ void ModelImplement::_output_param()
     printf("timeout_s_chased    : %3.3f\n", this->param.timeout_s_chased);
 #endif
 }
+
+bool ModelImplement::_is_zero(float value, float min_limit)
+{
+    bool return_value = false;
+
+    if ((value <= min_limit) && (value >= -min_limit)) {
+        return_value = true;
+    }
+
+    return return_value;
+}
+
 } // namespace maid_robot_system
