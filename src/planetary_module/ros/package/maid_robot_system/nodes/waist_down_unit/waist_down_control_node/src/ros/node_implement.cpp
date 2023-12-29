@@ -52,12 +52,10 @@ int NodeImplement::_callback_param_init()
                     case rclcpp::PARAMETER_DOUBLE:
                         if (param.get_name() == this->MRS_PARAMETER_SAMPLE_OFFSET) {
                             this->_model.set_offset(param.as_double());
-                            this->_msg_convert.offset.data = this->_model.get_offset();
                             RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_OFFSET.c_str(), this->_model.get_offset());
                             results->successful = true;
                         } else if (param.get_name() == this->MRS_PARAMETER_SAMPLE_TIMES) {
                             this->_model.set_times(param.as_double());
-                            this->_msg_convert.times.data = this->_model.get_times();
                             RCLCPP_INFO(this->get_logger(), "  set param : %s[%f]", this->MRS_PARAMETER_SAMPLE_TIMES.c_str(), this->_model.get_times());
                             results->successful = true;
                         }
@@ -94,29 +92,10 @@ int NodeImplement::_callback_param_init()
 
 void NodeImplement::_callback_timer()
 {
-    this->_msg_convert.value.data = this->_model.calculate();
-    this->_pub_info->publish(this->_msg_convert);
+    this->_model.calculate();
 
-    static double __times  = 0;
-    static double __offset = 0;
-    static double __data   = 0;
-    static double __value  = 0;
-    if ((__times != this->_model.get_times()) ||   //
-        (__offset != this->_model.get_offset()) || //
-        (__value != this->_model.get_value()) ||   //
-        (__data != this->_msg_convert.value.data)) {
-        RCLCPP_INFO_EXPRESSION(this->get_logger(), //
-                               LOGGER_ROS_INFO_TIMER,
-                               "callback_timer : %f = %f * n(%2.1f) + %f",
-                               this->_msg_convert.value.data,
-                               this->_model.get_times(),
-                               this->_model.get_value(),
-                               this->_model.get_offset());
-        __times  = this->_model.get_times();
-        __offset = this->_model.get_offset();
-        __value  = this->_model.get_value();
-        __data   = this->_msg_convert.value.data;
-    }
+    this->set_move_velocity_reference();
+    this->_pub_move_velocity_reference->publish(this->_msg_move_velocity_reference);
 }
 
 NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Node(node_name)
@@ -126,16 +105,13 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
 #endif
 
     if (true) {
-        this->_msg_convert.offset.data = this->_model.get_offset();
-        this->_msg_convert.times.data  = this->_model.get_times();
-        this->_msg_convert.value.data  = this->_model.calculate();
         // set parameter
         if (0 == this->_callback_param_init()) {
             // set publisher
-            this->_pub_info =                                                             //
-                    this->create_publisher<maid_robot_system_interfaces::msg::MrsSample>( //
-                            this->MRS_TOPIC_OUTPUT,                                       //
-                            this->DEPTH_PUBLISHER                                         //
+            this->_pub_move_velocity_reference =                       //
+                    this->create_publisher<geometry_msgs::msg::Twist>( //
+                            this->MRS_TOPIC_OUTPUT,                    //
+                            this->DEPTH_PUBLISHER                      //
                     );
             // set subscription
             this->_sub_robot_position_rotation =                                //
@@ -158,6 +134,19 @@ NodeImplement::NodeImplement(std::string node_name, int argc, char **argv) : Nod
         RCLCPP_ERROR(this->get_logger(), "Failed to open.");
         throw new std::runtime_error("Failed to open.");
     }
+}
+
+void NodeImplement::set_move_velocity_reference()
+{
+    this->_model.get_velocity_reference(this->_translational_velocity, this->_rotational_velocity);
+
+    this->_msg_move_velocity_reference.linear.x = this->_translational_velocity->x;
+    this->_msg_move_velocity_reference.linear.y = this->_translational_velocity->y;
+    this->_msg_move_velocity_reference.linear.z = this->_translational_velocity->z;
+
+    this->_msg_move_velocity_reference.angular.x = this->_rotational_velocity->x;
+    this->_msg_move_velocity_reference.angular.y = this->_rotational_velocity->y;
+    this->_msg_move_velocity_reference.angular.z = this->_rotational_velocity->z;
 }
 
 NodeImplement::~NodeImplement()

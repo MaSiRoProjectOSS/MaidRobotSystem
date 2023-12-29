@@ -29,7 +29,8 @@ public:
 
     double get_times();
     double get_offset();
-    double get_value();
+
+    void get_velocity_reference(Vector3 *translational_velocity, Vector3 *rotational_velocity);
 
 private:
     // =============================
@@ -74,10 +75,10 @@ private:
     float _wheel_target_v = 0.0; /*!< wheel target v */
     float _wheel_target_w = 0.0; /*!< wheel target w */
 
-    int _target_r = 150;  /*!< target r */
-    int _target_s = 15;   /*!< target s */
-    float _K_v    = -1.8; /*!< gain of v */
-    float _K_w    = 0.03; /*!< gain of w */
+    float _target_r = 0.15; /*!< target r */
+    float _target_s = 15;   /*!< target s */
+    float _K_v      = -1.8; /*!< gain of v */
+    float _K_w      = 0.03; /*!< gain of w */
 
     int _z_count = 0; /*!<  */
 

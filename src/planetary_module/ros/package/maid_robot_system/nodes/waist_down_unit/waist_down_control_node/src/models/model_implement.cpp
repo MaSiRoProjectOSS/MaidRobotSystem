@@ -9,10 +9,6 @@
  */
 #include "models/model_implement.hpp"
 
-//
-#include <iostream>
-//
-
 namespace maid_robot_system
 {
 // =============================
@@ -60,13 +56,21 @@ double ModelImplement::get_times()
 {
     return this->_times;
 }
+
 double ModelImplement::get_offset()
 {
     return this->_offset;
 }
-double ModelImplement::get_value()
+
+void ModelImplement::get_velocity_reference(Vector3 *translational_velocity, Vector3 *rotational_velocity)
 {
-    return 0.0;
+    translational_velocity->x = this->_wheel_target_v;
+    translational_velocity->y = 0.0f;
+    translational_velocity->z = 0.0f;
+
+    rotational_velocity->x = 0.0f;
+    rotational_velocity->y = 0.0f;
+    rotational_velocity->z = this->_wheel_target_w;
 }
 
 // =============================

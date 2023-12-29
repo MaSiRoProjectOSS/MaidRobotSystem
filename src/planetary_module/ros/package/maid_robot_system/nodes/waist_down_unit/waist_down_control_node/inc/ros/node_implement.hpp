@@ -11,6 +11,7 @@
 #define SAMPLE_NODE_IMPLEMENT_HPP
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "models/model_implement.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -38,18 +39,24 @@ public:
     NodeImplement(std::string node_name, int argc, char **argv);
     ~NodeImplement();
 
+    void set_move_velocity_reference();
+
 private:
     // =============================
     // Variable
     // =============================
     ModelImplement _model;
 
+    geometry_msgs::msg::Twist _msg_move_velocity_reference;
+
+    Vector3 *_translational_velocity = new Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 *_rotational_velocity    = new Vector3(0.0f, 0.0f, 0.0f);
+
 private:
     // =============================
     // ROS : publisher
     // =============================
-    maid_robot_system_interfaces::msg::MrsSample _msg_convert;
-    rclcpp::Publisher<maid_robot_system_interfaces::msg::MrsSample>::SharedPtr _pub_info;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _pub_move_velocity_reference;
 
 private:
     // =============================
@@ -86,7 +93,7 @@ private:
     // =============================
     // ROS Topic / Service / Action
     // =============================
-    const std::string MRS_TOPIC_OUTPUT                  = "out";
+    const std::string MRS_TOPIC_OUTPUT                  = "out/move_velocity_reference";
     const std::string MRS_TOPIC_ROBOT_POSITION_ROTATION = "in/robot_position_rotation";
     const std::string MRS_TOPIC_HAND_POSITION           = "in/hand_position";
 
