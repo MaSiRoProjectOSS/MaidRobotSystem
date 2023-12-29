@@ -32,12 +32,19 @@ def generate_launch_description():
                 get_package_share_directory('maid_robot_system_py'),
                 'launch/video_topic_to_service.launch.py'))
     )
-    # controller
+    # head unit controller
     launch_head_control_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
                 get_package_share_directory('maid_robot_system'),
                 'launch/maid_robot_system/head_unit/head_control_node.launch.py'))
+    )
+    # waist down unit controller
+    launch_waist_down_control_node = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('maid_robot_system'),
+                'launch/maid_robot_system/waist_down_unit/waist_down_control_node.launch.py'))
     )
 
     return LaunchDescription([
@@ -47,5 +54,6 @@ def generate_launch_description():
         launch_mediapipe_node,
         launch_mediapipe_ext_node,
         # # controller
-        launch_head_control_node
+        launch_head_control_node,
+        launch_waist_down_control_node
     ])
