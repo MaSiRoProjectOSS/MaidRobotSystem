@@ -83,7 +83,7 @@ void ModelImplement::_handshake_follow(float r, float sita, float z)
     this->_mode = WAIST_DOWN_UNIT_MODE_FOLLOW;
 
     float r_error = this->_target_r - r;
-    float s_error = this->_target_s - sita;
+    float s_error = -(this->_target_s - sita);
 
     v = this->_constrain(r_error * this->_K_v * (float)this->_R_V_FACTOR, -this->_max_speed * this->_R_V_FACTOR, this->_max_speed * this->_R_V_FACTOR) / (float)this->_R_V_FACTOR;
     w = this->_constrain(s_error * this->_K_w * (float)this->_S_W_FACTOR, -this->_max_turn_speed * this->_S_W_FACTOR, this->_max_turn_speed * this->_S_W_FACTOR)
