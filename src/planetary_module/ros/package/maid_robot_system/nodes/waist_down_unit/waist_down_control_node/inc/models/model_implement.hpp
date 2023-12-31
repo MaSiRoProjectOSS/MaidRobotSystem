@@ -76,7 +76,7 @@ private:
     float _wheel_target_w = 0.0; /*!< wheel target w */
 
     float _target_r = 0.15; /*!< target r */
-    float _target_s = 15;   /*!< target s */
+    float _target_s = -15;  /*!< target s */
     float _K_v      = -1.8; /*!< gain of v */
     float _K_w      = 0.03; /*!< gain of w */
 
@@ -105,8 +105,8 @@ private:
     const int _Z_COUNT_MIN           = 0;   /*!<  */
     const int _Z_COUNT_MAX           = 100; /*!<  */
 
-    const float _R_MOVING_LIMIT = 100.0; /*!<  */
-    const float _S_MOVING_LIMIT = 0.1;   /*!<  */
+    const float _R_MOVING_LIMIT = 0.1; /*!<  */
+    const float _S_MOVING_LIMIT = 0.1; /*!<  */
 
     const float _SPEED_INERTIA_INCREASE_RATE = 50.0 / 1500.0; /*!<  */
     const float _SPEED_INERTIA_DECREASE_RATE = 50.0 / 2500.0; /*!<  */
