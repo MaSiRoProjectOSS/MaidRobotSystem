@@ -1,0 +1,27 @@
+{
+    "name": "ModbusLibrary",
+    "version": "0.23.12",
+    "description": "Maid Robot System Library",
+    "keywords": "Maid_Robot_System",
+    "homepage": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem",
+    "authors": {
+        "name": "MaSiRo Project.",
+        "email": "developer@masiro-project.com",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem.git"
+    },
+    "license": "MIT",
+    "dependencies": {},
+    "examples": [],
+    "export": {
+        "exclude": [
+            ".vscode/*",
+            "test/*",
+            "doc/*",
+            "examples/*"
+        ]
+    }
+}
