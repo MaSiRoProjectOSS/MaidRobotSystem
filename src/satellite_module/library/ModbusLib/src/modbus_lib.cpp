@@ -18,7 +18,7 @@ ModbusLib::~ModbusLib()
 bool ModbusLib::init(int address, MODBUS_TYPE type)
 {
     this->_type = type;
-    if (0 < address || address <= 247) {
+    if (0 <= address || address <= this->SLAVE_ADDRESS_MAX) {
         this->_address = address;
     } else {
         this->_type = MODBUS_TYPE::MODBUS_TYPE_NONE;
@@ -32,7 +32,7 @@ bool ModbusLib::init(int address, MODBUS_TYPE type)
     ///////////////////////////////////////////
 
     if (this->_type == MODBUS_TYPE::MODBUS_TYPE_NONE) {
-        this->_address = 0;
+        this->_address = -1;
         return false;
     } else {
         return true;
@@ -70,7 +70,7 @@ unsigned int ModbusLib::ccitt(unsigned int *data, int len, int seed)
 }
 void ModbusLib::calc_crc(ModbusLib::MessageFrame &frame, bool first_generate)
 {
-    unsigned int crc = 0xFFFF;
+    unsigned int crc    = 0xFFFF;
     unsigned int buf[3] = { frame.address, frame.function, (unsigned int)frame.data_length };
     frame.valid         = first_generate;
 

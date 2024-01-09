@@ -911,7 +911,9 @@ WARN_LOGFILE           =
 INPUT                  = src \
                          include \
                          README.md \
-                         LICENSE
+                         specification.md \
+                         LICENSE \
+                         Changelog.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -931,7 +933,9 @@ INPUT_ENCODING         = UTF-8
 # form: pattern=encoding (like *.php=ISO-8859-1). See cfg_input_encoding
 # "INPUT_ENCODING" for further information on supported encodings.
 
-INPUT_FILE_ENCODING    = LICENSE
+INPUT_FILE_ENCODING    = Changelog.md \
+                         LICENSE \
+                         README.md
 
 # If the value of the INPUT tag contains directories, you can use the
 # FILE_PATTERNS tag to specify one or more wildcard patterns (like *.cpp and
