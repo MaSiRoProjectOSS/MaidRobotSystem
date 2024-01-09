@@ -9,29 +9,32 @@
  */
 #include "modbus_lib.hpp"
 
+/////////////////////////////////////////////////////////////////////
+// ModbusLib
+/////////////////////////////////////////////////////////////////////
 ModbusLib::ModbusLib()
 {
 }
 ModbusLib::~ModbusLib()
 {
 }
-bool ModbusLib::init(int address, MODBUS_TYPE type)
+bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type)
 {
     this->_type = type;
-    if (0 <= address || address <= this->SLAVE_ADDRESS_MAX) {
+    if ((0 <= address) || (address <= this->SLAVE_ADDRESS_MAX)) {
         this->_address = address;
     } else {
-        this->_type = MODBUS_TYPE::MODBUS_TYPE_NONE;
+        this->_type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE;
     }
 
     ///////////////////////////////////////////
     // TODO : Not support TCP
-    if (this->_type == MODBUS_TYPE::MODBUS_TYPE_TCP) {
-        this->_type = MODBUS_TYPE::MODBUS_TYPE_NONE;
+    if (this->_type == MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP) {
+        this->_type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE;
     }
     ///////////////////////////////////////////
 
-    if (this->_type == MODBUS_TYPE::MODBUS_TYPE_NONE) {
+    if (this->_type == MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE) {
         this->_address = -1;
         return false;
     } else {
@@ -42,6 +45,10 @@ int ModbusLib::get_address(void)
 {
     return this->_address;
 }
+MessageFrame::MODBUS_TYPE ModbusLib::get_type(void)
+{
+    return this->_type;
+}
 bool ModbusLib::is_range_slave_address()
 {
     bool result = false;
@@ -51,7 +58,19 @@ bool ModbusLib::is_range_slave_address()
     return result;
 }
 
-unsigned int ModbusLib::ccitt(unsigned int *data, int len, int seed)
+/////////////////////////////////////////////////////////////////////
+// MessageFrame
+/////////////////////////////////////////////////////////////////////
+MessageFrame::MessageFrame(MessageFrame::MODBUS_TYPE type)
+{
+    this->_type = type;
+}
+
+MessageFrame::~MessageFrame(void)
+{
+}
+
+unsigned int MessageFrame::_ccitt(unsigned int *data, int len, int seed)
 {
     const unsigned int POLY = 0xA001;
 
@@ -68,72 +87,73 @@ unsigned int ModbusLib::ccitt(unsigned int *data, int len, int seed)
     }
     return (crc16 & 0xFFFF);
 }
-void ModbusLib::calc_crc(ModbusLib::MessageFrame &frame, bool first_generate)
+void MessageFrame::_calc_crc(bool first_generate)
 {
     unsigned int crc    = 0xFFFF;
-    unsigned int buf[3] = { frame.address, frame.function, (unsigned int)frame.data_length };
-    frame.valid         = first_generate;
+    unsigned int buf[3] = { this->address, this->function, (unsigned int)this->data_length };
+    this->valid         = first_generate;
 
-    crc = this->ccitt(buf, (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) ? 3 : 2, crc);
-    crc = this->ccitt(frame.data, frame.data_length, crc);
+    crc = this->_ccitt(buf, (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) ? 3 : 2, crc);
+    crc = this->_ccitt(this->data, this->data_length, crc);
 
     crc = ((crc & 0xFF) << 8) | ((crc >> 8) & 0xFF);
 
-    if (frame.crc_lrc == crc) {
-        frame.valid = true;
+    if (this->footer == crc) {
+        this->valid = true;
     }
-    frame.crc_lrc = crc;
+    this->footer = crc;
 }
-void ModbusLib::calc_lrc(ModbusLib::MessageFrame &frame, bool first_generate)
+void MessageFrame::_calc_lrc(bool first_generate)
 {
-    unsigned int lrc = (frame.address + frame.function) & 0xFF;
-    frame.valid      = first_generate;
+    unsigned int lrc = (this->address + this->function) & 0xFF;
+    this->valid      = first_generate;
 
-    for (int i = 0; i < frame.data_length; i++) {
-        lrc = (lrc + frame.data[i]) & 0xFF;
+    for (int i = 0; i < this->data_length; i++) {
+        lrc = (lrc + this->data[i]) & 0xFF;
     }
     lrc = ~lrc;
     lrc = (lrc + 1) & 0xFF;
 
-    if (frame.crc_lrc == lrc) {
-        frame.valid = true;
+    if (this->footer == lrc) {
+        this->valid = true;
     }
-    frame.crc_lrc = lrc;
+    this->footer = lrc;
 }
 
-ModbusLib::MessageFrame ModbusLib::make_frame(unsigned int address, unsigned int function, unsigned int *data, int len)
+void MessageFrame::make_frame(unsigned int address, unsigned int function, unsigned int *data, int len)
 {
-    MessageFrame frame;
-    frame.address     = address;
-    frame.function    = function;
-    frame.data_length = len;
-    for (int i = 0; i < frame.data_length; i++) {
-        frame.data[i] = data[i];
+    this->address     = address;
+    this->function    = function;
+    this->data_length = len;
+    for (int i = 0; i < this->data_length; i++) {
+        this->data[i] = data[i];
     }
+    this->calc_footer(true);
+}
+void MessageFrame::calc_footer(bool first_generate)
+{
     switch (this->_type) {
         case MODBUS_TYPE::MODBUS_TYPE_ASCII:
-            this->calc_lrc(frame, true);
+            this->_calc_lrc(first_generate);
             break;
         case MODBUS_TYPE::MODBUS_TYPE_RTU:
         case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
-            this->calc_crc(frame, true);
+            this->_calc_crc(first_generate);
             break;
         case MODBUS_TYPE::MODBUS_TYPE_TCP:
         default:
-            this->calc_crc(frame, true);
+            this->_calc_crc(first_generate);
             break;
     }
-    return frame;
 }
 
-void ModbusLib::receive(ModbusLib::MessageFrame &frame)
+void MessageFrame::happened_error(EXCEPTION_CODE error_code)
 {
-    frame.error_code = 0;
-    //frame.data_length = frame.function;
-    // return frame;
-}
-void ModbusLib::receive_error(ModbusLib::MessageFrame &frame)
-{
-    frame.error_code = 1;
-    //frame.data_length = 0;
+    this->error_code = error_code;
+    if (0x80 > this->function) {
+        this->function = this->function + 0x80;
+    }
+    this->data_length = 1;
+    this->data[0]     = (unsigned int)this->error_code;
+    this->calc_footer(true);
 }

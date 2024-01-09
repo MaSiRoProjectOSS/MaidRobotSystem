@@ -11,6 +11,9 @@
 
 #include <M5Atom.h>
 ModbusImpl modbus(&Serial1);
+#ifndef CUSTOM_MODBUS_TYPE
+#define CUSTOM_MODBUS_TYPE ModbusImpl::MODBUS_TYPE::MODBUS_TYPE_RTU_EX
+#endif
 
 void setup()
 {
@@ -21,14 +24,14 @@ void setup()
     log_d("M5Atom initialized.");
     delay(1000);
     log_d("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
-    bool result = modbus.begin(MODBUS_ADDRESS, ModbusImpl::MODBUS_TYPE::MODBUS_TYPE_RTU_EX);
+    bool result = modbus.begin(MODBUS_ADDRESS, (MessageFrame::MODBUS_TYPE)CUSTOM_MODBUS_TYPE);
     log_d("========================================");
     (void)M5.dis.fillpix((false == result) ? CRGB::Red : CRGB::Blue);
 }
 
 void loop()
 {
-    static int count = 0;
+    static int count              = 0;
     static unsigned int data[255] = { 0 };
     (void)M5.update();
     if (true == M5.Btn.wasPressed()) {

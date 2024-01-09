@@ -11,12 +11,12 @@
 #define MODBUS_LIB_HPP
 
 /**
- * @class ModbusLib
- * @brief Modbus library
+ * @struct MessageFrame
+ * @brief Message frame
  *
- * This class provides the base functionality for Modbus communication.
+ * This struct represents a Modbus message frame.
  */
-class ModbusLib {
+class MessageFrame {
 public:
     /**
      * @enum MODBUS_TYPE
@@ -32,27 +32,119 @@ public:
         MODBUS_TYPE_RTU_EX, ///< RTU Modbus protocol / The first line of the data frame contains the number of data.
         MODBUS_TYPE_TCP,    ///< TCP Modbus protocol
     };
-
-protected:
     /**
-     * @struct MessageFrame
-     * @brief Message frame
+     * @enum EXCEPTION_CODE
+     * @brief Exception codes
      *
-     * This struct represents a Modbus message frame.
+     * This enum represents the different exception codes for Modbus communication.
      */
-    class MessageFrame {
-    public:
-        //int start;
-        unsigned int address   = 0;     ///< The address of the Modbus device
-        unsigned int function  = 0;     ///< The function code of the message frame
-        unsigned int data[255] = { 0 }; ///< The data of the message frame
-        unsigned int crc_lrc   = 0;     ///< The CRC or LRC of the message frame
-        //int end;
-        int data_length         = 0;     ///< The length of the data
-        bool valid              = false; ///< Flag indicating whether the message frame is valid
-        unsigned int error_code = 0;     ///< The error code of the message frame
+    enum EXCEPTION_CODE
+    {
+        CODE_NONE                            = 0x0,  ///< No error
+        CODE_COMMUNICATION_ERROR             = 0x84, ///< Communication error
+        CODE_ILLEGAL_FUNCTION                = 0x88, ///< Illegal function
+        CODE_INVALID_DATA_ADDRESS            = 0x88, ///< Invalid data address
+        CODE_FRAUDULENT_DATA                 = 0x8C, ///< Fraudulent data
+        CODE_CANNOT_BE_EXECUTED_BY_IF        = 0x89, ///< Cannot be executed because user I/F communication is in progress
+        CODE_CANNOT_BE_EXECUTED_BY_NV_MEMORY = 0x89, ///< Cannot be executed because NV memory is being processed 8A
+        CODE_OUTSIDE_RAGE                    = 0x8C, ///< Outside the setting range 8C
+        CODE_CANNOT_BE_EXECUTED              = 0x8D, ///< Command cannot be executed 8D
     };
 
+public:
+    /**
+     * @brief Constructor for MessageFrame
+     *
+     * This function constructs a MessageFrame using the provided type.
+     *
+     * @param type The type of Modbus protocol to use
+     */
+    MessageFrame(MODBUS_TYPE type);
+    /**
+     * @brief Destructor for MessageFrame
+     */
+    ~MessageFrame(void);
+
+public:
+    //int start;
+    unsigned int address   = 0;     ///< The address of the Modbus device
+    unsigned int function  = 0;     ///< The function code of the message frame
+    unsigned int data[255] = { 0 }; ///< The data of the message frame
+    unsigned int footer    = 0;     ///< The CRC or LRC of the message frame
+    //int end;
+    int data_length           = 0;                         ///< The length of the data
+    bool valid                = false;                     ///< Flag indicating whether the message frame is valid
+    EXCEPTION_CODE error_code = EXCEPTION_CODE::CODE_NONE; ///< The error code of the message frame
+public:
+    /**
+     * @brief Make a message frame
+     *
+     * This function creates a MessageFrame using the provided function code and data.
+     *
+     * @param address The address of the Modbus device
+     * @param function The function code to use in the message frame
+     * @param data The data to include in the message frame
+     * @param len The length of the data
+     * @return The created MessageFrame
+     */
+    void make_frame(unsigned int address, unsigned int function, unsigned int *data, int len);
+    /**
+     * @brief Calculate the footer for a message frame
+     *
+     * This function calculates the footer (CRC or LRC) for a given MessageFrame.
+     *
+     * @param first_generate Flag indicating whether this is the first footer generation for the frame
+     */
+    void calc_footer(bool first_generate = false);
+    /**
+     * @brief Set the error code for a message frame
+     *
+     * This function sets the error code for a given MessageFrame.
+     *
+     * @param error_code The error code to set
+     */
+    void happened_error(EXCEPTION_CODE error_code);
+
+private:
+    /**
+     * @brief Calculate the CRC for a message frame
+     *
+     * This function calculates the CRC (Cyclic Redundancy Check) for a given MessageFrame.
+     *
+     * @param first_generate Flag indicating whether this is the first CRC generation for the frame
+     */
+    void _calc_crc(bool first_generate = false);
+    /**
+     * @brief Calculate the LRC for a message frame
+     *
+     * This function calculates the LRC (Longitudinal Redundancy Check) for a given MessageFrame.
+     *
+     * @param first_generate Flag indicating whether this is the first LRC generation for the frame
+     */
+    void _calc_lrc(bool first_generate = false);
+
+    /**
+     * @brief Calculate the CCITT checksum for a data array
+     *
+     * This function calculates the CCITT (International Telegraph and Telephone Consultative Committee) checksum for a given data array.
+     *
+     * @param data The data array to calculate the checksum for
+     * @param len The length of the data array
+     * @param seed The seed value for the checksum calculation
+     * @return The calculated checksum
+     */
+    unsigned int _ccitt(unsigned int *data, int len, int seed);
+
+private:
+    MODBUS_TYPE _type; ///< The type of Modbus protocol to use
+};
+/**
+ * @class ModbusLib
+ * @brief Modbus library
+ *
+ * This class provides the base functionality for Modbus communication.
+ */
+class ModbusLib {
 public:
     /**
      * @brief Constructor for ModbusLib
@@ -73,9 +165,8 @@ public:
      * @param type The type of Modbus protocol to use
      * @return True if the initialization was successful, false otherwise
      */
-    bool init(int address, MODBUS_TYPE type = MODBUS_TYPE_RTU);
+    bool init(int address, MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX);
 
-public:
     /**
      * @brief Get the address of the Modbus device
      *
@@ -84,19 +175,14 @@ public:
      * @return The address of the Modbus device
      */
     int get_address(void);
-
     /**
-     * @brief Make a message frame
+     * @brief Get the type of Modbus protocol to use
      *
-     * This function creates a MessageFrame using the provided function code and data.
+     * This function returns the type of Modbus protocol to use.
      *
-     * @param address The address of the Modbus device
-     * @param function The function code to use in the message frame
-     * @param data The data to include in the message frame
-     * @param len The length of the data
-     * @return The created MessageFrame
+     * @return The type of Modbus protocol to use
      */
-    MessageFrame make_frame(unsigned int address, unsigned int function, unsigned int *data, int len);
+    MessageFrame::MODBUS_TYPE get_type(void);
 
 protected:
     /**
@@ -119,59 +205,12 @@ protected:
      * @return True if the address is a broadcast address, false otherwise
      */
     bool is_range_slave_address();
-    /**
-     * @brief Receive a Modbus message
-     *
-     * This function is called when a Modbus message is received. It processes the received MessageFrame.
-     *
-     * @param frame The received MessageFrame
-     */
-    void receive(MessageFrame &frame);
-    /**
-     * @brief Receive an error message
-     *
-     * This function is called when an error occurs during Modbus communication.
-     *
-     * @param frame The MessageFrame containing the error message
-     */
-    void receive_error(MessageFrame &frame);
-
-    /**
-     * @brief Calculate the CRC for a message frame
-     *
-     * This function calculates the CRC (Cyclic Redundancy Check) for a given MessageFrame.
-     *
-     * @param frame The MessageFrame to calculate the CRC for
-     * @param first_generate Flag indicating whether this is the first CRC generation for the frame
-     */
-    void calc_crc(MessageFrame &frame, bool first_generate = false);
-    /**
-     * @brief Calculate the LRC for a message frame
-     *
-     * This function calculates the LRC (Longitudinal Redundancy Check) for a given MessageFrame.
-     *
-     * @param frame The MessageFrame to calculate the LRC for
-     * @param first_generate Flag indicating whether this is the first LRC generation for the frame
-     */
-    void calc_lrc(MessageFrame &frame, bool first_generate = false);
-
-    /**
-     * @brief Calculate the CCITT checksum for a data array
-     *
-     * This function calculates the CCITT (International Telegraph and Telephone Consultative Committee) checksum for a given data array.
-     *
-     * @param data The data array to calculate the checksum for
-     * @param len The length of the data array
-     * @param seed The seed value for the checksum calculation
-     * @return The calculated checksum
-     */
-    unsigned int ccitt(unsigned int *data, int len, int seed);
 
 protected:
-    int _address;      ///< The address of the Modbus device
-    MODBUS_TYPE _type; ///< The type of Modbus protocol to use
+    int _address;                    ///< The address of the Modbus device
+    MessageFrame::MODBUS_TYPE _type; ///< The type of Modbus protocol to use
 
-private:
+protected:
     const int BROADCAST_ADDRESS = 0;   ///< The broadcast address for Modbus communication
     const int SLAVE_ADDRESS_MIN = 1;   ///< The minimum slave address for Modbus communication
     const int SLAVE_ADDRESS_MAX = 247; ///< The maximum slave address for Modbus communication

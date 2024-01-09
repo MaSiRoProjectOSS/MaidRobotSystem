@@ -27,9 +27,10 @@ public:
      *
      * @param serial Pointer to a HardwareSerial object
      */
-    ModbusLibArduino(HardwareSerial *serial) : ModbusLib()
+    ModbusLibArduino(HardwareSerial *serial, int timeout_times = 500) : ModbusLib()
     {
-        this->_serial = serial;
+        this->_serial        = serial;
+        this->_timeout_times = timeout_times;
     }
     /**
      * @brief Destructor for ModbusLibArduino
@@ -47,10 +48,10 @@ public:
      * @param baud The baud rate for serial communication (default is 115200)
      * @return true if initialization was successful, false otherwise
      */
-    bool begin(int address, MODBUS_TYPE type = MODBUS_TYPE_RTU, unsigned long baud = 115200)
+    bool begin(int address, MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU, unsigned long baud = 115200)
     {
-        this->_serial->setRxBufferSize(255 * 2);
-        this->_serial->setTxBufferSize(255 * 2);
+        this->_serial->setRxBufferSize(256 * 2);
+        this->_serial->setTxBufferSize(256 * 2);
         this->_sleep_us = 1 + ((1000 * 1000) / (baud / 8));
 
         bool result = this->init(address, type);
@@ -58,14 +59,14 @@ public:
             if (true == this->is_range_slave_address()) {
                 this->_serial->onReceiveError([this](hardwareSerial_error_t error) { this->on_receive_error(error); });
                 switch (type) {
-                    case MODBUS_TYPE::MODBUS_TYPE_ASCII:
+                    case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
                         this->_serial->onReceive([this]() { this->on_receive_ascii(); });
                         break;
-                    case MODBUS_TYPE::MODBUS_TYPE_RTU:
-                    case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
+                    case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU:
+                    case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
                         this->_serial->onReceive([this]() { this->on_receive_rtu(); });
                         break;
-                    case MODBUS_TYPE::MODBUS_TYPE_TCP:
+                    case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP:
                         this->_serial->onReceive([this]() { this->on_receive_tcp(); });
                         break;
                     default:
@@ -94,31 +95,43 @@ public:
     {
         bool result = false;
         if (0 == this->_address) {
-            MessageFrame frame = this->make_frame(address, function, data, len);
+            MessageFrame frame(this->_type);
+            frame.make_frame(address, function, data, len);
             switch (this->_type) {
-                case MODBUS_TYPE::MODBUS_TYPE_ASCII:
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
                     this->_send_ascii(frame);
-                    for (int i = 0; i < this->_timeout; i++) {
-                        result = this->on_receive_ascii();
-                        if (true == result) {
-                            break;
+                    if (this->BROADCAST_ADDRESS != frame.address) {
+                        for (int i = 0; i < this->_timeout_times; i++) {
+                            result = this->on_receive_ascii();
+                            if (true == result) {
+                                break;
+                            }
+                            delayMicroseconds(this->_sleep_us);
                         }
-                        delayMicroseconds(this->_sleep_us);
+                    } else {
+                        // No response is returned in case of broadcast
+                        result = true;
                     }
                     break;
-                case MODBUS_TYPE::MODBUS_TYPE_RTU:
-                case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU:
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
                     delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
                     this->_send_rtu(frame);
-                    for (int i = 0; i < this->_timeout; i++) {
-                        result = this->on_receive_rtu();
-                        if (true == result) {
-                            break;
+                    delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
+                    if (this->BROADCAST_ADDRESS != frame.address) {
+                        for (int i = 0; i < this->_timeout_times; i++) {
+                            result = this->on_receive_rtu();
+                            if (true == result) {
+                                break;
+                            }
+                            delayMicroseconds(this->_sleep_us);
                         }
-                        delayMicroseconds(this->_sleep_us);
+                    } else {
+                        // No response is returned in case of broadcast
+                        result = true;
                     }
                     break;
-                case MODBUS_TYPE::MODBUS_TYPE_TCP:
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP:
                     break;
                 default:
                     break;
@@ -135,7 +148,7 @@ protected:
     {
         bool result = false;
         while (0 < this->_serial->available()) {
-            MessageFrame frame;
+            MessageFrame frame(this->_type);
             int step    = 0;
             int buf     = 0;
             int timeout = 4;
@@ -160,7 +173,7 @@ protected:
                             case 2:
                                 if ((c1 == '\r') && (c2 == '\n')) {
                                     if (1 <= frame.data_length) {
-                                        frame.crc_lrc     = (frame.data[frame.data_length - 1]);
+                                        frame.footer      = (frame.data[frame.data_length - 1]);
                                         frame.data_length = frame.data_length - 1;
                                     } else {
                                         timeout = 0;
@@ -193,17 +206,21 @@ protected:
             result = true;
             if (true == this->is_range_slave_address()) {
                 log_v("received: slave");
-                if ((0 == frame.address) || (this->_address == frame.address)) {
-                    this->calc_lrc(frame);
+                if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
+                    frame.calc_footer();
                     if (true == frame.valid) {
                         this->reception(frame);
-                        this->calc_lrc(frame, true);
-                        this->receive(frame);
-                        this->_send_ascii(frame);
+                        if (this->BROADCAST_ADDRESS != frame.address) {
+                            frame.calc_footer(true);
+                            this->_send_ascii(frame);
+                        } else {
+                            // do nothing
+                            //   No response is returned in case of broadcast
+                        }
                     } else {
-                        this->receive_error(frame);
+                        frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_COMMUNICATION_ERROR);
                         this->_send_ascii(frame);
-                        log_e("receive error");
+                        log_w("receive error");
                     }
                 } else {
                     // do nothing
@@ -211,7 +228,7 @@ protected:
                 }
             } else if (0 == this->_address) {
                 log_v("received: master");
-                this->calc_lrc(frame);
+                frame.calc_footer();
                 this->reception(frame);
             }
         }
@@ -221,7 +238,7 @@ protected:
     {
         bool result = false;
         while (0 < this->_serial->available()) {
-            MessageFrame frame;
+            MessageFrame frame(this->_type);
             int step         = 0;
             int buf          = 0;
             int timeout      = 4;
@@ -241,7 +258,7 @@ protected:
                             break;
                         case 2:
                             count_length = 0;
-                            if (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
+                            if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
                                 frame.data_length = buf;
                             } else {
                                 frame.data[count_length] = buf;
@@ -270,7 +287,7 @@ protected:
                     delayMicroseconds(this->_sleep_us);
                 }
                 // check last message
-                if (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
+                if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
                     if ((0 >= timeout) || (count_length >= (frame.data_length + 2))) {
                         last_char = true;
                     }
@@ -283,8 +300,8 @@ protected:
                 }
                 if (true == last_char) {
                     if (2 <= count_length) {
-                        frame.crc_lrc = (frame.data[count_length - 2] << 8) | (frame.data[count_length - 1]);
-                        timeout       = 4;
+                        frame.footer = (frame.data[count_length - 2] << 8) | (frame.data[count_length - 1]);
+                        timeout      = 4;
                     } else {
                         timeout = 0;
                     }
@@ -297,17 +314,21 @@ protected:
             result = true;
             if (true == this->is_range_slave_address()) {
                 log_v("received: slave");
-                if ((0 == frame.address) || (this->_address == frame.address)) {
-                    this->calc_crc(frame);
+                if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
+                    frame.calc_footer();
                     if (true == frame.valid) {
                         this->reception(frame);
-                        this->calc_lrc(frame, true);
-                        this->receive(frame);
-                        this->_send_rtu(frame);
+                        if (this->BROADCAST_ADDRESS != frame.address) {
+                            frame.calc_footer(true);
+                            this->_send_rtu(frame);
+                        } else {
+                            // do nothing
+                            //   No response is returned in case of broadcast
+                        }
                     } else {
-                        this->receive_error(frame);
+                        frame.happened_error(MessageFrame::CODE_COMMUNICATION_ERROR);
                         this->_send_rtu(frame);
-                        log_e("receive error");
+                        log_w("receive error");
                     }
                 } else {
                     // do nothing
@@ -315,7 +336,7 @@ protected:
                 }
             } else if (0 == this->_address) {
                 log_v("received: master");
-                this->calc_crc(frame);
+                frame.calc_footer();
                 this->reception(frame);
             }
         }
@@ -366,7 +387,7 @@ protected:
         this->_serial->write(frame.address);
         // function
         this->_serial->write(frame.function);
-        if (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
+        if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
             // length
             this->_serial->write(frame.data_length);
         }
@@ -380,11 +401,11 @@ protected:
 #endif
         }
         // lrc
-        this->_serial->write((unsigned int)((frame.crc_lrc >> 8) & 0xFFu));
-        this->_serial->write((unsigned int)((frame.crc_lrc) & 0xFFu));
+        this->_serial->write((unsigned int)((frame.footer >> 8) & 0xFFu));
+        this->_serial->write((unsigned int)((frame.footer) & 0xFFu));
 
 #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_VERBOSE
-        log_v("%s:%02X%02X%02X%s%04X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, frame.data_length, str.c_str(), frame.crc_lrc & 0xFFFF);
+        log_v("%s:%02X%02X%02X%s%04X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, frame.data_length, str.c_str(), frame.footer & 0xFFFF);
 #endif
     }
     /**
@@ -404,8 +425,8 @@ protected:
             sprintf(buffer, "%02X", frame.data[i]);
             str += buffer;
         }
-        this->_serial->printf(":%02X%02X%s%02X\r\n", frame.address, frame.function, str.c_str(), frame.crc_lrc & 0xFF);
-        log_v("%s:%02X%02X%s%02X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, str.c_str(), frame.crc_lrc & 0xFF);
+        this->_serial->printf(":%02X%02X%s%02X\r\n", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
+        log_v("%s:%02X%02X%s%02X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
     }
 
 private:
@@ -422,7 +443,7 @@ private:
          */
     uint32_t _sleep_us = 1;
 
-    int _timeout = 100;
+    int _timeout_times = 500;
 };
 
 #endif

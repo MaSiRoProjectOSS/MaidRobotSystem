@@ -14,9 +14,12 @@
 		],
 		"cSpell.words": [
 			"APIP",
+			"ARDUHAL",
 			"COMMU",
 			"CRGB",
 			"endregion",
+			"espressif",
+			"fastled",
 			"fillpix",
 			"GPIO",
 			"IRAM",
@@ -27,6 +30,16 @@
 			"PROGMEM",
 			"XIAO"
 		],
+		"files.exclude": {
+			"**/.git": true,
+			"**/.pio": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/doxygen": true
+		},
 		"files.watcherExclude": {
 			"**/.git/objects/**": true,
 			"**/.git/subtree-cache/**": true,

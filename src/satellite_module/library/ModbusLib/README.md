@@ -112,7 +112,7 @@ h3 {
 }
 
 h4 {
-    counter-reset: indexlist;
+    counter-reset: index-list;
 }
 
 h1::before {
@@ -135,8 +135,8 @@ h4::before {
 }
 
 h5::before {
-    counter-increment: indexlist;
-    content: "(" counter(indexlist) ") ";
+    counter-increment: index-list;
+    content: "(" counter(index-list) ") ";
 }
 
 #sidebar-toc-btn {
