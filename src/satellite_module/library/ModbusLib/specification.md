@@ -1,5 +1,38 @@
 # Specification
 
+## Message frame
+
+* ASCII mode
+
+| Function type | byte          | Range        | Note |
+| ------------- | ------------- | ------------ | ---- |
+| Address       | 2byte         | '00' ～ 'F7' | --   |
+| Function code | 2byte         | '00' ～ '79' | --   |
+| Data          | 0 ～ 243 byte | ...          | --   |
+| Error check   | 2byte         | '00' ～ 'FF  | LRC  |
+
+
+* RTU mode
+
+| Function type | byte          | Range            | Note   |
+| ------------- | ------------- | ---------------- | ------ |
+| Address       | 1byte         | 0x00 ～ 0xF7     | --     |
+| Function code | 1byte         | 0x00 ～ 0x79     | --     |
+| Data          | 0 ～ 243 byte | ...              | --     |
+| Error check   | 2byte         | 0x0000 ～ 0xFFFF | CRC-16 |
+
+* RTU(EX) mode
+
+| Function type | byte          | Range            | Note   |
+| ------------- | ------------- | ---------------- | ------ |
+| Address       | 1byte         | 0x00 ～ 0xF7     | --     |
+| Function code | 1byte         | 0x00 ～ 0x79     | --     |
+| Data Length   | 1byte         | 0x00 ～ 0xFF     | --     |
+| Data          | 0 ～ 243 byte | ...              | --     |
+| Error check   | 2byte         | 0x0000 ～ 0xFFFF | CRC-16 |
+
+* TCP mode
+  * 調査中
 
 ## Function code
 
@@ -33,5 +66,22 @@
   * スレーブアドレスが自身のアドレスではない
   * ブロードキャスト
     * 受信した処理を行うが、応答は行わない。
+
+
+
+
+## Exception Codes
+
+| Code | Name                                    | Meaning                                                                                                                                                                                                                     |
+| ---- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0x01 | ILLEGAL FUNCTION                        | The server can't process the received function code.                                                                                                                                                                        |
+| 0x02 | ILLEGAL DATA ADDRESS                    | The server rejects queries with invalid data addresses.                                                                                                                                                                     |
+| 0x03 | ILLEGAL DATA VALUE                      | The server rejects queries with invalid data values, indicating a structural fault in the request, like incorrect implied length.                                                                                           |
+| 0x04 | SERVER DEVICE FAILURE                   | The server encountered a fatal error while trying to execute a task.                                                                                                                                                        |
+| 0x05 | ACKNOWLEDGE                             | The server is processing a programming command which takes a long time, and sends a response to prevent client timeout. The client can check if processing is done by sending a Poll Program Complete message.              |
+| 0x06 | SERVER DEVICE BUSY                      | The server is busy processing a long-lasting programming command. The client should resend the message when the server is available.                                                                                        |
+| 0x08 | MEMORY PARITY ERROR                     | With function codes 20 and 21 and reference type 6, the server detected a parity error in the memory while reading a file, indicating a consistency check failure. The client can retry, but the server may need servicing. |
+| 0x0A | GATEWAY PATH UNAVAILABLE                | The gateway couldn't allocate an internal communication path for request processing, typically indicating misconfiguration or overload.                                                                                     |
+| 0x0B | GATEWAY TARGET DEVICE FAILED TO RESPOND | In the context of gateways, no response from the target device usually indicates its absence from the network.                                                                                                              |
 
 

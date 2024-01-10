@@ -40,15 +40,21 @@ public:
      */
     enum EXCEPTION_CODE
     {
-        CODE_NONE                            = 0x0,  ///< No error
-        CODE_COMMUNICATION_ERROR             = 0x84, ///< Communication error
-        CODE_ILLEGAL_FUNCTION                = 0x88, ///< Illegal function
-        CODE_INVALID_DATA_ADDRESS            = 0x88, ///< Invalid data address
-        CODE_FRAUDULENT_DATA                 = 0x8C, ///< Fraudulent data
-        CODE_CANNOT_BE_EXECUTED_BY_IF        = 0x89, ///< Cannot be executed because user I/F communication is in progress
-        CODE_CANNOT_BE_EXECUTED_BY_NV_MEMORY = 0x89, ///< Cannot be executed because NV memory is being processed 8A
-        CODE_OUTSIDE_RAGE                    = 0x8C, ///< Outside the setting range 8C
-        CODE_CANNOT_BE_EXECUTED              = 0x8D, ///< Command cannot be executed 8D
+        CODE_NONE                  = 0x0,  ///< No error
+        CODE_ILLEGAL_FUNCTION      = 0x01, ///< The server can't process the received function code.
+        CODE_ILLEGAL_DATA_ADDRESS  = 0x02, ///< The server rejects queries with invalid data addresses.
+        CODE_ILLEGAL_DATA_VALUE    = 0x03, ///< The server rejects queries with invalid data values.
+        CODE_SERVER_DEVICE_FAILURE = 0x04, ///< The server encountered a fatal error while trying to execute a task.
+        CODE_ACKNOWLEDGE           = 0x05, ///< The server is processing a programming command which takes a long time, and sends a response to prevent client timeout.
+        CODE_SERVER_DEVICE_BUSY    = 0x06, ///< The server is busy processing a long-lasting programming command. The client should resend the message when the server is available.
+        CODE_MEMORY_PARITY_ERROR   = 0x08, ///< The server detected a parity error in the memory.
+        CODE_GATEWAY_PATH_UNAVAILABLE                = 0x0A, ///< The gateway couldn't allocate an internal communication path.
+        CODE_GATEWAY_TARGET_DEVICE_FAILED_TO_RESPOND = 0x0B, ///< In the context of gateways, no response from the target device usually indicates its absence from the network.
+
+        ///////////////////////////////////////////////////////////////
+        // This error code has been added. It is not standard.
+        ///////////////////////////////////////////////////////////////
+        CODE_COMMUNICATION_ERROR = 0x0F, ///< Communication error
     };
 
 public:
