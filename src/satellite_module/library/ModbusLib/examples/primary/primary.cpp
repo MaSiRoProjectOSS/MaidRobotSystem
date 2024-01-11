@@ -12,7 +12,7 @@
 #include <M5Atom.h>
 ModbusImpl modbus(&Serial1);
 #ifndef CUSTOM_MODBUS_TYPE
-#define CUSTOM_MODBUS_TYPE ModbusImpl::MODBUS_TYPE::MODBUS_TYPE_RTU_EX
+#define CUSTOM_MODBUS_TYPE MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX
 #endif
 
 void setup()

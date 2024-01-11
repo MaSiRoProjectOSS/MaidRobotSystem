@@ -9,15 +9,9 @@
  */
 #include "modbus_lib.hpp"
 
-/////////////////////////////////////////////////////////////////////
-// ModbusLib
-/////////////////////////////////////////////////////////////////////
-ModbusLib::ModbusLib()
-{
-}
-ModbusLib::~ModbusLib()
-{
-}
+// =============================
+// PUBLIC : Function
+// =============================
 bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type)
 {
     this->_type = type;
@@ -41,6 +35,10 @@ bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type)
         return true;
     }
 }
+
+// =============================
+// PUBLIC : Function : Getter/Setter
+// =============================
 int ModbusLib::get_address(void)
 {
     return this->_address;
@@ -49,6 +47,10 @@ MessageFrame::MODBUS_TYPE ModbusLib::get_type(void)
 {
     return this->_type;
 }
+
+// =============================
+// PROTECTED : Function
+// =============================
 bool ModbusLib::is_range_slave_address()
 {
     bool result = false;
@@ -58,102 +60,12 @@ bool ModbusLib::is_range_slave_address()
     return result;
 }
 
-/////////////////////////////////////////////////////////////////////
-// MessageFrame
-/////////////////////////////////////////////////////////////////////
-MessageFrame::MessageFrame(MessageFrame::MODBUS_TYPE type)
-{
-    this->_type = type;
-}
-
-MessageFrame::~MessageFrame(void)
+// =============================
+// Constructor
+// =============================
+ModbusLib::ModbusLib()
 {
 }
-
-unsigned int MessageFrame::_ccitt(unsigned int *data, int len, int seed)
+ModbusLib::~ModbusLib()
 {
-    const unsigned int POLY = 0xA001;
-
-    unsigned int crc16 = seed;
-    for (int i = 0; i < len; i++) {
-        crc16 ^= data[i];
-        for (int j = 0; j < 8; j++) {
-            if (crc16 & 0x01) {
-                crc16 = (crc16 >> 1) ^ POLY;
-            } else {
-                crc16 >>= 1;
-            }
-        }
-    }
-    return (crc16 & 0xFFFF);
-}
-void MessageFrame::_calc_crc(bool first_generate)
-{
-    unsigned int crc    = 0xFFFF;
-    unsigned int buf[3] = { this->address, this->function, (unsigned int)this->data_length };
-    this->valid         = first_generate;
-
-    crc = this->_ccitt(buf, (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) ? 3 : 2, crc);
-    crc = this->_ccitt(this->data, this->data_length, crc);
-
-    crc = ((crc & 0xFF) << 8) | ((crc >> 8) & 0xFF);
-
-    if (this->footer == crc) {
-        this->valid = true;
-    }
-    this->footer = crc;
-}
-void MessageFrame::_calc_lrc(bool first_generate)
-{
-    unsigned int lrc = (this->address + this->function) & 0xFF;
-    this->valid      = first_generate;
-
-    for (int i = 0; i < this->data_length; i++) {
-        lrc = (lrc + this->data[i]) & 0xFF;
-    }
-    lrc = ~lrc;
-    lrc = (lrc + 1) & 0xFF;
-
-    if (this->footer == lrc) {
-        this->valid = true;
-    }
-    this->footer = lrc;
-}
-
-void MessageFrame::make_frame(unsigned int address, unsigned int function, unsigned int *data, int len)
-{
-    this->address     = address;
-    this->function    = function;
-    this->data_length = len;
-    for (int i = 0; i < this->data_length; i++) {
-        this->data[i] = data[i];
-    }
-    this->calc_footer(true);
-}
-void MessageFrame::calc_footer(bool first_generate)
-{
-    switch (this->_type) {
-        case MODBUS_TYPE::MODBUS_TYPE_ASCII:
-            this->_calc_lrc(first_generate);
-            break;
-        case MODBUS_TYPE::MODBUS_TYPE_RTU:
-        case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
-            this->_calc_crc(first_generate);
-            break;
-        case MODBUS_TYPE::MODBUS_TYPE_TCP:
-        default:
-            this->_calc_crc(first_generate);
-            break;
-    }
-}
-
-void MessageFrame::happened_error(EXCEPTION_CODE error_code)
-{
-    this->error_code = error_code;
-    if (0x80 > this->function) {
-        this->function = this->function + 0x80;
-    }
-    this->data_length = 1;
-    this->data[0]     = (unsigned int)this->error_code;
-    this->calc_footer(true);
 }
