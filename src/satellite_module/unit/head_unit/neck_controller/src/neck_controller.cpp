@@ -9,14 +9,18 @@
  */
 #include "neck_controller.hpp"
 
+#define ENABLE_PWM_SERVO 0
+
 // =============================
 // Constructor
 // =============================
-NeckController::NeckController(HardwareSerial *serial, int pwm_size) : ModbusLibArduino(serial)
+NeckController::NeckController(HardwareSerial *serial, int pwm_size, int pwm_address) : ModbusLibArduino(serial)
 {
     this->pwm_servo         = new int[pwm_size];
     this->pwm_servo_request = new int[pwm_size];
     this->pwm_servo_count   = pwm_size;
+    this->_load_setting_setting();
+    this->_pwm = new Adafruit_PWMServoDriver(pwm_address);
 }
 
 NeckController::~NeckController(void)
@@ -26,10 +30,25 @@ NeckController::~NeckController(void)
 }
 
 // =============================
-// PUBLIC : Function
+// Protected : Virtual Function
 // =============================
-MessageFrame NeckController::reception(MessageFrame frame)
+bool NeckController::_init()
 {
+    bool result = this->_load_setting_setting();
+    try {
+#if ENABLE_PWM_SERVO
+        result = this->_pwm->begin();
+        this->_pwm->setOscillatorFrequency(this->_oscillator_frequency);
+        this->_pwm->setPWMFreq(this->_pwm_freq);
+#endif
+    } catch (...) {
+        result = false;
+    }
+    return result;
+}
+MessageFrame NeckController::_reception(MessageFrame frame)
+{
+    this->count_reception++;
     /*
 | Function type |               |                                                 | Function name                    | Function code | Comment     |
 | ------------- | ------------- | ----------------------------------------------- | -------------------------------- | :-----------: | ----------- |
@@ -80,10 +99,14 @@ MessageFrame NeckController::reception(MessageFrame frame)
         //   - Internal Registers or Physical Output Registers
         ///////////////////////////////////
         case 0x03: // read_holding_registers
-            this->read_holding_registers(frame);
+            if (true == this->_read_holding_registers(frame)) {
+                this->count_process++;
+            }
             break;
         case 0x06: // write_single_register
-            this->write_single_register(frame);
+            if (true == this->_write_single_register(frame)) {
+                this->count_process++;
+            }
             break;
         ///////////////////////////////////
         // Data Access
@@ -91,7 +114,9 @@ MessageFrame NeckController::reception(MessageFrame frame)
         //   - Internal Registers or Physical Output Registers
         ///////////////////////////////////
         case 0x10: // write_multiple_registers
-            this->write_multiple_registers(frame);
+            if (true == this->_write_multiple_registers(frame)) {
+                this->count_process++;
+            }
             break;
         case 0x17: // read/write_multiple_registers
         case 0x16: // mask_write_register
@@ -132,8 +157,19 @@ MessageFrame NeckController::reception(MessageFrame frame)
             frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
             break;
     }
+    if (count_process > 0xFFFFFFF) {
+        count_process = 0;
+    }
+    if (count_reception > 0xFFFFFFF) {
+        count_process   = 0;
+        count_reception = 0;
+    }
     return frame;
 }
+
+// =============================
+// PUBLIC : Function : getter/setter
+// =============================
 void NeckController::set_accel(float x, float y, float z)
 {
     this->accel.x = (uint16_t)(x * 1000);
@@ -155,44 +191,97 @@ bool NeckController::set_pwm_servo(int index, int value)
     }
     return result;
 }
-
-void NeckController::read_holding_registers(MessageFrame &frame)
+uint32_t NeckController::get_oscillator_frequency(void)
 {
+    return this->_oscillator_frequency;
+}
+uint32_t NeckController::get_pwm_freq(void)
+{
+    return this->_pwm_freq;
+}
+
+// =============================
+// PRIVATE : Function : MODBUS
+// =============================
+bool NeckController::_read_holding_registers(MessageFrame &frame)
+{
+    bool result     = false;
     int length      = 0;
     int start_index = 1;
     if (0x68 == frame.data[0]) {
         length = this->_response_accel_and_gyro(frame, frame.data[1], (frame.data[2] << 8) | frame.data[3], start_index);
         start_index += length;
+        result = true;
     }
-    if (0x70 == frame.data[0]) {
+    if (0x71 == frame.data[0]) {
         length = this->_response_pwm_servo(frame, frame.data[1], (frame.data[2] << 8) | frame.data[3], start_index);
         start_index += length;
+        result = true;
     }
     frame.data_length = length;
     frame.data[0]     = length;
+    return result;
 }
-
-void NeckController::write_single_register(MessageFrame &frame)
+bool NeckController::_write_single_register(MessageFrame &frame)
 {
-    int length = 0;
-    if (0x70 == frame.data[0]) {
+    bool result    = false;
+    int length     = 0;
+    uint32_t value = 0;
+    if (0x71 == frame.data[0]) {
+        result = true;
+        value  = (frame.data[2] << 8) | (frame.data[3]);
         if (0x00 == frame.data[1]) {
             for (int i = 0; i < this->pwm_servo_count; i++) {
-                this->set_pwm_servo(i, (int)((frame.data[2] << 8) | frame.data[3]));
+                this->set_pwm_servo(i, (int)(value));
                 length++;
             }
         } else {
-            this->set_pwm_servo((int)frame.data[1], (int)((frame.data[2] << 8) | frame.data[3]));
+            this->set_pwm_servo((int)frame.data[1], (int)(value));
             length++;
+        }
+    }
+    if (0x70 == frame.data[0]) {
+        bool flag_osc = false;
+        bool flag_pwm = false;
+        value         = (frame.data[2] << 8) | (frame.data[3]);
+        if (0x00 == frame.data[1]) {
+            this->_oscillator_frequency = (uint32_t)((value << 16) | (this->_oscillator_frequency & 0xFFFF));
+            flag_osc                    = true;
+        }
+        if (0x01 == frame.data[1]) {
+            this->_oscillator_frequency = (uint32_t)((this->_oscillator_frequency | 0xFFFF0000) | (value & 0xFFFF));
+            flag_osc                    = true;
+        }
+        if (0x02 == frame.data[1]) {
+            this->_pwm_freq = (uint32_t)((value << 16) | (this->_pwm_freq & 0xFFFF));
+            flag_pwm        = true;
+        }
+        if (0x03 == frame.data[1]) {
+            this->_pwm_freq = (uint32_t)((this->_pwm_freq | 0xFFFF0000) | (value & 0xFFFF));
+            flag_pwm        = true;
+        }
+        if (true == flag_osc) {
+            this->_pwm->setOscillatorFrequency(this->_oscillator_frequency);
+            result = true;
+        }
+        if (true == flag_pwm) {
+            this->_pwm->setPWMFreq(this->_pwm_freq);
+            result = true;
+        }
+        if ((true == flag_osc) || (true == flag_pwm)) {
+            this->_save_setting_setting();
         }
     }
     frame.data_length = 1;
     frame.data[0]     = length;
+    return result;
 }
-void NeckController::write_multiple_registers(MessageFrame &frame)
+bool NeckController::_write_multiple_registers(MessageFrame &frame)
 {
-    int length = 0;
-    if (0x70 == frame.data[0]) {
+    bool result = false;
+    int length  = 0;
+    if (0x71 == frame.data[0]) {
+        result = true;
         if (0x00 == frame.data[1]) {
             length        = this->pwm_servo_count;
             frame.data[1] = 0x01;
@@ -205,12 +294,68 @@ void NeckController::write_multiple_registers(MessageFrame &frame)
             length++;
         }
     }
+    if (0x70 == frame.data[0]) {
+        int count                     = 4;
+        bool flag_osc                 = false;
+        bool flag_pwm                 = false;
+        bool flag_write               = false;
+        result                        = true;
+        uint32_t oscillator_frequency = this->_oscillator_frequency;
+        uint32_t pwm_freq             = this->_pwm_freq;
+        uint32_t value                = 0;
+        int data_length               = ((frame.data[2] << 8) | frame.data[3]) + length;
+        /////////////////////////////////
+        if ((0x00 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+            value                = (frame.data[count++] << 8) | (frame.data[count++]);
+            oscillator_frequency = (uint32_t)((value << 16) | (oscillator_frequency & 0xFFFF));
+            flag_osc             = true;
+            flag_write           = true;
+            length++;
+        }
+        if ((0x01 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+            value                = (frame.data[count++] << 8) | (frame.data[count++]);
+            oscillator_frequency = (uint32_t)((oscillator_frequency | 0xFFFF0000) | (value & 0xFFFF));
+            flag_osc             = true;
+            flag_write           = true;
+            length++;
+        }
+        if ((0x02 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+            value      = (frame.data[count++] << 8) | (frame.data[count++]);
+            pwm_freq   = (uint32_t)((value << 16) | (pwm_freq & 0xFFFF));
+            flag_pwm   = true;
+            flag_write = true;
+            length++;
+        }
+        if ((0x03 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+            value      = (frame.data[count++] << 8) | (frame.data[count++]);
+            pwm_freq   = (uint32_t)((pwm_freq | 0xFFFF0000) | (value & 0xFFFF));
+            flag_pwm   = true;
+            flag_write = true;
+            length++;
+        }
+
+        /////////////////////////////////
+        if (true == flag_osc) {
+            this->_oscillator_frequency = oscillator_frequency;
+            this->_pwm->setOscillatorFrequency(this->_oscillator_frequency);
+            result = true;
+        }
+        if (true == flag_pwm) {
+            this->_pwm_freq = pwm_freq;
+            this->_pwm->setPWMFreq(this->_pwm_freq);
+            result = true;
+        }
+        if ((true == flag_osc) || (true == flag_pwm)) {
+            this->_save_setting_setting();
+        }
+    }
     frame.data_length = 1;
     frame.data[0]     = length;
+    return result;
 }
 
 // =============================
-// PRIVATE : Function
+// PRIVATE : Function : MODBUS : Response
 // =============================
 int NeckController::_response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, unsigned int length, int start_index)
 {
@@ -292,4 +437,95 @@ int NeckController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_ad
     }
 
     return start_index;
+}
+
+// =============================
+// PRIVATE : Function : File
+// =============================
+bool NeckController::_load_setting_setting()
+{
+    bool result = false;
+    try {
+        if (SPIFFS.begin(true)) {
+            if (false == SPIFFS.exists(this->_setting_file_name)) {
+                result = this->_save_setting_setting(SPIFFS);
+            } else {
+                result = true;
+            }
+            if (true == result) {
+                result = this->_load_setting_setting(SPIFFS);
+            }
+            SPIFFS.end();
+        }
+    } catch (...) {
+        result = false;
+    }
+
+    return result;
+}
+
+bool NeckController::_load_setting_setting(fs::FS &fs)
+{
+    bool result = false;
+    if (true == fs.exists(this->_setting_file_name)) {
+        File dataFile = fs.open(this->_setting_file_name, FILE_READ);
+        if (!dataFile) {
+            result = false;
+        } else {
+            bool flag_break = false;
+            result          = true;
+
+            while (dataFile.available()) {
+                String word = dataFile.readStringUntil('\n');
+                word.replace("\r", "");
+                word.replace("\n", "");
+                int index_start = 0;
+                int next        = word.indexOf(':');
+                String address  = word.substring(index_start, next);
+
+                index_start        = next + 1;
+                next               = word.indexOf(':', index_start);
+                String data_length = word.substring(index_start, next);
+
+                index_start  = next + 1;
+                String value = word.substring(index_start);
+
+                if (0 < word.length()) {
+                    if (true == address.equals("0x7000")) {
+                        if (0 < value.length()) {
+                            this->_oscillator_frequency = value.toInt();
+                        }
+                    }
+                    if (true == address.equals("0x7002")) {
+                        if (0 < value.length()) {
+                            this->_pwm_freq = value.toInt();
+                        }
+                    }
+                }
+            }
+            dataFile.close();
+        }
+    }
+    return result;
+}
+bool NeckController::_save_setting_setting()
+{
+    bool result = false;
+    if (SPIFFS.begin(true)) {
+        result = this->_save_setting_setting(SPIFFS);
+        SPIFFS.end();
+    }
+
+    return result;
+}
+bool NeckController::_save_setting_setting(fs::FS &fs)
+{
+    bool result   = false;
+    File dataFile = fs.open(this->_setting_file_name, FILE_WRITE);
+    dataFile.printf("0x7000:2:%d\n", this->_oscillator_frequency);
+    dataFile.printf("0x7002:2:%d\n", this->_pwm_freq);
+    dataFile.close();
+    result = true;
+
+    return result;
 }

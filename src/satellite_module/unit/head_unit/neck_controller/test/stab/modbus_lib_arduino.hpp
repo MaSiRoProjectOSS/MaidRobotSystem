@@ -26,7 +26,7 @@ public:
     }
     MessageFrame pub_reception(MessageFrame frame)
     {
-        return this->reception(frame);
+        return this->_reception(frame);
     }
 
 protected:

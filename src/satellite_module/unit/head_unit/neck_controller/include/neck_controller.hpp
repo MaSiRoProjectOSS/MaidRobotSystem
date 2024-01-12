@@ -13,6 +13,16 @@
 #include "modbus_lib_arduino.hpp"
 #include "queue.hpp"
 
+#include <Adafruit_PWMServoDriver.h>
+#include <SPIFFS.h>
+
+#ifndef SERVO_ADDRESS
+#define SERVO_ADDRESS PCA9685_I2C_ADDRESS
+#endif
+#ifndef NECK_CONTROLLER_SETTING_FILE_NAME
+#define NECK_CONTROLLER_SETTING_FILE_NAME "/setting.ini"
+#endif
+
 class NeckController : public ModbusLibArduino {
 public:
     struct vector_t {
@@ -27,7 +37,7 @@ public:
     };
 
 public:
-    NeckController(HardwareSerial *serial, int pwm_size = 3);
+    NeckController(HardwareSerial *serial, int pwm_size = 3, int pwm_address = PCA9685_I2C_ADDRESS);
     ~NeckController();
 
 public:
@@ -36,26 +46,42 @@ public:
     int *pwm_servo;
     int pwm_servo_count;
     int *pwm_servo_request;
+    unsigned int count_reception = 0;
+    unsigned int count_process   = 0;
 
 public:
     void set_accel(float x, float y, float z);
     void set_gyro(float x, float y, float z);
     bool set_pwm_servo(int index, int value);
+    uint32_t get_oscillator_frequency(void);
+    uint32_t get_pwm_freq(void);
 
 protected:
-    MessageFrame reception(MessageFrame frame) override;
+    MessageFrame _reception(MessageFrame frame) override;
+    bool _init() override;
 
 private:
-    void read_holding_registers(MessageFrame &frame);
-    void write_single_register(MessageFrame &frame);
-    void write_multiple_registers(MessageFrame &frame);
+    bool _read_holding_registers(MessageFrame &frame);
 
-private:
+    bool _write_single_register(MessageFrame &frame);
+    bool _write_multiple_registers(MessageFrame &frame);
+
     int _response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, unsigned int length, int start_index = 1);
     int _response_pwm_servo(MessageFrame &frame, unsigned int sub_address, unsigned int length, int start_index = 1);
 
+    bool _load_setting_setting();
+    bool _save_setting_setting();
+    bool _load_setting_setting(fs::FS &fs);
+    bool _save_setting_setting(fs::FS &fs);
+
 private:
     Queue<MessageFrame::EXCEPTION_CODE> _exception_queue;
+    Adafruit_PWMServoDriver *_pwm;
+    uint32_t _oscillator_frequency = (2.7 * 1000 * 1000);
+    uint32_t _pwm_freq             = (1.6 * 1000);
+
+private:
+    const char *_setting_file_name = NECK_CONTROLLER_SETTING_FILE_NAME;
 };
 
 #endif
