@@ -32,7 +32,7 @@ bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type)
         this->_address = -1;
         return false;
     } else {
-        return true;
+        return _init();
     }
 }
 
@@ -58,6 +58,14 @@ bool ModbusLib::is_range_slave_address()
         result = true;
     }
     return result;
+}
+
+// =============================
+// PROTECTED : Virtual Function
+// =============================
+bool ModbusLib::_init()
+{
+    return true;
 }
 
 // =============================

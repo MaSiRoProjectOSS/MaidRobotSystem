@@ -18,7 +18,7 @@ public:
     ~ModbusImpl(void);
 
 protected:
-    MessageFrame reception(MessageFrame frame) override;
+    MessageFrame _reception(MessageFrame frame) override;
 };
 
 #endif

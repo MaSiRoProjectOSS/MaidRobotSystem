@@ -17,7 +17,7 @@ ModbusImpl::~ModbusImpl(void)
 {
 }
 
-MessageFrame ModbusImpl::reception(MessageFrame frame)
+MessageFrame ModbusImpl::_reception(MessageFrame frame)
 {
     switch (frame.function) {
         ///////////////////////////////////

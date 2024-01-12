@@ -209,7 +209,7 @@ protected:
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
-                        this->reception(frame);
+                        this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
                             frame.calc_footer(true);
                             this->_send_ascii(frame);
@@ -229,7 +229,7 @@ protected:
             } else if (0 == this->_address) {
                 log_v("received: master");
                 frame.calc_footer();
-                this->reception(frame);
+                this->_reception(frame);
             }
         }
         return result;
@@ -317,7 +317,7 @@ protected:
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
-                        this->reception(frame);
+                        this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
                             frame.calc_footer(true);
                             this->_send_rtu(frame);
@@ -337,7 +337,7 @@ protected:
             } else if (0 == this->_address) {
                 log_v("received: master");
                 frame.calc_footer();
-                this->reception(frame);
+                this->_reception(frame);
             }
         }
         return result;
@@ -426,7 +426,7 @@ protected:
             str += buffer;
         }
         this->_serial->printf(":%02X%02X%s%02X\r\n", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
-        log_v("%s:%02X%02X%s%02X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
+        log_v("%s:%02X%02X%s%02X", frame.valid ? "T" : "F", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
     }
 
 private:

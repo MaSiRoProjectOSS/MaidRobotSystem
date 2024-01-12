@@ -17,7 +17,7 @@ ModbusImpl::~ModbusImpl(void)
 {
 }
 
-MessageFrame ModbusImpl::reception(MessageFrame frame)
+MessageFrame ModbusImpl::_reception(MessageFrame frame)
 {
     if (0x80 <= frame.function) {
         log_w("  EXCEPTION[%d]", (int)frame.error_code);

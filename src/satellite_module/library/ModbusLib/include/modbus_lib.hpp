@@ -67,7 +67,16 @@ protected:
      * @param frame The received MessageFrame
      * @return The processed MessageFrame
      */
-    virtual MessageFrame reception(MessageFrame frame) = 0;
+    virtual MessageFrame _reception(MessageFrame frame) = 0;
+
+    /**
+     * @brief Initialize the Modbus library
+     *
+     * This function initializes the Modbus library. It should be overridden by subclasses to provide specific initialization behavior.
+     *
+     * @return True if the initialization was successful, false otherwise
+     */
+    virtual bool _init();
 
 protected:
     /**
