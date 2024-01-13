@@ -33,7 +33,7 @@ public:
     }
 };
 
-HardwareSerialEX SerialEX(1);
+HardwareSerialEX SerialEX(0);
 NeckController modbus(&SerialEX);
 
 void setup(void)
