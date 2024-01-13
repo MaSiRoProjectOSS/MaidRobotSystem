@@ -1,0 +1,25 @@
+{
+    "name": "STAB_Arduino",
+    "version": "0.0.3",
+    "description": "STAB_Arduino",
+    "keywords": "STAB Arduino",
+    "homepage": "https://github.com/MasterAkari/STAB_Arduino",
+    "authors": {
+        "name": "MaSiRo Project.",
+        "email": "masiro.to.akari@gmail.com",
+        "url": "https://github.com/MasterAkari/STAB_Arduino"
+    },
+    "platforms": "native",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MasterAkari/STAB_Arduino.git"
+    },
+    "license": "LGPL-2.1 license",
+    "dependencies": {},
+    "examples": [],
+    "export": {
+        "exclude": [
+            "test/*"
+        ]
+    }
+}

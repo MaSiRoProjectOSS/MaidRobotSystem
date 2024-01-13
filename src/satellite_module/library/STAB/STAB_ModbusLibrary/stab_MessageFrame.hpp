@@ -7,7 +7,7 @@
  * @copyright Copyright (c) MaSiRo Project. 2024-.
  *
  */
-#if PIO_UNIT_TESTING
+#if 1
 #ifndef STAB_MESSAGE_FRAME_HPP
 #define STAB_MESSAGE_FRAME_HPP
 
