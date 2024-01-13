@@ -81,8 +81,8 @@ MessageFrame NeckController::_reception(MessageFrame frame)
         case 0x07: // read_exception_status (serial line only)
             length            = this->_exception_queue.length();
             frame.data_length = length;
-            for (int i = length; i >= 0; i--) {
-                frame.data[i] = this->_exception_queue.pop();
+            for (int i = length; i > 0; i--) {
+                frame.data[i - 1] = this->_exception_queue.pop();
             }
             break;
         case 0x08: // diagnostics (serial line only)
@@ -99,7 +99,7 @@ MessageFrame NeckController::_reception(MessageFrame frame)
         //   - Internal Registers or Physical Output Registers
         ///////////////////////////////////
         case 0x03: // read_holding_registers
-            if (true == this->_read_holding_registers(frame)) {
+            if (true == this->_read_multiple_holding_registers(frame)) {
                 this->count_process++;
             }
             break;
@@ -203,11 +203,11 @@ uint32_t NeckController::get_pwm_freq(void)
 // =============================
 // PRIVATE : Function : MODBUS
 // =============================
-bool NeckController::_read_holding_registers(MessageFrame &frame)
+bool NeckController::_read_multiple_holding_registers(MessageFrame &frame)
 {
     bool result     = false;
     int length      = 0;
-    int start_index = 1;
+    int start_index = 2;
     if (0x68 == frame.data[0]) {
         length = this->_response_accel_and_gyro(frame, frame.data[1], (frame.data[2] << 8) | frame.data[3], start_index);
         start_index += length;
@@ -219,7 +219,8 @@ bool NeckController::_read_holding_registers(MessageFrame &frame)
         result = true;
     }
     frame.data_length = length;
-    frame.data[0]     = length;
+    frame.data[0]     = (length >> 8) & 0xFF;
+    frame.data[1]     = length & 0xFF;
     return result;
 }
 bool NeckController::_write_single_register(MessageFrame &frame)
@@ -357,7 +358,7 @@ bool NeckController::_write_multiple_registers(MessageFrame &frame)
 // =============================
 // PRIVATE : Function : MODBUS : Response
 // =============================
-int NeckController::_response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, unsigned int length, int start_index)
+int NeckController::_response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
 {
     bool is_skip = true;
     /*
@@ -370,48 +371,56 @@ int NeckController::_response_accel_and_gyro(MessageFrame &frame, unsigned int s
         | 0x6814 | IMU         | gyro.y  | --   |
         | 0x6815 | IMU         | gyro.z  | --   |
     */
-    // accel
-    if ((0x10 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->accel.x >> 8) & 0xFF;
-        frame.data[start_index++] = (this->accel.x >> 0) & 0xFF;
-        length--;
-        is_skip = false;
-    }
-    if ((0x11 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->accel.y >> 8) & 0xFF;
-        frame.data[start_index++] = (this->accel.y >> 0) & 0xFF;
-        length--;
-        is_skip = false;
-    }
-    if ((0x12 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->accel.z >> 8) & 0xFF;
-        frame.data[start_index++] = (this->accel.z >> 0) & 0xFF;
-        length--;
-        is_skip = false;
-    }
-    // gyro
-    if ((0x13 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->gyro.x >> 8) & 0xFF;
-        frame.data[start_index++] = (this->gyro.x >> 0) & 0xFF;
-        length--;
-        is_skip = false;
-    }
-    if ((0x14 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->gyro.y >> 8) & 0xFF;
-        frame.data[start_index++] = (this->gyro.y >> 0) & 0xFF;
-        length--;
-        is_skip = false;
-    }
-    if ((0x15 == sub_address) || ((false == is_skip) && (0 < length))) {
-        frame.data[start_index++] = (this->gyro.z >> 8) & 0xFF;
-        frame.data[start_index++] = (this->gyro.z >> 0) & 0xFF;
-        length--;
-        is_skip = false;
+    if ((0 < length)) {
+        // accel
+        if ((0x10 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->accel.x >> 8) & 0xFF;
+            frame.data[start_index++] = (this->accel.x >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x11 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->accel.y >> 8) & 0xFF;
+            frame.data[start_index++] = (this->accel.y >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x12 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->accel.z >> 8) & 0xFF;
+            frame.data[start_index++] = (this->accel.z >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        // gyro
+        if ((0x13 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->gyro.x >> 8) & 0xFF;
+            frame.data[start_index++] = (this->gyro.x >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x14 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->gyro.y >> 8) & 0xFF;
+            frame.data[start_index++] = (this->gyro.y >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x15 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->gyro.z >> 8) & 0xFF;
+            frame.data[start_index++] = (this->gyro.z >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if (false == is_skip) {
+            for (int i = length; i > 0; i--) {
+                frame.data[start_index++] = 0x00;
+                frame.data[start_index++] = 0x00;
+            }
+        }
     }
 
     return start_index;
 }
-int NeckController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_address, unsigned int length, int start_index)
+int NeckController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
 {
     bool is_skip = true;
     /*
@@ -424,18 +433,25 @@ int NeckController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_ad
         | 0x7004 | PWM Motor(I2C) - No.04 | --  |               |
         | 0x7005 | PWM Motor(I2C) - No.05 | --  |               |
     */
-    if (0x00 == sub_address) {
-        is_skip = false;
-    }
-    for (int i = 0; i < this->pwm_servo_count; i++) {
-        if (((i + 1) == sub_address) || ((false == is_skip) && (0 < length))) {
-            frame.data[start_index++] = (this->pwm_servo[i] >> 8) & 0xFF;
-            frame.data[start_index++] = (this->pwm_servo[i] >> 0) & 0xFF;
-            length--;
+    if ((0 < length)) {
+        if (0x00 == sub_address) {
             is_skip = false;
         }
+        for (int i = 0; i < this->pwm_servo_count; i++) {
+            if (((i + 1) == sub_address) || ((false == is_skip) && (0 < length))) {
+                frame.data[start_index++] = (this->pwm_servo[i] >> 8) & 0xFF;
+                frame.data[start_index++] = (this->pwm_servo[i] >> 0) & 0xFF;
+                length--;
+                is_skip = false;
+            }
+        }
+        if (false == is_skip) {
+            for (int i = length; i > 0; i--) {
+                frame.data[start_index++] = 0x00;
+                frame.data[start_index++] = 0x00;
+            }
+        }
     }
-
     return start_index;
 }
 
