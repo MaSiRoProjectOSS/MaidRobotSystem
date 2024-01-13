@@ -234,10 +234,10 @@ bool NeckController::_write_single_register(MessageFrame &frame)
         if (0x00 == frame.data[1]) {
             for (int i = 0; i < this->pwm_servo_count; i++) {
                 this->set_pwm_servo(i, (int)(value));
-                length++;
             }
+            length++;
         } else {
-            this->set_pwm_servo((int)frame.data[1], (int)(value));
+            this->set_pwm_servo((int)frame.data[1] - 1, (int)(value));
             length++;
         }
     }
@@ -250,7 +250,7 @@ bool NeckController::_write_single_register(MessageFrame &frame)
             flag_osc                    = true;
         }
         if (0x01 == frame.data[1]) {
-            this->_oscillator_frequency = (uint32_t)((this->_oscillator_frequency | 0xFFFF0000) | (value & 0xFFFF));
+            this->_oscillator_frequency = (uint32_t)((this->_oscillator_frequency & 0xFFFF0000) | (value & 0xFFFF));
             flag_osc                    = true;
         }
         if (0x02 == frame.data[1]) {
@@ -258,23 +258,26 @@ bool NeckController::_write_single_register(MessageFrame &frame)
             flag_pwm        = true;
         }
         if (0x03 == frame.data[1]) {
-            this->_pwm_freq = (uint32_t)((this->_pwm_freq | 0xFFFF0000) | (value & 0xFFFF));
+            this->_pwm_freq = (uint32_t)((this->_pwm_freq & 0xFFFF0000) | (value & 0xFFFF));
             flag_pwm        = true;
         }
         if (true == flag_osc) {
             this->_pwm->setOscillatorFrequency(this->_oscillator_frequency);
             result = true;
+            length++;
         }
         if (true == flag_pwm) {
             this->_pwm->setPWMFreq(this->_pwm_freq);
             result = true;
+            length++;
         }
         if ((true == flag_osc) || (true == flag_pwm)) {
             this->_save_setting_setting();
         }
     }
     frame.data_length = 1;
-    frame.data[0]     = length;
+    frame.data[0]     = (length >> 8) & 0xFF;
+    frame.data[1]     = length & 0xFF;
     return result;
 }
 bool NeckController::_write_multiple_registers(MessageFrame &frame)
@@ -315,7 +318,7 @@ bool NeckController::_write_multiple_registers(MessageFrame &frame)
         }
         if ((0x01 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
             value                = (frame.data[count++] << 8) | (frame.data[count++]);
-            oscillator_frequency = (uint32_t)((oscillator_frequency | 0xFFFF0000) | (value & 0xFFFF));
+            oscillator_frequency = (uint32_t)((oscillator_frequency & 0xFFFF0000) | (value & 0xFFFF));
             flag_osc             = true;
             flag_write           = true;
             length++;
@@ -329,7 +332,7 @@ bool NeckController::_write_multiple_registers(MessageFrame &frame)
         }
         if ((0x03 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
             value      = (frame.data[count++] << 8) | (frame.data[count++]);
-            pwm_freq   = (uint32_t)((pwm_freq | 0xFFFF0000) | (value & 0xFFFF));
+            pwm_freq   = (uint32_t)((pwm_freq & 0xFFFF0000) | (value & 0xFFFF));
             flag_pwm   = true;
             flag_write = true;
             length++;
@@ -351,7 +354,8 @@ bool NeckController::_write_multiple_registers(MessageFrame &frame)
         }
     }
     frame.data_length = 1;
-    frame.data[0]     = length;
+    frame.data[0]     = (length >> 8) & 0xFF;
+    frame.data[1]     = length & 0xFF;
     return result;
 }
 

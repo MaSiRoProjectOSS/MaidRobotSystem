@@ -2460,11 +2460,178 @@ void test_neck_controller_reception_0x03_read_holding_registers_pwm_0x71_sub_0x0
 //////////////////////////////////////////////////////////////////////////////////////
 void test_neck_controller_reception_0x06_write_single_register_0x7000()
 {
-    unsigned int function  = 0x06;
-    unsigned int address   = 0x7000;
-    unsigned int data_size = 0x04;
-    int response_data      = 0;
-    int data_length        = 0;
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7000;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data        = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    oscillator_frequency = ((response_data << 16) & 0xFFFF0000) | (oscillator_frequency & 0xFFFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(oscillator_frequency, neck.get_oscillator_frequency());
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7001()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7001;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data        = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    oscillator_frequency = (oscillator_frequency & 0xFFFF0000) | (response_data & 0xFFFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(oscillator_frequency, neck.get_oscillator_frequency());
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7002()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7002;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t pwm_freq = neck.get_pwm_freq();
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    pwm_freq      = ((response_data << 16) & 0xFFFF0000) | (pwm_freq & 0xFFFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(pwm_freq, neck.get_pwm_freq());
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7003()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7003;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t pwm_freq = neck.get_pwm_freq();
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    pwm_freq      = (pwm_freq & 0xFFFF0000) | (response_data & 0xFFFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(pwm_freq, neck.get_pwm_freq());
+}
+
+void test_neck_controller_reception_0x06_write_single_register_0x7100()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7100;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
 
     NeckController neck(&Serial);
     MessageFrame frame;
@@ -2472,36 +2639,195 @@ void test_neck_controller_reception_0x06_write_single_register_0x7000()
 
     neck.set_accel(4, 5, 6);
     neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
 
     frame.function = function;
     frame.data[0]  = (address >> 8) & 0xFF;
     frame.data[1]  = address & 0xFF;
-    frame.data[2]  = (data_size >> 8) & 0xFF;
-    frame.data[3]  = data_size & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
     response       = neck.pub_reception(frame);
 
     // data_length
-    TEST_ASSERT_EQUAL(2 + data_size * 2, response.data_length);
+    TEST_ASSERT_EQUAL(1, response.data_length);
     // size
     data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
-    TEST_ASSERT_EQUAL(2 + data_size * 2, data_length);
+    TEST_ASSERT_EQUAL(1, data_length);
 
     // response_data
     response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
-    response_data = ((response_data << 16) & 0xFFFF0000) | ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
     TEST_ASSERT_EQUAL(0, response_data);
-
     response_data = ((response.data[6] << 8) & 0xFF00) | (response.data[7] & 0xFF);
-    response_data = ((response_data << 16) & 0xFFFF0000) | ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
     TEST_ASSERT_EQUAL(0, response_data);
-
+    response_data = ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
     response_data = ((response.data[10] << 8) & 0xFF00) | (response.data[11] & 0xFF);
-    response_data = ((response_data << 16) & 0xFFFF0000) | ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
     TEST_ASSERT_EQUAL(0, response_data);
-}
+    response_data = ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[14] << 8) & 0xFF00) | (response.data[15] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
 
-void test_neck_controller_reception_0x06_write_single_register_0x7002()
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[0]);
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[1]);
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[2]);
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7101()
 {
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7101;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[6] << 8) & 0xFF00) | (response.data[7] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[10] << 8) & 0xFF00) | (response.data[11] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[14] << 8) & 0xFF00) | (response.data[15] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[0]);
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[1]);
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[2]);
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7102()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7102;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[6] << 8) & 0xFF00) | (response.data[7] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[10] << 8) & 0xFF00) | (response.data[11] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[14] << 8) & 0xFF00) | (response.data[15] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[0]);
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[1]);
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[2]);
+}
+void test_neck_controller_reception_0x06_write_single_register_0x7103()
+{
+    unsigned int function = 0x06;
+    unsigned int address  = 0x7103;
+    unsigned int data     = 0x32FA;
+    int response_data     = 0;
+    int data_length       = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data >> 8) & 0xFF;
+    frame.data[3]  = data & 0xFF;
+    response       = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(1, data_length);
+
+    // response_data
+    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
+    TEST_ASSERT_EQUAL(data, response_data);
+    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[6] << 8) & 0xFF00) | (response.data[7] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[10] << 8) & 0xFF00) | (response.data[11] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+    response_data = ((response.data[14] << 8) & 0xFF00) | (response.data[15] & 0xFF);
+    TEST_ASSERT_EQUAL(0, response_data);
+
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[0]);
+    TEST_ASSERT_EQUAL(0xFFFF, neck.pwm_servo_request[1]);
+    TEST_ASSERT_EQUAL(data, neck.pwm_servo_request[2]);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -2510,6 +2836,50 @@ void test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size1()
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size2()
 {
+    unsigned int function  = 0x10;
+    unsigned int address   = 0x7000;
+    unsigned int data_size = 0x02;
+    int response_data      = 0;
+    int data_length        = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t pwm_freq             = neck.get_pwm_freq();
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+    uint32_t request_data         = 0x12345678;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data_size >> 8) & 0xFF;
+    frame.data[3]  = data_size & 0xFF;
+
+    frame.data[4] = (request_data >> 24) & 0xFF;
+    frame.data[5] = (request_data >> 16) & 0xFF;
+    frame.data[6] = (request_data >> 8) & 0xFF;
+    frame.data[7] = (request_data >> 0) & 0xFF;
+
+    response = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(3, data_length);
+
+    // response_data
+
+    // get value
+    TEST_ASSERT_EQUAL(request_data, neck.get_oscillator_frequency());
+    TEST_ASSERT_EQUAL(pwm_freq, neck.get_pwm_freq());
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size3()
 {
@@ -2526,37 +2896,40 @@ void test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size4()
     MessageFrame frame;
     MessageFrame response;
 
+    uint32_t pwm_freq             = neck.get_pwm_freq();
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+    uint32_t request_data         = 0x12345678;
+
     neck.set_accel(4, 5, 6);
     neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
 
     frame.function = function;
     frame.data[0]  = (address >> 8) & 0xFF;
     frame.data[1]  = address & 0xFF;
     frame.data[2]  = (data_size >> 8) & 0xFF;
     frame.data[3]  = data_size & 0xFF;
-    response       = neck.pub_reception(frame);
+
+    frame.data[4] = (request_data >> 24) & 0xFF;
+    frame.data[5] = (request_data >> 16) & 0xFF;
+    frame.data[6] = (request_data >> 8) & 0xFF;
+    frame.data[7] = (request_data >> 0) & 0xFF;
+
+    response = neck.pub_reception(frame);
 
     // data_length
-    TEST_ASSERT_EQUAL(2 + data_size * 2, response.data_length);
+    TEST_ASSERT_EQUAL(1, response.data_length);
     // size
     data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
-    TEST_ASSERT_EQUAL(2 + data_size * 2, data_length);
+    TEST_ASSERT_EQUAL(4, data_length);
 
     // response_data
-    response_data = ((response.data[2] << 8) & 0xFF00) | (response.data[3] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[4] << 8) & 0xFF00) | (response.data[5] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[6] << 8) & 0xFF00) | (response.data[7] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[8] << 8) & 0xFF00) | (response.data[9] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[10] << 8) & 0xFF00) | (response.data[11] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[12] << 8) & 0xFF00) | (response.data[13] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
-    response_data = ((response.data[14] << 8) & 0xFF00) | (response.data[15] & 0xFF);
-    TEST_ASSERT_EQUAL(0, response_data);
+
+    // get value
+    TEST_ASSERT_EQUAL(request_data, neck.get_oscillator_frequency());
+    TEST_ASSERT_EQUAL(0, neck.get_pwm_freq());
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size5()
 {
@@ -2567,12 +2940,100 @@ void test_neck_controller_reception_0x10_write_multiple_registers_0x7002_size1()
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7002_size2()
 {
+    unsigned int function  = 0x10;
+    unsigned int address   = 0x7002;
+    unsigned int data_size = 0x02;
+    int response_data      = 0;
+    int data_length        = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t pwm_freq             = neck.get_pwm_freq();
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+    uint32_t request_data         = 0x12345678;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data_size >> 8) & 0xFF;
+    frame.data[3]  = data_size & 0xFF;
+
+    frame.data[4] = (request_data >> 24) & 0xFF;
+    frame.data[5] = (request_data >> 16) & 0xFF;
+    frame.data[6] = (request_data >> 8) & 0xFF;
+    frame.data[7] = (request_data >> 0) & 0xFF;
+
+    response = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(2, data_length);
+
+    // response_data
+
+    // get value
+    TEST_ASSERT_EQUAL(oscillator_frequency, neck.get_oscillator_frequency());
+    TEST_ASSERT_EQUAL(request_data, neck.get_pwm_freq());
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7002_size3()
 {
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7002_size4()
 {
+    unsigned int function  = 0x10;
+    unsigned int address   = 0x7002;
+    unsigned int data_size = 0x04;
+    int response_data      = 0;
+    int data_length        = 0;
+
+    NeckController neck(&Serial);
+    MessageFrame frame;
+    MessageFrame response;
+
+    uint32_t pwm_freq             = neck.get_pwm_freq();
+    uint32_t oscillator_frequency = neck.get_oscillator_frequency();
+    uint32_t request_data         = 0x12345678;
+
+    neck.set_accel(4, 5, 6);
+    neck.set_gyro(0.001, 0.002, 0.003);
+    for (int i = 0; i < 10; i++) {
+        neck.set_pwm_servo(i, 0xFFFF);
+    }
+
+    frame.function = function;
+    frame.data[0]  = (address >> 8) & 0xFF;
+    frame.data[1]  = address & 0xFF;
+    frame.data[2]  = (data_size >> 8) & 0xFF;
+    frame.data[3]  = data_size & 0xFF;
+
+    frame.data[4] = (request_data >> 24) & 0xFF;
+    frame.data[5] = (request_data >> 16) & 0xFF;
+    frame.data[6] = (request_data >> 8) & 0xFF;
+    frame.data[7] = (request_data >> 0) & 0xFF;
+
+    response = neck.pub_reception(frame);
+
+    // data_length
+    TEST_ASSERT_EQUAL(1, response.data_length);
+    // size
+    data_length = ((response.data[0] << 8) & 0xFF00) | (response.data[1] & 0xFF);
+    TEST_ASSERT_EQUAL(2, data_length);
+
+    // response_data
+
+    // get value
+    TEST_ASSERT_EQUAL(oscillator_frequency, neck.get_oscillator_frequency());
+    TEST_ASSERT_EQUAL(request_data, neck.get_pwm_freq());
 }
 void test_neck_controller_reception_0x10_write_multiple_registers_0x7002_size5()
 {
@@ -2715,7 +3176,13 @@ int main(int argc, char **argv)
     RUN_TEST(test_neck_controller_reception_0x03_read_holding_registers_pwm_0x71_sub_0x03_size4);
     //
     RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7000);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7001);
     RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7002);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7003);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7100);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7101);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7102);
+    RUN_TEST(test_neck_controller_reception_0x06_write_single_register_0x7103);
 
     RUN_TEST(test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size1);
     RUN_TEST(test_neck_controller_reception_0x10_write_multiple_registers_0x7000_size2);
