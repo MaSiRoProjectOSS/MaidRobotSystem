@@ -67,7 +67,9 @@ private:
     bool _write_multiple_registers(MessageFrame &frame);
 
     int _response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
-    int _response_pwm_servo(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_request(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_actual(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_setting(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
 
     bool _load_setting_setting();
     bool _save_setting_setting();

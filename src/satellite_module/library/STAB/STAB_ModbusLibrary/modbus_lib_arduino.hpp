@@ -23,7 +23,11 @@ public:
 public:
     MessageFrame pub_reception(MessageFrame frame)
     {
-        return this->_reception(frame);
+        MessageFrame reception = this->_reception(frame);
+        for (int i = reception.data_length; i < 255; i++) {
+            reception.data[i] = 0;
+        }
+        return reception;
     }
 
 public:
