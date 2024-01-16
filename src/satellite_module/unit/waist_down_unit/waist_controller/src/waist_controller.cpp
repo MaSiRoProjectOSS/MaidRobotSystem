@@ -206,21 +206,29 @@ uint32_t WaistController::get_pwm_freq(void)
 bool WaistController::_read_multiple_holding_registers(MessageFrame &frame)
 {
     bool result     = false;
-    int length      = 0;
-    int start_index = 2;
-    if (0x68 == frame.data[0]) {
-        length = this->_response_accel_and_gyro(frame, frame.data[1], (frame.data[2] << 8) | frame.data[3], start_index);
-        start_index += length;
-        result = true;
+    int data_length = (frame.data[2] << 8) | frame.data[3];
+    int array_index = 2;
+    if (0x31 == frame.data[0]) {
+        array_index = this->_response_pwm_servo_actual(frame, frame.data[1], data_length, array_index);
+        result      = true;
+    } else if (0x68 == frame.data[0]) {
+        array_index = this->_response_accel_and_gyro(frame, frame.data[1], data_length, array_index);
+        result      = true;
+    } else if (0x70 == frame.data[0]) {
+        array_index = this->_response_pwm_servo_setting(frame, frame.data[1], data_length, array_index);
+        result      = true;
+    } else if (0x71 == frame.data[0]) {
+        array_index = this->_response_pwm_servo_request(frame, frame.data[1], data_length, array_index);
+        result      = true;
     }
-    if (0x71 == frame.data[0]) {
-        length = this->_response_pwm_servo(frame, frame.data[1], (frame.data[2] << 8) | frame.data[3], start_index);
-        start_index += length;
-        result = true;
+    frame.data_length = array_index;
+    data_length       = (array_index - 2) / 2;
+    if (data_length < 0) {
+        data_length = 0;
     }
-    frame.data_length = length;
-    frame.data[0]     = (length >> 8) & 0xFF;
-    frame.data[1]     = length & 0xFF;
+
+    frame.data[0] = (data_length >> 8) & 0xFF;
+    frame.data[1] = data_length & 0xFF;
     return result;
 }
 bool WaistController::_write_single_register(MessageFrame &frame)
@@ -275,26 +283,33 @@ bool WaistController::_write_single_register(MessageFrame &frame)
             this->_save_setting_setting();
         }
     }
-    frame.data_length = 1;
+    frame.data_length = 2;
     frame.data[0]     = (length >> 8) & 0xFF;
     frame.data[1]     = length & 0xFF;
     return result;
 }
 bool WaistController::_write_multiple_registers(MessageFrame &frame)
 {
-    bool result = false;
-    int length  = 0;
+    bool result     = false;
+    int length      = 0;
+    int loot_length = 0;
     if (0x71 == frame.data[0]) {
+        int count = 4;
+
         result = true;
         if (0x00 == frame.data[1]) {
-            length        = this->pwm_servo_count;
             frame.data[1] = 0x01;
+            loot_length   = this->pwm_servo_count + frame.data[1];
+            for (int i = frame.data[1]; (i <= this->pwm_servo_count) && (i < loot_length); i++) {
+                frame.data[count++] = frame.data[4];
+                frame.data[count++] = frame.data[5];
+            }
+            count = 4;
         } else {
-            length = (frame.data[2] << 8) | frame.data[3];
+            loot_length = ((frame.data[2] << 8) | frame.data[3]) + frame.data[1];
         }
-        int count = 4;
-        for (int i = frame.data[1]; (i < this->pwm_servo_count) && (i <= length); i++) {
-            this->set_pwm_servo(i, (int)((frame.data[count++] << 8) | frame.data[count++]));
+        for (int i = frame.data[1]; (i <= this->pwm_servo_count) && (i < loot_length); i++) {
+            this->set_pwm_servo(i - 1, (int)((frame.data[count++] << 8) | frame.data[count++]));
             length++;
         }
     }
@@ -309,28 +324,28 @@ bool WaistController::_write_multiple_registers(MessageFrame &frame)
         uint32_t value                = 0;
         int data_length               = ((frame.data[2] << 8) | frame.data[3]) + length;
         /////////////////////////////////
-        if ((0x00 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+        if ((0x00 == frame.data[1]) || ((true == flag_write) && (length < data_length))) {
             value                = (frame.data[count++] << 8) | (frame.data[count++]);
             oscillator_frequency = (uint32_t)((value << 16) | (oscillator_frequency & 0xFFFF));
             flag_osc             = true;
             flag_write           = true;
             length++;
         }
-        if ((0x01 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+        if ((0x01 == frame.data[1]) || ((true == flag_write) && (length < data_length))) {
             value                = (frame.data[count++] << 8) | (frame.data[count++]);
             oscillator_frequency = (uint32_t)((oscillator_frequency & 0xFFFF0000) | (value & 0xFFFF));
             flag_osc             = true;
             flag_write           = true;
             length++;
         }
-        if ((0x02 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+        if ((0x02 == frame.data[1]) || ((true == flag_write) && (length < data_length))) {
             value      = (frame.data[count++] << 8) | (frame.data[count++]);
             pwm_freq   = (uint32_t)((value << 16) | (pwm_freq & 0xFFFF));
             flag_pwm   = true;
             flag_write = true;
             length++;
         }
-        if ((0x03 == frame.data[1]) || ((true == flag_write) && (length <= data_length))) {
+        if ((0x03 == frame.data[1]) || ((true == flag_write) && (length < data_length))) {
             value      = (frame.data[count++] << 8) | (frame.data[count++]);
             pwm_freq   = (uint32_t)((pwm_freq & 0xFFFF0000) | (value & 0xFFFF));
             flag_pwm   = true;
@@ -353,7 +368,7 @@ bool WaistController::_write_multiple_registers(MessageFrame &frame)
             this->_save_setting_setting();
         }
     }
-    frame.data_length = 1;
+    frame.data_length = 2;
     frame.data[0]     = (length >> 8) & 0xFF;
     frame.data[1]     = length & 0xFF;
     return result;
@@ -414,28 +429,28 @@ int WaistController::_response_accel_and_gyro(MessageFrame &frame, unsigned int 
             length--;
             is_skip = false;
         }
-        if (false == is_skip) {
-            for (int i = length; i > 0; i--) {
-                frame.data[start_index++] = 0x00;
-                frame.data[start_index++] = 0x00;
-            }
+        if (true == is_skip) {
+            frame.data[start_index]     = 0x00;
+            frame.data[start_index + 1] = 0x00;
+        }
+        for (int i = length; i > 0; i--) {
+            frame.data[start_index++] = 0x00;
+            frame.data[start_index++] = 0x00;
         }
     }
 
     return start_index;
 }
-int WaistController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
+int WaistController::_response_pwm_servo_actual(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
 {
     bool is_skip = true;
     /*
-        | Num    | Device type            | --  | Note          |
-        | ------ | ---------------------- | --- | ------------- |
-        | 0x7000 | PWM Motor(I2C) - ALL   | --  | for Broadcast |
-        | 0x7001 | PWM Motor(I2C) - No.01 | --  |               |
-        | 0x7002 | PWM Motor(I2C) - No.02 | --  |               |
-        | 0x7003 | PWM Motor(I2C) - No.03 | --  |               |
-        | 0x7004 | PWM Motor(I2C) - No.04 | --  |               |
-        | 0x7005 | PWM Motor(I2C) - No.05 | --  |               |
+    | Num    | Device type            | --  | Note |
+    | ------ | ---------------------- | --- | ---- |
+    | 0x3101 | PWM Motor(I2C) - No.01 | --  |      |
+    | 0x3102 | PWM Motor(I2C) - No.02 | --  |      |
+    | 0x3103 | PWM Motor(I2C) - No.03 | --  |      |
+    | ...    |                        |     |      |
     */
     if ((0 < length)) {
         if (0x00 == sub_address) {
@@ -445,17 +460,104 @@ int WaistController::_response_pwm_servo(MessageFrame &frame, unsigned int sub_a
             if (((i + 1) == sub_address) || ((false == is_skip) && (0 < length))) {
                 frame.data[start_index++] = (this->pwm_servo[i] >> 8) & 0xFF;
                 frame.data[start_index++] = (this->pwm_servo[i] >> 0) & 0xFF;
-                length--;
-                is_skip = false;
+                is_skip                   = false;
             }
+            length--;
         }
-        if (false == is_skip) {
-            for (int i = length; i > 0; i--) {
-                frame.data[start_index++] = 0x00;
-                frame.data[start_index++] = 0x00;
-            }
+        if (true == is_skip) {
+            frame.data[start_index]     = 0x00;
+            frame.data[start_index + 1] = 0x00;
+        }
+        for (int i = length; i > 0; i--) {
+            frame.data[start_index++] = 0x00;
+            frame.data[start_index++] = 0x00;
         }
     }
+    return start_index;
+}
+int WaistController::_response_pwm_servo_request(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
+{
+    bool is_skip = true;
+    /*
+        | Num    | Device type            | --  | Note          |
+        | ------ | ---------------------- | --- | ------------- |
+        | 0x7100 | PWM Motor(I2C) - ALL   | --  | for Broadcast |
+        | 0x7101 | PWM Motor(I2C) - No.01 | --  |               |
+        | 0x7102 | PWM Motor(I2C) - No.02 | --  |               |
+        | 0x7103 | PWM Motor(I2C) - No.03 | --  |               |
+        | 0x7104 | PWM Motor(I2C) - No.04 | --  |               |
+        | 0x7105 | PWM Motor(I2C) - No.05 | --  |               |
+    */
+    if ((0 < length)) {
+        if (0x00 == sub_address) {
+            is_skip = false;
+        }
+        for (int i = 0; i < this->pwm_servo_count; i++) {
+            if (((i + 1) == sub_address) || ((false == is_skip) && (0 < length))) {
+                frame.data[start_index++] = (this->pwm_servo_request[i] >> 8) & 0xFF;
+                frame.data[start_index++] = (this->pwm_servo_request[i] >> 0) & 0xFF;
+                is_skip                   = false;
+                length--;
+            }
+        }
+        if (true == is_skip) {
+            frame.data[start_index]     = 0x00;
+            frame.data[start_index + 1] = 0x00;
+        }
+        for (int i = length; i > 0; i--) {
+            frame.data[start_index++] = 0x00;
+            frame.data[start_index++] = 0x00;
+        }
+    }
+    return start_index;
+}
+int WaistController::_response_pwm_servo_setting(MessageFrame &frame, unsigned int sub_address, int length, int start_index)
+{
+    bool is_skip = true;
+    /*
+        | Num    | Device type              | --                      | Note |
+        | ------ | ------------------------ | ----------------------- | ---- |
+        | 0x7000 | PWM Motor(I2C) - Setting | Oscillator Frequency(H) |      |
+        | 0x7001 | PWM Motor(I2C) - Setting | Oscillator Frequency(L) |      |
+        | 0x7002 | PWM Motor(I2C) - Setting | PWM Frequency(H)        |      |
+        | 0x7003 | PWM Motor(I2C) - Setting | PWM Frequency(L)        |      |
+    */
+    if ((0 < length)) {
+        // accel
+        if ((0x00 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->_oscillator_frequency >> 24) & 0xFF;
+            frame.data[start_index++] = (this->_oscillator_frequency >> 16) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x01 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->_oscillator_frequency >> 8) & 0xFF;
+            frame.data[start_index++] = (this->_oscillator_frequency >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x02 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->_pwm_freq >> 24) & 0xFF;
+            frame.data[start_index++] = (this->_pwm_freq >> 16) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if ((0x03 == sub_address) || ((false == is_skip) && (0 < length))) {
+            frame.data[start_index++] = (this->_pwm_freq >> 8) & 0xFF;
+            frame.data[start_index++] = (this->_pwm_freq >> 0) & 0xFF;
+            length--;
+            is_skip = false;
+        }
+        if (true == is_skip) {
+            frame.data[start_index]     = 0x00;
+            frame.data[start_index + 1] = 0x00;
+        }
+        for (int i = length; i > 0; i--) {
+            frame.data[start_index++] = 0x00;
+            frame.data[start_index++] = 0x00;
+        }
+    }
+
     return start_index;
 }
 

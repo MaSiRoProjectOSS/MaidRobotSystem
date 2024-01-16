@@ -1,5 +1,5 @@
 /**
- * @file neck_controller.hpp
+ * @file wheel_controller.hpp
  * @brief
  * @version 0.23.12
  * @date 2024-01-06
@@ -19,8 +19,8 @@
 #ifndef SERVO_ADDRESS
 #define SERVO_ADDRESS PCA9685_I2C_ADDRESS
 #endif
-#ifndef NECK_CONTROLLER_SETTING_FILE_NAME
-#define NECK_CONTROLLER_SETTING_FILE_NAME "/setting.ini"
+#ifndef WHEEL_CONTROLLER_SETTING_FILE_NAME
+#define WHEEL_CONTROLLER_SETTING_FILE_NAME "/setting.ini"
 #endif
 
 class WheelController : public ModbusLibArduino {
@@ -67,7 +67,9 @@ private:
     bool _write_multiple_registers(MessageFrame &frame);
 
     int _response_accel_and_gyro(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
-    int _response_pwm_servo(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_request(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_actual(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
+    int _response_pwm_servo_setting(MessageFrame &frame, unsigned int sub_address, int length, int start_index = 2);
 
     bool _load_setting_setting();
     bool _save_setting_setting();
@@ -81,7 +83,7 @@ private:
     uint32_t _pwm_freq             = (1.6 * 1000);
 
 private:
-    const char *_setting_file_name = NECK_CONTROLLER_SETTING_FILE_NAME;
+    const char *_setting_file_name = WHEEL_CONTROLLER_SETTING_FILE_NAME;
 };
 
 #endif
