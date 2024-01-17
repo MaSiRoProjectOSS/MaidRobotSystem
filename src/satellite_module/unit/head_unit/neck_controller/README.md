@@ -1,4 +1,30 @@
-# neck_controller
+# Neck Controller
+
+
+```plantuml
+@startuml
+rectangle Planetary
+rectangle "Neck Controller" as NC {
+    rectangle "IMU(I2C)" as IMU
+}
+rectangle "PWM Motor(I2C)" as PWM
+
+Planetary -down- NC
+NC -down- PWM
+
+@enduml
+
+```
+
+Modbus on Serialで通信して制御するためのデバイス。
+Modbusのアドレスは下記を参照のこと。
+
+* サポートしている機能
+  * IMU(6軸)
+  * PWM Servo Motor(３つ)
+
+
+
 
 ## Modbus data
 
@@ -14,7 +40,7 @@
 
 
 
-## レジスタ
+### レジスタ
 
 | Num    | Device type | --      | Note |
 | ------ | ----------- | ------- | ---- |
