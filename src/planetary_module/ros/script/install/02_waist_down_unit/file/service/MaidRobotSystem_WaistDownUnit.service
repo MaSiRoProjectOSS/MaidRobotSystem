@@ -8,7 +8,7 @@ Before=network.target network-online.target
 
 [Service]
 Type=forking
-ExecStart=/opt/MaidRobotSystem/src/planetary_module/ros/script/service_WaistDownUnit.sh
+ExecStart=/opt/MaidRobotSystem/src/planetary_module/ros/script/service_WaistDownUnit.sh __MRS_CONFIG__
 Restart=yes
 
 [Install]
