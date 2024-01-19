@@ -43,7 +43,7 @@ if [ ! -e "${MRS_WORKSPACE}" ]; then
     echo -e "${COLOR_ON_RED}   ERROR : Not found ros_workspace : ${MRS_WORKSPACE} ${COLOR_OFF}"
     exit 1
 else
-    sudo mkdir -p ${MRS_WORKSPACE}/.colcon
+    mkdir -p ${MRS_WORKSPACE}/.colcon
     if [ ! -e "/etc/apt/sources.list.d/ros2.list" ]; then
         sudo apt update -q
         sudo apt install -y -q software-properties-common
@@ -107,6 +107,7 @@ echo -e "${COLOR_ON_BLUE}* Install of related software${COLOR_OFF}"
 sudo apt install -y -q ros-${ROS_DISTRO}-serial-driver
 sudo apt install -y -q ros-${ROS_DISTRO}-rosbridge-server ros-${ROS_DISTRO}-cv-bridge
 sudo apt install -y -q python3-colcon-common-extensions
+sudo apt install -y ros--${ROS_DISTRO}-image-geometry ros--${ROS_DISTRO}-cv-bridge
 
 # Application
 sudo apt install -y -q nlohmann-json3-dev
