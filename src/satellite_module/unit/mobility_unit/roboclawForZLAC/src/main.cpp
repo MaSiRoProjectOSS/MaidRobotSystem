@@ -30,6 +30,7 @@ static CRGB request_color                = CRGB::Black;
 ////////////////////////////////////
 WebViewerCustom viewer;
 volatile bool led_flash = true;
+xSemaphoreHandle mutex;
 
 void m5_led(CRGB color)
 {
@@ -107,13 +108,28 @@ void viewer_mode(WebViewerCustom::WEB_VIEWER_MODE mode)
 }
 
 ////////////////////////////////////////////////////////
+void request_loop()
+{
+    BaseType_t mStatus;
+    if (pdTRUE == xSemaphoreTake(mutex, 500)) {
+        viewer.loop();
+        xSemaphoreGive(mutex);
+    }
+}
+
 void setup()
 {
     (void)setup_m5();
+    if (NULL == mutex) {
+        mutex = xSemaphoreCreateMutex();
+    }
     ////////////////////////////////////////////////////////
     viewer.set_callback_led(&m5_led_request);
     viewer.set_callback_mode(&viewer_mode);
-    viewer.init();
+
+    viewer.init(&Serial);
+    Serial.onReceive(request_loop);
+
     ////////////////////////////////////////////////////////
     xTaskCreatePinnedToCore(thread_model_m5, //
                             THREAD_MODEL_M5_NAME,
@@ -127,7 +143,7 @@ void setup()
 void loop()
 {
     (void)M5.update();
-    viewer.loop();
+    request_loop();
     (void)delay(SETTING_LOOP_TIME_SLEEP_DETECT);
 }
 
