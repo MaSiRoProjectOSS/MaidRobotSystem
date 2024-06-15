@@ -647,10 +647,10 @@ void WebViewerCustom::_check_state()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-void WebViewerCustom::init()
+void WebViewerCustom::init(HardwareSerial *input_serial)
 {
     ////////////////////////////////////////////////////////
-    (void)this->_claw.setup(&Serial, &Serial2, &Serial1, BOARD_INPUT_BAUDRATE);
+    (void)this->_claw.setup(input_serial, &Serial2, &Serial1, BOARD_INPUT_BAUDRATE);
     (void)this->_claw.update_id();
     ////////////////////////////////////////////////////////
     if (true == this->_claw.begin()) {

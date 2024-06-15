@@ -39,7 +39,7 @@ public:
 
     void set_callback_led(LEDFunction callback);
 
-    void init();
+    void init(HardwareSerial *input_serial);
     void loop();
     void pressed();
 
