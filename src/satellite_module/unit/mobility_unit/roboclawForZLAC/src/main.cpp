@@ -17,6 +17,9 @@
 #ifndef SETTING_LOOP_TIME_SLEEP_DETECT
 #define SETTING_LOOP_TIME_SLEEP_DETECT (10)
 #endif
+#ifndef SETTING_RECEIVED_TIMEOUT
+#define SETTING_RECEIVED_TIMEOUT (10)
+#endif
 ////////////////////////////////////
 const char *THREAD_MODEL_M5_NAME           = "ThreadModelM5";
 const UBaseType_t THREAD_MODEL_M5_SIZE     = (4096);
@@ -128,6 +131,7 @@ void setup()
     viewer.set_callback_mode(&viewer_mode);
 
     viewer.init(&Serial);
+    Serial.setTimeout(SETTING_RECEIVED_TIMEOUT);
     Serial.onReceive(request_loop);
 
     ////////////////////////////////////////////////////////
