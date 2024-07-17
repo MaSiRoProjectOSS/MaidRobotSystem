@@ -1,7 +1,7 @@
 # roboclawForZLAC
 
-これはZLAC-706を[roboclaw_ros](https://github.com/sonyccd/roboclaw_ros)で制御するためのプロジェクト。
-roboclawを繋ぐかわりにM5ATOMを接続し、その先にZLAC-706を制御する。
+これは[roboclaw_ros](https://github.com/sonyccd/roboclaw_ros)で**ZLAC8015D**等を制御するためのプロジェクト。
+roboclawを繋ぐかわりにM5ATOMを接続し、その先にZLACのドライバを制御する。
 
 ```plantuml
 @startuml
@@ -30,8 +30,8 @@ rectangle "connect board" as board {
   interface pt_board_2
 }
 rectangle Battery
-rectangle "ZLAC706 (1)" as ZLAC706_1
-rectangle "ZLAC706 (2)" as ZLAC706_2
+rectangle "ZLAC (1)" as ZLAC_1
+rectangle "ZLAC (2)" as ZLAC_2
 
 rectangle "Motor (1)" as Motor_1
 rectangle "Motor (2)" as Motor_2
@@ -40,13 +40,13 @@ MCU -right- roboclawForZLAC : "USB\n[ttyUSB]"
 roboclawForZLAC -- pt_board_1 : UART(Motor_1)
 roboclawForZLAC -- pt_board_2 : UART(Motor_2)
 
-pt_board_1 -- ZLAC706_1 : UART\n[Tx]\n[Rx]\n[5V]\n[GND]
-pt_board_2 -- ZLAC706_2 : UART\n[Tx]\n[Rx]\n[5V]\n[GND]
+pt_board_1 -- ZLAC_1 : UART\n[Tx]\n[Rx]\n[5V]\n[GND]
+pt_board_2 -- ZLAC_2 : UART\n[Tx]\n[Rx]\n[5V]\n[GND]
 
-ZLAC706_1 -right- Battery : Positive[+]/[-]
-ZLAC706_2 -left- Battery : Positive[+]/[-]
-ZLAC706_1 -- Motor_1 : M1A/M1B
-ZLAC706_2 -- Motor_2 : M2A/M2B
+ZLAC_1 -right- Battery : Positive[+]/[-]
+ZLAC_2 -left- Battery : Positive[+]/[-]
+ZLAC_1 -- Motor_1 : M1A/M1B
+ZLAC_2 -- Motor_2 : M2A/M2B
 @enduml
 ```
 
@@ -63,7 +63,7 @@ ZLAC706_2 -- Motor_2 : M2A/M2B
 |    4 | ケーブル | USBケーブル             | 1    |
 |    5 | ^        | LANケーブル(ストレート) | 2    |
 |    6 | Battery  | Battery(24V)            | 1    |
-|    7 | Motor    | ZLAC706                 | 2    |
+|    7 | Motor    | ZLAC706 / ZLAC-8015D    | 2    |
 |    8 | ^        | Motor                   | 2    |
 
 
@@ -72,8 +72,8 @@ ZLAC706_2 -- Motor_2 : M2A/M2B
 * roboclawForZLAC
   * PlatformIO
   * ライブラリ
-  	* m5stack/M5Atom@^0.1.0
-  	* fastled/FastLED@^3.5.0
+    * m5stack/M5Atom@^0.1.0
+    * fastled/FastLED@^3.5.0
 
 ## 変換基板の仕様について
 
