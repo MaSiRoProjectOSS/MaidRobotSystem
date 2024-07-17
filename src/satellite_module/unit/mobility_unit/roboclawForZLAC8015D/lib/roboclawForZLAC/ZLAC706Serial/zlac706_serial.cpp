@@ -16,8 +16,8 @@
 // Define [LOGGER]
 ///////////////////////////////////////////////////////////////////
 #pragma region LOGGER
-#ifndef DEBUG_ZLAC706_SERIAL
-#define DEBUG_ZLAC706_SERIAL (0)
+#ifndef DEBUG_ZLAC
+#define DEBUG_ZLAC (0)
 #endif
 #ifndef DEBUG_TRACE
 #define DEBUG_TRACE (0)
@@ -1345,13 +1345,13 @@ int ZLAC706Serial::_receive(const char *name, HardwareSerial *serial, int size, 
         } while (millis() <= loop_time);
     }
     if (true == flag_timeout) {
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
         log_w("Timeout [%d] ms : size [%02d/%02d] :  (%s)", (count - 1) * this->INTERVAL_DRIVER_MS, index, size, name);
 #endif
     } else {
         if (true == output_log) {
 #if DEBUG_TRACE
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
             std::string debug_message_01 = "receive :";
             sprintf(buf, " count [%d] :", count - 1);
             debug_message_01.append(buf);
@@ -1389,7 +1389,7 @@ bool ZLAC706Serial::_send(const char *name, DRIVER_TARGET target, HardwareSerial
     char buffer[4]  = { a1, a2, a3, (char)(cs & 0xFF) };
     if (true == output_log) {
 #if DEBUG_TRACE
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
         std::string debug_message = "send    :";
         char buf[100];
         for (int i = 0; i < 4; i++) {

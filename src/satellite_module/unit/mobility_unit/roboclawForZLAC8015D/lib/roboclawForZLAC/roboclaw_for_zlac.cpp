@@ -43,7 +43,7 @@ bool RoboClawForZlac::_check_crc(uint8_t id, uint8_t command, uint8_t *packet, i
 
 void RoboClawForZlac::_receive()
 {
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
     // [[[not all api support]]]
 
     const int SPEED_SPAN         = 92;
@@ -51,18 +51,18 @@ void RoboClawForZlac::_receive()
     const int POSITION_SPAN      = 512;
     const int TORQUE_SPAN        = 50;
     ///////////////////////////////////////////
-    // DEBUG_ZLAC706_SERIAL_MODE_SPEED
-    // DEBUG_ZLAC706_SERIAL_MODE_POSITION
+    // ZLAC_MODE_SPEED
+    // ZLAC_MODE_POSITION
     static int left            = 0;
     static int right           = 0;
     static int acceleration_ms = SETTING_SPEED_ACCELERATION_MS;
     static int deceleration_ms = SETTING_SPEED_DECELERATION_MS;
     ///////////////////////////////////////////
-    // DEBUG_ZLAC706_SERIAL_MODE_POSITION
+    // ZLAC_MODE_POSITION
     static long left_pos  = (4096) * 1;
     static long right_pos = (4096) * 1;
     ///////////////////////////////////////////
-    // DEBUG_ZLAC706_SERIAL_MODE_TORQUE
+    // ZLAC_MODE_TORQUE
     static int value_l_mA = 0;
     static int value_r_mA = 0;
     ///////////////////////////////////////////
@@ -80,7 +80,7 @@ void RoboClawForZlac::_receive()
         buffer[0]                         = Serial.read();
         this->_zlac->info.flag.heart_beat = true;
 
-#if DEBUG_ZLAC706_SERIAL_MODE == DEBUG_ZLAC706_SERIAL_MODE_POSITION
+#if ZLAC_MODE == ZLAC_MODE_POSITION
         bool flag_set_value = false;
         switch (buffer[0]) {
             case '1':
@@ -138,7 +138,7 @@ void RoboClawForZlac::_receive()
             this->_zlac->cmd_position_set(left_pos, left, right_pos, right);
             this->_zlac->cmd_motor_start();
         }
-#elif DEBUG_ZLAC706_SERIAL_MODE == DEBUG_ZLAC706_SERIAL_MODE_TORQUE
+#elif ZLAC_MODE == ZLAC_MODE_TORQUE
         bool flag_send = false;
         switch (buffer[0]) {
             case 'q':
@@ -628,7 +628,7 @@ bool RoboClawForZlac::reset()
         this->_zlac->cmd_modify_the_rated_current(ROBOCLAW_CURRENT_MODIFICATION);
 
         this->_zlac->cmd_position_set_absolute();
-#if DEBUG_ZLAC706_SERIAL_MODE == DEBUG_ZLAC706_SERIAL_MODE_POSITION
+#if ZLAC_MODE == ZLAC_MODE_POSITION
         this->_zlac->cmd_position_set_relative();
         this->_zlac->cmd_position_mode();
 #if ROBOCLAW_SETTING_SET_GAIN
@@ -640,7 +640,7 @@ bool RoboClawForZlac::reset()
         this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.position_differential_gain);
         this->_zlac->cmd_setting_feed_forward_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.position_feed_forward_gain);
 #endif
-#elif DEBUG_ZLAC706_SERIAL_MODE == DEBUG_ZLAC706_SERIAL_MODE_TORQUE
+#elif ZLAC_MODE == ZLAC_MODE_TORQUE
         this->_zlac->cmd_torque_mode();
 #else
         // this->_zlac->cmd_mode_selection(ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL);
@@ -875,7 +875,7 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t command, uint8_t data[
         }
         send_data[length++] = crc >> 8;
         send_data[length++] = crc & 0xFF;
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
         std::string message = "response(CRC) :";
         char buffer[100];
         for (int i = 0; i < length; i++) {
@@ -901,7 +901,7 @@ void RoboClawForZlac::_response(unsigned int crc, uint8_t command, uint8_t data[
 
 #endif
     } else {
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
         std::string message = "response(---) :";
         char buffer[100];
         for (int i = 0; i < size; i++) {
@@ -980,7 +980,7 @@ void RoboClawForZlac::_set_speed(int speed_left, int speed_right, bool enable_le
         if (true == enable_right) {
             right = speed_right;
         }
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
         log_d("%s left[%d],right[%d]", __func__, left, right);
 #endif
 
@@ -1028,7 +1028,7 @@ void RoboClawForZlac::_speed_m1m2(unsigned int crc, uint8_t value[100], size_t v
     int right = (int32_t)((value[4] << 24) | (value[5] << 16) | (value[6] << 8) | (value[7] << 0));
 
     this->_set_speed(left, right);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1099,7 +1099,7 @@ void RoboClawForZlac::_speed_m1(unsigned int crc, uint8_t value[100], size_t val
     int left = (int32_t)((value[0] << 24) | (value[1] << 16) | (value[2] << 8) | (value[3] << 0));
 
     this->_set_speed(left, 0, true, false);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1110,7 +1110,7 @@ void RoboClawForZlac::_speed_m2(unsigned int crc, uint8_t value[100], size_t val
     int right = (int32_t)((value[0] << 24) | (value[1] << 16) | (value[2] << 8) | (value[3] << 0));
 
     this->_set_speed(0, right, false, true);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1120,7 +1120,7 @@ void RoboClawForZlac::_forward_m1(unsigned int crc, uint8_t value[100], size_t v
     log_v("ForwardM1");
     int left = (int32_t)(value[0]);
     this->_set_speed(left, 0, true, false);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1130,7 +1130,7 @@ void RoboClawForZlac::_forward_m2(unsigned int crc, uint8_t value[100], size_t v
     log_v("ForwardM2");
     int right = (int32_t)(value[0]);
     this->_set_speed(0, right, false, true);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1140,7 +1140,7 @@ void RoboClawForZlac::_backwards_m1(unsigned int crc, uint8_t value[100], size_t
     log_v("BackwardsM1");
     int left = (int32_t)(value[0]);
     this->_set_speed(-left, 0, true, false);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1150,7 +1150,7 @@ void RoboClawForZlac::_backwards_m2(unsigned int crc, uint8_t value[100], size_t
     log_v("BackwardsM2");
     int right = (int32_t)(value[0]);
     this->_set_speed(0, -right, false, true);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
@@ -1224,7 +1224,7 @@ void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size
 
     this->_enc_postion    = this->_zlac->info.left.position_feedback;
     this->_enc_difference = (this->_zlac->info.left.position_feedback - this->_zlac->info.right.position_feedback);
-#if DEBUG_ZLAC706_SERIAL
+#if DEBUG_ZLAC
 #else
     this->_input_serial->write(0xFF);
 #endif
