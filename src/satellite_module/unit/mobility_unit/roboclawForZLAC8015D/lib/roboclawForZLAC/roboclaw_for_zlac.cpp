@@ -682,7 +682,7 @@ bool RoboClawForZlac::setup(HardwareSerial *input_serial, HardwareSerial *motor_
             this->_input_serial->setTimeout(150);
             this->_input_serial->begin(input_baud);
 
-            this->_zlac->setup_serial_driver(motor_driver_left, motor_driver_right);
+            this->_zlac->setup(motor_driver_left, motor_driver_right);
             this->_zlac->begin();
 
             this->_flag_initialized = true;

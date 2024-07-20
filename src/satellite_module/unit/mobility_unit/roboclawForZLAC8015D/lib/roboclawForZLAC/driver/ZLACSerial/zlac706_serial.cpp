@@ -10,20 +10,15 @@
  */
 #include "zlac706_serial.hpp"
 
-#include <SPIFFS.h>
-
 ///////////////////////////////////////////////////////////////////
 // Define [LOGGER]
 ///////////////////////////////////////////////////////////////////
-#pragma region LOGGER
 #ifndef DEBUG_ZLAC
 #define DEBUG_ZLAC (0)
 #endif
 #ifndef DEBUG_TRACE
 #define DEBUG_TRACE (0)
 #endif
-
-#pragma endregion
 
 ///////////////////////////////////////////////////////////////////
 // constructor
@@ -67,184 +62,12 @@ bool ZLAC706Serial::loop()
     log_v("%s", __func__);
     return result;
 }
-bool ZLAC706Serial::setting_save()
-{
-    bool result = false;
-    char buffer[255];
-    if (true == SPIFFS.begin(false)) {
-        sprintf(buffer,
-                "%s\n%s\n"                 //
-                "%d\n%d\n%d\n%d\n%d\n%d\n" // +6(8)
-                "%d\n%d\n%d\n%d\n%d\n%d\n" // +6(14)
-                "%d\n%d\n%d\n%d\n"         // +4(18)
-                "%d\n%d\n%d\n"             // +3(21)
-                ,                          //
-
-                info.left.interval ? "t" : "f",
-                info.right.interval ? "t" : "f",
-
-                info.left.speed_proportional_gain,  // s_skp
-                info.right.speed_proportional_gain, // s_skp
-                info.left.speed_integral_gain,      // s_ski
-                info.right.speed_integral_gain,     // s_ski
-                info.left.speed_differential_gain,  // s_skd
-                info.right.speed_differential_gain, // s_skd
-
-                info.left.position_proportional_gain,  // s_pkp
-                info.right.position_proportional_gain, // s_pkp
-                info.left.position_differential_gain,  // s_pkd
-                info.right.position_differential_gain, // s_pkd
-                info.left.position_feed_forward_gain,  // s_pkf
-                info.right.position_feed_forward_gain, // s_pkf
-
-                info.left.current_proportional_gain,  // s_ckp
-                info.right.current_proportional_gain, // s_ckp
-                info.left.current_integral_gain,      // s_cki
-                info.right.current_integral_gain,     // s_cki
-
-                info.acceleration_ms, //
-                info.deceleration_ms, //
-                info.SPEED_LIMIT      //
-
-        );
-        File dataFile = SPIFFS.open(SETTING_ZLAC_SETTING_FILE, FILE_WRITE);
-        if (!dataFile) {
-            result = false;
-        } else {
-            dataFile.println(buffer);
-            dataFile.close();
-            result = true;
-        }
-        SPIFFS.end();
-    }
-
-    return result;
-}
-
-bool ZLAC706Serial::setting_load()
-{
-    bool result    = false;
-    int totalBytes = 0;
-    int line       = 0;
-    if (true == SPIFFS.begin(false)) {
-        if (true == SPIFFS.exists(SETTING_ZLAC_SETTING_FILE)) {
-            File dataFile = SPIFFS.open(SETTING_ZLAC_SETTING_FILE, FILE_READ);
-            if (!dataFile) {
-                result = false;
-            } else {
-                result     = true;
-                totalBytes = dataFile.size();
-                while (0 < dataFile.available()) {
-                    String word = dataFile.readStringUntil('\n');
-                    switch (line) {
-                        case 0:
-#if SETTING_LOAD_FILE_SETTING_INTERVAL
-                            if (true == word.equals("t")) {
-                                this->info.left.interval = true;
-                            } else {
-                                this->info.left.interval = false;
-                            }
-#endif
-                            break;
-                        case 1:
-#if SETTING_LOAD_FILE_SETTING_INTERVAL
-                            if (true == word.equals("t")) {
-                                this->info.right.interval = true;
-                            } else {
-                                this->info.right.interval = false;
-                            }
-#endif
-                            break;
-                        case 2:
-                            info.left.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
-                            break;
-                        case 3:
-                            info.right.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
-                            break;
-                        case 4:
-                            info.left.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
-                            break;
-                        case 5:
-                            info.right.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
-                            break;
-                        case 6:
-                            info.left.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
-                            break;
-                        case 7:
-                            info.right.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
-                            break;
-
-                        case 8:
-                            info.left.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
-                            break;
-                        case 9:
-                            info.right.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
-                            break;
-                        case 10:
-                            info.left.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
-                            break;
-                        case 11:
-                            info.right.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
-                            break;
-                        case 12:
-                            info.left.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
-                            break;
-                        case 13:
-                            info.right.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
-                            break;
-
-                        case 14:
-                            info.left.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
-                            break;
-                        case 15:
-                            info.right.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
-                            break;
-                        case 16:
-                            info.left.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
-                            break;
-                        case 17:
-                            info.right.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
-                            break;
-                        case 18:
-                            info.acceleration_ms = this->_to_int(word, SETTING_SPEED_ACCELERATION_MS);
-                            break;
-                        case 19:
-                            info.deceleration_ms = this->_to_int(word, SETTING_SPEED_DECELERATION_MS);
-                            break;
-                        case 20:
-                            info.SPEED_LIMIT = this->_to_int(word, SETTING_SYSTEM_SPEED_LIMIT_RPM);
-                            break;
-                        default:
-                            break;
-                    }
-                    line++;
-                    if (20 < line) {
-                        break;
-                    }
-                }
-                dataFile.close();
-            }
-        }
-        SPIFFS.end();
-    }
-
-    return result;
-}
-int ZLAC706Serial::_to_int(String data, int default_value)
-{
-    int value = default_value;
-    if (true != data.isEmpty()) {
-        value = std::stoi(data.c_str());
-    }
-    return value;
-}
-#pragma endregion
 
 ///////////////////////////////////////////////////////////////////
 // Setup
 ///////////////////////////////////////////////////////////////////
 #pragma region setup
-bool ZLAC706Serial::setup_serial_driver(HardwareSerial *serial_l, HardwareSerial *serial_r, unsigned long baud)
+bool ZLAC706Serial::setup(HardwareSerial *serial_l, HardwareSerial *serial_r, unsigned long baud)
 {
     bool result = false;
     try {
@@ -271,94 +94,6 @@ bool ZLAC706Serial::setup_serial_driver(HardwareSerial *serial_l, HardwareSerial
     } catch (...) {
     }
     return result;
-}
-#pragma endregion
-
-///////////////////////////////////////////////////////////////////
-// Check status
-///////////////////////////////////////////////////////////////////
-#pragma region check_status
-bool ZLAC706Serial::is_connection()
-{
-    static bool flag_previous = false;
-    bool result               = (!this->info.left.error.not_connection) && (!this->info.right.error.not_connection);
-
-    if (flag_previous != result) {
-        this->info.system.set(((true == result) ? LOG_CONNECTED : LOG_DISCONNECTED), 0, 0);
-    }
-    flag_previous = result;
-    return result;
-}
-
-bool ZLAC706Serial::is_error_flag()
-{
-    return this->_flag_error;
-}
-
-bool ZLAC706Serial::is_error()
-{
-    bool result_01                       = false;
-    bool result_02                       = false;
-    static bool flag_previous_01         = false;
-    static bool flag_previous_02         = false;
-    static unsigned int TIME_INTERVAL_MS = (1000) * 5;
-    static unsigned long next_time_ms    = 0;
-    if (next_time_ms <= millis()) {
-        next_time_ms = millis() + TIME_INTERVAL_MS;
-        this->cmd_get_alarm_status();
-    }
-#if SETTING_MOTOR_ENABLE_LEFT
-    // result_01 |= this->info.left.error.stop_state || this->info.left.error.startup_state;
-    result_01 |= this->info.left.error.over_current || this->info.left.error.over_voltage || this->info.left.error.under_voltage;
-    result_01 |= this->info.left.error.encoder_error || this->info.left.error.overheat || this->info.left.error.overload;
-    result_01 |= this->info.left.error.not_connection;
-#else
-    result_02 |= false;
-#endif
-#if SETTING_MOTOR_ENABLE_RIGHT
-    // result_02 |= this->info.right.error.stop_state || this->info.right.error.startup_state;
-    result_02 |= this->info.right.error.over_current || this->info.right.error.over_voltage || this->info.right.error.under_voltage;
-    result_02 |= this->info.right.error.encoder_error || this->info.right.error.overheat || this->info.right.error.overload;
-    result_02 |= this->info.right.error.not_connection;
-#else
-    result_02 |= false;
-#endif
-
-    if (flag_previous_01 != result_01) {
-        this->info.system.set(LOG_IS_ERROR,
-                              DRIVER_TARGET::DRIVER_TARGET_LEFT,
-                              ((true == result_01) ? 1 : 2),
-                              0,
-                              this->info.left.error.over_current,
-                              this->info.left.error.over_voltage,
-                              this->info.left.error.under_voltage,
-                              this->info.left.error.encoder_error,
-                              this->info.left.error.overheat,
-                              this->info.left.error.overload,
-                              this->info.left.error.not_connection);
-    }
-    if (flag_previous_02 != result_02) {
-        this->info.system.set(LOG_IS_ERROR,
-                              DRIVER_TARGET::DRIVER_TARGET_LEFT,
-                              ((true == result_02) ? 1 : 2),
-                              0,
-                              this->info.right.error.over_current,
-                              this->info.right.error.over_voltage,
-                              this->info.right.error.under_voltage,
-                              this->info.right.error.encoder_error,
-                              this->info.right.error.overheat,
-                              this->info.right.error.overload,
-                              this->info.right.error.not_connection);
-    }
-    flag_previous_01 = result_01;
-    flag_previous_02 = result_02;
-
-    this->_flag_error = result_01 || result_02;
-    return result_01 || result_02;
-}
-ZLAC706Serial::DRIVER_MODE ZLAC706Serial::get_mode()
-{
-    return this->info.mode;
 }
 #pragma endregion
 
@@ -1446,13 +1181,4 @@ bool ZLAC706Serial::_confirm(const char *name, DRIVER_TARGET target, char cmd, b
     return result;
 }
 
-float ZLAC706Serial::rpm_to_mps(int value)
-{
-    return ((float)value * SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI) / (60.0 * 1000.0);
-}
-
-float ZLAC706Serial::mps_to_rpm(int value)
-{
-    return ((float)value * 60.0 * 1000.0) / (SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI);
-}
 #pragma endregion

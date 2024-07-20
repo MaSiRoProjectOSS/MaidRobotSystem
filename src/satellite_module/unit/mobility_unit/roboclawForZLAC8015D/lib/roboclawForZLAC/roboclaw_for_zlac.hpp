@@ -10,8 +10,8 @@
  */
 #ifndef ROBOCLAW_FOR_ZLAC_HPP
 #define ROBOCLAW_FOR_ZLAC_HPP
-#include "ZLAC706Serial/zlac706_serial.hpp"
 #include "config_roboclaw_for_zlac.hpp"
+#include "driver/ZLACSerial/zlac706_serial.hpp"
 
 #ifndef DRIVE_ID
 #define DRIVE_ID 0x80

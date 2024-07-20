@@ -1,5 +1,5 @@
 /**
- * @file config_zlac706_serial.hpp
+ * @file config_zlac.hpp
  * @author Akari (masiro.to.akari@gmail.com)
  * @brief
  * @version 0.23.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023 / MaSiRo Project.
  *
  */
-#ifndef CONFIG_ZLAC706_SERIAL_HPP
-#define CONFIG_ZLAC706_SERIAL_HPP
+#ifndef CONFIG_ZLAC_HPP
+#define CONFIG_ZLAC_HPP
 
 ///////////////////////////////////////////////////////////
 // WHEEL setting
