@@ -12,7 +12,7 @@
 // =============================
 // PUBLIC : Function
 // =============================
-bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type)
+bool ModbusLib::init(int address, MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX)
 {
     this->_type = type;
     if ((0 <= address) || (address <= this->SLAVE_ADDRESS_MAX)) {
@@ -54,8 +54,10 @@ MessageFrame::MODBUS_TYPE ModbusLib::get_type(void)
 bool ModbusLib::is_range_slave_address()
 {
     bool result = false;
-    if (this->SLAVE_ADDRESS_MIN <= this->_address && this->_address <= this->SLAVE_ADDRESS_MAX) {
-        result = true;
+    if (this->SLAVE_ADDRESS_MIN <= this->_address) {
+        if (this->_address <= this->SLAVE_ADDRESS_MAX) {
+            result = true;
+        }
     }
     return result;
 }

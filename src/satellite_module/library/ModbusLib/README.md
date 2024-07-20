@@ -2,7 +2,6 @@
 
 Modbusプロトコルで使うメッセージフレームを作成するライブラリです。
 
-
 ## Project Status
 
 <div style="display: flex">
@@ -20,7 +19,6 @@ Serial通信を行うためArduinoをメインターゲットにしています�
 | RTU(EX) mode | support     | Enlarge the message frame.The first line of the data frame contains the number of data. |
 | ASCII mode   | support     | --                                                                                      |
 | TCP mode     | NOT support | --                                                                                      |
-
 
 ## Installation
 

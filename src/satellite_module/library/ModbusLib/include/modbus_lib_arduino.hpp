@@ -48,7 +48,10 @@ public:
      * @param baud The baud rate for serial communication (default is 115200)
      * @return true if initialization was successful, false otherwise
      */
-    bool begin(int address, MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU, unsigned long baud = 115200)
+    bool begin( //
+            int address,
+            MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU,
+            unsigned long baud             = 115200)
     {
         this->_serial->setRxBufferSize(256 * 2);
         this->_serial->setTxBufferSize(256 * 2);

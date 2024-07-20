@@ -39,7 +39,7 @@ public:
      * @param type The type of Modbus protocol to use
      * @return True if the initialization was successful, false otherwise
      */
-    bool init(int address, MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX);
+    bool init(int address, MessageFrame::MODBUS_TYPE type);
 
     /**
      * @brief Get the address of the Modbus device

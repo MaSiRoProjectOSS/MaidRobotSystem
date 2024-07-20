@@ -65,7 +65,11 @@ void MessageFrame::_calc_lrc(bool first_generate)
 // =============================
 // PUBLIC : Function
 // =============================
-void MessageFrame::make_frame(unsigned int address, unsigned int function, unsigned int *data, int len)
+void MessageFrame::make_frame( //
+        unsigned int address,
+        unsigned int function,
+        unsigned int *data,
+        int len)
 {
     this->address     = address;
     this->function    = function;
