@@ -29,15 +29,7 @@ void read_serial1()
     static char line[255] = "";
     int cnt               = 0;
 
-#if 0
-    buffer[cnt++] = Serial1.read();
-    while (0 < Serial1.available()) {
-        buffer[cnt] = Serial1.read();
-        cnt++;
-    }
-#else
-    Serial1.readBytes(buffer, 255);
-#endif
+    cnt = Serial1.readBytes(buffer, 255);
 #if DEVICE_NAME == DEVICE_M5AtomLite
     m5_led(CRGB::Yellow);
     Serial.write(buffer);
@@ -152,7 +144,6 @@ void m5_loop()
     if (true == M5.BtnA.wasPressed()) {
         send_data();
     }
-    send_data();
 }
 #endif
 
