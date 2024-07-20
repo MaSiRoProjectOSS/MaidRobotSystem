@@ -21,6 +21,7 @@ void m5_led(CRGB color);
 #include <M5AtomS3.h>
 #endif
 #define SETTING_LOOP_TIME_SLEEP_DETECT 10
+#define BOARD_RATE                     115200
 
 void read_serial1()
 {
@@ -52,10 +53,10 @@ void read_serial1()
 }
 void serial_setup()
 {
-    Serial1.begin(38400);
+    Serial1.begin(BOARD_RATE);
     Serial1.onReceive(read_serial1);
     Serial1.setTimeout(10);
-    Serial.begin(38400);
+    Serial.begin(BOARD_RATE);
 }
 
 #if DEVICE_NAME == DEVICE_M5AtomLite
@@ -78,22 +79,26 @@ void m5_setup()
     serial_setup();
     m5_led(CRGB::White);
 }
-void m5_loop()
+void send_data()
 {
     static int count = 0;
+    Serial.printf("[S0] Btn is pressed[%03d]\n", count);
+    Serial1.printf("Lite[%03d]\n", count);
+    if (0 == count % 2) {
+        m5_led(CRGB::Green);
+    } else {
+        m5_led(CRGB::Blue);
+    }
+    count++;
+    if (1000 <= count) {
+        count = 0;
+    }
+}
+void m5_loop()
+{
     M5.update();
     if (true == M5.Btn.wasPressed()) {
-        Serial.printf("[S0] Btn is pressed[%03d]\n", count);
-        Serial1.printf("Lite [%03d]\n", count);
-        if (0 == count % 2) {
-            m5_led(CRGB::Green);
-        } else {
-            m5_led(CRGB::Blue);
-        }
-        count++;
-        if (1000 <= count) {
-            count = 0;
-        }
+        send_data();
     }
 }
 #elif DEVICE_NAME == DEVICE_M5AtomS3
@@ -102,10 +107,11 @@ void m5_setup()
 {
     m5::M5Unified::config_t cfg;
     cfg.clear_display = true;
+    cfg.serial_baudrate = BOARD_RATE;
     bool ledEnable = false;
-
     (void)AtomS3.begin(cfg, ledEnable);
 
+    //////////////////////////////////////////////////////
     // 液晶初期化
     M5.Lcd.init();
     M5.Lcd.setTextWrap(true);
@@ -121,28 +127,32 @@ void m5_setup()
     M5.Lcd.drawString("S3", 88, 2, &fonts::Font4);    // 上中央座標を基準に文字表示（表示内容, x, y）
     M5.Lcd.fillRect(16, 14, 7, 2, TFT_RED);           // ATOMの「A」の横線用
 
+    //////////////////////////////////////////////////////
     serial_setup();
 }
-void m5_loop()
+void send_data()
 {
     static char buffer[255] = "";
     static int count = 0;
+    Serial.printf("[S0] BtnA is pressed[%03d]\n", count);
+    sprintf(buffer, "S3[%03d]\n", count);
+    M5.Lcd.fillRect(0, 28, 128, 25, TFT_BLACK);
+    M5.Lcd.setTextColor(TFT_CYAN);
+    M5.Lcd.drawCentreString(buffer, 64, 28, &fonts::lgfxJapanGothicP_16);
+
+    Serial1.printf(buffer);
+    count++;
+    if (1000 <= count) {
+        count = 0;
+    }
+}
+void m5_loop()
+{
     M5.update();
     if (true == M5.BtnA.wasPressed()) {
-        Serial.printf("[S0] BtnA is pressed[%03d]\n", count);
-        USBSerial.printf("[S0] BtnA is pressed[%03d]\n", count);
-        sprintf(buffer, "S3[%03d]\n", count);
-        M5.Lcd.fillRect(0, 28, 128, 25, TFT_BLACK);
-        M5.Lcd.setTextColor(TFT_CYAN);
-        M5.Lcd.drawCentreString(buffer, 64, 28, &fonts::lgfxJapanGothicP_16);
-
-        Serial1.printf(buffer);
-        Serial.printf(buffer);
-        count++;
-        if (1000 <= count) {
-            count = 0;
-        }
+        send_data();
     }
+    send_data();
 }
 #endif
 
