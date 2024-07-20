@@ -22,6 +22,7 @@ void m5_led(CRGB color);
 #endif
 #define SETTING_LOOP_TIME_SLEEP_DETECT 10
 #define BOARD_RATE                     115200
+#define SETTING_LOOP_LAP               3000
 
 void read_serial1()
 {
@@ -88,10 +89,17 @@ void send_data()
 }
 void m5_loop()
 {
+    static int MAX = SETTING_LOOP_LAP / SETTING_LOOP_TIME_SLEEP_DETECT;
+    static int cnt = 0;
     M5.update();
     if (true == M5.Btn.wasPressed()) {
         send_data();
     }
+    if (cnt >= MAX) {
+        cnt = 0;
+        send_data();
+    }
+    cnt++;
 }
 #elif DEVICE_NAME == DEVICE_M5AtomS3
 
@@ -104,20 +112,20 @@ void m5_setup()
     (void)AtomS3.begin(cfg, ledEnable);
 
     //////////////////////////////////////////////////////
-    // 液晶初期化
+    // Initalized LCD
     M5.Lcd.init();
     M5.Lcd.setTextWrap(true);
     M5.Lcd.clear(TFT_BLACK);
     M5.Lcd.setTextColor(TFT_WHITE);
     M5.Lcd.setTextWrap(true);
 
-    // 初期画面
-    M5.Lcd.fillRect(0, 0, 128, 25, TFT_WHITE);        // タイトルエリア背景
-    M5.Lcd.setTextColor(M5.Lcd.color565(20, 20, 20)); // 文字色
-    M5.Lcd.drawString("ATOM", 12, 2, &fonts::Font4);  // 上中央座標を基準に文字表示（表示内容, x, y）
-    M5.Lcd.setTextColor(TFT_RED);                     // 文字色
-    M5.Lcd.drawString("S3", 88, 2, &fonts::Font4);    // 上中央座標を基準に文字表示（表示内容, x, y）
-    M5.Lcd.fillRect(16, 14, 7, 2, TFT_RED);           // ATOMの「A」の横線用
+    // Display title
+    M5.Lcd.fillRect(0, 0, 128, 25, TFT_WHITE);        // Title background
+    M5.Lcd.setTextColor(M5.Lcd.color565(20, 20, 20)); // char color
+    M5.Lcd.drawString("ATOM", 12, 2, &fonts::Font4);  // Character display based on top center coordinates (display content, x, y)
+    M5.Lcd.setTextColor(TFT_RED);                     // char color
+    M5.Lcd.drawString("S3", 88, 2, &fonts::Font4);    // Character display based on top center coordinates (display content, x, y)
+    M5.Lcd.fillRect(16, 14, 7, 2, TFT_RED);           // For the horizontal line of the "A" in ATOM
 
     //////////////////////////////////////////////////////
     serial_setup();
@@ -140,10 +148,17 @@ void send_data()
 }
 void m5_loop()
 {
+    static int MAX = SETTING_LOOP_LAP / SETTING_LOOP_TIME_SLEEP_DETECT;
+    static int cnt = 0;
     M5.update();
     if (true == M5.BtnA.wasPressed()) {
         send_data();
     }
+    if (cnt >= MAX) {
+        cnt = 0;
+        send_data();
+    }
+    cnt++;
 }
 #endif
 
