@@ -39,10 +39,11 @@ public:
     {
     }
 
-    MessageFrame _reception(MessageFrame frame)
+    bool _reception(MessageFrame &frame)
     {
+        bool result = true;
         if (0x80 <= frame.function) {
-            frame = this->_call_exception(frame);
+            result = this->_call_exception(frame);
         } else {
             switch (frame.function) {
                 ///////////////////////////////////
@@ -51,7 +52,7 @@ public:
                 //   - Physical Discrete Inputs
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
-                    frame = this->_call_read_discrete_inputs(frame);
+                    result = this->_call_read_discrete_inputs(frame);
                     break;
                 ///////////////////////////////////
                 // Data Access
@@ -59,13 +60,13 @@ public:
                 //   - Internal Bits or Physical Coils
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
-                    frame = this->_call_read_coils(frame);
+                    result = this->_call_read_coils(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
-                    frame = this->_call_write_single_coil(frame);
+                    result = this->_call_write_single_coil(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
-                    frame = this->_call_write_multiple_coils(frame);
+                    result = this->_call_write_multiple_coils(frame);
                     break;
                 ///////////////////////////////////
                 // Data Access
@@ -73,7 +74,7 @@ public:
                 //   - Physical Discrete Inputs
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
-                    frame = this->_call_read_input_registers(frame);
+                    result = this->_call_read_input_registers(frame);
                     break;
                 ///////////////////////////////////
                 // Data Access
@@ -81,22 +82,22 @@ public:
                 //   - Internal Registers or Physical Output Registers
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
-                    frame = this->_call_read_holding_registers(frame);
+                    result = this->_call_read_holding_registers(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
-                    frame = this->_call_write_single_register(frame);
+                    result = this->_call_write_single_register(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
-                    frame = this->_call_write_multiple_registers(frame);
+                    result = this->_call_write_multiple_registers(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
-                    frame = this->_call_readwrite_multiple_registers(frame);
+                    result = this->_call_readwrite_multiple_registers(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
-                    frame = this->_call_mask_write_register(frame);
+                    result = this->_call_mask_write_register(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
-                    frame = this->_call_read_fifo_queue(frame);
+                    result = this->_call_read_fifo_queue(frame);
                     break;
                 ///////////////////////////////////
                 // Data Access
@@ -104,41 +105,44 @@ public:
                 //   - File Record Access
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
-                    frame = this->_call_read_file_record(frame);
+                    result = this->_call_read_file_record(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
-                    frame = this->_call_write_file_record(frame);
+                    result = this->_call_write_file_record(frame);
                     break;
                 ///////////////////////////////////
                 // Diagnostics
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
-                    frame = this->_call_read_exception_status(frame);
+                    result = this->_call_read_exception_status(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
-                    frame = this->_call_diagnostics(frame);
+                    result = this->_call_diagnostics(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
-                    frame = this->_call_get_comm_event_counter(frame);
+                    result = this->_call_get_comm_event_counter(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
-                    frame = this->_call_get_comm_event_log(frame);
+                    result = this->_call_get_comm_event_log(frame);
                     break;
                 case MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
-                    frame = this->_call_report_server_id(frame);
+                    result = this->_call_report_server_id(frame);
                     break;
                 ///////////////////////////////////
                 // Other
                 ///////////////////////////////////
                 case MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
-                    frame = this->_call_encapsulated_interface_transport(frame);
+                    result = this->_call_encapsulated_interface_transport(frame);
                     break;
                 default:
-                    frame = this->_call_unknown(frame);
                     break;
             }
         }
-        return frame;
+        if (false == result) {
+            this->_call_unknown(frame);
+            result = false;
+        }
+        return result;
     }
 
 public:
@@ -182,6 +186,11 @@ public:
             this->_serial->begin(baud);
         }
         return result;
+    }
+
+    bool send(unsigned int address, MODBUS_FUNCTION function, unsigned int *data, int len)
+    {
+        return this->send(address, (unsigned int)function, data, len);
     }
 
     /**
@@ -313,7 +322,7 @@ protected:
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
-                        this->_reception(frame);
+                        result = this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
                             frame.calc_footer(true);
                             this->_send_ascii(frame);
@@ -330,7 +339,7 @@ protected:
                 }
             } else if (0 == this->_address) {
                 frame.calc_footer();
-                this->_reception(frame);
+                result = this->_reception(frame);
             }
         }
         return result;
@@ -415,7 +424,7 @@ protected:
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
-                        this->_reception(frame);
+                        result = this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
                             frame.calc_footer(true);
                             this->_send_rtu(frame);
@@ -432,7 +441,7 @@ protected:
                 }
             } else if (0 == this->_address) {
                 frame.calc_footer();
-                this->_reception(frame);
+                result = this->_reception(frame);
             }
         }
         return result;

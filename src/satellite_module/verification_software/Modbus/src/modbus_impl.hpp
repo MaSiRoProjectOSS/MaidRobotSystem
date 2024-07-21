@@ -18,31 +18,31 @@ public:
     ~ModbusImpl(void);
 
 protected:
-    MessageFrame _reception(MessageFrame frame) override;
+    bool _reception(MessageFrame &frame) override;
 
-    MessageFrame _call_exception(MessageFrame frame);
-    MessageFrame _call_read_discrete_inputs(MessageFrame frame);
-    MessageFrame _call_read_coils(MessageFrame frame);
-    MessageFrame _call_write_single_coil(MessageFrame frame);
-    MessageFrame _call_write_multiple_coils(MessageFrame frame);
-    MessageFrame _call_read_input_registers(MessageFrame frame);
-    MessageFrame _call_read_holding_registers(MessageFrame frame);
-    MessageFrame _call_write_single_register(MessageFrame frame);
-    MessageFrame _call_write_multiple_registers(MessageFrame frame);
-    MessageFrame _call_readwrite_multiple_registers(MessageFrame frame);
-    MessageFrame _call_mask_write_register(MessageFrame frame);
-    MessageFrame _call_read_fifo_queue(MessageFrame frame);
+    bool _call_exception(MessageFrame &frame);
+    bool _call_read_discrete_inputs(MessageFrame &frame);
+    bool _call_read_coils(MessageFrame &frame);
+    bool _call_write_single_coil(MessageFrame &frame);
+    bool _call_write_multiple_coils(MessageFrame &frame);
+    bool _call_read_input_registers(MessageFrame &frame);
+    bool _call_read_holding_registers(MessageFrame &frame);
+    bool _call_write_single_register(MessageFrame &frame);
+    bool _call_write_multiple_registers(MessageFrame &frame);
+    bool _call_readwrite_multiple_registers(MessageFrame &frame);
+    bool _call_mask_write_register(MessageFrame &frame);
+    bool _call_read_fifo_queue(MessageFrame &frame);
 
-    MessageFrame _call_read_file_record(MessageFrame frame);
-    MessageFrame _call_write_file_record(MessageFrame frame);
-    MessageFrame _call_read_exception_status(MessageFrame frame);
-    MessageFrame _call_diagnostics(MessageFrame frame);
+    bool _call_read_file_record(MessageFrame &frame);
+    bool _call_write_file_record(MessageFrame &frame);
+    bool _call_read_exception_status(MessageFrame &frame);
+    bool _call_diagnostics(MessageFrame &frame);
 
-    MessageFrame _call_get_comm_event_counter(MessageFrame frame);
-    MessageFrame _call_get_comm_event_log(MessageFrame frame);
-    MessageFrame _call_report_server_id(MessageFrame frame);
-    MessageFrame _call_encapsulated_interface_transport(MessageFrame frame);
-    MessageFrame _call_unknown(MessageFrame frame);
+    bool _call_get_comm_event_counter(MessageFrame &frame);
+    bool _call_get_comm_event_log(MessageFrame &frame);
+    bool _call_report_server_id(MessageFrame &frame);
+    bool _call_encapsulated_interface_transport(MessageFrame &frame);
+    void _call_unknown(MessageFrame &frame);
 };
 
 #endif

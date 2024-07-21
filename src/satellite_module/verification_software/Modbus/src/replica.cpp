@@ -21,11 +21,11 @@ void setup()
     (void)M5.begin(true, false, true);
     (void)M5.dis.begin();
     (void)M5.dis.fillpix(CRGB::White);
-    log_d("========================================");
-    log_d("M5Atom initialized.");
-    log_d("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
+    log_i("========================================");
+    log_i("M5Atom initialized.");
+    log_i("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
     bool result = modbus.begin(MODBUS_ADDRESS, (MessageFrame::MODBUS_TYPE)CUSTOM_MODBUS_TYPE);
-    log_d("========================================");
+    log_i("========================================");
     (void)M5.dis.fillpix((false == result) ? CRGB::Red : CRGB::Green);
 }
 

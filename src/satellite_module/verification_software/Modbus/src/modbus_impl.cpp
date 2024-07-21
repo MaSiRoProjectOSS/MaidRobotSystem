@@ -21,7 +21,7 @@ static void print_message_frame(MessageFrame frame)
 {
     static char msg_buffer[512];
     sprintf(msg_buffer,
-            "Address[%d] Function[%d] DataLength[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+            "Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
             frame.address,
             frame.function,
             frame.data_length,
@@ -44,143 +44,144 @@ ModbusImpl::ModbusImpl(HardwareSerial *serial) : ModbusLibArduino(serial)
 ModbusImpl::~ModbusImpl(void)
 {
 }
-MessageFrame ModbusImpl::_call_exception(MessageFrame frame)
+bool ModbusImpl::_call_exception(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_w("  EXCEPTION[%d]", (int)frame.error_code);
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_discrete_inputs(MessageFrame frame)
+bool ModbusImpl::_call_read_discrete_inputs(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_discrete_inputs");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_coils(MessageFrame frame)
+bool ModbusImpl::_call_read_coils(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_coils");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_write_single_coil(MessageFrame frame)
+bool ModbusImpl::_call_write_single_coil(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("write_single_coil");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_write_multiple_coils(MessageFrame frame)
+bool ModbusImpl::_call_write_multiple_coils(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("write_multiple_coils");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_input_registers(MessageFrame frame)
+bool ModbusImpl::_call_read_input_registers(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_input_registers");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_holding_registers(MessageFrame frame)
+bool ModbusImpl::_call_read_holding_registers(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_holding_registers");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_write_single_register(MessageFrame frame)
+bool ModbusImpl::_call_write_single_register(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("write_single_register");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_write_multiple_registers(MessageFrame frame)
+bool ModbusImpl::_call_write_multiple_registers(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("write_multiple_registers");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_readwrite_multiple_registers(MessageFrame frame)
+bool ModbusImpl::_call_readwrite_multiple_registers(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read/write_multiple_registers");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_mask_write_register(MessageFrame frame)
+bool ModbusImpl::_call_mask_write_register(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("mask_write_register");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_fifo_queue(MessageFrame frame)
+bool ModbusImpl::_call_read_fifo_queue(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_fifo_queue");
 #endif
-    return frame;
+    return true;
 }
 
-MessageFrame ModbusImpl::_call_read_file_record(MessageFrame frame)
+bool ModbusImpl::_call_read_file_record(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_file_record");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_write_file_record(MessageFrame frame)
+bool ModbusImpl::_call_write_file_record(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("write_file_record");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_read_exception_status(MessageFrame frame)
+bool ModbusImpl::_call_read_exception_status(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("read_exception_status");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_diagnostics(MessageFrame frame)
+bool ModbusImpl::_call_diagnostics(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("diagnostics");
 #endif
-    return frame;
+    return true;
 }
 
-MessageFrame ModbusImpl::_call_get_comm_event_counter(MessageFrame frame)
+bool ModbusImpl::_call_get_comm_event_counter(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("get_comm_event_counter");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_get_comm_event_log(MessageFrame frame)
+bool ModbusImpl::_call_get_comm_event_log(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("get_comm_event_log");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_report_server_id(MessageFrame frame)
+bool ModbusImpl::_call_report_server_id(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("report_server_id");
 #endif
-    return frame;
+    return true;
 }
-MessageFrame ModbusImpl::_call_encapsulated_interface_transport(MessageFrame frame)
+bool ModbusImpl::_call_encapsulated_interface_transport(MessageFrame &frame)
 {
+    bool result = true;
 #if DEBUG_TRACE
     log_i("encapsulated_interface_transport");
 #endif
@@ -203,21 +204,21 @@ MessageFrame ModbusImpl::_call_encapsulated_interface_transport(MessageFrame fra
             frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
             break;
     }
-    return frame;
+    return result;
 }
-MessageFrame ModbusImpl::_call_unknown(MessageFrame frame)
+void ModbusImpl::_call_unknown(MessageFrame &frame)
 {
 #if DEBUG_TRACE
     log_i("unknown function");
 #endif
     frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
-    return frame;
 }
 
-MessageFrame ModbusImpl::_reception(MessageFrame frame)
+bool ModbusImpl::_reception(MessageFrame &frame)
 {
+    bool result = true;
     if (0x80 <= frame.function) {
-        frame = this->_call_exception(frame);
+        result = this->_call_exception(frame);
     } else {
         switch (frame.function) {
             ///////////////////////////////////
@@ -226,7 +227,7 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
             //   - Physical Discrete Inputs
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
-                frame = this->_call_read_discrete_inputs(frame);
+                result = this->_call_read_discrete_inputs(frame);
                 break;
             ///////////////////////////////////
             // Data Access
@@ -234,13 +235,13 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
             //   - Internal Bits or Physical Coils
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
-                frame = this->_call_read_coils(frame);
+                result = this->_call_read_coils(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
-                frame = this->_call_write_single_coil(frame);
+                result = this->_call_write_single_coil(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
-                frame = this->_call_write_multiple_coils(frame);
+                result = this->_call_write_multiple_coils(frame);
                 break;
             ///////////////////////////////////
             // Data Access
@@ -248,7 +249,7 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
             //   - Physical Discrete Inputs
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
-                frame = this->_call_read_input_registers(frame);
+                result = this->_call_read_input_registers(frame);
                 break;
             ///////////////////////////////////
             // Data Access
@@ -256,22 +257,22 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
             //   - Internal Registers or Physical Output Registers
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
-                frame = this->_call_read_holding_registers(frame);
+                result = this->_call_read_holding_registers(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
-                frame = this->_call_write_single_register(frame);
+                result = this->_call_write_single_register(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
-                frame = this->_call_write_multiple_registers(frame);
+                result = this->_call_write_multiple_registers(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
-                frame = this->_call_readwrite_multiple_registers(frame);
+                result = this->_call_readwrite_multiple_registers(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
-                frame = this->_call_mask_write_register(frame);
+                result = this->_call_mask_write_register(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
-                frame = this->_call_read_fifo_queue(frame);
+                result = this->_call_read_fifo_queue(frame);
                 break;
             ///////////////////////////////////
             // Data Access
@@ -279,44 +280,48 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
             //   - File Record Access
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
-                frame = this->_call_read_file_record(frame);
+                result = this->_call_read_file_record(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
-                frame = this->_call_write_file_record(frame);
+                result = this->_call_write_file_record(frame);
                 break;
             ///////////////////////////////////
             // Diagnostics
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
-                frame = this->_call_read_exception_status(frame);
+                result = this->_call_read_exception_status(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
-                frame = this->_call_diagnostics(frame);
+                result = this->_call_diagnostics(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
-                frame = this->_call_get_comm_event_counter(frame);
+                result = this->_call_get_comm_event_counter(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
-                frame = this->_call_get_comm_event_log(frame);
+                result = this->_call_get_comm_event_log(frame);
                 break;
             case MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
-                frame = this->_call_report_server_id(frame);
+                result = this->_call_report_server_id(frame);
                 break;
             ///////////////////////////////////
             // Other
             ///////////////////////////////////
             case MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
-                frame = this->_call_encapsulated_interface_transport(frame);
+                result = this->_call_encapsulated_interface_transport(frame);
                 break;
             default:
-                frame = this->_call_unknown(frame);
                 break;
         }
     }
-    if (true == this->is_range_slave_address()) {
-        print_message_frame(frame);
+    if (false == result) {
+        this->_call_unknown(frame);
+        result = false;
     }
-    print_watermark();
+    //if (true == this->is_range_slave_address())
+    {
+        print_message_frame(frame);
+        print_watermark();
+    }
 
-    return frame;
+    return result;
 }

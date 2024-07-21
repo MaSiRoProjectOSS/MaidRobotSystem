@@ -54,91 +54,91 @@ public:
     ~ModbusLib();
 
 protected:
-    virtual MessageFrame _call_exception(MessageFrame frame)
+    virtual bool _call_exception(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_read_discrete_inputs(MessageFrame frame)
+    virtual bool _call_read_discrete_inputs(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_read_coils(MessageFrame frame)
+    virtual bool _call_read_coils(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_write_single_coil(MessageFrame frame)
+    virtual bool _call_write_single_coil(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_write_multiple_coils(MessageFrame frame)
+    virtual bool _call_write_multiple_coils(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_read_input_registers(MessageFrame frame)
+    virtual bool _call_read_input_registers(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_read_holding_registers(MessageFrame frame)
+    virtual bool _call_read_holding_registers(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_write_single_register(MessageFrame frame)
+    virtual bool _call_write_single_register(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_write_multiple_registers(MessageFrame frame)
+    virtual bool _call_write_multiple_registers(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_readwrite_multiple_registers(MessageFrame frame)
+    virtual bool _call_readwrite_multiple_registers(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_mask_write_register(MessageFrame frame)
+    virtual bool _call_mask_write_register(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_read_fifo_queue(MessageFrame frame)
+    virtual bool _call_read_fifo_queue(MessageFrame &frame)
     {
-        return frame;
-    }
-
-    virtual MessageFrame _call_read_file_record(MessageFrame frame)
-    {
-        return frame;
-    }
-    virtual MessageFrame _call_write_file_record(MessageFrame frame)
-    {
-        return frame;
-    }
-    virtual MessageFrame _call_read_exception_status(MessageFrame frame)
-    {
-        return frame;
-    }
-    virtual MessageFrame _call_diagnostics(MessageFrame frame)
-    {
-        return frame;
+        return false;
     }
 
-    virtual MessageFrame _call_get_comm_event_counter(MessageFrame frame)
+    virtual bool _call_read_file_record(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_get_comm_event_log(MessageFrame frame)
+    virtual bool _call_write_file_record(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_report_server_id(MessageFrame frame)
+    virtual bool _call_read_exception_status(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_encapsulated_interface_transport(MessageFrame frame)
+    virtual bool _call_diagnostics(MessageFrame &frame)
     {
-        return frame;
+        return false;
     }
-    virtual MessageFrame _call_unknown(MessageFrame frame)
+
+    virtual bool _call_get_comm_event_counter(MessageFrame &frame)
     {
-        return frame;
+        return false;
+    }
+    virtual bool _call_get_comm_event_log(MessageFrame &frame)
+    {
+        return false;
+    }
+    virtual bool _call_report_server_id(MessageFrame &frame)
+    {
+        return false;
+    }
+    virtual bool _call_encapsulated_interface_transport(MessageFrame &frame)
+    {
+        return false;
+    }
+    virtual void _call_unknown(MessageFrame &frame)
+    {
+        frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
     }
 
     /**
@@ -149,7 +149,7 @@ protected:
      * @param frame The received MessageFrame
      * @return The processed MessageFrame
      */
-    virtual MessageFrame _reception(MessageFrame frame) = 0;
+    virtual bool _reception(MessageFrame &frame) = 0;
 
     /**
      * @brief Initialize the Modbus library
