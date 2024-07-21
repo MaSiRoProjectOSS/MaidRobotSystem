@@ -139,7 +139,7 @@ private:
      * @param seed The seed value for the checksum calculation
      * @return The calculated checksum
      */
-    unsigned int _ccitt(unsigned int *data, int len, int seed);
+    static unsigned int _ccitt(unsigned int *data, int len, int seed);
 
 private:
     MODBUS_TYPE _type; ///< The type of Modbus protocol to use

@@ -20,6 +20,30 @@
  */
 class ModbusLib {
 public:
+    enum MODBUS_FUNCTION
+    {
+        FUNCTION_READ_COILS                       = 0x01,
+        FUNCTION_READ_DISCRETE_INPUTS             = 0x02,
+        FUNCTION_READ_HOLDING_REGISTERS           = 0x03,
+        FUNCTION_READ_INPUT_REGISTERS             = 0x04,
+        FUNCTION_WRITE_SINGLE_COIL                = 0x05,
+        FUNCTION_WRITE_SINGLE_REGISTER            = 0x06,
+        FUNCTION_READ_EXCEPTION_STATUS            = 0x07,
+        FUNCTION_DIAGNOSTICS                      = 0x08,
+        FUNCTION_GET_COMM_EVENT_COUNTER           = 0x0b,
+        FUNCTION_GET_COMM_EVENT_LOG               = 0x0c,
+        FUNCTION_WRITE_MULTIPLE_COILS             = 0x0F,
+        FUNCTION_WRITE_MULTIPLE_REGISTERS         = 0x10,
+        FUNCTION_REPORT_SERVER_ID                 = 0x11,
+        FUNCTION_READ_FILE_RECORD                 = 0x14,
+        FUNCTION_WRITE_FILE_RECORD                = 0x15,
+        FUNCTION_MASK_WRITE_REGISTER              = 0x16,
+        FUNCTION_READWRITE_MULTIPLE_REGISTERS     = 0x17,
+        FUNCTION_READ_FIFO_QUEUE                  = 0x18,
+        FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT = 0x2b,
+    };
+
+public:
     /**
      * @brief Constructor for ModbusLib
      */
@@ -28,6 +52,113 @@ public:
      * @brief Destructor for ModbusLib
      */
     ~ModbusLib();
+
+protected:
+    virtual MessageFrame _call_exception(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_discrete_inputs(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_coils(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_write_single_coil(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_write_multiple_coils(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_input_registers(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_holding_registers(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_write_single_register(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_write_multiple_registers(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_readwrite_multiple_registers(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_mask_write_register(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_fifo_queue(MessageFrame frame)
+    {
+        return frame;
+    }
+
+    virtual MessageFrame _call_read_file_record(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_write_file_record(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_read_exception_status(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_diagnostics(MessageFrame frame)
+    {
+        return frame;
+    }
+
+    virtual MessageFrame _call_get_comm_event_counter(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_get_comm_event_log(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_report_server_id(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_encapsulated_interface_transport(MessageFrame frame)
+    {
+        return frame;
+    }
+    virtual MessageFrame _call_unknown(MessageFrame frame)
+    {
+        return frame;
+    }
+
+    /**
+     * @brief Receive a message frame
+     *
+     * This function is called when a MessageFrame is received. It should be overridden by subclasses to provide specific reception behavior.
+     *
+     * @param frame The received MessageFrame
+     * @return The processed MessageFrame
+     */
+    virtual MessageFrame _reception(MessageFrame frame) = 0;
+
+    /**
+     * @brief Initialize the Modbus library
+     *
+     * This function initializes the Modbus library. It should be overridden by subclasses to provide specific initialization behavior.
+     *
+     * @return True if the initialization was successful, false otherwise
+     */
+    virtual bool _init();
 
 public:
     /**
@@ -57,26 +188,6 @@ public:
      * @return The type of Modbus protocol to use
      */
     MessageFrame::MODBUS_TYPE get_type(void);
-
-protected:
-    /**
-     * @brief Receive a message frame
-     *
-     * This function is called when a MessageFrame is received. It should be overridden by subclasses to provide specific reception behavior.
-     *
-     * @param frame The received MessageFrame
-     * @return The processed MessageFrame
-     */
-    virtual MessageFrame _reception(MessageFrame frame) = 0;
-
-    /**
-     * @brief Initialize the Modbus library
-     *
-     * This function initializes the Modbus library. It should be overridden by subclasses to provide specific initialization behavior.
-     *
-     * @return True if the initialization was successful, false otherwise
-     */
-    virtual bool _init();
 
 protected:
     /**

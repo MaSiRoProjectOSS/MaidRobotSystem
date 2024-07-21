@@ -87,8 +87,6 @@ void MessageFrame::calc_footer(bool first_generate)
             break;
         case MODBUS_TYPE::MODBUS_TYPE_RTU:
         case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
-            this->_calc_crc(first_generate);
-            break;
         case MODBUS_TYPE::MODBUS_TYPE_TCP:
         default:
             this->_calc_crc(first_generate);

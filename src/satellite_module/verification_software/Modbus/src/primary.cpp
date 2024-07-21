@@ -84,8 +84,11 @@ void loop()
         if (count > 4) {
             count = 0;
         }
-        delay(500);
         (void)M5.dis.fillpix(CRGB::Blue);
+        char msg_buffer[512];
+        UBaseType_t stack_cushy = uxTaskGetStackHighWaterMark(NULL);
+        sprintf(msg_buffer, "STACK SIZE : %d", (int)stack_cushy);
+        log_i("%s", msg_buffer);
     }
 
     delay(SETTING_LOOP_TIME_SLEEP_DETECT);

@@ -8,7 +8,7 @@
  *
  */
 #if MODBUS_ADDRESS != 0x00
-#define SETTING_LOOP_TIME_SLEEP_DETECT 1000
+#define SETTING_LOOP_TIME_SLEEP_DETECT 10
 
 #include "modbus_impl.hpp"
 
@@ -31,6 +31,15 @@ void setup()
 
 void loop()
 {
+    (void)M5.update();
+    if (true == M5.Btn.wasPressed()) {
+        (void)M5.dis.fillpix(CRGB::Yellow);
+        char msg_buffer[512];
+        UBaseType_t stack_cushy = uxTaskGetStackHighWaterMark(NULL);
+        sprintf(msg_buffer, "STACK SIZE : %d", (int)stack_cushy);
+        log_i("%s", msg_buffer);
+    }
+
     delay(SETTING_LOOP_TIME_SLEEP_DETECT);
 }
 

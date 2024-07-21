@@ -39,6 +39,108 @@ public:
     {
     }
 
+    MessageFrame _reception(MessageFrame frame)
+    {
+        if (0x80 <= frame.function) {
+            frame = this->_call_exception(frame);
+        } else {
+            switch (frame.function) {
+                ///////////////////////////////////
+                // Data Access
+                // - Bit access
+                //   - Physical Discrete Inputs
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
+                    frame = this->_call_read_discrete_inputs(frame);
+                    break;
+                ///////////////////////////////////
+                // Data Access
+                // - Bit access
+                //   - Internal Bits or Physical Coils
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
+                    frame = this->_call_read_coils(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
+                    frame = this->_call_write_single_coil(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
+                    frame = this->_call_write_multiple_coils(frame);
+                    break;
+                ///////////////////////////////////
+                // Data Access
+                // - 16-bit access
+                //   - Physical Discrete Inputs
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
+                    frame = this->_call_read_input_registers(frame);
+                    break;
+                ///////////////////////////////////
+                // Data Access
+                // - 16-bit access
+                //   - Internal Registers or Physical Output Registers
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
+                    frame = this->_call_read_holding_registers(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
+                    frame = this->_call_write_single_register(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
+                    frame = this->_call_write_multiple_registers(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
+                    frame = this->_call_readwrite_multiple_registers(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
+                    frame = this->_call_mask_write_register(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
+                    frame = this->_call_read_fifo_queue(frame);
+                    break;
+                ///////////////////////////////////
+                // Data Access
+                // - 16-bit access
+                //   - File Record Access
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
+                    frame = this->_call_read_file_record(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
+                    frame = this->_call_write_file_record(frame);
+                    break;
+                ///////////////////////////////////
+                // Diagnostics
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
+                    frame = this->_call_read_exception_status(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
+                    frame = this->_call_diagnostics(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
+                    frame = this->_call_get_comm_event_counter(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
+                    frame = this->_call_get_comm_event_log(frame);
+                    break;
+                case MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
+                    frame = this->_call_report_server_id(frame);
+                    break;
+                ///////////////////////////////////
+                // Other
+                ///////////////////////////////////
+                case MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
+                    frame = this->_call_encapsulated_interface_transport(frame);
+                    break;
+                default:
+                    frame = this->_call_unknown(frame);
+                    break;
+            }
+        }
+        return frame;
+    }
+
 public:
     /**
      * @brief Initialize the Modbus library
@@ -53,8 +155,8 @@ public:
             MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU,
             unsigned long baud             = 115200)
     {
-        this->_serial->setRxBufferSize(256 * 2);
-        this->_serial->setTxBufferSize(256 * 2);
+        this->_serial->setRxBufferSize(BUFFERSIZE_RX);
+        this->_serial->setTxBufferSize(BUFFERSIZE_TX);
         this->_sleep_us = 1 + ((1000 * 1000) / (baud / 8));
 
         bool result = this->init(address, type);
@@ -208,7 +310,6 @@ protected:
             }
             result = true;
             if (true == this->is_range_slave_address()) {
-                log_v("received: slave");
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
@@ -223,14 +324,11 @@ protected:
                     } else {
                         frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_COMMUNICATION_ERROR);
                         this->_send_ascii(frame);
-                        log_w("receive error");
                     }
                 } else {
                     // do nothing
-                    log_d("not target address[my:%02X][req:%02X]", this->_address, frame.address);
                 }
             } else if (0 == this->_address) {
-                log_v("received: master");
                 frame.calc_footer();
                 this->_reception(frame);
             }
@@ -273,7 +371,6 @@ protected:
                             if (255 <= count_length) {
                                 timeout = 0;
                                 flag    = false;
-                                log_d("overflow");
                             } else {
                                 frame.data[count_length] = buf;
                                 count_length++;
@@ -296,7 +393,6 @@ protected:
                     }
                 } else {
                     if (0 >= timeout) {
-                        log_i("timeout");
                         last_char         = true;
                         frame.data_length = count_length - 2;
                     }
@@ -316,7 +412,6 @@ protected:
             }
             result = true;
             if (true == this->is_range_slave_address()) {
-                log_v("received: slave");
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
                     frame.calc_footer();
                     if (true == frame.valid) {
@@ -331,14 +426,11 @@ protected:
                     } else {
                         frame.happened_error(MessageFrame::CODE_COMMUNICATION_ERROR);
                         this->_send_rtu(frame);
-                        log_w("receive error");
                     }
                 } else {
                     // do nothing
-                    log_d("not target address[my:%02X][req:%02X]", this->_address, frame.address);
                 }
             } else if (0 == this->_address) {
-                log_v("received: master");
                 frame.calc_footer();
                 this->_reception(frame);
             }
@@ -382,10 +474,6 @@ protected:
      */
     void _send_rtu(MessageFrame frame)
     {
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_VERBOSE
-        char buffer[10] = { 0 };
-        String str      = "";
-#endif
         // address
         this->_serial->write(frame.address);
         // function
@@ -398,18 +486,10 @@ protected:
         // data
         for (int i = 0; i < frame.data_length; i++) {
             this->_serial->write(frame.data[i]);
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_VERBOSE
-            sprintf(buffer, "%02X", frame.data[i]);
-            str += buffer;
-#endif
         }
         // lrc
         this->_serial->write((unsigned int)((frame.footer >> 8) & 0xFFu));
         this->_serial->write((unsigned int)((frame.footer) & 0xFFu));
-
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_VERBOSE
-        log_v("%s:%02X%02X%02X%s%04X\r\n", frame.valid ? "T" : "F", frame.address, frame.function, frame.data_length, str.c_str(), frame.footer & 0xFFFF);
-#endif
     }
     /**
      * @brief Send a Modbus message in ASCII format
@@ -428,8 +508,6 @@ protected:
             sprintf(buffer, "%02X", frame.data[i]);
             str += buffer;
         }
-        this->_serial->printf(":%02X%02X%s%02X\r\n", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
-        log_v("%s:%02X%02X%s%02X", frame.valid ? "T" : "F", frame.address, frame.function, str.c_str(), frame.footer & 0xFF);
     }
 
 private:
@@ -447,6 +525,10 @@ private:
     uint32_t _sleep_us = 1;
 
     int _timeout_times = 500;
+
+private:
+    const int BUFFERSIZE_RX = (256 * 2);
+    const int BUFFERSIZE_TX = (256 * 2);
 };
 
 #endif
