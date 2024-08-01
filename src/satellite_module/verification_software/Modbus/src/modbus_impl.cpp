@@ -35,9 +35,18 @@ static void print_message_frame(MessageFrame frame)
             frame.data[6],
             frame.data[7]);
     log_i("%s", msg_buffer);
+#if MODBUS_ADDRESS != 0x00
+    static bool flag_led = false;
+    if (true == flag_led) {
+        (void)M5.dis.fillpix(CRGB::Blue);
+    } else {
+        (void)M5.dis.fillpix(CRGB::Green);
+    }
+    flag_led = !flag_led;
+#endif
 }
 
-ModbusImpl::ModbusImpl(HardwareSerial *serial) : ModbusLibArduino(serial)
+ModbusImpl::ModbusImpl()
 {
 }
 
@@ -201,7 +210,7 @@ bool ModbusImpl::_call_encapsulated_interface_transport(MessageFrame &frame)
 #if DEBUG_TRACE
             log_i("unknown function");
 #endif
-            frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
+            frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
             break;
     }
     return result;
@@ -211,7 +220,7 @@ void ModbusImpl::_call_unknown(MessageFrame &frame)
 #if DEBUG_TRACE
     log_i("unknown function");
 #endif
-    frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
+    frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
 }
 
 bool ModbusImpl::_reception(MessageFrame &frame)
@@ -226,7 +235,7 @@ bool ModbusImpl::_reception(MessageFrame &frame)
             // - Bit access
             //   - Physical Discrete Inputs
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
                 result = this->_call_read_discrete_inputs(frame);
                 break;
             ///////////////////////////////////
@@ -234,13 +243,13 @@ bool ModbusImpl::_reception(MessageFrame &frame)
             // - Bit access
             //   - Internal Bits or Physical Coils
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
                 result = this->_call_read_coils(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
                 result = this->_call_write_single_coil(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
                 result = this->_call_write_multiple_coils(frame);
                 break;
             ///////////////////////////////////
@@ -248,7 +257,7 @@ bool ModbusImpl::_reception(MessageFrame &frame)
             // - 16-bit access
             //   - Physical Discrete Inputs
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
                 result = this->_call_read_input_registers(frame);
                 break;
             ///////////////////////////////////
@@ -256,22 +265,22 @@ bool ModbusImpl::_reception(MessageFrame &frame)
             // - 16-bit access
             //   - Internal Registers or Physical Output Registers
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
                 result = this->_call_read_holding_registers(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
                 result = this->_call_write_single_register(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
                 result = this->_call_write_multiple_registers(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
                 result = this->_call_readwrite_multiple_registers(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
                 result = this->_call_mask_write_register(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
                 result = this->_call_read_fifo_queue(frame);
                 break;
             ///////////////////////////////////
@@ -279,34 +288,34 @@ bool ModbusImpl::_reception(MessageFrame &frame)
             // - 16-bit access
             //   - File Record Access
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
                 result = this->_call_read_file_record(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
                 result = this->_call_write_file_record(frame);
                 break;
             ///////////////////////////////////
             // Diagnostics
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
                 result = this->_call_read_exception_status(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
                 result = this->_call_diagnostics(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
                 result = this->_call_get_comm_event_counter(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
                 result = this->_call_get_comm_event_log(frame);
                 break;
-            case MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
                 result = this->_call_report_server_id(frame);
                 break;
             ///////////////////////////////////
             // Other
             ///////////////////////////////////
-            case MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
+            case MessageFrame::MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
                 result = this->_call_encapsulated_interface_transport(frame);
                 break;
             default:

@@ -9,7 +9,7 @@
  */
 #include "modbus_impl.hpp"
 
-ModbusImpl::ModbusImpl(HardwareSerial *serial) : ModbusLibArduino(serial)
+ModbusImpl::ModbusImpl() : ModbusLibArduino()
 {
 }
 
@@ -17,8 +17,9 @@ ModbusImpl::~ModbusImpl(void)
 {
 }
 
-MessageFrame ModbusImpl::_reception(MessageFrame frame)
+bool ModbusImpl::_reception(MessageFrame &frame)
 {
+    bool result = true;
     switch (frame.function) {
         ///////////////////////////////////
         // Data Access
@@ -117,13 +118,13 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
 
                 default:
                     log_i("  unknown function");
-                    frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
+                    frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
                     break;
             }
         default:
             log_i("  unknown function");
-            frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
+            frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
             break;
     }
-    return frame;
+    return result;
 }

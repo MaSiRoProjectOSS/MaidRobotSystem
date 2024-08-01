@@ -20,38 +20,18 @@
  */
 class ModbusLib {
 public:
-    enum MODBUS_FUNCTION
-    {
-        FUNCTION_READ_COILS                       = 0x01,
-        FUNCTION_READ_DISCRETE_INPUTS             = 0x02,
-        FUNCTION_READ_HOLDING_REGISTERS           = 0x03,
-        FUNCTION_READ_INPUT_REGISTERS             = 0x04,
-        FUNCTION_WRITE_SINGLE_COIL                = 0x05,
-        FUNCTION_WRITE_SINGLE_REGISTER            = 0x06,
-        FUNCTION_READ_EXCEPTION_STATUS            = 0x07,
-        FUNCTION_DIAGNOSTICS                      = 0x08,
-        FUNCTION_GET_COMM_EVENT_COUNTER           = 0x0b,
-        FUNCTION_GET_COMM_EVENT_LOG               = 0x0c,
-        FUNCTION_WRITE_MULTIPLE_COILS             = 0x0F,
-        FUNCTION_WRITE_MULTIPLE_REGISTERS         = 0x10,
-        FUNCTION_REPORT_SERVER_ID                 = 0x11,
-        FUNCTION_READ_FILE_RECORD                 = 0x14,
-        FUNCTION_WRITE_FILE_RECORD                = 0x15,
-        FUNCTION_MASK_WRITE_REGISTER              = 0x16,
-        FUNCTION_READWRITE_MULTIPLE_REGISTERS     = 0x17,
-        FUNCTION_READ_FIFO_QUEUE                  = 0x18,
-        FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT = 0x2b,
-    };
-
-public:
     /**
      * @brief Constructor for ModbusLib
      */
-    ModbusLib();
+    ModbusLib()
+    {
+    }
     /**
      * @brief Destructor for ModbusLib
      */
-    ~ModbusLib();
+    ~ModbusLib()
+    {
+    }
 
 protected:
     virtual bool _call_exception(MessageFrame &frame)
@@ -138,7 +118,7 @@ protected:
     }
     virtual void _call_unknown(MessageFrame &frame)
     {
-        frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
+        frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_ILLEGAL_FUNCTION);
     }
 
     /**
@@ -158,7 +138,10 @@ protected:
      *
      * @return True if the initialization was successful, false otherwise
      */
-    virtual bool _init();
+    virtual bool _init()
+    {
+        return true;
+    }
 
 public:
     /**
@@ -170,7 +153,29 @@ public:
      * @param type The type of Modbus protocol to use
      * @return True if the initialization was successful, false otherwise
      */
-    bool init(int address, MessageFrame::MODBUS_TYPE type);
+    bool init(int address, MessageFrame::MODBUS_TYPE type)
+    {
+        this->_type = type;
+        if ((0 <= address) || (address <= this->SLAVE_ADDRESS_MAX)) {
+            this->_address = address;
+        } else {
+            this->_type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE;
+        }
+
+        ///////////////////////////////////////////
+        // TODO : Not support TCP
+        if (this->_type == MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP) {
+            this->_type = MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE;
+        }
+        ///////////////////////////////////////////
+
+        if (this->_type == MessageFrame::MODBUS_TYPE::MODBUS_TYPE_NONE) {
+            this->_address = -1;
+            return false;
+        } else {
+            return _init();
+        }
+    }
 
     /**
      * @brief Get the address of the Modbus device
@@ -179,7 +184,10 @@ public:
      *
      * @return The address of the Modbus device
      */
-    int get_address(void);
+    int get_address(void)
+    {
+        return this->_address;
+    }
     /**
      * @brief Get the type of Modbus protocol to use
      *
@@ -187,7 +195,10 @@ public:
      *
      * @return The type of Modbus protocol to use
      */
-    MessageFrame::MODBUS_TYPE get_type(void);
+    MessageFrame::MODBUS_TYPE get_type(void)
+    {
+        return this->_type;
+    }
 
 protected:
     /**
@@ -198,7 +209,16 @@ protected:
      * @param address The address to check
      * @return True if the address is a broadcast address, false otherwise
      */
-    bool is_range_slave_address();
+    bool is_range_slave_address()
+    {
+        bool result = false;
+        if (this->SLAVE_ADDRESS_MIN <= this->_address) {
+            if (this->_address <= this->SLAVE_ADDRESS_MAX) {
+                result = true;
+            }
+        }
+        return result;
+    }
 
 protected:
     int _address;                    ///< The address of the Modbus device

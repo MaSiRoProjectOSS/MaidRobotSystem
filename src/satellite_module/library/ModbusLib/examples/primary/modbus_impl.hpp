@@ -14,11 +14,11 @@
 
 class ModbusImpl : public ModbusLibArduino {
 public:
-    ModbusImpl(HardwareSerial *serial);
+    ModbusImpl();
     ~ModbusImpl(void);
 
 protected:
-    MessageFrame _reception(MessageFrame frame) override;
+    bool _reception(MessageFrame &frame) override;
 };
 
 #endif

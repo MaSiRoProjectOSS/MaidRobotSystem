@@ -9,7 +9,7 @@
  */
 #include "modbus_impl.hpp"
 
-ModbusImpl::ModbusImpl(HardwareSerial *serial) : ModbusLibArduino(serial)
+ModbusImpl::ModbusImpl() : ModbusLibArduino()
 {
 }
 
@@ -17,8 +17,9 @@ ModbusImpl::~ModbusImpl(void)
 {
 }
 
-MessageFrame ModbusImpl::_reception(MessageFrame frame)
+bool ModbusImpl::_reception(MessageFrame &frame)
 {
+    bool result = true;
     if (0x80 <= frame.function) {
         log_w("  EXCEPTION[%d]", (int)frame.error_code);
     } else {
@@ -127,5 +128,5 @@ MessageFrame ModbusImpl::_reception(MessageFrame frame)
                 break;
         }
     }
-    return frame;
+    return result;
 }

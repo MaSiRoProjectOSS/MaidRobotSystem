@@ -12,9 +12,11 @@
 
 #include "modbus_lib_arduino.hpp"
 
+#include <M5Atom.h>
+
 class ModbusImpl : public ModbusLibArduino {
 public:
-    ModbusImpl(HardwareSerial *serial);
+    ModbusImpl();
     ~ModbusImpl(void);
 
 protected:

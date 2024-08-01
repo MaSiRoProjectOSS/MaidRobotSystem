@@ -27,16 +27,22 @@ public:
      *
      * @param serial Pointer to a HardwareSerial object
      */
-    ModbusLibArduino(HardwareSerial *serial, int timeout_times = 500) : ModbusLib()
+    ModbusLibArduino() : ModbusLib()
     {
-        this->_serial        = serial;
-        this->_timeout_times = timeout_times;
     }
     /**
      * @brief Destructor for ModbusLibArduino
      */
     ~ModbusLibArduino()
     {
+        if (nullptr != this->_serial) {
+            this->_serial->end();
+        }
+    }
+    void setup(HardwareSerial *serial, int timeout_times = 500)
+    {
+        this->_serial        = serial;
+        this->_timeout_times = timeout_times;
     }
 
     bool _reception(MessageFrame &frame)
@@ -51,7 +57,7 @@ public:
                 // - Bit access
                 //   - Physical Discrete Inputs
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
+                case MessageFrame::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
                     result = this->_call_read_discrete_inputs(frame);
                     break;
                 ///////////////////////////////////
@@ -59,13 +65,13 @@ public:
                 // - Bit access
                 //   - Internal Bits or Physical Coils
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_COILS: // read_coils
+                case MessageFrame::FUNCTION_READ_COILS: // read_coils
                     result = this->_call_read_coils(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
+                case MessageFrame::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
                     result = this->_call_write_single_coil(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
+                case MessageFrame::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
                     result = this->_call_write_multiple_coils(frame);
                     break;
                 ///////////////////////////////////
@@ -73,7 +79,7 @@ public:
                 // - 16-bit access
                 //   - Physical Discrete Inputs
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
+                case MessageFrame::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
                     result = this->_call_read_input_registers(frame);
                     break;
                 ///////////////////////////////////
@@ -81,22 +87,22 @@ public:
                 // - 16-bit access
                 //   - Internal Registers or Physical Output Registers
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
+                case MessageFrame::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
                     result = this->_call_read_holding_registers(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
+                case MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
                     result = this->_call_write_single_register(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
+                case MessageFrame::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
                     result = this->_call_write_multiple_registers(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
+                case MessageFrame::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
                     result = this->_call_readwrite_multiple_registers(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
+                case MessageFrame::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
                     result = this->_call_mask_write_register(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
+                case MessageFrame::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
                     result = this->_call_read_fifo_queue(frame);
                     break;
                 ///////////////////////////////////
@@ -104,34 +110,34 @@ public:
                 // - 16-bit access
                 //   - File Record Access
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_FILE_RECORD: // read_file_record
+                case MessageFrame::FUNCTION_READ_FILE_RECORD: // read_file_record
                     result = this->_call_read_file_record(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_WRITE_FILE_RECORD: // write_file_record
+                case MessageFrame::FUNCTION_WRITE_FILE_RECORD: // write_file_record
                     result = this->_call_write_file_record(frame);
                     break;
                 ///////////////////////////////////
                 // Diagnostics
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
+                case MessageFrame::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
                     result = this->_call_read_exception_status(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
+                case MessageFrame::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
                     result = this->_call_diagnostics(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
+                case MessageFrame::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
                     result = this->_call_get_comm_event_counter(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
+                case MessageFrame::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
                     result = this->_call_get_comm_event_log(frame);
                     break;
-                case MODBUS_FUNCTION::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
+                case MessageFrame::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
                     result = this->_call_report_server_id(frame);
                     break;
                 ///////////////////////////////////
                 // Other
                 ///////////////////////////////////
-                case MODBUS_FUNCTION::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
+                case MessageFrame::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
                     result = this->_call_encapsulated_interface_transport(frame);
                     break;
                 default:
@@ -155,10 +161,12 @@ public:
      * @return true if initialization was successful, false otherwise
      */
     bool begin( //
+            HardwareSerial *serial,
             int address,
             MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU,
             unsigned long baud             = 115200)
     {
+        this->_serial = serial;
         this->_serial->setRxBufferSize(BUFFERSIZE_RX);
         this->_serial->setTxBufferSize(BUFFERSIZE_TX);
         this->_sleep_us = 1 + ((1000 * 1000) / (baud / 8));
@@ -169,28 +177,31 @@ public:
                 this->_serial->onReceiveError([this](hardwareSerial_error_t error) { this->on_receive_error(error); });
                 switch (type) {
                     case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
-                        this->_serial->onReceive([this]() { this->on_receive_ascii(); });
+                        this->_serial->onReceive([this]() {
+                            MessageFrame frame;
+                            this->on_receive_ascii(frame);
+                        });
                         break;
                     case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU:
                     case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
-                        this->_serial->onReceive([this]() { this->on_receive_rtu(); });
+                        this->_serial->onReceive([this]() {
+                            MessageFrame frame;
+                            this->on_receive_rtu(frame);
+                        });
                         break;
                     case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP:
-                        this->_serial->onReceive([this]() { this->on_receive_tcp(); });
+                        this->_serial->onReceive([this]() {
+                            MessageFrame frame;
+                            this->on_receive_tcp(frame);
+                        });
                         break;
                     default:
                         break;
                 }
             }
-
             this->_serial->begin(baud);
         }
         return result;
-    }
-
-    bool send(unsigned int address, MODBUS_FUNCTION function, unsigned int *data, int len)
-    {
-        return this->send(address, (unsigned int)function, data, len);
     }
 
     /**
@@ -205,18 +216,18 @@ public:
      * @param len The number of elements in the data array
      * @return true if the message was sent successfully, false otherwise
      */
-    bool send(unsigned int address, unsigned int function, unsigned int *data, int len)
+    bool send(unsigned int address, MessageFrame::MODBUS_FUNCTION function, unsigned int *data, int len)
     {
         bool result = false;
         if (0 == this->_address) {
-            MessageFrame frame(this->_type);
-            frame.make_frame(address, function, data, len);
+            MessageFrame frame;
+            frame.make_frame(this->_type, address, function, data, len);
             switch (this->_type) {
                 case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
                     this->_send_ascii(frame);
                     if (this->BROADCAST_ADDRESS != frame.address) {
                         for (int i = 0; i < this->_timeout_times; i++) {
-                            result = this->on_receive_ascii();
+                            result = this->on_receive_ascii(frame);
                             if (true == result) {
                                 break;
                             }
@@ -234,7 +245,7 @@ public:
                     delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
                     if (this->BROADCAST_ADDRESS != frame.address) {
                         for (int i = 0; i < this->_timeout_times; i++) {
-                            result = this->on_receive_rtu();
+                            result = this->on_receive_rtu(frame);
                             if (true == result) {
                                 break;
                             }
@@ -253,16 +264,61 @@ public:
         }
         return result;
     }
+    MessageFrame send_frame(MessageFrame frame)
+    {
+        bool result = false;
+        if (0 == this->_address) {
+            switch (this->_type) {
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
+                    this->_send_ascii(frame);
+                    if (this->BROADCAST_ADDRESS != frame.address) {
+                        for (int i = 0; i < this->_timeout_times; i++) {
+                            result = this->on_receive_ascii(frame);
+                            if (true == result) {
+                                break;
+                            }
+                            delayMicroseconds(this->_sleep_us);
+                        }
+                    } else {
+                        // No response is returned in case of broadcast
+                        result = true;
+                    }
+                    break;
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU:
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
+                    delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
+                    this->_send_rtu(frame);
+                    delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
+                    if (this->BROADCAST_ADDRESS != frame.address) {
+                        for (int i = 0; i < this->_timeout_times; i++) {
+                            result = this->on_receive_rtu(frame);
+                            if (true == result) {
+                                break;
+                            }
+                            delayMicroseconds(this->_sleep_us);
+                        }
+                    } else {
+                        // No response is returned in case of broadcast
+                        result = true;
+                    }
+                    break;
+                case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_TCP:
+                    break;
+                default:
+                    break;
+            }
+        }
+        return frame;
+    }
 
 protected:
     void on_receive_error(hardwareSerial_error_t error)
     {
     }
-    bool on_receive_ascii()
+    bool on_receive_ascii(MessageFrame &frame)
     {
         bool result = false;
         while (0 < this->_serial->available()) {
-            MessageFrame frame(this->_type);
             int step    = 0;
             int buf     = 0;
             int timeout = 4;
@@ -320,35 +376,34 @@ protected:
             result = true;
             if (true == this->is_range_slave_address()) {
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
-                    frame.calc_footer();
+                    frame.calc_footer(this->_type);
                     if (true == frame.valid) {
                         result = this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
-                            frame.calc_footer(true);
+                            frame.calc_footer(this->_type, true);
                             this->_send_ascii(frame);
                         } else {
                             // do nothing
                             //   No response is returned in case of broadcast
                         }
                     } else {
-                        frame.happened_error(MessageFrame::EXCEPTION_CODE::CODE_COMMUNICATION_ERROR);
+                        frame.happened_error(this->_type, MessageFrame::EXCEPTION_CODE::CODE_COMMUNICATION_ERROR);
                         this->_send_ascii(frame);
                     }
                 } else {
                     // do nothing
                 }
             } else if (0 == this->_address) {
-                frame.calc_footer();
+                frame.calc_footer(this->_type);
                 result = this->_reception(frame);
             }
         }
         return result;
     }
-    bool on_receive_rtu()
+    bool on_receive_rtu(MessageFrame &frame)
     {
         bool result = false;
         while (0 < this->_serial->available()) {
-            MessageFrame frame(this->_type);
             int step         = 0;
             int buf          = 0;
             int timeout      = 4;
@@ -422,31 +477,31 @@ protected:
             result = true;
             if (true == this->is_range_slave_address()) {
                 if ((this->BROADCAST_ADDRESS == frame.address) || (this->_address == frame.address)) {
-                    frame.calc_footer();
+                    frame.calc_footer(this->_type);
                     if (true == frame.valid) {
                         result = this->_reception(frame);
                         if (this->BROADCAST_ADDRESS != frame.address) {
-                            frame.calc_footer(true);
+                            frame.calc_footer(this->_type, true);
                             this->_send_rtu(frame);
                         } else {
                             // do nothing
                             //   No response is returned in case of broadcast
                         }
                     } else {
-                        frame.happened_error(MessageFrame::CODE_COMMUNICATION_ERROR);
+                        frame.happened_error(this->_type, MessageFrame::CODE_COMMUNICATION_ERROR);
                         this->_send_rtu(frame);
                     }
                 } else {
                     // do nothing
                 }
             } else if (0 == this->_address) {
-                frame.calc_footer();
+                frame.calc_footer(this->_type);
                 result = this->_reception(frame);
             }
         }
         return result;
     }
-    bool on_receive_tcp()
+    bool on_receive_tcp(MessageFrame &frame)
     {
         bool result = false;
         return result;

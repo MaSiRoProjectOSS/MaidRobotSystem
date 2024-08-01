@@ -29,13 +29,13 @@ unsigned int MessageFrame::_ccitt(unsigned int *data, int len, int seed)
     }
     return (crc16 & 0xFFFF);
 }
-void MessageFrame::_calc_crc(bool first_generate)
+void MessageFrame::_calc_crc(MessageFrame::MODBUS_TYPE type, bool first_generate)
 {
     unsigned int crc    = 0xFFFF;
     unsigned int buf[3] = { this->address, this->function, (unsigned int)this->data_length };
     this->valid         = first_generate;
 
-    crc = this->_ccitt(buf, (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) ? 3 : 2, crc);
+    crc = this->_ccitt(buf, (MODBUS_TYPE::MODBUS_TYPE_RTU_EX == type) ? 3 : 2, crc);
     crc = this->_ccitt(this->data, this->data_length, crc);
 
     crc = ((crc & 0xFF) << 8) | ((crc >> 8) & 0xFF);
@@ -66,8 +66,9 @@ void MessageFrame::_calc_lrc(bool first_generate)
 // PUBLIC : Function
 // =============================
 void MessageFrame::make_frame( //
+        MessageFrame::MODBUS_TYPE type,
         unsigned int address,
-        unsigned int function,
+        MODBUS_FUNCTION function,
         unsigned int *data,
         int len)
 {
@@ -77,11 +78,12 @@ void MessageFrame::make_frame( //
     for (int i = 0; i < this->data_length; i++) {
         this->data[i] = data[i];
     }
-    this->calc_footer(true);
+    this->calc_footer(type, true);
 }
-void MessageFrame::calc_footer(bool first_generate)
+
+void MessageFrame::calc_footer(MessageFrame::MODBUS_TYPE type, bool first_generate)
 {
-    switch (this->_type) {
+    switch (type) {
         case MODBUS_TYPE::MODBUS_TYPE_ASCII:
             this->_calc_lrc(first_generate);
             break;
@@ -89,12 +91,12 @@ void MessageFrame::calc_footer(bool first_generate)
         case MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
         case MODBUS_TYPE::MODBUS_TYPE_TCP:
         default:
-            this->_calc_crc(first_generate);
+            this->_calc_crc(type, first_generate);
             break;
     }
 }
 
-void MessageFrame::happened_error(EXCEPTION_CODE error_code)
+void MessageFrame::happened_error(MessageFrame::MODBUS_TYPE type, EXCEPTION_CODE error_code)
 {
     this->error_code = error_code;
     if (0x80 > this->function) {
@@ -102,15 +104,14 @@ void MessageFrame::happened_error(EXCEPTION_CODE error_code)
     }
     this->data_length = 1;
     this->data[0]     = (unsigned int)this->error_code;
-    this->calc_footer(true);
+    this->calc_footer(type, true);
 }
 
 // =============================
 // Constructor
 // =============================
-MessageFrame::MessageFrame(MessageFrame::MODBUS_TYPE type)
+MessageFrame::MessageFrame()
 {
-    this->_type = type;
 }
 
 MessageFrame::~MessageFrame(void)

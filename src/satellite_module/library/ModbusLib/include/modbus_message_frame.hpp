@@ -18,6 +18,29 @@
  */
 class MessageFrame {
 public:
+    enum MODBUS_FUNCTION
+    {
+        FUNCTION_UNKNOWN                          = 0x00,
+        FUNCTION_READ_COILS                       = 0x01,
+        FUNCTION_READ_DISCRETE_INPUTS             = 0x02,
+        FUNCTION_READ_HOLDING_REGISTERS           = 0x03,
+        FUNCTION_READ_INPUT_REGISTERS             = 0x04,
+        FUNCTION_WRITE_SINGLE_COIL                = 0x05,
+        FUNCTION_WRITE_SINGLE_REGISTER            = 0x06,
+        FUNCTION_READ_EXCEPTION_STATUS            = 0x07,
+        FUNCTION_DIAGNOSTICS                      = 0x08,
+        FUNCTION_GET_COMM_EVENT_COUNTER           = 0x0b,
+        FUNCTION_GET_COMM_EVENT_LOG               = 0x0c,
+        FUNCTION_WRITE_MULTIPLE_COILS             = 0x0F,
+        FUNCTION_WRITE_MULTIPLE_REGISTERS         = 0x10,
+        FUNCTION_REPORT_SERVER_ID                 = 0x11,
+        FUNCTION_READ_FILE_RECORD                 = 0x14,
+        FUNCTION_WRITE_FILE_RECORD                = 0x15,
+        FUNCTION_MASK_WRITE_REGISTER              = 0x16,
+        FUNCTION_READWRITE_MULTIPLE_REGISTERS     = 0x17,
+        FUNCTION_READ_FIFO_QUEUE                  = 0x18,
+        FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT = 0x2b,
+    };
     /**
      * @enum MODBUS_TYPE
      * @brief Modbus protocol types
@@ -65,7 +88,7 @@ public:
      *
      * @param type The type of Modbus protocol to use
      */
-    MessageFrame(MODBUS_TYPE type);
+    MessageFrame();
     /**
      * @brief Destructor for MessageFrame
      */
@@ -73,10 +96,10 @@ public:
 
 public:
     //int start;
-    unsigned int address   = 0;     ///< The address of the Modbus device
-    unsigned int function  = 0;     ///< The function code of the message frame
-    unsigned int data[255] = { 0 }; ///< The data of the message frame
-    unsigned int footer    = 0;     ///< The CRC or LRC of the message frame
+    unsigned int address   = 0;                                               ///< The address of the Modbus device
+    unsigned int function  = (unsigned int)MODBUS_FUNCTION::FUNCTION_UNKNOWN; ///< The function code of the message frame
+    unsigned int data[255] = { 0 };                                           ///< The data of the message frame
+    unsigned int footer    = 0;                                               ///< The CRC or LRC of the message frame
     //int end;
     int data_length           = 0;                         ///< The length of the data
     bool valid                = false;                     ///< Flag indicating whether the message frame is valid
@@ -93,7 +116,8 @@ public:
      * @param len The length of the data
      * @return The created MessageFrame
      */
-    void make_frame(unsigned int address, unsigned int function, unsigned int *data, int len);
+    void make_frame(MessageFrame::MODBUS_TYPE type, unsigned int address, MODBUS_FUNCTION function, unsigned int *data, int len);
+
     /**
      * @brief Calculate the footer for a message frame
      *
@@ -101,7 +125,7 @@ public:
      *
      * @param first_generate Flag indicating whether this is the first footer generation for the frame
      */
-    void calc_footer(bool first_generate = false);
+    void calc_footer(MessageFrame::MODBUS_TYPE type, bool first_generate = false);
     /**
      * @brief Set the error code for a message frame
      *
@@ -109,7 +133,7 @@ public:
      *
      * @param error_code The error code to set
      */
-    void happened_error(EXCEPTION_CODE error_code);
+    void happened_error(MessageFrame::MODBUS_TYPE type, EXCEPTION_CODE error_code);
 
 private:
     /**
@@ -119,7 +143,7 @@ private:
      *
      * @param first_generate Flag indicating whether this is the first CRC generation for the frame
      */
-    void _calc_crc(bool first_generate = false);
+    void _calc_crc(MessageFrame::MODBUS_TYPE type, bool first_generate = false);
     /**
      * @brief Calculate the LRC for a message frame
      *
@@ -140,8 +164,5 @@ private:
      * @return The calculated checksum
      */
     static unsigned int _ccitt(unsigned int *data, int len, int seed);
-
-private:
-    MODBUS_TYPE _type; ///< The type of Modbus protocol to use
 };
 #endif
