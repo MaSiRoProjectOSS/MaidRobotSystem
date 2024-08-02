@@ -33,7 +33,7 @@ bool RoboClawForZlac::_check_crc(uint8_t id, uint8_t command, uint8_t *packet, i
         if ((crc & 0xFFFF) == (crc_receive)) {
             result = true;
         } else {
-            this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_CRC_ERROR, 0, 0);
+            this->_zlac->info.system.set(ZlacDriver::SYSTEM_LOG::LOG_CRC_ERROR, 0, 0);
         }
     } else {
         result = true;
@@ -172,14 +172,14 @@ void RoboClawForZlac::_receive()
 
             this->_zlac->cmd_torque_set(value_l_mA, value_r_mA);
             if (10 < abs(value_l_mA)) {
-                this->_zlac->cmd_motor_start(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+                this->_zlac->cmd_motor_start(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
             } else {
-                this->_zlac->cmd_motor_stop(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+                this->_zlac->cmd_motor_stop(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
             }
             if (10 < abs(value_r_mA)) {
-                this->_zlac->cmd_motor_start(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+                this->_zlac->cmd_motor_start(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
             } else {
-                this->_zlac->cmd_motor_stop(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+                this->_zlac->cmd_motor_stop(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
             }
         }
 #else
@@ -210,7 +210,7 @@ void RoboClawForZlac::_receive()
                 this->_zlac->cmd_speed_set_acc_and_dec(acceleration_ms, deceleration_ms);
                 break;
             case 'c':
-                this->_zlac->cmd_clear_fault(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
+                this->_zlac->cmd_clear_fault(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
                 break;
             case 'm':
                 this->_zlac->cmd_looking_for_z_signal();
@@ -632,27 +632,27 @@ bool RoboClawForZlac::reset()
         this->_zlac->cmd_position_set_relative();
         this->_zlac->cmd_position_mode();
 #if ROBOCLAW_SETTING_SET_GAIN
-        this->_zlac->cmd_setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.position_proportional_gain);
-        this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.position_differential_gain);
-        this->_zlac->cmd_setting_feed_forward_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.position_feed_forward_gain);
+        this->_zlac->cmd_setting_proportional_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.position_proportional_gain);
+        this->_zlac->cmd_setting_differential_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.position_differential_gain);
+        this->_zlac->cmd_setting_feed_forward_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.position_feed_forward_gain);
 
-        this->_zlac->cmd_setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.position_proportional_gain);
-        this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.position_differential_gain);
-        this->_zlac->cmd_setting_feed_forward_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.position_feed_forward_gain);
+        this->_zlac->cmd_setting_proportional_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.position_proportional_gain);
+        this->_zlac->cmd_setting_differential_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.position_differential_gain);
+        this->_zlac->cmd_setting_feed_forward_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.position_feed_forward_gain);
 #endif
 #elif ZLAC_MODE == ZLAC_MODE_TORQUE
         this->_zlac->cmd_torque_mode();
 #else
-        // this->_zlac->cmd_mode_selection(ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL);
+        // this->_zlac->cmd_mode_selection(DRIVER_MODE::SPEED_FROM_DIGITAL);
         this->_zlac->cmd_speed_mode();
 #if ROBOCLAW_SETTING_SET_GAIN
-        this->_zlac->cmd_setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.speed_proportional_gain);
-        this->_zlac->cmd_setting_integral_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.speed_integral_gain);
-        this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT, this->_zlac->info.left.speed_differential_gain);
+        this->_zlac->cmd_setting_proportional_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.speed_proportional_gain);
+        this->_zlac->cmd_setting_integral_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.speed_integral_gain);
+        this->_zlac->cmd_setting_differential_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT, this->_zlac->info.left.speed_differential_gain);
 
-        this->_zlac->cmd_setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.speed_proportional_gain);
-        this->_zlac->cmd_setting_integral_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.speed_integral_gain);
-        this->_zlac->cmd_setting_differential_gain(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT, this->_zlac->info.right.speed_differential_gain);
+        this->_zlac->cmd_setting_proportional_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.speed_proportional_gain);
+        this->_zlac->cmd_setting_integral_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.speed_integral_gain);
+        this->_zlac->cmd_setting_differential_gain(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT, this->_zlac->info.right.speed_differential_gain);
 #endif
 #endif
 
@@ -755,10 +755,10 @@ RoboClawForZlac::roboclaw_state RoboClawForZlac::get_state()
 }
 void RoboClawForZlac::set_log_update()
 {
-    this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_UPLOAD_DATA, 0, 0);
+    this->_zlac->info.system.set(ZlacDriver::SYSTEM_LOG::LOG_UPLOAD_DATA, 0, 0);
 }
 
-ZLAC706Serial::zlac_info RoboClawForZlac::get_zlac_info()
+ZlacDriver::zlac_info RoboClawForZlac::get_zlac_info()
 {
     return this->_zlac->info;
 }
@@ -766,7 +766,7 @@ void RoboClawForZlac::set_emergency(bool flag)
 {
     this->_zlac->info.flag.emergency  = flag;
     this->_zlac->info.flag.motor_free = false;
-    this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_EMERGENCY, 0, ((true == flag) ? 1 : 2));
+    this->_zlac->info.system.set(ZlacDriver::SYSTEM_LOG::LOG_EMERGENCY, 0, ((true == flag) ? 1 : 2));
     this->reset();
     this->_zlac->cmd_motor_start();
 }
@@ -774,42 +774,42 @@ void RoboClawForZlac::set_motor_free(bool flag)
 {
     if (false == this->_zlac->info.flag.emergency) {
         this->_zlac->info.flag.motor_free = flag;
-        this->_zlac->info.system.set(ZLAC706Serial::SYSTEM_LOG::LOG_MOTOR_FREE, 0, ((true == flag) ? 1 : 2));
+        this->_zlac->info.system.set(ZlacDriver::SYSTEM_LOG::LOG_MOTOR_FREE, 0, ((true == flag) ? 1 : 2));
         this->reset();
         this->_zlac->cmd_motor_start();
         this->_set_speed(0, 0);
         this->_zlac->cmd_motor_stop();
     }
 }
-bool RoboClawForZlac::setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_proportional_gain(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_proportional_gain(target, value);
 }
-bool RoboClawForZlac::setting_integral_gain(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_integral_gain(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_integral_gain(target, value);
 }
-bool RoboClawForZlac::setting_differential_gain(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_differential_gain(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_differential_gain(target, value);
 }
-bool RoboClawForZlac::setting_feed_forward_gain(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_feed_forward_gain(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_feed_forward_gain(target, value);
 }
-bool RoboClawForZlac::setting_inverted(ZLAC706Serial::DRIVER_TARGET target, bool value)
+bool RoboClawForZlac::setting_inverted(ZLAC::TARGET_MOTOR target, bool value)
 {
     return this->_zlac->cmd_setting_inverted(target, value);
 }
-bool RoboClawForZlac::setting_acc(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_acc(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_acc(target, value);
 }
-bool RoboClawForZlac::setting_dcc(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_dcc(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_dcc(target, value);
 }
-bool RoboClawForZlac::setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value)
+bool RoboClawForZlac::setting_limit(ZLAC::TARGET_MOTOR target, int value)
 {
     return this->_zlac->cmd_setting_limit(target, value);
 }
@@ -857,7 +857,7 @@ bool RoboClawForZlac::_check_id(uint8_t id)
     }
 #endif
     if (false == result) {
-        this->_zlac->cmd_clear_fault(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
+        this->_zlac->cmd_clear_fault(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
         log_w("Not id[0x%02X]", id);
     }
     return result;
@@ -1039,8 +1039,8 @@ void RoboClawForZlac::_get_speed_m1m2(unsigned int crc, uint8_t command)
     log_v("GetSpeedM1M2");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
-    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
-    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    this->_zlac->cmd_get_motor_speed(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
+    this->_zlac->cmd_get_motor_speed(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
     int32_t rps_l    = (this->_zlac->info.left.speed_enc * 1000 * 60) / (4096 * 4);
     int32_t rps_r    = (this->_zlac->info.right.speed_enc * 1000 * 60) / (4096 * 4);
     buffer[length++] = (rps_l >> 24) & 0xFF;
@@ -1060,7 +1060,7 @@ void RoboClawForZlac::_get_speed_m1(unsigned int crc, uint8_t command)
     log_v("GetSpeedM1");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
-    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+    this->_zlac->cmd_get_motor_speed(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
 
     int32_t rps      = (this->_zlac->info.left.speed_enc * 1000 * 60) / (4096 * 4);
     int state        = (rps > 0) ? 0 : 1;
@@ -1080,7 +1080,7 @@ void RoboClawForZlac::_get_speed_m2(unsigned int crc, uint8_t command)
     log_v("GetSpeedM2");
     uint8_t buffer[255] = { 0 };
     int length          = 0;
-    this->_zlac->cmd_get_motor_speed(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    this->_zlac->cmd_get_motor_speed(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
     int32_t rps      = (this->_zlac->info.right.speed_enc * 1000 * 60) / (4096 * 4);
     int state        = (rps > 0) ? 0 : 1;
     buffer[length++] = (rps >> 24) & 0xFF;
@@ -1161,7 +1161,7 @@ void RoboClawForZlac::_read_enc_m1(unsigned int crc, uint8_t command)
     uint8_t buffer[255] = { 0 };
     int length          = 0;
     int state           = 0; // TODO
-    this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
+    this->_zlac->cmd_get_position_feedback(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
 
     long enc_count   = (this->_zlac->info.left.position_feedback - this->_enc_postion) * ROBOCLAW_FEED_BACK_TIMES;
     buffer[length++] = (enc_count >> 24) & 0xFF;
@@ -1191,7 +1191,7 @@ void RoboClawForZlac::_read_enc_m2(unsigned int crc, uint8_t command)
     int length           = 0;
     static long previous = 0;
     int state            = 0; // TODO
-    this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    this->_zlac->cmd_get_position_feedback(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
 
     long enc_count = (this->_zlac->info.right.position_feedback + this->_enc_difference);
     enc_count *= ROBOCLAW_FEED_BACK_TIMES;
@@ -1219,8 +1219,8 @@ void RoboClawForZlac::_read_enc_m2(unsigned int crc, uint8_t command)
 void RoboClawForZlac::_reset_encoders(unsigned int crc, uint8_t value[100], size_t value_size)
 {
     log_v("ResetEncoders");
-    this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
-    this->_zlac->cmd_get_position_feedback(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    this->_zlac->cmd_get_position_feedback(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
+    this->_zlac->cmd_get_position_feedback(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
 
     this->_enc_postion    = this->_zlac->info.left.position_feedback;
     this->_enc_difference = (this->_zlac->info.left.position_feedback - this->_zlac->info.right.position_feedback);
@@ -1236,7 +1236,7 @@ void RoboClawForZlac::_read_main_battery_voltage(unsigned int crc, uint8_t comma
     int length          = 0;
     int voltage         = 0;
 
-    this->_zlac->cmd_get_bus_voltage(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL);
+    this->_zlac->cmd_get_bus_voltage(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
 
     if (this->_zlac->info.left.voltage > this->_zlac->info.right.voltage) {
         voltage = this->_zlac->info.right.voltage;
@@ -1256,8 +1256,8 @@ void RoboClawForZlac::_read_logic_battery_voltage(unsigned int crc, uint8_t comm
     int length          = 0;
     int voltage         = 0;
 
-    this->_zlac->cmd_get_bus_voltage(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT);
-    this->_zlac->cmd_get_bus_voltage(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT);
+    this->_zlac->cmd_get_bus_voltage(ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT);
+    this->_zlac->cmd_get_bus_voltage(ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT);
 
     if (this->_zlac->info.left.voltage > this->_zlac->info.right.voltage) {
         voltage = this->_zlac->info.right.voltage;
@@ -1362,6 +1362,10 @@ void RoboClawForZlac::_read_error(unsigned int crc, uint8_t command)
 #pragma region constructor
 RoboClawForZlac::RoboClawForZlac()
 {
+#if ZLAC_DRIVER == ZLAC8015D_MODBUS
+    this->_zlac = new ZLAC8015DModbus();
+#elif ZLAC_DRIVER == ZLAC706_SERIAL
     this->_zlac = new ZLAC706Serial();
+#endif
 }
 #pragma endregion

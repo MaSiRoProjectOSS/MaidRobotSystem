@@ -11,7 +11,18 @@
 #ifndef ROBOCLAW_FOR_ZLAC_HPP
 #define ROBOCLAW_FOR_ZLAC_HPP
 #include "config_roboclaw_for_zlac.hpp"
-#include "driver/ZLACSerial/zlac706_serial.hpp"
+
+#define ZLAC8015D_MODBUS 0x01
+#define ZLAC706_SERIAL   0x02
+#ifndef ZLAC_DRIVER
+#define ZLAC_DRIVER ZLAC706_SERIAL
+#endif
+
+#if ZLAC_DRIVER == ZLAC8015D_MODBUS
+#include "driver_zlac/zlac8015d_modbus.hpp"
+#elif ZLAC_DRIVER == ZLAC706_SERIAL
+#include "driver_zlac/zlac706_serial.hpp"
+#endif
 
 #ifndef DRIVE_ID
 #define DRIVE_ID 0x80
@@ -43,19 +54,19 @@ public:
 
     bool reset();
     roboclaw_state get_state();
-    ZLAC706Serial::zlac_info get_zlac_info();
+    ZlacDriver::zlac_info get_zlac_info();
     void set_log_update();
     void set_emergency(bool emergency);
     void set_motor_free(bool emergency);
-    bool setting_proportional_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
-    bool setting_integral_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
-    bool setting_differential_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
-    bool setting_feed_forward_gain(ZLAC706Serial::DRIVER_TARGET target, int value);
-    bool setting_inverted(ZLAC706Serial::DRIVER_TARGET target, bool value);
-    bool setting_acc(ZLAC706Serial::DRIVER_TARGET target, int value);
-    bool setting_dcc(ZLAC706Serial::DRIVER_TARGET target, int value);
+    bool setting_proportional_gain(ZLAC::TARGET_MOTOR target, int value);
+    bool setting_integral_gain(ZLAC::TARGET_MOTOR target, int value);
+    bool setting_differential_gain(ZLAC::TARGET_MOTOR target, int value);
+    bool setting_feed_forward_gain(ZLAC::TARGET_MOTOR target, int value);
+    bool setting_inverted(ZLAC::TARGET_MOTOR target, bool value);
+    bool setting_acc(ZLAC::TARGET_MOTOR target, int value);
+    bool setting_dcc(ZLAC::TARGET_MOTOR target, int value);
     bool setting_save();
-    bool setting_limit(ZLAC706Serial::DRIVER_TARGET target, int value);
+    bool setting_limit(ZLAC::TARGET_MOTOR target, int value);
 
 public:
     bool is_error_flag();
@@ -68,7 +79,12 @@ private:
     const unsigned long TIMEOUT_INPUT_SERIAL_MS = 10;
     uint8_t _id                                 = DRIVE_ID;
     HardwareSerial *_input_serial;
+
+#if ZLAC_DRIVER == ZLAC8015D_MODBUS
+    ZLAC8015DModbus *_zlac;
+#elif ZLAC_DRIVER == ZLAC706_SERIAL
     ZLAC706Serial *_zlac;
+#endif
     bool _flag_initialized = false;
     bool _flag_setting     = false;
     void _receive();

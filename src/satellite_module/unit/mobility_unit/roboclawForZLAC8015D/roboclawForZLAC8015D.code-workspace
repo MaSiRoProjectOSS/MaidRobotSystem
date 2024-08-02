@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"name": "roboclawForZLAC",
+			"name": "roboclawForZLAC8015D",
 			"path": "."
 		}
 	],
@@ -39,19 +39,26 @@
 		],
 		"cSpell.words": [
 			"assy",
+			"asynchr",
 			"Consolas",
 			"CRGB",
 			"darkgrey",
+			"Deccel",
+			"deque",
 			"doxdocgen",
 			"doxygen",
+			"eeprom",
 			"endregion",
 			"ensp",
 			"fastled",
+			"feedforward",
 			"fillpix",
 			"forbeslindesay",
+			"libdeps",
 			"nosniff",
 			"onchange",
 			"onclick",
+			"onous",
 			"onunload",
 			"PROGMEM",
 			"roboclaw",
@@ -60,6 +67,17 @@
 			"zlac"
 		],
 		"forbeslindesay-taskrunner.source": "Workspace",
-		"forbeslindesay-taskrunner.prefix": "RoboClaw : "
+		"forbeslindesay-taskrunner.prefix": "RoboClaw : ",
+		"files.associations": {
+			"string_view": "cpp",
+			"regex": "cpp",
+			"*.tcc": "cpp",
+			"deque": "cpp",
+			"string": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"vector": "cpp",
+			"system_error": "cpp"
+		}
 	}
 }

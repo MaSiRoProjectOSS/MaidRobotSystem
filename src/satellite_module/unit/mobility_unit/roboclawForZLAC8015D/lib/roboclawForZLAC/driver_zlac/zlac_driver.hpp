@@ -1,5 +1,5 @@
 /**
- * @file ZlacDriver.hpp
+ * @file zlac_driver.hpp
  * @brief
  * @version 0.23.1
  * @date 2024-07-17
@@ -7,9 +7,18 @@
  * @copyright Copyright (c) MaSiRo Project. 2024-.
  *
  */
-
 #ifndef ZLAC_DRIVER_HPP
 #define ZLAC_DRIVER_HPP
+
+///////////////////////////////////////////////////////////////////
+// Define [LOGGER]
+///////////////////////////////////////////////////////////////////
+#ifndef DEBUG_ZLAC
+#define DEBUG_ZLAC (0)
+#endif
+#ifndef DEBUG_TRACE
+#define DEBUG_TRACE (0)
+#endif
 
 #include "config_zlac.hpp"
 
@@ -19,12 +28,6 @@
 
 class ZlacDriver {
 public:
-    typedef enum driver_target
-    {
-        DRIVER_TARGET_ALL,
-        DRIVER_TARGET_LEFT,
-        DRIVER_TARGET_RIGHT,
-    } DRIVER_TARGET;
     typedef enum system_log
     {
         LOG_BEGIN,         // 0
@@ -213,38 +216,46 @@ public:
     FourDimensionalChart speed_mps_request;
 
 public:
+    ZlacDriver()
+    {
+    }
+    ~ZlacDriver()
+    {
+    }
+
+public:
     virtual bool begin() = 0;
     virtual bool loop()  = 0;
 
 public:
-    virtual bool cmd_setting_proportional_gain(DRIVER_TARGET target, int value) = 0;
-    virtual bool cmd_setting_integral_gain(DRIVER_TARGET target, int value)     = 0;
-    virtual bool cmd_setting_differential_gain(DRIVER_TARGET target, int value) = 0;
-    virtual bool cmd_setting_feed_forward_gain(DRIVER_TARGET target, int value) = 0;
-    virtual bool cmd_setting_inverted(DRIVER_TARGET target, bool value)         = 0;
-    virtual bool cmd_setting_acc(DRIVER_TARGET target, int value)               = 0;
-    virtual bool cmd_setting_dcc(DRIVER_TARGET target, int value)               = 0;
-    virtual bool cmd_setting_limit(DRIVER_TARGET target, int value)             = 0;
+    virtual bool cmd_setting_proportional_gain(ZLAC::TARGET_MOTOR target, int value) = 0;
+    virtual bool cmd_setting_integral_gain(ZLAC::TARGET_MOTOR target, int value)     = 0;
+    virtual bool cmd_setting_differential_gain(ZLAC::TARGET_MOTOR target, int value) = 0;
+    virtual bool cmd_setting_feed_forward_gain(ZLAC::TARGET_MOTOR target, int value) = 0;
+    virtual bool cmd_setting_inverted(ZLAC::TARGET_MOTOR target, bool value)         = 0;
+    virtual bool cmd_setting_acc(ZLAC::TARGET_MOTOR target, int value)               = 0;
+    virtual bool cmd_setting_dcc(ZLAC::TARGET_MOTOR target, int value)               = 0;
+    virtual bool cmd_setting_limit(ZLAC::TARGET_MOTOR target, int value)             = 0;
 
 public:
-    virtual bool cmd_modify_the_rated_current(int value_mW, DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL) = 0;
+    virtual bool cmd_modify_the_rated_current(int value_mW, ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
 
-    virtual bool cmd_looking_for_z_signal(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL) = 0;
-    virtual bool cmd_clear_fault(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL)          = 0;
+    virtual bool cmd_looking_for_z_signal(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
+    virtual bool cmd_clear_fault(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)          = 0;
 
-    virtual void cmd_get_all_status(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL)   = 0;
-    virtual bool cmd_get_alarm_status(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL) = 0;
-    virtual bool cmd_get_bus_voltage(DRIVER_TARGET targe)                                      = 0;
-    virtual bool cmd_get_output_current(DRIVER_TARGET target)                                  = 0;
-    virtual bool cmd_get_motor_speed(DRIVER_TARGET target)                                     = 0;
-    virtual bool cmd_get_position_given(DRIVER_TARGET target)                                  = 0;
-    virtual bool cmd_get_position_feedback(DRIVER_TARGET target)                               = 0;
+    virtual void cmd_get_all_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)   = 0;
+    virtual bool cmd_get_alarm_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
+    virtual bool cmd_get_bus_voltage(ZLAC::TARGET_MOTOR target)                                         = 0;
+    virtual bool cmd_get_output_current(ZLAC::TARGET_MOTOR target)                                      = 0;
+    virtual bool cmd_get_motor_speed(ZLAC::TARGET_MOTOR target)                                         = 0;
+    virtual bool cmd_get_position_given(ZLAC::TARGET_MOTOR target)                                      = 0;
+    virtual bool cmd_get_position_feedback(ZLAC::TARGET_MOTOR target)                                   = 0;
 
     //////////////////////////////////////
     virtual bool cmd_mode_selection(DRIVER_MODE mode) = 0;
     //////////////////////////////////////
-    virtual bool cmd_motor_start(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL) = 0;
-    virtual bool cmd_motor_stop(DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL)  = 0;
+    virtual bool cmd_motor_start(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
+    virtual bool cmd_motor_stop(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)  = 0;
     //////////////////////////////////////
     virtual bool cmd_position_mode()                                            = 0;
     virtual bool cmd_position_mode_pulse()                                      = 0;
@@ -255,10 +266,10 @@ public:
     virtual bool cmd_torque_mode()                              = 0;
     virtual bool cmd_torque_set(int value_l_mA, int value_r_mA) = 0;
     //////////////////////////////////////
-    virtual bool cmd_speed_mode()                                                                                                             = 0;
-    virtual bool cmd_speed_set_acc_and_dec(int acceleration_ms, int deceleration_ms, DRIVER_TARGET target = DRIVER_TARGET::DRIVER_TARGET_ALL) = 0;
-    virtual bool cmd_speed_set(int milli_rpm_l, int milli_rpm_r)                                                                              = 0;
-    virtual bool cmd_speed_heart_beat()                                                                                                       = 0;
+    virtual bool cmd_speed_mode()                                                                                                                      = 0;
+    virtual bool cmd_speed_set_acc_and_dec(int acceleration_ms, int deceleration_ms, ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
+    virtual bool cmd_speed_set(int milli_rpm_l, int milli_rpm_r)                                                                                       = 0;
+    virtual bool cmd_speed_heart_beat()                                                                                                                = 0;
 
 public:
     float rpm_to_mps(int value)
@@ -271,6 +282,24 @@ public:
         return ((float)value * 60.0 * 1000.0) / (SETTING_SYSTEM_WHEEL_DIAMETER_MM_X_PI);
     }
     //////////////////////////////////////
+
+    bool _is_right(ZLAC::TARGET_MOTOR target)
+    {
+        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    bool _is_left(ZLAC::TARGET_MOTOR target)
+    {
+        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     bool is_error()
     {
         bool result_01                       = false;
@@ -302,7 +331,7 @@ public:
 
         if (flag_previous_01 != result_01) {
             this->info.system.set(LOG_IS_ERROR,
-                                  DRIVER_TARGET::DRIVER_TARGET_LEFT,
+                                  ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT,
                                   ((true == result_01) ? 1 : 2),
                                   0,
                                   this->info.left.error.over_current,
@@ -315,7 +344,7 @@ public:
         }
         if (flag_previous_02 != result_02) {
             this->info.system.set(LOG_IS_ERROR,
-                                  DRIVER_TARGET::DRIVER_TARGET_LEFT,
+                                  ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT,
                                   ((true == result_02) ? 1 : 2),
                                   0,
                                   this->info.right.error.over_current,
@@ -365,31 +394,31 @@ public:
                     "%d\n%d\n%d\n"             // +3(21)
                     ,                          //
 
-                    info.left.interval ? "t" : "f",
-                    info.right.interval ? "t" : "f",
+                    this->info.left.interval ? "t" : "f",
+                    this->info.right.interval ? "t" : "f",
 
-                    info.left.speed_proportional_gain,  // s_skp
-                    info.right.speed_proportional_gain, // s_skp
-                    info.left.speed_integral_gain,      // s_ski
-                    info.right.speed_integral_gain,     // s_ski
-                    info.left.speed_differential_gain,  // s_skd
-                    info.right.speed_differential_gain, // s_skd
+                    this->info.left.speed_proportional_gain,  // s_skp
+                    this->info.right.speed_proportional_gain, // s_skp
+                    this->info.left.speed_integral_gain,      // s_ski
+                    this->info.right.speed_integral_gain,     // s_ski
+                    this->info.left.speed_differential_gain,  // s_skd
+                    this->info.right.speed_differential_gain, // s_skd
 
-                    info.left.position_proportional_gain,  // s_pkp
-                    info.right.position_proportional_gain, // s_pkp
-                    info.left.position_differential_gain,  // s_pkd
-                    info.right.position_differential_gain, // s_pkd
-                    info.left.position_feed_forward_gain,  // s_pkf
-                    info.right.position_feed_forward_gain, // s_pkf
+                    this->info.left.position_proportional_gain,  // s_pkp
+                    this->info.right.position_proportional_gain, // s_pkp
+                    this->info.left.position_differential_gain,  // s_pkd
+                    this->info.right.position_differential_gain, // s_pkd
+                    this->info.left.position_feed_forward_gain,  // s_pkf
+                    this->info.right.position_feed_forward_gain, // s_pkf
 
-                    info.left.current_proportional_gain,  // s_ckp
-                    info.right.current_proportional_gain, // s_ckp
-                    info.left.current_integral_gain,      // s_cki
-                    info.right.current_integral_gain,     // s_cki
+                    this->info.left.current_proportional_gain,  // s_ckp
+                    this->info.right.current_proportional_gain, // s_ckp
+                    this->info.left.current_integral_gain,      // s_cki
+                    this->info.right.current_integral_gain,     // s_cki
 
-                    info.acceleration_ms, //
-                    info.deceleration_ms, //
-                    info.SPEED_LIMIT      //
+                    this->info.acceleration_ms, //
+                    this->info.deceleration_ms, //
+                    this->info.SPEED_LIMIT      //
 
             );
             File dataFile = SPIFFS.open(SETTING_ZLAC_SETTING_FILE, FILE_WRITE);
@@ -440,63 +469,63 @@ public:
 #endif
                                 break;
                             case 2:
-                                info.left.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
+                                this->info.left.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
                                 break;
                             case 3:
-                                info.right.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
+                                this->info.right.speed_proportional_gain = this->_to_int(word, SETTING_SPEED_PROPORTIONAL_GAIN);
                                 break;
                             case 4:
-                                info.left.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
+                                this->info.left.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
                                 break;
                             case 5:
-                                info.right.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
+                                this->info.right.speed_integral_gain = this->_to_int(word, SETTING_SPEED_INTEGRAL_GAIN);
                                 break;
                             case 6:
-                                info.left.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
+                                this->info.left.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
                                 break;
                             case 7:
-                                info.right.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
+                                this->info.right.speed_differential_gain = this->_to_int(word, SETTING_SPEED_DIFFERENTIAL_GAIN);
                                 break;
 
                             case 8:
-                                info.left.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
+                                this->info.left.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
                                 break;
                             case 9:
-                                info.right.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
+                                this->info.right.position_proportional_gain = this->_to_int(word, SETTING_POSITION_PROPORTIONAL_GAIN);
                                 break;
                             case 10:
-                                info.left.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
+                                this->info.left.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
                                 break;
                             case 11:
-                                info.right.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
+                                this->info.right.position_differential_gain = this->_to_int(word, SETTING_POSITION_DIFFERENTIAL_GAIN);
                                 break;
                             case 12:
-                                info.left.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
+                                this->info.left.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
                                 break;
                             case 13:
-                                info.right.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
+                                this->info.right.position_feed_forward_gain = this->_to_int(word, SETTING_POSITION_FEED_FORWARD_GAIN);
                                 break;
 
                             case 14:
-                                info.left.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
+                                this->info.left.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
                                 break;
                             case 15:
-                                info.right.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
+                                this->info.right.current_proportional_gain = this->_to_int(word, SETTING_CURRENT_PROPORTIONAL_GAIN);
                                 break;
                             case 16:
-                                info.left.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
+                                this->info.left.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
                                 break;
                             case 17:
-                                info.right.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
+                                this->info.right.current_integral_gain = this->_to_int(word, SETTING_CURRENT_INTEGRAL_GAIN);
                                 break;
                             case 18:
-                                info.acceleration_ms = this->_to_int(word, SETTING_SPEED_ACCELERATION_MS);
+                                this->info.acceleration_ms = this->_to_int(word, SETTING_SPEED_ACCELERATION_MS);
                                 break;
                             case 19:
-                                info.deceleration_ms = this->_to_int(word, SETTING_SPEED_DECELERATION_MS);
+                                this->info.deceleration_ms = this->_to_int(word, SETTING_SPEED_DECELERATION_MS);
                                 break;
                             case 20:
-                                info.SPEED_LIMIT = this->_to_int(word, SETTING_SYSTEM_SPEED_LIMIT_RPM);
+                                this->info.SPEED_LIMIT = this->_to_int(word, SETTING_SYSTEM_SPEED_LIMIT_RPM);
                                 break;
                             default:
                                 break;

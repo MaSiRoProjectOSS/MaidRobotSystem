@@ -9,10 +9,11 @@
  *
  */
 #ifndef PIO_UNIT_TESTING
-
 #include "web/web_viewer_custom.hpp"
 
 #include <Arduino.h>
+#include <M5Atom.h>
+
 ////////////////////////////////////
 #ifndef SETTING_LOOP_TIME_SLEEP_DETECT
 #define SETTING_LOOP_TIME_SLEEP_DETECT (10)
@@ -55,6 +56,14 @@ void setup_m5()
     bool enable_display = true;
     (void)M5.begin(enable_serial, enable_i2c, enable_display);
     (void)M5.dis.begin();
+    m5_led(CRGB::White);
+    delay(200);
+    m5_led(CRGB::Black);
+    delay(200);
+    m5_led(CRGB::White);
+    delay(200);
+    m5_led(CRGB::Black);
+    delay(200);
     m5_led(CRGB::White);
 }
 
@@ -150,5 +159,4 @@ void loop()
     request_loop();
     (void)delay(SETTING_LOOP_TIME_SLEEP_DETECT);
 }
-
 #endif

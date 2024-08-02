@@ -189,7 +189,7 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
 {
     bool result = false;
     char buffer[255];
-    ZLAC706Serial::zlac_info info = this->_claw.get_zlac_info();
+    ZlacDriver::zlac_info info = this->_claw.get_zlac_info();
 
     std::string data = "{";
     ////////////////////////////////
@@ -225,9 +225,9 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
     data.append(buffer);
 
     switch (info.mode) {
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_PULSE:
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_PULSE:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -239,8 +239,8 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
 
             );
             break;
-        case ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::SPEED_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::SPEED_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::SPEED_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -252,8 +252,8 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
 
             );
             break;
-        case ZLAC706Serial::DRIVER_MODE::TORQUE_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::TORQUE_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::TORQUE_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::TORQUE_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -314,9 +314,9 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
     data.append(buffer);
 
     switch (info.mode) {
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_PULSE:
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::POSITION_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_PULSE:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::POSITION_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -328,8 +328,8 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
 
             );
             break;
-        case ZLAC706Serial::DRIVER_MODE::SPEED_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::SPEED_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::SPEED_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::SPEED_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -341,8 +341,8 @@ void WebViewerCustom::handle_get_motor(AsyncWebServerRequest *request)
 
             );
             break;
-        case ZLAC706Serial::DRIVER_MODE::TORQUE_FROM_DIGITAL:
-        case ZLAC706Serial::DRIVER_MODE::TORQUE_FROM_ANALOG:
+        case ZlacDriver::DRIVER_MODE::TORQUE_FROM_DIGITAL:
+        case ZlacDriver::DRIVER_MODE::TORQUE_FROM_ANALOG:
             sprintf(buffer,
                     ",[%u,%u,%u,%u]" //
                     ,                //
@@ -520,17 +520,17 @@ void WebViewerCustom::handle_set_setting(AsyncWebServerRequest *request)
     int value;
     try {
         if (request->args() > 0) {
-            ZLAC706Serial::DRIVER_TARGET target = ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL;
+            ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL;
             if (true == request->hasArg("le")) {
                 value = this->to_int(request->arg("le"));
                 if (1 == value) {
-                    target = ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_LEFT;
+                    target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT;
                 }
             }
             if (true == request->hasArg("re")) {
                 value = this->to_int(request->arg("re"));
                 if (1 == value) {
-                    target = ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_RIGHT;
+                    target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT;
                 }
             }
 
@@ -556,15 +556,15 @@ void WebViewerCustom::handle_set_setting(AsyncWebServerRequest *request)
             }
             if (true == request->hasArg("acc")) {
                 value  = this->to_int(request->arg("acc"));
-                result = this->_claw.setting_acc(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL, value);
+                result = this->_claw.setting_acc(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL, value);
             }
             if (true == request->hasArg("dcc")) {
                 value  = this->to_int(request->arg("dcc"));
-                result = this->_claw.setting_dcc(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL, value);
+                result = this->_claw.setting_dcc(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL, value);
             }
             if (true == request->hasArg("limit")) {
                 value  = this->to_int(request->arg("limit"));
-                result = this->_claw.setting_limit(ZLAC706Serial::DRIVER_TARGET::DRIVER_TARGET_ALL, value);
+                result = this->_claw.setting_limit(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL, value);
             }
         }
     } catch (...) {
@@ -617,14 +617,12 @@ void WebViewerCustom::set_callback_led(LEDFunction callback)
     this->_callback_led = callback;
 }
 
-#ifndef PIO_UNIT_TESTING
 void WebViewerCustom::_led(CRGB color)
 {
     if (nullptr != this->_callback_led) {
         this->_callback_led(color);
     }
 }
-#endif
 void WebViewerCustom::_check_state()
 {
     switch (this->_claw.get_state()) {

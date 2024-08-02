@@ -13,9 +13,7 @@
 
 #include "roboclaw_for_zlac.hpp"
 
-#ifndef PIO_UNIT_TESTING
 #include <M5Atom.h>
-#endif
 #include <cushy_web_server.hpp>
 
 //////////////////////////////////////////////////////////
@@ -50,9 +48,7 @@ protected:
 
 private:
     void _check_state();
-#ifndef PIO_UNIT_TESTING
     void _led(CRGB color);
-#endif
     int _set_data(std::vector<FourDimensionalChart::FourDimensionalChartData> *list, int assy, int cnt, std::string *param);
     void _data_saved(std::vector<FourDimensionalChart::FourDimensionalChartData> *list);
     char *_make_row_text(FourDimensionalChart::FourDimensionalChartData csd, int assy, int cast_id = CAST_ID);
