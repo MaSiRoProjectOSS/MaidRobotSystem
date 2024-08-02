@@ -39,11 +39,6 @@ public:
             this->_serial->end();
         }
     }
-    void setup(HardwareSerial *serial, int timeout_times = 500)
-    {
-        this->_serial        = serial;
-        this->_timeout_times = timeout_times;
-    }
 
     bool _reception(MessageFrame &frame)
     {
@@ -164,9 +159,11 @@ public:
             HardwareSerial *serial,
             int address,
             MessageFrame::MODBUS_TYPE type = MessageFrame::MODBUS_TYPE_RTU,
-            unsigned long baud             = 115200)
+            unsigned long baud             = 115200,
+            int timeout_times              = 500)
     {
-        this->_serial = serial;
+        this->_serial        = serial;
+        this->_timeout_times = timeout_times;
         this->_serial->setRxBufferSize(BUFFERSIZE_RX);
         this->_serial->setTxBufferSize(BUFFERSIZE_TX);
         this->_sleep_us = 1 + ((1000 * 1000) / (baud / 8));
@@ -219,6 +216,12 @@ public:
     bool send(unsigned int address, MessageFrame::MODBUS_FUNCTION function, unsigned int *data, int len)
     {
         bool result = false;
+#if 1
+        MessageFrame frame;
+        frame.make_frame(this->_type, address, function, data, len);
+        frame  = send_frame(frame);
+        result = frame.is_error();
+#else
         if (0 == this->_address) {
             MessageFrame frame;
             frame.make_frame(this->_type, address, function, data, len);
@@ -262,6 +265,7 @@ public:
                     break;
             }
         }
+#endif
         return result;
     }
     MessageFrame send_frame(MessageFrame frame)

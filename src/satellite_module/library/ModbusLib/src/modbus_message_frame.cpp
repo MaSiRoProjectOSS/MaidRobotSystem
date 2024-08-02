@@ -107,6 +107,15 @@ void MessageFrame::happened_error(MessageFrame::MODBUS_TYPE type, EXCEPTION_CODE
     this->calc_footer(type, true);
 }
 
+bool MessageFrame::is_error()
+{
+    bool result = false;
+    if (0x80 > this->function) {
+        result = true;
+    }
+    return result;
+}
+
 // =============================
 // Constructor
 // =============================

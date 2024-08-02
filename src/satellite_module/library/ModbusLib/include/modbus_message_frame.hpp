@@ -135,6 +135,14 @@ public:
      */
     void happened_error(MessageFrame::MODBUS_TYPE type, EXCEPTION_CODE error_code);
 
+    /**
+     * @brief Check for error flags
+     *
+     * @return true : error
+     * @return false : NOT error
+     */
+    bool is_error();
+
 private:
     /**
      * @brief Calculate the CRC for a message frame
