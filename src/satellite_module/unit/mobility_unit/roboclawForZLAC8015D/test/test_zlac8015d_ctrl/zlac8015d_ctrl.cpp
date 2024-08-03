@@ -54,17 +54,17 @@ void setup_m5()
     m5_led(CRGB::Black);
     delay(200);
     m5_led(CRGB::White);
-}
-
-///////////////////////////////////////////////////////////////////
-void setUp(void)
-{
-    (void)setup_m5();
     log_i("========================================");
     log_i("M5Atom initialized.");
     log_i("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
     bool flag = ctrl.begin(&Serial1, MODBUS_ADDRESS, MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU);
     log_i("========================================");
+}
+
+///////////////////////////////////////////////////////////////////
+
+void setUp(void)
+{
 }
 
 void tearDown(void)
@@ -82,11 +82,9 @@ void Communication_offline_time(void)
 }
 void RS485_Node_ID(void)
 {
-    bool result = false;
-    Serial.println("RS485_Node_ID");
     int value = ctrl.get_rs485_node_id();
-    //TEST_ASSERT_EQUAL_INT(1, value);
-    TEST_ASSERT_TRUE(result);
+    log_i("* RS485 Node ID : %d", value);
+    TEST_ASSERT_EQUAL_INT(1, value);
 }
 void RS485_Baud_Rate(void)
 {
@@ -462,9 +460,9 @@ void Target_torque(void)
 }
 void Software_version(void)
 {
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    int value = ctrl.get_software_version();
+    log_i("* Software version : %d", value);
+    TEST_ASSERT_EQUAL_INT(23423, value);
 }
 void Bus_voltage(void)
 {
@@ -531,8 +529,8 @@ void Driver_temperature(void)
 
 void RUN_UNITY_TESTS()
 {
+    (void)setup_m5();
     UNITY_BEGIN();
-    RUN_TEST(RS485_Node_ID);
     //////////////////////////////////
     // Common constant
 #if COMMON_CONSTANT

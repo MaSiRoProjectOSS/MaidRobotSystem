@@ -75,6 +75,9 @@ void MessageFrame::make_frame( //
     this->address     = address;
     this->function    = function;
     this->data_length = len;
+    for (int i = this->data_length; i < 255; i++) {
+        this->data[i] = 0;
+    }
     for (int i = 0; i < this->data_length; i++) {
         this->data[i] = data[i];
     }
@@ -103,7 +106,10 @@ void MessageFrame::happened_error(MessageFrame::MODBUS_TYPE type, EXCEPTION_CODE
         this->function = this->function + 0x80;
     }
     this->data_length = 1;
-    this->data[0]     = (unsigned int)this->error_code;
+    for (int i = 0; i < 255; i++) {
+        this->data[i] = 0;
+    }
+    this->data[0] = (unsigned int)this->error_code;
     this->calc_footer(type, true);
 }
 

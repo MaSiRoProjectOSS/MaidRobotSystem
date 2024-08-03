@@ -40,112 +40,6 @@ public:
         }
     }
 
-    bool _reception(MessageFrame &frame)
-    {
-        bool result = true;
-        if (0x80 <= frame.function) {
-            result = this->_call_exception(frame);
-        } else {
-            switch (frame.function) {
-                ///////////////////////////////////
-                // Data Access
-                // - Bit access
-                //   - Physical Discrete Inputs
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_DISCRETE_INPUTS: // read_discrete_inputs
-                    result = this->_call_read_discrete_inputs(frame);
-                    break;
-                ///////////////////////////////////
-                // Data Access
-                // - Bit access
-                //   - Internal Bits or Physical Coils
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_COILS: // read_coils
-                    result = this->_call_read_coils(frame);
-                    break;
-                case MessageFrame::FUNCTION_WRITE_SINGLE_COIL: // write_single_coil
-                    result = this->_call_write_single_coil(frame);
-                    break;
-                case MessageFrame::FUNCTION_WRITE_MULTIPLE_COILS: // write_multiple_coils
-                    result = this->_call_write_multiple_coils(frame);
-                    break;
-                ///////////////////////////////////
-                // Data Access
-                // - 16-bit access
-                //   - Physical Discrete Inputs
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_INPUT_REGISTERS: // read_input_registers
-                    result = this->_call_read_input_registers(frame);
-                    break;
-                ///////////////////////////////////
-                // Data Access
-                // - 16-bit access
-                //   - Internal Registers or Physical Output Registers
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_HOLDING_REGISTERS: // read_holding_registers
-                    result = this->_call_read_holding_registers(frame);
-                    break;
-                case MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER: // write_single_register
-                    result = this->_call_write_single_register(frame);
-                    break;
-                case MessageFrame::FUNCTION_WRITE_MULTIPLE_REGISTERS: // write_multiple_registers
-                    result = this->_call_write_multiple_registers(frame);
-                    break;
-                case MessageFrame::FUNCTION_READWRITE_MULTIPLE_REGISTERS: // read/write_multiple_registers
-                    result = this->_call_readwrite_multiple_registers(frame);
-                    break;
-                case MessageFrame::FUNCTION_MASK_WRITE_REGISTER: // mask_write_register
-                    result = this->_call_mask_write_register(frame);
-                    break;
-                case MessageFrame::FUNCTION_READ_FIFO_QUEUE: // read_fifo_queue
-                    result = this->_call_read_fifo_queue(frame);
-                    break;
-                ///////////////////////////////////
-                // Data Access
-                // - 16-bit access
-                //   - File Record Access
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_FILE_RECORD: // read_file_record
-                    result = this->_call_read_file_record(frame);
-                    break;
-                case MessageFrame::FUNCTION_WRITE_FILE_RECORD: // write_file_record
-                    result = this->_call_write_file_record(frame);
-                    break;
-                ///////////////////////////////////
-                // Diagnostics
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_READ_EXCEPTION_STATUS: // read_exception_status (serial line only)
-                    result = this->_call_read_exception_status(frame);
-                    break;
-                case MessageFrame::FUNCTION_DIAGNOSTICS: // diagnostics (serial line only)
-                    result = this->_call_diagnostics(frame);
-                    break;
-                case MessageFrame::FUNCTION_GET_COMM_EVENT_COUNTER: // get_comm_event_counter (serial line only)
-                    result = this->_call_get_comm_event_counter(frame);
-                    break;
-                case MessageFrame::FUNCTION_GET_COMM_EVENT_LOG: // get_comm_event_log (serial line only)
-                    result = this->_call_get_comm_event_log(frame);
-                    break;
-                case MessageFrame::FUNCTION_REPORT_SERVER_ID: // report_server_id (serial line only)
-                    result = this->_call_report_server_id(frame);
-                    break;
-                ///////////////////////////////////
-                // Other
-                ///////////////////////////////////
-                case MessageFrame::FUNCTION_ENCAPSULATED_INTERFACE_TRANSPORT: // can_open_general reference request and response
-                    result = this->_call_encapsulated_interface_transport(frame);
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (false == result) {
-            this->_call_unknown(frame);
-            result = false;
-        }
-        return result;
-    }
-
 public:
     /**
      * @brief Initialize the Modbus library
@@ -164,9 +58,7 @@ public:
     {
         this->_serial        = serial;
         this->_timeout_times = timeout_times;
-        this->_serial->setRxBufferSize(BUFFERSIZE_RX);
-        this->_serial->setTxBufferSize(BUFFERSIZE_TX);
-        this->_sleep_us = 1 + ((1000 * 1000) / (baud / 8));
+        this->_sleep_us      = 1 + ((1000 * 1000) / (baud / 8));
 
         bool result = this->init(address, type);
         if (true == result) {
@@ -275,6 +167,7 @@ public:
             switch (this->_type) {
                 case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_ASCII:
                     this->_send_ascii(frame);
+                    frame.happened_error(this->_type, MessageFrame::CODE_COMMUNICATION_ERROR);
                     if (this->BROADCAST_ADDRESS != frame.address) {
                         for (int i = 0; i < this->_timeout_times; i++) {
                             result = this->on_receive_ascii(frame);
@@ -292,6 +185,7 @@ public:
                 case MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX:
                     delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
                     this->_send_rtu(frame);
+                    frame.happened_error(this->_type, MessageFrame::CODE_COMMUNICATION_ERROR);
                     delayMicroseconds((uint32_t)(this->_sleep_us * 3.6));
                     if (this->BROADCAST_ADDRESS != frame.address) {
                         for (int i = 0; i < this->_timeout_times; i++) {
@@ -398,7 +292,11 @@ protected:
                     // do nothing
                 }
             } else if (0 == this->_address) {
+                unsigned int _footer = frame.footer;
                 frame.calc_footer(this->_type);
+                if (_footer != frame.footer) {
+                    result = false;
+                }
                 result = this->_reception(frame);
             }
         }
@@ -427,12 +325,12 @@ protected:
                             break;
                         case 2:
                             count_length = 0;
-                            if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
-                                frame.data_length = buf;
-                            } else {
-                                frame.data[count_length] = buf;
-                                count_length++;
-                            }
+                            // if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
+                            // } else {
+                            // frame.data[count_length] = buf;
+                            //     count_length++;
+                            // }
+                            frame.data_length = buf;
                             step++;
                             break;
                         case 3:
@@ -442,6 +340,10 @@ protected:
                             } else {
                                 frame.data[count_length] = buf;
                                 count_length++;
+                            }
+                            if (count_length >= (frame.data_length + 2)) {
+                                timeout = 0;
+                                flag    = false;
                             }
                             break;
 
@@ -467,8 +369,10 @@ protected:
                 }
                 if (true == last_char) {
                     if (2 <= count_length) {
-                        frame.footer = (frame.data[count_length - 2] << 8) | (frame.data[count_length - 1]);
-                        timeout      = 4;
+                        frame.footer                 = (frame.data[count_length - 2] << 8) | (frame.data[count_length - 1]);
+                        frame.data[count_length - 2] = 0;
+                        frame.data[count_length - 1] = 0;
+                        timeout                      = 4;
                     } else {
                         timeout = 0;
                     }
@@ -499,7 +403,11 @@ protected:
                     // do nothing
                 }
             } else if (0 == this->_address) {
+                unsigned int _footer = frame.footer;
                 frame.calc_footer(this->_type);
+                if (_footer != frame.footer) {
+                    result = false;
+                }
                 result = this->_reception(frame);
             }
         }
@@ -593,10 +501,6 @@ private:
     uint32_t _sleep_us = 1;
 
     int _timeout_times = 500;
-
-private:
-    const int BUFFERSIZE_RX = (256 * 2);
-    const int BUFFERSIZE_TX = (256 * 2);
 };
 
 #endif

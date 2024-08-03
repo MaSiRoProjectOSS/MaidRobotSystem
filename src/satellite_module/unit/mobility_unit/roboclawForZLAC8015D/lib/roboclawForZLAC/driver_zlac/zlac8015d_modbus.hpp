@@ -29,6 +29,23 @@ public:
     ~ZLAC8015DCtrl()
     {
     }
+    bool _reception(MessageFrame &frame) override
+    {
+        log_i("Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              frame.address,
+              frame.function,
+              frame.data_length,
+              frame.footer,
+              frame.data[0],
+              frame.data[1],
+              frame.data[2],
+              frame.data[3],
+              frame.data[4],
+              frame.data[5],
+              frame.data[6],
+              frame.data[7]);
+        return true;
+    }
     void set_address(unsigned int address)
     {
         this->_address = address;
@@ -182,23 +199,21 @@ private:
                 MessageFrame::FUNCTION_READ_HOLDING_REGISTERS,
                 arr.data(),
                 arr.size());
-        static char msg_buffer[512];
-        sprintf(msg_buffer,
-                "Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
-                this->_frame.address,
-                this->_frame.function,
-                this->_frame.data_length,
-                this->_frame.footer,
-                this->_frame.data[0],
-                this->_frame.data[1],
-                this->_frame.data[2],
-                this->_frame.data[3],
-                this->_frame.data[4],
-                this->_frame.data[5],
-                this->_frame.data[6],
-                this->_frame.data[7]);
-        log_i("%s", msg_buffer);
-        return this->send_frame(this->_frame);
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              this->_frame.address,
+              this->_frame.function,
+              this->_frame.data_length,
+              this->_frame.footer,
+              this->_frame.data[0],
+              this->_frame.data[1],
+              this->_frame.data[2],
+              this->_frame.data[3],
+              this->_frame.data[4],
+              this->_frame.data[5],
+              this->_frame.data[6],
+              this->_frame.data[7]);
+        this->_frame = this->send_frame(this->_frame);
+        return this->_frame;
     }
 #if 0
     MessageFrame _modbus_send_0x03(unsigned int *data, int len)
@@ -240,7 +255,7 @@ public:
         if (0x80 <= _frame.function) {
             return -1;
         } else {
-            return (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            return (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
     }
     bool set_communication_offline_time(bool check, int value_ms)
@@ -277,7 +292,7 @@ public:
             return -1;
         } else {
             log_d("<<ok>>");
-            return (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            return (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
     }
     bool set_rs485_node_id(bool check, int id)
@@ -312,7 +327,7 @@ public:
         if (0x80 <= _frame.function) {
             return -1;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             switch (value) {
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
                     return 128000;
@@ -374,7 +389,7 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             x0                 = (value >> 0) & 0x01;
             x1                 = (value >> 1) & 0x01;
             return true;
@@ -386,7 +401,7 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             x0                 = (value >> 0) & 0x01;
             x1                 = (value >> 1) & 0x01;
             return true;
@@ -399,7 +414,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 1:
                     return ZLAC::target_motor::TARGET_MOTOR_LEFT;
@@ -443,7 +458,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 1:
                     return ZLAC::target_motor::TARGET_MOTOR_LEFT;
@@ -487,7 +502,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -506,7 +521,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -522,7 +537,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -541,8 +556,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *id                = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            unsigned int value = (int)(_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *id                = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int value = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             switch (value) {
                 case 0:
                     *baud = CAN_BAUD_RATE::CAN_BAUD_RATE_1000K;
@@ -586,7 +601,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC::DRIVER_MODE::NOT_INITIALIZED;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 1:
                     return ZLAC::DRIVER_MODE::POSITION_RELATIVE;
@@ -614,7 +629,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 0x05:
                     return ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP;
@@ -649,7 +664,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x00 == value) {
                 result = true;
             }
@@ -668,7 +683,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -681,7 +696,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 0x05:
                     return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
@@ -708,7 +723,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -727,7 +742,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -745,7 +760,7 @@ public:
         if (0x80 <= _frame.function) {
             return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int value = _frame.data[3];
+            int value = _frame.data[0];
             switch (value) {
                 case 0x05:
                     return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
@@ -772,7 +787,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -792,8 +807,8 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            unsigned int value0 = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            unsigned int value1 = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             if (9 == value0) {
                 *x0 = true;
             }
@@ -818,7 +833,7 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0 < (0x01 & value)) {
                 *y0 = true;
             }
@@ -852,10 +867,10 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            unsigned int value0 = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            unsigned int value1 = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
-            unsigned int value2 = (_frame.data[7] << 8) | (_frame.data[8] & 0xFF);
-            unsigned int value3 = (_frame.data[9] << 8) | (_frame.data[10] & 0xFF);
+            unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            unsigned int value2 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+            unsigned int value3 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
             if (0 == value0) {
                 *b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE;
             } else if (1 == value0) {
@@ -899,7 +914,7 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            unsigned int value0 = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (9 == value0) {
                 result = ((double)value0) / 10.0;
             }
@@ -918,7 +933,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -937,7 +952,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -956,7 +971,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == value) {
                 result = true;
             }
@@ -978,7 +993,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -994,7 +1009,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1010,7 +1025,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1026,7 +1041,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 0.1;
         }
         return result;
@@ -1043,7 +1058,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 0.1;
         }
         return result;
@@ -1060,7 +1075,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 100;
         }
         return result;
@@ -1077,7 +1092,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 10;
         }
         return result;
@@ -1094,7 +1109,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1110,7 +1125,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1126,7 +1141,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1142,7 +1157,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1158,7 +1173,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1174,7 +1189,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1190,7 +1205,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1206,7 +1221,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1222,7 +1237,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1238,7 +1253,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1268,7 +1283,7 @@ public:
             if (0x80 <= _frame.function) {
                 result = 0;
             } else {
-                result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+                result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             }
         }
         return result;
@@ -1286,7 +1301,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1302,7 +1317,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 10;
         }
         return result;
@@ -1318,10 +1333,10 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            *index1 = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *index2 = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
-            *index3 = (_frame.data[7] << 8) | (_frame.data[8] & 0xFF);
-            *index4 = (_frame.data[9] << 8) | (_frame.data[10] & 0xFF);
+            *index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+            *index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
         }
     }
     bool set_velocity_observer_coefficient_left(bool check)
@@ -1338,7 +1353,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1354,7 +1369,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1370,7 +1385,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1386,7 +1401,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 0.1;
         }
         return result;
@@ -1403,7 +1418,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 0.1;
         }
         return result;
@@ -1420,7 +1435,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 100;
         }
         return result;
@@ -1437,7 +1452,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 10;
         }
         return result;
@@ -1454,7 +1469,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1470,7 +1485,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1486,7 +1501,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1502,7 +1517,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1518,7 +1533,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1534,7 +1549,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1550,7 +1565,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1566,7 +1581,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1582,7 +1597,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1598,7 +1613,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1628,7 +1643,7 @@ public:
             if (0x80 <= _frame.function) {
                 result = 0;
             } else {
-                result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+                result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             }
         }
         return result;
@@ -1646,7 +1661,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
@@ -1662,7 +1677,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 10;
         }
         return result;
@@ -1678,10 +1693,10 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            *index1 = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *index2 = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
-            *index3 = (_frame.data[7] << 8) | (_frame.data[8] & 0xFF);
-            *index4 = (_frame.data[9] << 8) | (_frame.data[10] & 0xFF);
+            *index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+            *index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
         }
     }
     bool set_velocity_observer_coefficient_right(int index1, int index2, int index3, int index4, bool check)
@@ -1727,8 +1742,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1744,8 +1759,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1761,8 +1776,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1778,8 +1793,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1795,8 +1810,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 24) | (_frame.data[4] << 16) | (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
-            *right = (_frame.data[7] << 24) | (_frame.data[8] << 16) | (_frame.data[9] << 8) | (_frame.data[10] & 0xFF);
+            *left  = (_frame.data[0] << 24) | (_frame.data[1] << 16) | (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *right = (_frame.data[4] << 24) | (_frame.data[5] << 16) | (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
             return true;
         }
     }
@@ -1812,8 +1827,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1829,8 +1844,8 @@ public:
         if (0x80 <= _frame.function) {
             return false;
         } else {
-            *left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            *right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
     }
@@ -1845,9 +1860,11 @@ public:
         int result          = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A0u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            log_v("<<ERROR>>");
+            result = -1;
         } else {
-            result = (int)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            log_v("<<OK>>");
+            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1858,7 +1875,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0;
         } else {
-            result = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             result = result / 100;
         }
         return result;
@@ -1888,8 +1905,8 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            result_left  = _frame.data[3];
-            result_right = _frame.data[4];
+            result_left  = _frame.data[0];
+            result_right = _frame.data[1];
             // is_run
             if (0 < (result_left & 0x01)) {
                 *left_is_run = true;
@@ -1928,8 +1945,8 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            int result_left  = _frame.data[3];
-            int result_right = _frame.data[4];
+            int result_left  = _frame.data[0];
+            int result_right = _frame.data[1];
             if ((0 == result_left) || (7 == result_left)) {
                 *left_hall_err = true;
             }
@@ -1946,8 +1963,8 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            *left  = (int)_frame.data[3];
-            *right = (int)_frame.data[4];
+            *left  = (int)_frame.data[0];
+            *right = (int)_frame.data[1];
             if (0x80 <= *left) {
                 *left = (0x7F & *left) * -1;
             }
@@ -1964,8 +1981,8 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            left->check((int)(_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
-            left->check((int)(_frame.data[5] << 8) | (_frame.data[6] & 0xFF));
+            left->check((int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            left->check((int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
         return 0;
     }
@@ -1977,14 +1994,14 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *left = (_frame.data[3] << 24)   //
-                    | (_frame.data[4] << 16) //
-                    | (_frame.data[5] << 8)  //
-                    | (_frame.data[6] & 0xFF);
-            *right = (_frame.data[7] << 24)   //
-                     | (_frame.data[8] << 16) //
-                     | (_frame.data[9] << 8)  //
-                     | (_frame.data[10] & 0xFF);
+            *left = (_frame.data[0] << 24)   //
+                    | (_frame.data[1] << 16) //
+                    | (_frame.data[2] << 8)  //
+                    | (_frame.data[3] & 0xFF);
+            *right = (_frame.data[4] << 24)   //
+                     | (_frame.data[5] << 16) //
+                     | (_frame.data[6] << 8)  //
+                     | (_frame.data[7] & 0xFF);
         }
         return result;
     }
@@ -1996,8 +2013,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int result_left  = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
-            unsigned int result_right = (_frame.data[5] << 8) | (_frame.data[6] & 0xFF);
+            unsigned int result_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int result_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
 
             if (0xF0000 <= result_left) {
                 *left = (double)(0x7FFF & result_left) / -10.0;
@@ -2020,8 +2037,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *left  = (double)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
-            *right = (double)((_frame.data[5] << 8) | (_frame.data[6] & 0xFF));
+            *left  = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *right = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
             *left  = *left / 10.0;
             *right = *right / 10.0;
         }
@@ -2035,7 +2052,7 @@ public:
         if (0x80 <= _frame.function) {
             // do nothing
         } else {
-            result = (int)((_frame.data[3] << 8) | (_frame.data[4] & 0xFF));
+            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2046,7 +2063,7 @@ public:
         if (0x80 <= _frame.function) {
             result = 0.0;
         } else {
-            unsigned int value = (_frame.data[3] << 8) | (_frame.data[4] & 0xFF);
+            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0xF0000 <= value) {
                 result = (double)(0x7FFF & value) / -10.0;
             } else {
@@ -2072,26 +2089,6 @@ public:
         if (nullptr != this->_serial_driver_2) {
             this->_serial_driver_2->end();
         }
-    }
-    bool _reception(MessageFrame &frame) override
-    {
-        static char msg_buffer[512];
-        sprintf(msg_buffer,
-                "Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
-                frame.address,
-                frame.function,
-                frame.data_length,
-                frame.footer,
-                frame.data[0],
-                frame.data[1],
-                frame.data[2],
-                frame.data[3],
-                frame.data[4],
-                frame.data[5],
-                frame.data[6],
-                frame.data[7]);
-        log_i("%s", msg_buffer);
-        return true;
     }
 #if 0
     bool _call_exception(MessageFrame &frame) override
