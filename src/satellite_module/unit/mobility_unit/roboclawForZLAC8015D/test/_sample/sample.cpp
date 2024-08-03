@@ -25,7 +25,6 @@ void tearDown(void)
 
 void test_setup(void)
 {
-
     bool result = true;
 
     TEST_ASSERT_TRUE(result);
@@ -35,7 +34,7 @@ void test_loop(void)
 {
     int result = 1;
 
-    TEST_ASSERT_EQUAL(1,result);
+    TEST_ASSERT_EQUAL(1, result);
 }
 
 ///////////////////////////////////////////////////////////////////

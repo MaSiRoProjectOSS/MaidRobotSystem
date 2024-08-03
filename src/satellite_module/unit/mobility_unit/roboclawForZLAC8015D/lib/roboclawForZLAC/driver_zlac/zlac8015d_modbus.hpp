@@ -31,7 +31,7 @@ public:
     }
     bool _reception(MessageFrame &frame) override
     {
-        log_i("Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               frame.address,
               frame.function,
               frame.data_length,
@@ -1855,41 +1855,42 @@ public:
         return true;
     }
     ////////////////
-    int get_software_version()
+    // Read only parameter
+    ////////////////
+    bool get_software_version(int *version)
     {
-        int result          = 0;
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A0u, 1);
         if (0x80 <= _frame.function) {
-            log_v("<<ERROR>>");
-            result = -1;
+            *version = -1;
+            result   = false;
         } else {
-            log_v("<<OK>>");
-            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *version = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
-    double get_bus_voltage()
+    bool get_bus_voltage(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A1u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            *value = NAN;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 100;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 100.0;
         }
         return result;
     }
-    void get_status_word( //
-            bool *left_shaft_lock,
-            bool *left_emergency_stop,
-            bool *left_alarm,
-            bool *left_is_run,
-            bool *right_shaft_lock,
-            bool *right_emergency_stop,
-            bool *right_alarm,
-            bool *right_is_run)
+    bool get_status_word(bool *left_shaft_lock,
+                         bool *left_emergency_stop,
+                         bool *left_alarm,
+                         bool *left_is_run,
+                         bool *right_shaft_lock,
+                         bool *right_emergency_stop,
+                         bool *right_alarm,
+                         bool *right_is_run)
     {
+        bool result           = true;
         *left_shaft_lock      = false;
         *left_emergency_stop  = false;
         *left_alarm           = false;
@@ -1903,7 +1904,7 @@ public:
         int result_right    = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A2u, 1);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             result_left  = _frame.data[0];
             result_right = _frame.data[1];
@@ -1936,14 +1937,16 @@ public:
                 *right_alarm = true;
             }
         }
+        return result;
     }
-    void get_hall_input_state(bool *left_hall_err, bool *right_hall_err)
+    bool get_hall_input_state(bool *left_hall_err, bool *right_hall_err)
     {
+        bool result         = true;
         *left_hall_err      = false;
         *right_hall_err     = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A3u, 1);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             int result_left  = _frame.data[0];
             int result_right = _frame.data[1];
@@ -1954,14 +1957,18 @@ public:
                 *left_hall_err = true;
             }
         }
+        return result;
     }
-    void get_motor_temperature(int *left, int *right)
+    bool get_motor_temperature(int *left, int *right)
     {
+        bool result         = true;
         *left               = 0;
         *right              = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x20A3u, 1);
+        MessageFrame _frame = this->_modbus_send_0x03(0x20A4u, 1);
         if (0x80 <= _frame.function) {
-            // do nothing
+            *left  = -1;
+            *right = -1;
+            result = false;
         } else {
             *left  = (int)_frame.data[0];
             *right = (int)_frame.data[1];
@@ -1972,19 +1979,21 @@ public:
                 *right = (0x7F & *right) * -1;
             }
         }
+        return result;
     }
-    int get_error_code(zlac_error *left, zlac_error *right)
+    bool get_error_code(zlac_error *left, zlac_error *right)
     {
+        bool result = true;
         left->clear();
         right->clear();
         MessageFrame _frame = this->_modbus_send_0x03(0x20A5u, 2);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             left->check((int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             left->check((int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
-        return 0;
+        return result;
     }
 
     bool get_actual_motor_position(long *left, long *right)
@@ -1992,6 +2001,8 @@ public:
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20A7u, 4);
         if (0x80 <= _frame.function) {
+            *left  = -1;
+            *right = -1;
             result = false;
         } else {
             *left = (_frame.data[0] << 24)   //
@@ -2011,6 +2022,8 @@ public:
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20ABu, 2);
         if (0x80 <= _frame.function) {
+            *left  = NAN;
+            *right = NAN;
             result = false;
         } else {
             unsigned int result_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
@@ -2035,6 +2048,8 @@ public:
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20ADu, 2);
         if (0x80 <= _frame.function) {
+            *left  = NAN;
+            *right = NAN;
             result = false;
         } else {
             *left  = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
@@ -2045,29 +2060,38 @@ public:
         return result;
     }
 
-    int get_software_connected_status()
+    bool get_software_connected_status(bool *value)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x20A5u, 2);
+        bool result         = true;
+        *value              = false;
+        MessageFrame _frame = this->_modbus_send_0x03(0x20AFu, 1);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
-            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+#if 1
+            *value = true;
+#else
+            if (1 == buf) {
+                *value = true;
+            }
+#endif
         }
         return result;
     }
-    double get_driver_temperature()
+    bool get_driver_temperature(double *value)
     {
-        double result       = 0.0;
+        double result       = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x20B0u, 2);
         if (0x80 <= _frame.function) {
-            result = 0.0;
+            *value = NAN;
+            result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0xF0000 <= value) {
-                result = (double)(0x7FFF & value) / -10.0;
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0xF0000 <= buffer) {
+                *value = (double)(0x7FFF & buffer) / -10.0;
             } else {
-                result = (double)value / 10.0;
+                *value = (double)buffer / 10.0;
             }
         }
         return result;

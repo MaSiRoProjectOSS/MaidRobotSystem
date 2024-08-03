@@ -8,18 +8,28 @@
  * @copyright Copyright (c) 2023 / MaSiRo Project.
  *
  */
-#define COMMON_CONSTANT     0
-#define MOTOR_PARAMETER     0
-#define CONTROL_PARAMETER   0
-#define READ_ONLY_PARAMETER 0
-////
-//#include <HTTPClient.h>
-#include <M5Atom.h>
-//#include <Update.h>
-//#include <WiFi.h>
-////#include <Arduino.h>
-#include <unity.h>
 ///////////////////////////////////////////////////////////////////
+#ifndef COMMON_CONSTANT
+#define COMMON_CONSTANT 0
+#endif
+#ifndef MOTOR_PARAMETER
+#define MOTOR_PARAMETER 0
+#endif
+#ifndef CONTROL_PARAMETER
+#define CONTROL_PARAMETER 0
+#endif
+#ifndef READ_ONLY_PARAMETER
+#define READ_ONLY_PARAMETER 1
+#endif
+
+///////////////////////////////////////////////////////////////////
+#ifndef ZLAC_DRIVER_VERSION
+#define ZLAC_DRIVER_VERSION 23423
+#endif
+///////////////////////////////////////////////////////////////////
+#include <M5Atom.h>
+#include <unity.h>
+////
 #include "driver_zlac/config_zlac.hpp"
 #include "driver_zlac/zlac8015d_modbus.hpp"
 
@@ -54,11 +64,12 @@ void setup_m5()
     m5_led(CRGB::Black);
     delay(200);
     m5_led(CRGB::White);
-    log_i("========================================");
-    log_i("M5Atom initialized.");
-    log_i("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
+    log_d("========================================");
+    log_d("M5Atom initialized.");
+    log_d("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
     bool flag = ctrl.begin(&Serial1, MODBUS_ADDRESS, MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU);
-    log_i("========================================");
+    log_d("========================================");
+    TEST_ASSERT_TRUE(flag);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -83,7 +94,7 @@ void Communication_offline_time(void)
 void RS485_Node_ID(void)
 {
     int value = ctrl.get_rs485_node_id();
-    log_i("* RS485 Node ID : %d", value);
+    log_d("* RS485 Node ID : %d", value);
     TEST_ASSERT_EQUAL_INT(1, value);
 }
 void RS485_Baud_Rate(void)
@@ -458,71 +469,191 @@ void Target_torque(void)
 
     TEST_ASSERT_TRUE(result);
 }
+/////////////////////////////////////////////////
+// Read only parameter
+/////////////////////////////////////////////////
 void Software_version(void)
 {
-    int value = ctrl.get_software_version();
-    log_i("* Software version : %d", value);
-    TEST_ASSERT_EQUAL_INT(23423, value);
+    int value   = 0;
+    bool result = ctrl.get_software_version(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Software_version : %d", value);
+    TEST_ASSERT_EQUAL_INT(ZLAC_DRIVER_VERSION, value);
 }
 void Bus_voltage(void)
 {
-    bool result = true;
-
+    double value = NAN;
+    bool result  = ctrl.get_bus_voltage(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Bus_voltage : %8.3f", value);
+    if (NAN == value) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value");
+    }
 }
 void Status_word(void)
 {
-    bool result = true;
+    bool left_shaft_lock;
+    bool left_emergency_stop;
+    bool left_alarm;
+    bool left_is_run;
+    bool right_shaft_lock;
+    bool right_emergency_stop;
+    bool right_alarm;
+    bool right_is_run;
 
+    bool result = ctrl.get_status_word(&left_shaft_lock, //
+                                       &left_emergency_stop,
+                                       &left_alarm,
+                                       &left_is_run,
+                                       &right_shaft_lock,
+                                       &right_emergency_stop,
+                                       &right_alarm,
+                                       &right_is_run);
     TEST_ASSERT_TRUE(result);
+    log_d("* Status_word : "
+          "left_shaft_lock[%s]"
+          "left_emergency_stop[%s]"
+          "left_alarm[%s]"
+          "left_is_run[%s]"
+          "right_shaft_lock[%s]"
+          "right_emergency_stop[%s]"
+          "right_alarm[%s]"
+          "right_is_run[%s] ", //
+          left_shaft_lock ? "T" : "F",
+          left_emergency_stop ? "T" : "F",
+          left_alarm ? "T" : "F",
+          left_is_run ? "T" : "F",
+          right_shaft_lock ? "T" : "F",
+          right_emergency_stop ? "T" : "F",
+          right_alarm ? "T" : "F",
+          right_is_run ? "T" : "F");
 }
 void Hall_input_state(void)
 {
-    bool result = true;
-
+    bool left;
+    bool right;
+    bool result = ctrl.get_hall_input_state(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Hall_input_state : L[%s]R[%s]", left ? "T" : "F", right ? "T" : "F");
 }
 void Motor_temperature(void)
 {
-    bool result = true;
-
+    int left;
+    int right;
+    bool result = ctrl.get_motor_temperature(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Motor_temperature : L[%d]R[%d]", left, right);
+    TEST_ASSERT_GREATER_OR_EQUAL(0, left);
+    TEST_ASSERT_GREATER_OR_EQUAL(0, right);
 }
 void Error_code(void)
 {
-    bool result = true;
-
+    ZLAC8015DCtrl::zlac_error left;
+    ZLAC8015DCtrl::zlac_error right;
+    bool result = ctrl.get_error_code(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Error_code : L : "
+          "over_voltage[%s]"
+          "under_voltage[%s]"
+          "over_current[%s]"
+          "over_load[%s]"
+          "current_out_of_tolerance[%s]"
+          "encoder_out_of_tolerance[%s]"
+          "velocity_out_of_tolerance[%s]"
+          "reference_voltage_error[%s]"
+          "eeprom_error[%s]"
+          "hall_error[%s]"
+          "motor_temperature_over_temperature[%s]", //
+          left.over_voltage ? "T" : "F",
+          left.under_voltage ? "T" : "F",
+          left.over_current ? "T" : "F",
+          left.over_load ? "T" : "F",
+          left.current_out_of_tolerance ? "T" : "F",
+          left.encoder_out_of_tolerance ? "T" : "F",
+          left.velocity_out_of_tolerance ? "T" : "F",
+          left.reference_voltage_error ? "T" : "F",
+          left.eeprom_error ? "T" : "F",
+          left.hall_error ? "T" : "F",
+          left.motor_temperature_over_temperature ? "T" : "F");
+    log_d("* Error_code : R : "
+          "over_voltage[%s]"
+          "under_voltage[%s]"
+          "over_current[%s]"
+          "over_load[%s]"
+          "current_out_of_tolerance[%s]"
+          "encoder_out_of_tolerance[%s]"
+          "velocity_out_of_tolerance[%s]"
+          "reference_voltage_error[%s]"
+          "eeprom_error[%s]"
+          "hall_error[%s]"
+          "motor_temperature_over_temperature[%s]", //
+          right.over_voltage ? "T" : "F",
+          right.under_voltage ? "T" : "F",
+          right.over_current ? "T" : "F",
+          right.over_load ? "T" : "F",
+          right.current_out_of_tolerance ? "T" : "F",
+          right.encoder_out_of_tolerance ? "T" : "F",
+          right.velocity_out_of_tolerance ? "T" : "F",
+          right.reference_voltage_error ? "T" : "F",
+          right.eeprom_error ? "T" : "F",
+          right.hall_error ? "T" : "F",
+          right.motor_temperature_over_temperature ? "T" : "F");
 }
 void Actual_motor_position(void)
 {
-    bool result = true;
-
+    long left;
+    long right;
+    bool result = ctrl.get_actual_motor_position(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Actual_motor_position : L[%d]R[%d]", left, right);
+    TEST_ASSERT_GREATER_OR_EQUAL(0, left);
+    TEST_ASSERT_GREATER_OR_EQUAL(0, right);
 }
 void Actual_velocity(void)
 {
-    bool result = true;
-
+    double left  = NAN;
+    double right = NAN;
+    bool result  = ctrl.get_actual_velocity(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Actual_velocity : L[%8.3f]R[%8.3f]", left, right);
+    if (NAN == left) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value(left)");
+    }
+    if (NAN == right) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value(right)");
+    }
 }
 void Actual_torque(void)
 {
-    bool result = true;
-
+    double left  = NAN;
+    double right = NAN;
+    bool result  = ctrl.get_actual_torque(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Actual_torque : L[%8.3f]R[%8.3f]", left, right);
+    if (NAN == left) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value(left)");
+    }
+    if (NAN == right) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value(right)");
+    }
 }
 void Software_connected_status(void)
 {
-    bool result = true;
-
+    bool value;
+    bool result = ctrl.get_software_connected_status(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Software_connected_status : %s", value ? "T" : "F");
+    TEST_ASSERT_TRUE_MESSAGE(value, "NOT connected");
 }
 void Driver_temperature(void)
 {
-    bool result = true;
-
+    double value = NAN;
+    bool result  = ctrl.get_driver_temperature(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Driver_temperature : %8.3f", value);
+    if (NAN == value) {
+        TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value");
+    }
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -651,11 +782,11 @@ ZLAC8015DCtrl ctrl;
 void setup()
 {
     (void)setup_m5();
-    log_i("========================================");
-    log_i("M5Atom initialized.");
-    log_i("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
+    log_d("========================================");
+    log_d("M5Atom initialized.");
+    log_d("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
     bool flag = ctrl.begin(&Serial1, MODBUS_ADDRESS, MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU);
-    log_i("========================================");
+    log_d("========================================");
     if (false == flag) {
         Serial.println("Failed to initialize RS485.");
         m5_led(CRGB::Red);
