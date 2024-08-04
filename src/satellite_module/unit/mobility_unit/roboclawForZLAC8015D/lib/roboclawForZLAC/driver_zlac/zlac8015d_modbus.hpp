@@ -108,6 +108,13 @@ public:
         ZLAC_STATUS_WORD_EMERGENCY_STOP,
         ZLAC_STATUS_WORD_ALARM
     } ZLAC_STATUS_WORD;
+    typedef enum terminal_function
+    {
+        TERMINAL_FUNCTION_NONE,
+        TERMINAL_FUNCTION_EMERGENCY_STOP,
+        TERMINAL_FUNCTION_NC,
+    } TERMINAL_FUNCTION;
+
     class zlac_error {
     public:
         zlac_error()
@@ -214,18 +221,37 @@ private:
               this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
-#if 0
-    MessageFrame _modbus_send_0x03(unsigned int *data, int len)
+#if 1
+    MessageFrame _modbus_writer_single(unsigned long index, int data)
     {
+        std::vector<unsigned int> arr = { //
+                                          (unsigned int)((index >> 8) & 0xFF),
+                                          (unsigned int)(index & 0xFF),
+                                          (unsigned int)((data >> 8) & 0xFF),
+                                          (unsigned int)(data & 0xFF)
+        };
         this->_frame.make_frame( //
                 this->_modbus_type,
                 this->_address,
-                MessageFrame::FUNCTION_READ_HOLDING_REGISTERS,
-                data,
-                len);
+                MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
+                arr.data(),
+                arr.size());
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              this->_frame.address,
+              this->_frame.function,
+              this->_frame.data_length,
+              this->_frame.footer,
+              this->_frame.data[0],
+              this->_frame.data[1],
+              this->_frame.data[2],
+              this->_frame.data[3],
+              this->_frame.data[4],
+              this->_frame.data[5],
+              this->_frame.data[6],
+              this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
-#endif
+#else
     MessageFrame _modbus_send_0x06(unsigned int *data, int len)
     {
         this->_frame.make_frame( //
@@ -249,7 +275,45 @@ private:
               this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
-    MessageFrame _modbus_send_0x10(unsigned int *data, int len)
+#endif
+#if 1
+    MessageFrame _modbus_writer_multiple(unsigned long start, std::vector<int> data)
+    {
+        std::vector<unsigned int> arr = { //
+                                          (unsigned int)((start >> 8) & 0xFF),
+                                          (unsigned int)(start & 0xFF),
+                                          (unsigned int)((data.size() >> 8) & 0xFF),
+                                          (unsigned int)(data.size() & 0xFF)
+        };
+        for (int i = 0; i < data.size(); ++i) {
+            arr.push_back((unsigned int)((data[i] >> 8) & 0xFF));
+            arr.push_back((unsigned int)(data[i] & 0xFF));
+        }
+
+        this->_frame.make_frame( //
+                this->_modbus_type,
+                this->_address,
+                MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
+                arr.data(),
+                arr.size());
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              this->_frame.address,
+              this->_frame.function,
+              this->_frame.data_length,
+              this->_frame.footer,
+              this->_frame.data[0],
+              this->_frame.data[1],
+              this->_frame.data[2],
+              this->_frame.data[3],
+              this->_frame.data[4],
+              this->_frame.data[5],
+              this->_frame.data[6],
+              this->_frame.data[7]);
+        return this->send_frame(this->_frame);
+    }
+#else
+
+    MessageFrame _modbus_writer_multiple(unsigned int *data, int len)
     {
         this->_frame.make_frame( //
                 this->_modbus_type,
@@ -272,6 +336,7 @@ private:
               this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
+#endif
 
 public:
     ////////////////
@@ -297,20 +362,17 @@ public:
             log_w("Out of range");
         }
         if (true == result) {
-            std::vector<unsigned int> arr = { //
-                                              0x20u,
-                                              0x00u,
-                                              value_ms >> 8 & 0xFFu,
-                                              value_ms & 0xFFu
-            };
-
-            MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
-            if (true == check) {
-                int buf = 0;
-                result  = get_communication_offline_time(&buf);
-                if (true == result) {
-                    if (buf != value_ms) {
-                        result = false;
+            MessageFrame _frame = this->_modbus_writer_single(0x2000u, value_ms);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_communication_offline_time(&buf);
+                    if (true == result) {
+                        if (buf != value_ms) {
+                            result = false;
+                        }
                     }
                 }
             }
@@ -338,20 +400,17 @@ public:
             log_w("Out of range");
         }
         if (true == result) {
-            std::vector<unsigned int> arr = { //
-                                              0x20u,
-                                              0x01u,
-                                              id >> 8 & 0xFFu,
-                                              id & 0xFFu
-            };
-
-            MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
-            if (true == check) {
-                int buf = 0;
-                result  = get_rs485_node_id(&buf);
-                if (true == result) {
-                    if (buf != id) {
-                        result = false;
+            MessageFrame _frame = this->_modbus_writer_single(0x2001u, id);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_rs485_node_id(&buf);
+                    if (true == result) {
+                        if (buf != id) {
+                            result = false;
+                        }
                     }
                 }
             }
@@ -413,17 +472,10 @@ public:
         }
 
         if (true == result) {
-            std::vector<unsigned int> arr = { //
-                                              0x20u,
-                                              0x02u,
-                                              input >> 8 & 0xFFu,
-                                              input & 0xFFu
-            };
-
-            MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
+            MessageFrame _frame = this->_modbus_writer_single(0x2002u, input);
             if (true == check) {
                 RS485_BAUD_RATE buf = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
-                result              = get_rs485_baud_rate(&buf);
+                result              = this->get_rs485_baud_rate(&buf);
                 if (true == result) {
                     if (buf != baud) {
                         result = false;
@@ -489,20 +541,14 @@ public:
     }
     bool set_clear_feedback_position(ZLAC::target_motor target, bool check = false)
     {
-        bool result = false;
-        if (true == result) {
-            unsigned int input            = (unsigned int)target;
-            std::vector<unsigned int> arr = { //
-                                              0x20u,
-                                              0x05u,
-                                              input >> 8 & 0xFFu,
-                                              input & 0xFFu
-            };
-
-            MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2005u, (int)target);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
             if (true == check) {
                 ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
-                result                 = get_clear_feedback_position(&buf);
+                result                 = this->get_clear_feedback_position(&buf);
                 if (true == result) {
                     if (buf != target) {
                         result = false;
@@ -543,20 +589,15 @@ public:
     }
     bool set_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor target, bool check = false)
     {
-        bool result = false;
-        if (true == result) {
-            unsigned int input            = (unsigned int)target;
-            std::vector<unsigned int> arr = { //
-                                              0x20u,
-                                              0x06u,
-                                              input >> 8 & 0xFFu,
-                                              input & 0xFFu
-            };
-
-            MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
+        bool result         = true;
+        unsigned int input  = (unsigned int)target;
+        MessageFrame _frame = this->_modbus_writer_single(0x2006u, input);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
             if (true == check) {
                 ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
-                result                 = get_reset_the_zero_point_in_absolute_position_control(&buf);
+                result                 = this->get_reset_the_zero_point_in_absolute_position_control(&buf);
                 if (true == result) {
                     if (buf != target) {
                         result = false;
@@ -581,10 +622,24 @@ public:
         }
         return result;
     }
-    bool set_shaft_state_after_power_on(bool check = false)
+    bool set_shaft_state_after_power_on(bool lock_shaft, bool check = false)
     {
-        // TODO
-        return true;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2007u, lock_shaft ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_shaft_state_after_power_on(&buf);
+                if (true == result) {
+                    if (buf != lock_shaft) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_maximum_motor_speed(int *value)
     {
@@ -598,10 +653,31 @@ public:
         }
         return result;
     }
-    bool set_maximum_motor_speed(bool check = false)
+    bool set_maximum_motor_speed(int r_min, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (1 <= r_min && r_min <= 10000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2008u, r_min);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_maximum_motor_speed(&buf);
+                    if (true == result) {
+                        if (buf != r_min) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_register_parameter_settings(bool *value)
     {
@@ -618,10 +694,24 @@ public:
         }
         return result;
     }
-    bool set_register_parameter_settings(bool check = false)
+    bool set_register_parameter_settings(bool restore_factory_settings, bool check = false)
     {
-        // TODO
-        return true;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2009u, restore_factory_settings ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_register_parameter_settings(&buf);
+                if (true == result) {
+                    if (buf != restore_factory_settings) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_can_node_info(int *id, CAN_BAUD_RATE *baud)
     {
@@ -665,8 +755,64 @@ public:
 
     bool set_can_node_info(int id, CAN_BAUD_RATE baud, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (1 <= id && id <= 127) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        int input_baud = 0;
+        switch (baud) {
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_1000K:
+                input_baud = 0;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_500K:
+                input_baud = 1;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_250K:
+                input_baud = 2;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_125K:
+                input_baud = 3;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_100K:
+                input_baud = 4;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_50K:
+                input_baud = 5;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_25K:
+                input_baud = 6;
+                break;
+            case CAN_BAUD_RATE::CAN_BAUD_RATE_INVALID:
+                result = false;
+                log_w("not support baud rate");
+                break;
+        }
+
+        if (true == result) {
+            std::vector<int> data = { id, input_baud };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x200Au, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_id             = 0;
+                    CAN_BAUD_RATE buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_INVALID;
+                    result                 = this->get_can_node_info(&buf_id, &buf_baud);
+                    if (true == result) {
+                        if (buf_id != id) {
+                            result = false;
+                        }
+                        if (buf_baud != baud) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_control_mode(ZLAC::DRIVER_MODE *value)
@@ -696,13 +842,50 @@ public:
                     *value = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
                     break;
             }
+            this->_mode = *value;
         }
         return result;
     }
-    bool set_control_mode(bool check = false)
+    bool set_control_mode(ZLAC::DRIVER_MODE mode, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        int input   = 2;
+        switch (mode) {
+            case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
+                input = 1;
+                break;
+            case ZLAC::DRIVER_MODE::POSITION_ABSOLUTE:
+                input = 2;
+                break;
+            case ZLAC::DRIVER_MODE::VELOCITY:
+                input = 3;
+                break;
+            case ZLAC::DRIVER_MODE::TORQUE:
+                input = 4;
+                break;
+            default:
+                result = false;
+                log_w("not support mode");
+                break;
+        }
+
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x200Du, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    ZLAC::DRIVER_MODE buf = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+                    result                = this->get_control_mode(&buf);
+                    if (true == result) {
+                        if (buf != mode) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_control_word(ZLAC_CONTROL_WORD *value)
     {
@@ -743,30 +926,103 @@ public:
         }
         return result;
     }
-    bool set_control_word(bool check = false)
+    bool set_control_word(ZLAC_CONTROL_WORD word, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        int input   = 2;
+        switch (word) {
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED:
+                input = 0x00;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP:
+                input = 0x05;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT:
+                input = 0x06;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_STOP:
+                input = 0x07;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE:
+                input = 0x08;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START:
+                switch (this->_mode) {
+                    case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
+                    case ZLAC::DRIVER_MODE::POSITION_ABSOLUTE:
+                        input = 0x10; //(Position mode)
+                        break;
+                    case ZLAC::DRIVER_MODE::VELOCITY:
+                    case ZLAC::DRIVER_MODE::TORQUE:
+                    default:
+                        result = false;
+                        log_w("not support mode");
+                        break;
+                }
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT:
+                input = 0x11;
+                break;
+            case ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT:
+                input = 0x12;
+                break;
+            default:
+                result = false;
+                log_w("not support mode");
+                break;
+        }
+
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x200Eu, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    ZLAC_CONTROL_WORD buf = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
+                    result                = this->get_control_word(&buf);
+                    if (true == result) {
+                        if (buf != word) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_synchronous_onous_control_status(bool *value)
+    bool get_synchronous_control_status(bool *synchronous)
     {
         bool result         = true;
-        *value              = false;
+        *synchronous        = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x200Fu, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x00 == buf) {
-                *value = true;
+                *synchronous = true;
             }
         }
         return result;
     }
-    bool set_synchronous_onous_control_status(bool check = false)
+    bool set_synchronous_control_status(bool synchronous, bool check = false)
     {
-        // TODO
-        return true;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x200Fu, synchronous ? 0 : 1);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_synchronous_control_status(&buf);
+                if (true == result) {
+                    if (buf != synchronous) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool store_rw_register_to_eperm()
     {
@@ -809,50 +1065,111 @@ public:
         }
         return result;
     }
-    bool set_quick_stop_control(bool check = false)
+    bool set_quick_stop_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        int input   = 2;
+        switch (ctrl) {
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP:
+                input = 5;
+                break;
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION:
+                input = 6;
+                break;
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION:
+                input = 7;
+                break;
+            default:
+                result = false;
+                log_w("not support ZLAC_STOP_CONTROL");
+                break;
+        }
+
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2011u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                    result                = this->get_quick_stop_control(&buf);
+                    if (true == result) {
+                        if (buf != ctrl) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_close_operation_control(bool *value)
+    bool get_close_operation_control(bool *stop_normally)
     {
         bool result         = true;
-        *value              = false;
+        *stop_normally      = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2012u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == buf) {
-                *value = true;
+                *stop_normally = true;
             }
         }
         return result;
     }
-    bool set_close_operation_control(bool check = false)
-    {
-        // TODO
-        return true;
-    }
-    bool get_disable_control(bool *value)
+    bool set_close_operation_control(bool stop_normally, bool check = false)
     {
         bool result         = true;
-        *value              = false;
+        MessageFrame _frame = this->_modbus_writer_single(0x2012u, stop_normally ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_close_operation_control(&buf);
+                if (true == result) {
+                    if (buf != stop_normally) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    bool get_disable_control(bool *stop)
+    {
+        bool result         = true;
+        *stop               = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2013u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == buf) {
-                *value = true;
+                *stop = true;
             }
         }
         return result;
     }
-    bool set_disable_control(bool check = false)
+    bool set_disable_control(bool stop, bool check = false)
     {
-        // TODO
-        return true;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2013u, stop ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_disable_control(&buf);
+                if (true == result) {
+                    if (buf != stop) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_halt_control(ZLAC_STOP_CONTROL *value)
     {
@@ -881,65 +1198,160 @@ public:
         }
         return result;
     }
-    bool set_halt_control(bool check = false)
+    bool set_halt_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        int input   = 2;
+        switch (ctrl) {
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP:
+                input = 5;
+                break;
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION:
+                input = 6;
+                break;
+            case ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION:
+                input = 7;
+                break;
+            default:
+                result = false;
+                log_w("not support ZLAC_STOP_CONTROL");
+                break;
+        }
+
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2014u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                    result                = this->get_halt_control(&buf);
+                    if (true == result) {
+                        if (buf != ctrl) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_input_effective_level(bool *value)
+    bool get_input_effective_level(bool *low_level)
     {
         bool result         = true;
-        *value              = false;
+        *low_level          = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2016u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == buf) {
-                *value = true;
+                *low_level = true;
             }
         }
         return result;
     }
-    bool set_input_effective_level(bool check = false)
-    {
-        // TODO
-        return true;
-    }
-    bool get_input_terminal_terminal_function_selection(int *x0, int *x1)
+    bool set_input_effective_level(bool low_level, bool check = false)
     {
         bool result         = true;
-        *x0                 = false;
-        *x1                 = false;
-        MessageFrame _frame = this->_modbus_send_0x03(0x201Fu, 2);
+        MessageFrame _frame = this->_modbus_writer_single(0x2016u, low_level ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_input_effective_level(&buf);
+                if (true == result) {
+                    if (buf != low_level) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    bool get_input_terminal_terminal_function_selection(TERMINAL_FUNCTION *x0, TERMINAL_FUNCTION *x1)
+    {
+        bool result         = true;
+        *x0                 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+        *x1                 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2017u, 2);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            if (9 == value0) {
-                *x0 = true;
+            if (0 == value0) {
+                *x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE;
+            } else if (9 == value0) {
+                *x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP;
             }
-            if (9 == value1) {
-                *x1 = true;
+            if (0 == value1) {
+                *x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE;
+            } else if (9 == value1) {
+                *x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP;
             }
         }
         return result;
     }
-    bool set_input_terminal_terminal_function_selection(int x0, int x1, bool check = false)
+    bool set_input_terminal_terminal_function_selection(TERMINAL_FUNCTION x0, TERMINAL_FUNCTION x1, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        switch (x0) {
+            case TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE:
+                data.push_back(0);
+                break;
+            case TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP:
+                data.push_back(9);
+                break;
+            default:
+                result = false;
+                log_w("Not support function: x0");
+        }
+        switch (x1) {
+            case TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE:
+                data.push_back(0);
+                break;
+            case TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP:
+                data.push_back(9);
+                break;
+            default:
+                log_w("Not support function: x1");
+                result = false;
+                break;
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_multiple(0x2017u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    TERMINAL_FUNCTION buf_x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+                    TERMINAL_FUNCTION buf_x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+                    result                   = this->get_input_terminal_terminal_function_selection(&buf_x0, &buf_x1);
+                    if (true == result) {
+                        if (buf_x0 != x0) {
+                            result = false;
+                        }
+                        if (buf_x1 != x1) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
-    bool get_output_effective_high_level(bool *y0, bool *y1, bool *b0, bool *b1)
+    bool get_output_effective_low_level(bool *y0, bool *y1, bool *b0, bool *b1)
     {
         bool result         = true;
         *y0                 = false;
         *y1                 = false;
         *b0                 = false;
         *b1                 = false;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2F19u, 2);
+        MessageFrame _frame = this->_modbus_send_0x03(0x2019u, 2);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
@@ -959,12 +1371,42 @@ public:
         }
         return result;
     }
-    bool set_output_effective_level(bool check = false)
+    bool set_output_effective_low_level(bool y0, bool y1, bool b0, bool b1, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        int input   = (y0 ? 0x01 : 0x00) | //
+                    (y1 ? 0x02 : 0x00) |   //
+                    (b0 ? 0x04 : 0x00) |   //
+                    (b1 ? 0x09 : 0x00);
+        MessageFrame _frame = this->_modbus_writer_single(0x2019u, input);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf_y0 = false;
+                bool buf_y1 = false;
+                bool buf_b0 = false;
+                bool buf_b1 = false;
+                result      = this->get_output_effective_low_level(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
+                if (true == result) {
+                    if (buf_y0 != y0) {
+                        result = false;
+                    }
+                    if (buf_y1 != y1) {
+                        result = false;
+                    }
+                    if (buf_b0 != b0) {
+                        result = false;
+                    }
+                    if (buf_b1 != b1) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_output_terminal_close_brake( //
+    bool get_output_terminal_function_selection( //
             ZLAC_TERMINAL_FUNCTION *b0,
             ZLAC_TERMINAL_FUNCTION *b1,
             ZLAC_TERMINAL_FUNCTION *y0,
@@ -1014,10 +1456,101 @@ public:
         }
         return result;
     }
-    bool set_output_terminal_terminal_function_selection(int b0, int b1, int y0, int y1, bool check = false)
+    bool set_output_terminal_function_selection( //
+            ZLAC_TERMINAL_FUNCTION b0,
+            ZLAC_TERMINAL_FUNCTION b1,
+            ZLAC_TERMINAL_FUNCTION y0,
+            ZLAC_TERMINAL_FUNCTION y1,
+            bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        switch (b0) {
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE:
+                data.push_back(0);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE:
+                data.push_back(1);
+                break;
+            default:
+                result = false;
+                break;
+        }
+        switch (b1) {
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE:
+                data.push_back(0);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE:
+                data.push_back(1);
+                break;
+            default:
+                result = false;
+                break;
+        }
+        switch (y0) {
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED:
+                data.push_back(0);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL:
+                data.push_back(1);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL:
+                data.push_back(2);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL:
+                data.push_back(3);
+                break;
+            default:
+                result = false;
+                break;
+        }
+        switch (y1) {
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED:
+                data.push_back(0);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL:
+                data.push_back(1);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL:
+                data.push_back(2);
+                break;
+            case ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL:
+                data.push_back(3);
+                break;
+            default:
+                result = false;
+                break;
+        }
+
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_multiple(0x201Au, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    ZLAC_TERMINAL_FUNCTION buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                    ZLAC_TERMINAL_FUNCTION buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                    ZLAC_TERMINAL_FUNCTION buf_b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                    ZLAC_TERMINAL_FUNCTION buf_b1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                    result                        = this->get_output_terminal_function_selection(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
+                    if (true == result) {
+                        if (buf_y0 != y0) {
+                            result = false;
+                        }
+                        if (buf_y1 != y1) {
+                            result = false;
+                        }
+                        if (buf_b0 != b0) {
+                            result = false;
+                        }
+                        if (buf_b1 != b1) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_driver_temperature_protection_threshold(double *value)
@@ -1032,70 +1565,134 @@ public:
         }
         return result;
     }
-    bool set_driver_temperature_protection_threshold(bool check = false)
+    bool set_driver_temperature_protection_threshold(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 120.0) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            int input           = value * 10;
+            MessageFrame _frame = this->_modbus_writer_single(0x201Eu, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    bool buf = false;
+                    result   = this->get_alarm_pwm_processing_method(&buf);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_alarm_pwm_processing_method(bool *value)
+    bool get_alarm_pwm_processing_method(bool *open)
     {
         bool result         = true;
-        *value              = false;
+        *open               = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x201Fu, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == buf) {
-                *value = true;
+                *open = true;
             }
         }
         return result;
     }
-    bool set_alarm_pwm_processing_method(bool check = false)
-    {
-        // TODO
-        return true;
-    }
-    bool get_overload_processing_method(bool *value)
+    bool set_alarm_pwm_processing_method(bool open, bool check = false)
     {
         bool result         = true;
-        *value              = false;
+        MessageFrame _frame = this->_modbus_writer_single(0x201Fu, open ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_alarm_pwm_processing_method(&buf);
+                if (true == result) {
+                    if (buf != open) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    bool get_overload_processing_method(bool *open)
+    {
+        bool result         = true;
+        *open               = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2020u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0x01 == buf) {
-                *value = true;
+                *open = true;
             }
         }
         return result;
     }
-    bool set_overload_processing_method(bool check = false)
-    {
-        // TODO
-        return true;
-    }
-    bool get_io_emergency_stop_processing_mode(bool *value)
+    bool set_overload_processing_method(bool open, bool check = false)
     {
         bool result         = true;
-        *value              = false;
+        MessageFrame _frame = this->_modbus_writer_single(0x2020u, open ? 1 : 0);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = this->get_overload_processing_method(&buf);
+                if (true == result) {
+                    if (buf != open) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    bool get_io_emergency_stop_processing_mode(bool *lock_shaft)
+    {
+        bool result         = true;
+        *lock_shaft         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2021u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == buf) {
-                *value = true;
+            if (0x00 == buf) {
+                *lock_shaft = false;
             }
         }
         return result;
     }
-    bool set_io_emergency_stop_processing_mode(bool check = false)
+    bool set_io_emergency_stop_processing_mode(bool lock_shaft, bool check = false)
     {
-        // TODO
-        return true;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2021u, lock_shaft ? 0 : 1);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                bool buf = false;
+                result   = set_overload_processing_method(&buf);
+                if (true == result) {
+                    if (buf != lock_shaft) {
+                        result = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     ////////////////
@@ -1113,10 +1710,31 @@ public:
         }
         return result;
     }
-    bool set_encoder_line_left(bool check = false)
+    bool set_encoder_line_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 4096) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2030u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_encoder_line_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_hall_offset_angle_left(int *value)
     {
@@ -1130,10 +1748,31 @@ public:
         }
         return result;
     }
-    bool set_hall_offset_angle_left(bool check = false)
+    bool set_hall_offset_angle_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (-360 <= value && value <= 360) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2031u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_hall_offset_angle_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_overload_factor_left(int *value)
     {
@@ -1147,12 +1786,33 @@ public:
         }
         return result;
     }
-    bool set_overload_factor_left(bool check = false)
+    bool set_overload_factor_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 300) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2032u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_overload_factor_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_rated_current_left(double *rated, double *maximum)
+    bool get_current_left(double *rated, double *maximum)
     {
         bool result         = true;
         *rated              = 0.0;
@@ -1166,17 +1826,63 @@ public:
         }
         return result;
     }
-    bool set_rated_current_left(bool check = false)
+    bool set_rated_current_left(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 15.0) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2033u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf_rated   = 0;
+                    double buf_maximum = 0;
+                    result             = this->get_current_left(&buf_rated, &buf_maximum);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf_rated - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool set_maximum_current_left(bool check = false)
+    bool set_maximum_current_left(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 30.0) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2034u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf_rated   = 0;
+                    double buf_maximum = 0;
+                    result             = this->get_current_left(&buf_rated, &buf_maximum);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf_maximum - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_overload_protection_time_left(double *value)
+    bool get_overload_protection_time_left(int *value)
     {
         bool result         = true;
         *value              = 0.0;
@@ -1184,16 +1890,38 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 100.0;
+            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
-    bool set_overload_protection_time_left(bool check = false)
+    bool set_overload_protection_time_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value / 10;
+        if (0 <= input && input <= 6553) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2035u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_overload_protection_time_left(&buf);
+                    if (true == result) {
+                        if ((buf / 10) == input) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_position_following_error_threshold_left(double *value)
+    bool get_position_following_error_threshold_left(int *value)
     {
         bool result         = true;
         *value              = 0.0;
@@ -1201,14 +1929,36 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
+            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
-    bool set_position_following_error_threshold_left(bool check = false)
+    bool set_position_following_error_threshold_left(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value / 10;
+        if (1 <= input && input <= 6553) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2036u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_position_following_error_threshold_left(&buf);
+                    if (true == result) {
+                        if ((buf / 10) == input) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_velocity_smoothing_factor_left(int *value)
     {
@@ -1222,12 +1972,33 @@ public:
         }
         return result;
     }
-    bool set_velocity_smoothing_factor_left(bool check = false)
+    bool set_velocity_smoothing_factor_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2037u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_velocity_smoothing_factor_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_cl_left(int *kp, int *ki)
+    bool get_current_loop_left(int *kp, int *ki)
     {
         bool result         = true;
         *kp                 = 0;
@@ -1241,10 +2012,43 @@ public:
         }
         return result;
     }
-    bool set_cl_left(int kp, int ki, bool check = false)
+    bool set_current_loop_left(int kp, int ki, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= ki && ki <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, ki };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2038u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_ki = 0;
+                    result     = this->get_current_loop_left(&buf_kp, &buf_ki);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_ki != ki) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_feedforward_output_smoothing_factor_left(int *value)
     {
@@ -1258,10 +2062,31 @@ public:
         }
         return result;
     }
-    bool set_feedforward_output_smoothing_factor_left(bool check = false)
+    bool set_feedforward_output_smoothing_factor_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x203Au, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_feedforward_output_smoothing_factor_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_torque_output_smoothing_factor_left(int *value)
     {
@@ -1275,10 +2100,31 @@ public:
         }
         return result;
     }
-    bool set_torque_output_smoothing_factor_left(bool check = false)
+    bool set_torque_output_smoothing_factor_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x203Bu, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_torque_output_smoothing_factor_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_velocity_loop_left(int *kp, int *ki, int *kf)
     {
@@ -1298,8 +2144,51 @@ public:
     }
     bool set_velocity_loop_left(int kp, int ki, int kf, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= ki && ki <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= kf && kf <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, ki, kf };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x203Cu, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_ki = 0;
+                    int buf_kf = 0;
+                    result     = this->get_velocity_loop_left(&buf_kp, &buf_ki, &buf_kf);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_ki != ki) {
+                            result = false;
+                        }
+                        if (buf_kf != kf) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_position_loop_left(int *kp, int *kf)
     {
@@ -1315,10 +2204,43 @@ public:
         }
         return result;
     }
-    bool set_position_loop_kp_left(bool check = false)
+    bool set_position_loop_left(int kp, int kf, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= kf && kf <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, kf };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x203Fu, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_kf = 0;
+                    result     = this->get_position_loop_left(&buf_kp, &buf_kf);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_kf != kf) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_initial_velocity_left(int *value)
@@ -1347,10 +2269,46 @@ public:
         }
         return result;
     }
-    bool set_initial_velocity_left(bool check = false)
+    bool set_initial_velocity_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int address = 0x00;
+        if (1 <= value && value <= 250) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        switch (this->_mode) {
+            case ZLAC::DRIVER_MODE::VELOCITY:
+                address = 0x2043u;
+                break;
+            case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
+            case ZLAC::DRIVER_MODE::POSITION_ABSOLUTE:
+                address = 0x2044u;
+                break;
+            default:
+                result = false;
+                break;
+        }
+        if (0 != address) {
+            if (true == result) {
+                MessageFrame _frame = this->_modbus_writer_single(address, value);
+                if (0x80 <= _frame.function) {
+                    result = false;
+                } else {
+                    if (true == check) {
+                        int buf = 0;
+                        result  = this->get_initial_velocity_left(&buf);
+                        if (true == result) {
+                            if (buf != value) {
+                                result = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_motor_poles_left(int *value)
@@ -1365,10 +2323,31 @@ public:
         }
         return result;
     }
-    bool set_motor_poles_left(bool check = false)
+    bool set_motor_poles_left(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (4 <= value && value <= 64) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2045u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_motor_poles_left(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_over_temperature_threshold_left(double *value)
     {
@@ -1382,10 +2361,32 @@ public:
         }
         return result;
     }
-    bool set_over_temperature_threshold_left(bool check = false)
+    bool set_over_temperature_threshold_left(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 1200) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2046u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf = 0;
+                    result     = this->get_over_temperature_threshold_left(&buf);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_velocity_observer_coefficient_left(int *index1, int *index2, int *index3, int *index4)
     {
@@ -1401,16 +2402,68 @@ public:
         }
         return result;
     }
-    bool set_velocity_observer_coefficient_left(bool check = false)
+    bool set_velocity_observer_coefficient_left(int index1, int index2, int index3, int index4, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= index1 && index1 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index2 && index2 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index3 && index3 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index4 && index4 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { index1, index2, index3, index4 };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2047u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_index1 = 0;
+                    int buf_index2 = 0;
+                    int buf_index3 = 0;
+                    int buf_index4 = 0;
+                    result         = this->get_velocity_observer_coefficient_left(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
+                    if (true == result) {
+                        if (buf_index1 != index1) {
+                            result = false;
+                        }
+                        if (buf_index2 != index2) {
+                            result = false;
+                        }
+                        if (buf_index3 != index3) {
+                            result = false;
+                        }
+                        if (buf_index4 != index4) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     ////////////////
     // Right motor parameter
     ////////////////
-
     bool get_encoder_line_right(int *value)
     {
         bool result         = true;
@@ -1423,10 +2476,31 @@ public:
         }
         return result;
     }
-    bool set_encoder_line_right(bool check = false)
+    bool set_encoder_line_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 4096) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2060u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_encoder_line_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_hall_offset_angle_right(int *value)
     {
@@ -1440,10 +2514,31 @@ public:
         }
         return result;
     }
-    bool set_hall_offset_angle_right(bool check = false)
+    bool set_hall_offset_angle_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (-360 <= value && value <= 360) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2061u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_hall_offset_angle_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_overload_factor_right(int *value)
     {
@@ -1457,12 +2552,33 @@ public:
         }
         return result;
     }
-    bool set_overload_factor_right(bool check = false)
+    bool set_overload_factor_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 300) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2062u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_overload_factor_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_rated_current_right(double *rated, double *maximum)
+    bool get_current_right(double *rated, double *maximum)
     {
         bool result         = true;
         *rated              = 0.0;
@@ -1476,17 +2592,63 @@ public:
         }
         return result;
     }
-    bool set_rated_current_right(bool check = false)
+    bool set_rated_current_right(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 15.0) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2063u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf_rated   = 0;
+                    double buf_maximum = 0;
+                    result             = this->get_current_right(&buf_rated, &buf_maximum);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf_rated - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool set_maximum_current_right(bool check = false)
+    bool set_maximum_current_right(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 30.0) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2064u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf_rated   = 0;
+                    double buf_maximum = 0;
+                    result             = this->get_current_right(&buf_rated, &buf_maximum);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf_maximum - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_overload_protection_time_right(double *value)
+    bool get_overload_protection_time_right(int *value)
     {
         bool result         = true;
         *value              = 0.0;
@@ -1494,16 +2656,38 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 100.0;
+            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
-    bool set_overload_protection_time_right(bool check = false)
+    bool set_overload_protection_time_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value / 10;
+        if (0 <= input && input <= 6553) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2065u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_overload_protection_time_right(&buf);
+                    if (true == result) {
+                        if ((buf / 10) == input) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_position_following_error_threshold_right(double *value)
+    bool get_position_following_error_threshold_right(int *value)
     {
         bool result         = true;
         *value              = 0.0;
@@ -1511,14 +2695,36 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
+            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
-    bool set_position_following_error_threshold_right(bool check = false)
+    bool set_position_following_error_threshold_right(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value / 10;
+        if (1 <= input && input <= 6553) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2066u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_position_following_error_threshold_right(&buf);
+                    if (true == result) {
+                        if ((buf / 10) == input) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_velocity_smoothing_factor_right(int *value)
     {
@@ -1532,12 +2738,33 @@ public:
         }
         return result;
     }
-    bool set_velocity_smoothing_factor_right(bool check = false)
+    bool set_velocity_smoothing_factor_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2067u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_velocity_smoothing_factor_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
-    bool get_cl_right(int *kp, int *ki)
+    bool get_current_loop_right(int *kp, int *ki)
     {
         bool result         = true;
         *kp                 = 0;
@@ -1551,10 +2778,43 @@ public:
         }
         return result;
     }
-    bool set_cl_right(int kp, int ki, bool check = false)
+    bool set_current_loop_right(int kp, int ki, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= ki && ki <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, ki };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2068u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_ki = 0;
+                    result     = this->get_current_loop_right(&buf_kp, &buf_ki);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_ki != ki) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_feedforward_output_smoothing_factor_right(int *value)
     {
@@ -1568,10 +2828,31 @@ public:
         }
         return result;
     }
-    bool set_feedforward_output_smoothing_factor_right(bool check = false)
+    bool set_feedforward_output_smoothing_factor_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x206Au, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_feedforward_output_smoothing_factor_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_torque_output_smoothing_factor_right(int *value)
     {
@@ -1585,10 +2866,31 @@ public:
         }
         return result;
     }
-    bool set_torque_output_smoothing_factor_right(bool check = false)
+    bool set_torque_output_smoothing_factor_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (0 <= value && value <= 30000) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x206Bu, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_torque_output_smoothing_factor_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_velocity_loop_right(int *kp, int *ki, int *kf)
     {
@@ -1608,8 +2910,51 @@ public:
     }
     bool set_velocity_loop_right(int kp, int ki, int kf, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= ki && ki <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= kf && kf <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, ki, kf };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x206Cu, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_ki = 0;
+                    int buf_kf = 0;
+                    result     = this->get_velocity_loop_right(&buf_kp, &buf_ki, &buf_kf);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_ki != ki) {
+                            result = false;
+                        }
+                        if (buf_kf != kf) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     int get_position_loop_right(int *kp, int *kf)
     {
@@ -1625,10 +2970,43 @@ public:
         }
         return result;
     }
-    bool set_position_loop_kp_right(bool check = false)
+    bool set_position_loop_right(int kp, int kf, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= kp && kp <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= kf && kf <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { kp, kf };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x206Fu, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_kp = 0;
+                    int buf_kf = 0;
+                    result     = this->get_position_loop_right(&buf_kp, &buf_kf);
+                    if (true == result) {
+                        if (buf_kp != kp) {
+                            result = false;
+                        }
+                        if (buf_kf != kf) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_initial_velocity_right(int *value)
@@ -1657,10 +3035,46 @@ public:
         }
         return result;
     }
-    bool set_initial_velocity_right(bool check = false)
+    bool set_initial_velocity_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int address = 0x00;
+        if (1 <= value && value <= 250) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        switch (this->_mode) {
+            case ZLAC::DRIVER_MODE::VELOCITY:
+                address = 0x2043u;
+                break;
+            case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
+            case ZLAC::DRIVER_MODE::POSITION_ABSOLUTE:
+                address = 0x2044u;
+                break;
+            default:
+                result = false;
+                break;
+        }
+        if (0 != address) {
+            if (true == result) {
+                MessageFrame _frame = this->_modbus_writer_single(address, value);
+                if (0x80 <= _frame.function) {
+                    result = false;
+                } else {
+                    if (true == check) {
+                        int buf = 0;
+                        result  = this->get_initial_velocity_right(&buf);
+                        if (true == result) {
+                            if (buf != value) {
+                                result = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_motor_poles_right(int *value)
@@ -1675,10 +3089,31 @@ public:
         }
         return result;
     }
-    bool set_motor_poles_right(bool check = false)
+    bool set_motor_poles_right(int value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        if (4 <= value && value <= 64) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2075u, value);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf = 0;
+                    result  = this->get_motor_poles_right(&buf);
+                    if (true == result) {
+                        if (buf != value) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_over_temperature_threshold_right(double *value)
     {
@@ -1692,10 +3127,32 @@ public:
         }
         return result;
     }
-    bool set_over_temperature_threshold_right(bool check = false)
+    bool set_over_temperature_threshold_right(double value, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = false;
+        int input   = value * 10;
+        if (0 <= input && input <= 1200) {
+            result = true;
+        } else {
+            log_w("Out of range");
+        }
+        if (true == result) {
+            MessageFrame _frame = this->_modbus_writer_single(0x2076u, input);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    double buf = 0;
+                    result     = this->get_over_temperature_threshold_right(&buf);
+                    if (true == result) {
+                        if (0.1 > std::abs(buf - value)) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     bool get_velocity_observer_coefficient_right(int *index1, int *index2, int *index3, int *index4)
     {
@@ -1711,11 +3168,65 @@ public:
         }
         return result;
     }
-    bool set_velocity_observer_coefficient_right(bool check = false)
+    bool set_velocity_observer_coefficient_right(int index1, int index2, int index3, int index4, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        if (0 <= index1 && index1 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index2 && index2 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index3 && index3 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (0 <= index4 && index4 <= 30000) {
+            // do nothing
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { index1, index2, index3, index4 };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2077u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_index1 = 0;
+                    int buf_index2 = 0;
+                    int buf_index3 = 0;
+                    int buf_index4 = 0;
+                    result         = this->get_velocity_observer_coefficient_right(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
+                    if (true == result) {
+                        if (buf_index1 != index1) {
+                            result = false;
+                        }
+                        if (buf_index2 != index2) {
+                            result = false;
+                        }
+                        if (buf_index3 != index3) {
+                            result = false;
+                        }
+                        if (buf_index4 != index4) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
+
     ////////////////
     // Control parameter
     ////////////////
@@ -1731,10 +3242,44 @@ public:
         }
         return result;
     }
-    bool set_s_shape_acceleration_time(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_s_shape_acceleration_time(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((0 <= left) && (left <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((0 <= right) && (right <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2080u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_s_shape_deceleration_time(int *left, int *right)
@@ -1749,10 +3294,44 @@ public:
         }
         return result;
     }
-    bool set_s_shape_deceleration_time(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_s_shape_deceleration_time(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((0 <= left) && (left <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((0 <= right) && (right <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2082u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_deceleration_time_of_quick_stop(int *left, int *right)
@@ -1768,10 +3347,44 @@ public:
         }
         return result;
     }
-    bool set_deceleration_time_of_quick_stop(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_deceleration_time_of_quick_stop(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((0 <= left) && (left <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((0 <= right) && (right <= 32767)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2084u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_torque_slope(int *left, int *right)
@@ -1787,10 +3400,28 @@ public:
         }
         return result;
     }
-    bool set_torque_slope(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_torque_slope(int left, int right, bool check = false)
     {
-        // TODO
-        return 0;
+        bool result           = true;
+        std::vector<int> data = { left, right };
+        MessageFrame _frame   = this->_modbus_writer_multiple(0x2086u, data);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            if (true == check) {
+                int buf_left  = -30001;
+                int buf_right = -30001;
+                result        = this->get_max_speed(&buf_left, &buf_right);
+                if (true == result) {
+                    if (buf_left != left) {
+                        result = false;
+                    }
+                    if (buf_right != right) {
+                        result = false;
+                    }
+                }
+            }
+        }
     }
 
     bool get_target_velocity(int *left, int *right)
@@ -1805,10 +3436,44 @@ public:
         }
         return result;
     }
-    bool set_target_velocity(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_target_velocity(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((-3000 <= left) && (left <= 3000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((-3000 <= right) && (right <= 3000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2088u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_target_position(long *left, long *right)
@@ -1823,10 +3488,49 @@ public:
         }
         return result;
     }
-    bool set_target_position(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_target_position(long left, long right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((-0x7FFFFFFF <= left) && (left <= 0x7FFFFFFF)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((-0x7FFFFFFF <= right) && (right <= 0x7FFFFFFF)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { //
+                                      (left >> 16) & 0xFFFF,
+                                      left & 0xFFFF,
+                                      (right >> 16) & 0xFFFF,
+                                      right & 0xFFFF
+            };
+            MessageFrame _frame = this->_modbus_writer_multiple(0x208Au, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    long buf_left  = -30001;
+                    long buf_right = -30001;
+                    result         = this->get_target_position(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_max_speed(int *left, int *right)
@@ -1841,10 +3545,44 @@ public:
         }
         return result;
     }
-    bool set_max_speed(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_max_speed(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((1 <= left) && (left <= 1000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((1 <= right) && (right <= 1000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x208Eu, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     bool get_target_torque(int *left, int *right)
@@ -1859,10 +3597,44 @@ public:
         }
         return result;
     }
-    bool set_target_torque(ZLAC::TARGET_MOTOR target, bool check = false)
+    bool set_target_torque(int left, int right, bool check = false)
     {
-        // TODO
-        return true;
+        bool result = true;
+        std::vector<int> data;
+        if ((-30000 <= left) && (left <= 30000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if ((-30000 <= right) && (right <= 30000)) {
+            // do noting
+        } else {
+            result = false;
+            log_w("Out of range");
+        }
+        if (true == result) {
+            std::vector<int> data = { left, right };
+            MessageFrame _frame   = this->_modbus_writer_multiple(0x2090u, data);
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
+                if (true == check) {
+                    int buf_left  = -30001;
+                    int buf_right = -30001;
+                    result        = this->get_target_torque(&buf_left, &buf_right);
+                    if (true == result) {
+                        if (buf_left != left) {
+                            result = false;
+                        }
+                        if (buf_right != right) {
+                            result = false;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
     ////////////////
     // Read only parameter

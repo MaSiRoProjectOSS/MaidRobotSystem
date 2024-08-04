@@ -95,7 +95,9 @@ void Communication_offline_time(void)
 }
 void RS485_Node_ID(void)
 {
-    int value = ctrl.get_rs485_node_id();
+    int value   = 0;
+    bool result = ctrl.get_rs485_node_id(&value);
+    TEST_ASSERT_TRUE(result);
     log_d("* RS485 Node ID : %d", value);
     TEST_ASSERT_EQUAL_INT(1, value);
 }
