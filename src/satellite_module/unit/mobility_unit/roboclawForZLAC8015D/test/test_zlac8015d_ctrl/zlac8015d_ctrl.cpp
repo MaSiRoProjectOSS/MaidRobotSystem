@@ -16,10 +16,10 @@
 #define MOTOR_PARAMETER 0
 #endif
 #ifndef CONTROL_PARAMETER
-#define CONTROL_PARAMETER 0
+#define CONTROL_PARAMETER 1
 #endif
 #ifndef READ_ONLY_PARAMETER
-#define READ_ONLY_PARAMETER 1
+#define READ_ONLY_PARAMETER 0
 #endif
 
 ///////////////////////////////////////////////////////////////////
@@ -84,7 +84,9 @@ void tearDown(void)
     m5_led(CRGB::Black);
 }
 
-///////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// Common constant for Left and Right motors
+/////////////////////////////////////////////////
 void Communication_offline_time(void)
 {
     bool result = true;
@@ -277,6 +279,9 @@ void IO_emergency_stop_processing_mode(void)
 
     TEST_ASSERT_TRUE(result);
 }
+/////////////////////////////////////////////////
+// Motor parameter
+/////////////////////////////////////////////////
 void Encoder_line(void)
 {
     bool result = true;
@@ -421,6 +426,9 @@ void Velocity_observer_coefficient_4(void)
 
     TEST_ASSERT_TRUE(result);
 }
+/////////////////////////////////////////////////
+// Control parameter
+/////////////////////////////////////////////////
 void S_shape_acceleration_time(void)
 {
     bool result = true;

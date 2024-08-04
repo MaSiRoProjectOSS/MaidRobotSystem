@@ -212,8 +212,7 @@ private:
               this->_frame.data[5],
               this->_frame.data[6],
               this->_frame.data[7]);
-        this->_frame = this->send_frame(this->_frame);
-        return this->_frame;
+        return this->send_frame(this->_frame);
     }
 #if 0
     MessageFrame _modbus_send_0x03(unsigned int *data, int len)
@@ -235,6 +234,19 @@ private:
                 MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
                 data,
                 len);
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              this->_frame.address,
+              this->_frame.function,
+              this->_frame.data_length,
+              this->_frame.footer,
+              this->_frame.data[0],
+              this->_frame.data[1],
+              this->_frame.data[2],
+              this->_frame.data[3],
+              this->_frame.data[4],
+              this->_frame.data[5],
+              this->_frame.data[6],
+              this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
     MessageFrame _modbus_send_0x10(unsigned int *data, int len)
@@ -245,20 +257,38 @@ private:
                 MessageFrame::FUNCTION_WRITE_MULTIPLE_REGISTERS,
                 data,
                 len);
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+              this->_frame.address,
+              this->_frame.function,
+              this->_frame.data_length,
+              this->_frame.footer,
+              this->_frame.data[0],
+              this->_frame.data[1],
+              this->_frame.data[2],
+              this->_frame.data[3],
+              this->_frame.data[4],
+              this->_frame.data[5],
+              this->_frame.data[6],
+              this->_frame.data[7]);
         return this->send_frame(this->_frame);
     }
 
 public:
-    int get_communication_offline_time()
+    ////////////////
+    // Common constant for Left and Right motors
+    ////////////////
+    bool get_communication_offline_time(int *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2000u, 1);
         if (0x80 <= _frame.function) {
-            return -1;
+            result = false;
         } else {
-            return (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
+        return result;
     }
-    bool set_communication_offline_time(bool check, int value_ms)
+    bool set_communication_offline_time(int value_ms, bool check = false)
     {
         bool result = false;
         if (0 <= value_ms && value_ms <= 32767) {
@@ -276,26 +306,30 @@ public:
 
             MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
             if (true == check) {
-                int value = get_communication_offline_time();
-                if (value != value_ms) {
-                    result = false;
+                int buf = 0;
+                result  = get_communication_offline_time(&buf);
+                if (true == result) {
+                    if (buf != value_ms) {
+                        result = false;
+                    }
                 }
             }
         }
         return result;
     }
-    int get_rs485_node_id()
+    bool get_rs485_node_id(int *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2001u, 1);
         if (0x80 <= _frame.function) {
-            log_d("<<error>>");
-            return -1;
+            *value = -1;
+            result = false;
         } else {
-            log_d("<<ok>>");
-            return (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
+        return result;
     }
-    bool set_rs485_node_id(bool check, int id)
+    bool set_rs485_node_id(int id, bool check = false)
     {
         bool result = false;
         if (0 <= id && id <= 127) {
@@ -313,40 +347,53 @@ public:
 
             MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
             if (true == check) {
-                int value = get_rs485_node_id();
-                if (value != id) {
-                    result = false;
+                int buf = 0;
+                result  = get_rs485_node_id(&buf);
+                if (true == result) {
+                    if (buf != id) {
+                        result = false;
+                    }
                 }
             }
         }
         return result;
     }
-    int get_rs485_baud_rate()
+    bool get_rs485_baud_rate(RS485_BAUD_RATE *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2002u, 1);
         if (0x80 <= _frame.function) {
-            return -1;
+            *value = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
+            result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            switch (value) {
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            switch (buffer) {
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
-                    return 128000;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+                    break;
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_115200:
-                    return 115200;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+                    break;
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_57600:
-                    return 57600;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+                    break;
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_38400:
-                    return 38400;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+                    break;
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_19200:
-                    return 19200;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+                    break;
                 case RS485_BAUD_RATE::RS485_BAUD_RATE_9600:
-                    return 9600;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+                    break;
                 default:
-                    return -1;
+                    *value = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
+                    result = false;
             }
         }
+        return result;
     }
-    bool set_rs485_baud_rate(bool check, RS485_BAUD_RATE baud)
+    bool set_rs485_baud_rate(RS485_BAUD_RATE baud, bool check = false)
     {
         bool result = true;
         int input   = 2;
@@ -375,9 +422,12 @@ public:
 
             MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
             if (true == check) {
-                int value = get_rs485_baud_rate();
-                if (value != baud) {
-                    result = false;
+                RS485_BAUD_RATE buf = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
+                result              = get_rs485_baud_rate(&buf);
+                if (true == result) {
+                    if (buf != baud) {
+                        result = false;
+                    }
                 }
             }
         }
@@ -385,51 +435,59 @@ public:
     }
     bool get_input_signal_status(int &x0, int &x1)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2003u, 1);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             x0                 = (value >> 0) & 0x01;
             x1                 = (value >> 1) & 0x01;
-            return true;
         }
+        return result;
     }
     bool get_out_signal_status(int &x0, int &x1)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2004u, 1);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             x0                 = (value >> 0) & 0x01;
             x1                 = (value >> 1) & 0x01;
-            return true;
         }
+        return result;
     }
 
-    ZLAC::target_motor get_clear_feedback_position()
+    bool get_clear_feedback_position(ZLAC::target_motor *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2005u, 1);
         if (0x80 <= _frame.function) {
-            return ZLAC::target_motor::TARGET_MOTOR_INVALID;
+            result = false;
+            *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int value = _frame.data[0];
-            switch (value) {
+            int buf = _frame.data[0];
+            switch (buf) {
                 case 1:
-                    return ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    break;
                 case 2:
-                    return ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    break;
                 case 3:
-                    return ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    break;
                 case 0:
                 default:
-                    return ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
                     break;
             }
         }
+        return result;
     }
-    bool set_clear_feedback_position(ZLAC::target_motor target, bool check)
+    bool set_clear_feedback_position(ZLAC::target_motor target, bool check = false)
     {
         bool result = false;
         if (true == result) {
@@ -443,37 +501,47 @@ public:
 
             MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
             if (true == check) {
-                ZLAC::target_motor value = get_clear_feedback_position();
-                if (value != target) {
-                    result = false;
+                ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                result                 = get_clear_feedback_position(&buf);
+                if (true == result) {
+                    if (buf != target) {
+                        result = false;
+                    }
                 }
             }
         }
         return result;
     }
 
-    ZLAC::target_motor get_reset_the_zero_point_in_absolute_position_control()
+    bool get_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2006u, 1);
         if (0x80 <= _frame.function) {
-            return ZLAC::target_motor::TARGET_MOTOR_INVALID;
+            result = false;
+            *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int value = _frame.data[0];
-            switch (value) {
+            int buf = _frame.data[0];
+            switch (buf) {
                 case 1:
-                    return ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    break;
                 case 2:
-                    return ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    break;
                 case 3:
-                    return ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    break;
                 case 0:
                 default:
-                    return ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                    result = false;
+                    *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
                     break;
             }
         }
+        return result;
     }
-    bool set_reset_the_zero_point_in_absolute_position_control(bool check, ZLAC::target_motor target)
+    bool set_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor target, bool check = false)
     {
         bool result = false;
         if (true == result) {
@@ -487,64 +555,70 @@ public:
 
             MessageFrame _frame = this->_modbus_send_0x06(arr.data(), arr.size());
             if (true == check) {
-                ZLAC::target_motor value = get_clear_feedback_position();
-                if (value != target) {
-                    result = false;
+                ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                result                 = get_reset_the_zero_point_in_absolute_position_control(&buf);
+                if (true == result) {
+                    if (buf != target) {
+                        result = false;
+                    }
                 }
             }
         }
         return result;
     }
-    bool get_shaft_state_after_power_on()
+    bool get_shaft_state_after_power_on(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2007u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_shaft_state_after_power_on(bool check)
+    bool set_shaft_state_after_power_on(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_maximum_motor_speed()
+    bool get_maximum_motor_speed(int *value)
     {
-        int result          = 0;
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2008u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            *value = -1;
+            result = false;
         } else {
-            result = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
-    bool set_maximum_motor_speed(bool check)
+    bool set_maximum_motor_speed(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_register_parameter_settings()
+    bool get_register_parameter_settings(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2009u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_register_parameter_settings(bool check)
+    bool set_register_parameter_settings(bool check = false)
     {
         // TODO
         return true;
@@ -589,89 +663,107 @@ public:
         return result;
     }
 
-    bool set_can_node_info(bool check, int id, CAN_BAUD_RATE baud)
+    bool set_can_node_info(int id, CAN_BAUD_RATE baud, bool check = false)
     {
         // TODO
         return true;
     }
 
-    ZLAC::DRIVER_MODE get_control_mode()
+    bool get_control_mode(ZLAC::DRIVER_MODE *value)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x200Du, 1);
         if (0x80 <= _frame.function) {
-            return ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+            result = false;
+            *value = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
         } else {
-            int value = _frame.data[0];
-            switch (value) {
+            int buf = _frame.data[0];
+            switch (buf) {
                 case 1:
-                    return ZLAC::DRIVER_MODE::POSITION_RELATIVE;
+                    *value = ZLAC::DRIVER_MODE::POSITION_RELATIVE;
+                    break;
                 case 2:
-                    return ZLAC::DRIVER_MODE::POSITION_ABSOLUTE;
+                    *value = ZLAC::DRIVER_MODE::POSITION_ABSOLUTE;
+                    break;
                 case 3:
-                    return ZLAC::DRIVER_MODE::VELOCITY;
+                    *value = ZLAC::DRIVER_MODE::VELOCITY;
+                    break;
                 case 4:
-                    return ZLAC::DRIVER_MODE::TORQUE;
+                    *value = ZLAC::DRIVER_MODE::TORQUE;
+                    break;
                 case 0:
                 default:
-                    return ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+                    *value = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
                     break;
-            }
-        }
-    }
-    bool set_control_mode(bool check)
-    {
-        // TODO
-        return true;
-    }
-    ZLAC_CONTROL_WORD get_control_word()
-    {
-        MessageFrame _frame = this->_modbus_send_0x03(0x200Eu, 1);
-        if (0x80 <= _frame.function) {
-            return ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
-        } else {
-            int value = _frame.data[0];
-            switch (value) {
-                case 0x05:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP;
-                case 0x06:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT;
-                case 0x07:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_STOP;
-                case 0x08:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE;
-                case 0x10:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START;
-                case 0x11:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT;
-                case 0x12:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT;
-                case 0x00:
-                default:
-                    return ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
-                    break;
-            }
-        }
-    }
-    bool set_control_word(bool check)
-    {
-        // TODO
-        return true;
-    }
-    bool get_synchronous_onous_control_status()
-    {
-        bool result         = false;
-        MessageFrame _frame = this->_modbus_send_0x03(0x200Fu, 1);
-        if (0x80 <= _frame.function) {
-            result = false;
-        } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x00 == value) {
-                result = true;
             }
         }
         return result;
     }
-    bool set_synchronous_onous_control_status(bool check)
+    bool set_control_mode(bool check = false)
+    {
+        // TODO
+        return true;
+    }
+    bool get_control_word(ZLAC_CONTROL_WORD *value)
+    {
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x200Eu, 1);
+        if (0x80 <= _frame.function) {
+            result = false;
+            *value = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
+        } else {
+            int buf = _frame.data[0];
+            switch (buf) {
+                case 0x05:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP;
+                    break;
+                case 0x06:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT;
+                    break;
+                case 0x07:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_STOP;
+                    break;
+                case 0x08:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE;
+                    break;
+                case 0x10:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START;
+                    break;
+                case 0x11:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT;
+                    break;
+                case 0x12:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT;
+                    break;
+                case 0x00:
+                default:
+                    *value = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
+                    break;
+            }
+        }
+        return result;
+    }
+    bool set_control_word(bool check = false)
+    {
+        // TODO
+        return true;
+    }
+    bool get_synchronous_onous_control_status(bool *value)
+    {
+        bool result         = true;
+        *value              = false;
+        MessageFrame _frame = this->_modbus_send_0x03(0x200Fu, 1);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x00 == buf) {
+                *value = true;
+            }
+        }
+        return result;
+    }
+    bool set_synchronous_onous_control_status(bool check = false)
     {
         // TODO
         return true;
@@ -683,129 +775,145 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
                 result = true;
             }
         }
         return result;
     }
-    ZLAC_STOP_CONTROL get_quick_stop_control()
+    bool get_quick_stop_control(ZLAC_STOP_CONTROL *value)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x211u, 1);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2011u, 1);
         if (0x80 <= _frame.function) {
-            return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+            result = false;
+            *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int value = _frame.data[0];
-            switch (value) {
+            int buf = _frame.data[0];
+            switch (buf) {
                 case 0x05:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                    break;
                 case 0x06:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                    break;
                 case 0x07:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                    break;
                 case 0x00:
                 default:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
                     break;
             }
         }
+        return result;
     }
-    bool set_quick_stop_control(bool check)
+    bool set_quick_stop_control(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_close_operation_control()
+    bool get_close_operation_control(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2012u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_close_operation_control(bool check)
+    bool set_close_operation_control(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_disable_control()
+    bool get_disable_control(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2013u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_disable_control(bool check)
+    bool set_disable_control(bool check = false)
     {
         // TODO
         return true;
     }
-    ZLAC_STOP_CONTROL get_halt_control()
+    bool get_halt_control(ZLAC_STOP_CONTROL *value)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x214u, 1);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2014u, 1);
         if (0x80 <= _frame.function) {
-            return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+            result = false;
+            *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int value = _frame.data[0];
-            switch (value) {
+            int buf = _frame.data[0];
+            switch (buf) {
                 case 0x05:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                    break;
                 case 0x06:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                    break;
                 case 0x07:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                    break;
                 case 0x00:
                 default:
-                    return ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                    *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
                     break;
             }
         }
+        return result;
     }
-    bool set_halt_control(bool check)
+    bool set_halt_control(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_input_effective_level()
+    bool get_input_effective_level(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2016u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_input_effective_level(bool check)
+    bool set_input_effective_level(bool check = false)
     {
         // TODO
         return true;
     }
-    void get_input_terminal_terminal_function_selection(int *x0, int *x1)
+    bool get_input_terminal_terminal_function_selection(int *x0, int *x1)
     {
+        bool result         = true;
         *x0                 = false;
         *x1                 = false;
-        MessageFrame _frame = this->_modbus_send_0x03(0x217Fu, 2);
+        MessageFrame _frame = this->_modbus_send_0x03(0x201Fu, 2);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
@@ -816,22 +924,24 @@ public:
                 *x1 = true;
             }
         }
+        return result;
     }
-    bool set_input_terminal_terminal_function_selection(int x0, int x1, bool check)
+    bool set_input_terminal_terminal_function_selection(int x0, int x1, bool check = false)
     {
         // TODO
         return true;
     }
 
-    void get_output_effective_high_level(bool *y0, bool *y1, bool *b0, bool *b1)
+    bool get_output_effective_high_level(bool *y0, bool *y1, bool *b0, bool *b1)
     {
+        bool result         = true;
         *y0                 = false;
         *y1                 = false;
         *b0                 = false;
         *b1                 = false;
-        MessageFrame _frame = this->_modbus_send_0x03(0x219Fu, 2);
+        MessageFrame _frame = this->_modbus_send_0x03(0x2F19u, 2);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             if (0 < (0x01 & value)) {
@@ -847,25 +957,27 @@ public:
                 *b1 = true;
             }
         }
+        return result;
     }
-    bool set_output_effective_level(bool check)
+    bool set_output_effective_level(bool check = false)
     {
         // TODO
         return true;
     }
-    void get_output_terminal_close_brake( //
+    bool get_output_terminal_close_brake( //
             ZLAC_TERMINAL_FUNCTION *b0,
             ZLAC_TERMINAL_FUNCTION *b1,
             ZLAC_TERMINAL_FUNCTION *y0,
             ZLAC_TERMINAL_FUNCTION *y1)
     {
+        bool result         = true;
         *b0                 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
         *b1                 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
         *y0                 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
         *y1                 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
-        MessageFrame _frame = this->_modbus_send_0x03(0x21AFu, 4);
+        MessageFrame _frame = this->_modbus_send_0x03(0x201Au, 4);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
@@ -900,372 +1012,319 @@ public:
                 *y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL;
             }
         }
+        return result;
     }
-    bool set_output_terminal_terminal_function_selection(int b0, int b1, int y0, int y1, bool check)
+    bool set_output_terminal_terminal_function_selection(int b0, int b1, int y0, int y1, bool check = false)
     {
         // TODO
         return true;
     }
 
-    double get_driver_temperature_protection_threshold()
+    bool get_driver_temperature_protection_threshold(double *value)
     {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x21EFu, 1);
+        bool result         = true;
+        *value              = 0.0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x201Eu, 1);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
-            unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (9 == value0) {
-                result = ((double)value0) / 10.0;
-            }
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
         }
         return result;
     }
-    bool set_driver_temperature_protection_threshold(bool check)
+    bool set_driver_temperature_protection_threshold(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_alarm_pwm_processing_method()
+    bool get_alarm_pwm_processing_method(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x201Fu, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_alarm_pwm_processing_method(bool check)
+    bool set_alarm_pwm_processing_method(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_overload_processing_method()
+    bool get_overload_processing_method(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2020u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_overload_processing_method(bool check)
+    bool set_overload_processing_method(bool check = false)
     {
         // TODO
         return true;
     }
-    bool get_io_emergency_stop_processing_mode()
+    bool get_io_emergency_stop_processing_mode(bool *value)
     {
-        bool result         = false;
+        bool result         = true;
+        *value              = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2021u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == value) {
-                result = true;
+            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x01 == buf) {
+                *value = true;
             }
         }
         return result;
     }
-    bool set_io_emergency_stop_processing_mode(bool check)
+    bool set_io_emergency_stop_processing_mode(bool check = false)
     {
         // TODO
         return true;
     }
 
-    ////////////////////////////////////////////
-
-    int get_encoder_line_left()
+    ////////////////
+    // Left motor parameter
+    ////////////////
+    bool get_encoder_line_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2030u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_encoder_line_left(bool check)
+    bool set_encoder_line_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_hall_offset_angle_left()
+    bool get_hall_offset_angle_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2031u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_hall_offset_angle_left(bool check)
+    bool set_hall_offset_angle_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_overload_factor_left()
+    int get_overload_factor_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2032u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_overload_factor_left(bool check)
+    bool set_overload_factor_left(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_rated_current_left()
+    bool get_rated_current_left(double *rated, double *maximum)
     {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2033u, 1);
+        bool result         = true;
+        *rated              = 0.0;
+        *maximum            = 0.0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2033u, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 0.1;
+            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 0.1;
+            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) / 0.1;
         }
         return result;
     }
-    bool set_rated_current_left(bool check)
+    bool set_rated_current_left(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_maximum_current_left()
-    {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2034u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 0.1;
-        }
-        return result;
-    }
-    bool set_maximum_current_left(bool check)
+    bool set_maximum_current_left(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_overload_protection_time_left()
+    bool get_overload_protection_time_left(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
+        *value              = 0.0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2035u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 100;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 100.0;
         }
         return result;
     }
-    bool set_overload_protection_time_left(bool check)
+    bool set_overload_protection_time_left(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_position_following_error_threshold_left()
+    bool get_position_following_error_threshold_left(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
+        *value              = 0.0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2036u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 10;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
         }
         return result;
     }
-    bool set_position_following_error_threshold_left(bool check)
+    bool set_position_following_error_threshold_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_smoothing_factor_left()
+    int get_velocity_smoothing_factor_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2037u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_smoothing_factor_left(bool check)
+    bool set_velocity_smoothing_factor_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_cl_kp_left()
+    bool get_cl_left(int *kp, int *ki)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2038u, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *ki                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2038u, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
         }
         return result;
     }
-    bool set_cl_kp_left(bool check)
+    bool set_cl_left(int kp, int ki, bool check = false)
     {
         // TODO
         return true;
     }
-    int get_cl_ki_left()
+    bool get_feedforward_output_smoothing_factor_left(int *value)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2039u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_cl_ki_left(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_feedforward_output_smoothing_factor_left()
-    {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x203Au, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_feedforward_output_smoothing_factor_left(bool check)
+    bool set_feedforward_output_smoothing_factor_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_torque_output_smoothing_factor_left()
+    bool get_torque_output_smoothing_factor_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x203Bu, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_torque_output_smoothing_factor_left(bool check)
+    bool set_torque_output_smoothing_factor_left(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_loop_kp_left()
+    int get_velocity_loop_left(int *kp, int *ki, int *kf)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x203Cu, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *ki                 = 0;
+        *kf                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x203Cu, 3);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kf = (int)(_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_loop_kp_left(bool check)
+    bool set_velocity_loop_left(int kp, int ki, int kf, bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_loop_ki_left()
+    int get_position_loop_left(int *kp, int *kf)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x203Du, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *kf                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x203Fu, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kf = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_loop_ki_left(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_velocity_loop_kf_left()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x203Eu, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_velocity_loop_kf_left(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_position_loop_kp_left()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x203Fu, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_position_loop_kp_left(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_position_loop_kf_left()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2040u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_position_loop_kf_left(bool check)
+    bool set_position_loop_kp_left(bool check = false)
     {
         // TODO
         return true;
     }
 
-    int get_initial_velocity_left()
+    bool get_initial_velocity_left(int *value)
     {
-        int result  = 0;
+        bool result = true;
+        *value      = 0;
         int address = 0x00;
         switch (this->_mode) {
             case ZLAC::DRIVER_MODE::VELOCITY:
@@ -1281,351 +1340,301 @@ public:
         if (0 != address) {
             MessageFrame _frame = this->_modbus_send_0x03(address, 1);
             if (0x80 <= _frame.function) {
-                result = 0;
+                result = false;
             } else {
-                result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             }
         }
         return result;
     }
-    bool set_initial_velocity_left(bool check)
+    bool set_initial_velocity_left(bool check = false)
     {
         // TODO
         return true;
     }
 
-    int get_motor_poles_left()
+    bool get_motor_poles_left(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2045u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_motor_poles_left(bool check)
+    bool set_motor_poles_left(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_over_temperature_threshold_left()
+    bool get_over_temperature_threshold_left(double *value)
     {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2146u, 1);
+        bool result         = true;
+        *value              = 0.0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2046u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 10;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
         }
         return result;
     }
-    bool set_over_temperature_threshold_left(bool check)
+    bool set_over_temperature_threshold_left(bool check = false)
     {
         // TODO
         return true;
     }
-    void get_velocity_observer_coefficient_left(int *index1, int *index2, int *index3, int *index4)
+    bool get_velocity_observer_coefficient_left(int *index1, int *index2, int *index3, int *index4)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2147u, 4);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2047u, 4);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             *index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             *index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
             *index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
         }
+        return result;
     }
-    bool set_velocity_observer_coefficient_left(bool check)
+    bool set_velocity_observer_coefficient_left(bool check = false)
     {
         // TODO
         return true;
     }
-    ////////////////////////////////////////////
 
-    int get_encoder_line_right()
+    ////////////////
+    // Right motor parameter
+    ////////////////
+
+    bool get_encoder_line_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2060u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_encoder_line_right(bool check)
+    bool set_encoder_line_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_hall_offset_angle_right()
+    bool get_hall_offset_angle_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2061u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_hall_offset_angle_right(bool check)
+    bool set_hall_offset_angle_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_overload_factor_right()
+    int get_overload_factor_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2062u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_overload_factor_right(bool check)
+    bool set_overload_factor_right(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_rated_current_right()
+    bool get_rated_current_right(double *rated, double *maximum)
     {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2063u, 1);
+        bool result         = true;
+        *rated              = 0.0;
+        *maximum            = 0.0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2063u, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 0.1;
+            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 0.1;
+            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) / 0.1;
         }
         return result;
     }
-    bool set_rated_current_right(bool check)
+    bool set_rated_current_right(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_maximum_current_right()
-    {
-        double result       = 0.0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2064u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 0.1;
-        }
-        return result;
-    }
-    bool set_maximum_current_right(bool check)
+    bool set_maximum_current_right(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_overload_protection_time_right()
+    bool get_overload_protection_time_right(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
+        *value              = 0.0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2065u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 100;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 100.0;
         }
         return result;
     }
-    bool set_overload_protection_time_right(bool check)
+    bool set_overload_protection_time_right(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_position_following_error_threshold_right()
+    bool get_position_following_error_threshold_right(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
+        *value              = 0.0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2066u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 10;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
         }
         return result;
     }
-    bool set_position_following_error_threshold_right(bool check)
+    bool set_position_following_error_threshold_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_smoothing_factor_right()
+    int get_velocity_smoothing_factor_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2067u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_smoothing_factor_right(bool check)
+    bool set_velocity_smoothing_factor_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_cl_kp_right()
+    bool get_cl_right(int *kp, int *ki)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2068u, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *ki                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2068u, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
         }
         return result;
     }
-    bool set_cl_kp_right(bool check)
+    bool set_cl_right(int kp, int ki, bool check = false)
     {
         // TODO
         return true;
     }
-    int get_cl_ki_right()
+    bool get_feedforward_output_smoothing_factor_right(int *value)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2069u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_cl_ki_right(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_feedforward_output_smoothing_factor_right()
-    {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x206Au, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_feedforward_output_smoothing_factor_right(bool check)
+    bool set_feedforward_output_smoothing_factor_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_torque_output_smoothing_factor_right()
+    bool get_torque_output_smoothing_factor_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x206Bu, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_torque_output_smoothing_factor_right(bool check)
+    bool set_torque_output_smoothing_factor_right(bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_loop_kp_right()
+    int get_velocity_loop_right(int *kp, int *ki, int *kf)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x206Cu, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *ki                 = 0;
+        *kf                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x206Cu, 3);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kf = (int)(_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_loop_kp_right(bool check)
+    bool set_velocity_loop_right(int kp, int ki, int kf, bool check = false)
     {
         // TODO
         return true;
     }
-    int get_velocity_loop_ki_right()
+    int get_position_loop_right(int *kp, int *kf)
     {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x206Du, 1);
+        bool result         = true;
+        *kp                 = 0;
+        *kf                 = 0;
+        MessageFrame _frame = this->_modbus_send_0x03(0x206Fu, 2);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *kf = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
         }
         return result;
     }
-    bool set_velocity_loop_ki_right(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_velocity_loop_kf_right()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x206Eu, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_velocity_loop_kf_right(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_position_loop_kp_right()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x206Fu, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_position_loop_kp_right(bool check)
-    {
-        // TODO
-        return true;
-    }
-    int get_position_loop_kf_right()
-    {
-        int result          = 0;
-        MessageFrame _frame = this->_modbus_send_0x03(0x2070u, 1);
-        if (0x80 <= _frame.function) {
-            result = 0;
-        } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-        }
-        return result;
-    }
-    bool set_position_loop_kf_right(bool check)
+    bool set_position_loop_kp_right(bool check = false)
     {
         // TODO
         return true;
     }
 
-    int get_initial_velocity_right()
+    bool get_initial_velocity_right(int *value)
     {
-        int result  = 0;
+        bool result = true;
+        *value      = 0;
         int address = 0x00;
         switch (this->_mode) {
             case ZLAC::DRIVER_MODE::VELOCITY:
@@ -1641,96 +1650,88 @@ public:
         if (0 != address) {
             MessageFrame _frame = this->_modbus_send_0x03(address, 1);
             if (0x80 <= _frame.function) {
-                result = 0;
+                result = false;
             } else {
-                result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             }
         }
         return result;
     }
-    bool set_initial_velocity_right(bool check)
+    bool set_initial_velocity_right(bool check = false)
     {
         // TODO
         return true;
     }
 
-    int get_motor_poles_right()
+    bool get_motor_poles_right(int *value)
     {
-        int result          = 0;
+        bool result         = true;
+        *value              = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2075u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
         }
         return result;
     }
-    bool set_motor_poles_right(bool check)
+    bool set_motor_poles_right(bool check = false)
     {
         // TODO
         return true;
     }
-    double get_over_temperature_threshold_right()
+    bool get_over_temperature_threshold_right(double *value)
     {
-        double result       = 0.0;
+        bool result         = true;
+        *value              = 0.0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2076u, 1);
         if (0x80 <= _frame.function) {
-            result = 0;
+            result = false;
         } else {
-            result = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            result = result / 10;
+            *value = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
         }
         return result;
     }
-    bool set_over_temperature_threshold_right(bool check)
+    bool set_over_temperature_threshold_right(bool check = false)
     {
         // TODO
         return true;
     }
-    void get_velocity_observer_coefficient_right(int *index1, int *index2, int *index3, int *index4)
+    bool get_velocity_observer_coefficient_right(int *index1, int *index2, int *index3, int *index4)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2177u, 4);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2077u, 4);
         if (0x80 <= _frame.function) {
-            // do nothing
+            result = false;
         } else {
             *index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             *index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
             *index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
         }
+        return result;
     }
-    bool set_velocity_observer_coefficient_right(int index1, int index2, int index3, int index4, bool check)
+    bool set_velocity_observer_coefficient_right(bool check = false)
     {
         // TODO
         return true;
     }
-    ////////////////////////////////////////////
-
-    int get_s_shape_acceleration_time(ZLAC::TARGET_MOTOR target)
+    ////////////////
+    // Control parameter
+    ////////////////
+    bool get_s_shape_acceleration_time(int *left, int *right)
     {
-        int address = 0;
-        int size    = 0;
-
-        switch (target) {
-            case ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT:
-                address = 0x2080u;
-                size    = 1;
-                break;
-            case ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT:
-                address = 0x2081u;
-                size    = 1;
-                break;
-            case ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL:
-                address = 0x2080u;
-                size    = 2;
-                break;
-            default:
-                break;
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2080u, 2);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
         }
-
-        return 0;
+        return result;
     }
-    bool set_s_shape_acceleration_time(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_s_shape_acceleration_time(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1738,16 +1739,17 @@ public:
 
     bool get_s_shape_deceleration_time(int *left, int *right)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2080u, 2);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2082u, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            return true;
         }
+        return result;
     }
-    bool set_s_shape_deceleration_time(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_s_shape_deceleration_time(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1755,16 +1757,18 @@ public:
 
     bool get_deceleration_time_of_quick_stop(int *left, int *right)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2082u, 2);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2084u, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
+        return result;
     }
-    bool set_deceleration_time_of_quick_stop(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_deceleration_time_of_quick_stop(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1772,16 +1776,18 @@ public:
 
     bool get_torque_slope(int *left, int *right)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2084u, 2);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2086u, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             return true;
         }
+        return result;
     }
-    bool set_torque_slope(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_torque_slope(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return 0;
@@ -1789,16 +1795,17 @@ public:
 
     bool get_target_velocity(int *left, int *right)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x2087u, 2);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x2088u, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            return true;
         }
+        return result;
     }
-    bool set_target_velocity(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_target_velocity(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1806,16 +1813,17 @@ public:
 
     bool get_target_position(long *left, long *right)
     {
-        MessageFrame _frame = this->_modbus_send_0x03(0x208Au, 2);
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_send_0x03(0x208Au, 4);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 24) | (_frame.data[1] << 16) | (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
             *right = (_frame.data[4] << 24) | (_frame.data[5] << 16) | (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
-            return true;
         }
+        return result;
     }
-    bool set_target_position(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_target_position(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1823,16 +1831,17 @@ public:
 
     bool get_max_speed(int *left, int *right)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x208Eu, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            return true;
         }
+        return result;
     }
-    bool set_max_speed(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_max_speed(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
@@ -1840,16 +1849,17 @@ public:
 
     bool get_target_torque(int *left, int *right)
     {
+        bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2090u, 2);
         if (0x80 <= _frame.function) {
-            return false;
+            result = false;
         } else {
             *left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             *right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            return true;
         }
+        return result;
     }
-    bool set_target_torque(ZLAC::TARGET_MOTOR target, bool check)
+    bool set_target_torque(ZLAC::TARGET_MOTOR target, bool check = false)
     {
         // TODO
         return true;
