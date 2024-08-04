@@ -10,16 +10,16 @@
  */
 ///////////////////////////////////////////////////////////////////
 #ifndef COMMON_CONSTANT
-#define COMMON_CONSTANT 0
+#define COMMON_CONSTANT 1
 #endif
 #ifndef MOTOR_PARAMETER
-#define MOTOR_PARAMETER 0
+#define MOTOR_PARAMETER 1
 #endif
 #ifndef CONTROL_PARAMETER
 #define CONTROL_PARAMETER 1
 #endif
 #ifndef READ_ONLY_PARAMETER
-#define READ_ONLY_PARAMETER 0
+#define READ_ONLY_PARAMETER 1
 #endif
 
 ///////////////////////////////////////////////////////////////////
@@ -87,398 +87,646 @@ void tearDown(void)
 /////////////////////////////////////////////////
 // Common constant for Left and Right motors
 /////////////////////////////////////////////////
+#if COMMON_CONSTANT
 void Communication_offline_time(void)
 {
-    bool result = true;
-
+    // bool set_communication_offline_time(int value_ms, bool check = false)
+    // TODO
+    int value   = 0;
+    bool result = ctrl.get_communication_offline_time(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Communication_offline_time : %d", value);
 }
 void RS485_Node_ID(void)
 {
+    // bool set_rs485_node_id(int id, bool check = false)
+    // TODO
+
     int value   = 0;
     bool result = ctrl.get_rs485_node_id(&value);
     TEST_ASSERT_TRUE(result);
-    log_d("* RS485 Node ID : %d", value);
+    log_d("* RS485_Node_ID : %d", value);
+
     TEST_ASSERT_EQUAL_INT(1, value);
 }
 void RS485_Baud_Rate(void)
 {
-    bool result = true;
+    // bool set_rs485_baud_rate(RS485_BAUD_RATE baud, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::RS485_BAUD_RATE value;
+    bool result = ctrl.get_rs485_baud_rate(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* RS485_Baud_Rate : [%d]", value);
 }
 void Input_signal_status(void)
 {
-    bool result = true;
-
+    // TODO
+    int x0      = 0;
+    int x1      = 0;
+    bool result = ctrl.get_input_signal_status(&x0, &x1);
     TEST_ASSERT_TRUE(result);
+    log_d("* Input_signal_status : x0[%d]x1[%d]", x0, x1);
 }
 void Out_signal_status(void)
 {
-    bool result = true;
-
+    // TODO
+    int x0      = 0;
+    int x1      = 0;
+    bool result = ctrl.get_out_signal_status(&x0, &x1);
     TEST_ASSERT_TRUE(result);
+    log_d("* Out_signal_status : x0[%d]x1[%d]", x0, x1);
 }
 void Clear_feedback_position(void)
 {
-    bool result = true;
+    // bool set_clear_feedback_position(ZLAC::target_motor target, bool check = false)
 
+    // TODO
+    ZLAC::target_motor value;
+    bool result = ctrl.get_clear_feedback_position(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Clear_feedback_position : [%d]", value);
 }
 void In_absolute_position_control_reset_the_zero_point(void)
 {
-    bool result = true;
+    // bool set_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor target, bool check = false)
 
+    // TODO
+    ZLAC::target_motor value;
+    bool result = ctrl.get_reset_the_zero_point_in_absolute_position_control(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* In_absolute_position_control_reset_the_zero_point : [%d]", value);
 }
 void Shaft_state_after_power_on(void)
 {
-    bool result = true;
+    // bool set_shaft_state_after_power_on(bool lock_shaft, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_shaft_state_after_power_on(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Shaft_state_after_power_on : %s", flag ? "T:lock" : "F:unlock");
 }
 void Maximum_motor_speed(void)
 {
-    bool result = true;
+    // bool set_maximum_motor_speed(int r_min, bool check = false)
 
+    // TODO
+    int value   = 0;
+    bool result = ctrl.get_maximum_motor_speed(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Maximum_motor_speed : %d", value);
 }
 void Register_parameter_settings(void)
 {
-    bool result = true;
+    // bool set_register_parameter_settings(bool restore_factory_settings, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_register_parameter_settings(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Register_parameter_settings : %s", flag ? "T" : "F");
 }
-void CAN_Node_ID(void)
+void CAN_Node_info(void)
 {
-    bool result = true;
+    // bool set_can_node_info(int id, CAN_BAUD_RATE baud, bool check = false)
 
+    // TODO
+    int id = 0;
+    ZLAC8015DCtrl::CAN_BAUD_RATE baud;
+    bool result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
-}
-void CAN_Baud_rate(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    log_d("* CAN_Node_info : id[%d]baud[%d]", id, baud);
 }
 void Control_mode(void)
 {
-    bool result = true;
+    // bool set_control_mode(ZLAC::DRIVER_MODE mode, bool check = false)
 
+    // TODO
+    ZLAC::DRIVER_MODE value;
+    bool result = ctrl.get_control_mode(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Control_mode : [%d]", value);
 }
 void Control_word(void)
 {
-    bool result = true;
+    // bool set_control_word(ZLAC_CONTROL_WORD word, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::ZLAC_CONTROL_WORD value;
+    bool result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Control_word : [%d]", value);
 }
 void Synchronous_control_status(void)
 {
-    bool result = true;
+    // bool set_synchronous_control_status(bool synchronous, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_synchronous_control_status(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Synchronous_control_status : %s", flag ? "T:synchronous" : "F:ansynchronous");
 }
-void Whether_store_RW_register_to_EEPROM(void)
+void Store_RW_register_to_EEPROM(void)
 {
+    // [CATION] This function is not implemented.
+    // bool store_rw_register_to_eperm()
+
+    // TODO
     bool result = true;
 
-    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE_MESSAGE(result, "NOT TEST");
 }
 void Quick_stop_control(void)
 {
-    bool result = true;
+    // bool set_quick_stop_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::ZLAC_STOP_CONTROL value;
+    bool result = ctrl.get_quick_stop_control(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Quick_stop_control : [%d]", value);
 }
 void Close_operation_control(void)
 {
-    bool result = true;
+    // bool set_close_operation_control(bool stop_normally, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_close_operation_control(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Close_operation_control : %s", flag ? "T:stop_normally" : "F:--");
 }
 void Disable_control(void)
 {
-    bool result = true;
+    // bool set_disable_control(bool stop, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_disable_control(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Disable_control : %s", flag ? "T:stop" : "F:--");
 }
 void Halt_control(void)
 {
-    bool result = true;
+    // bool set_halt_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::ZLAC_STOP_CONTROL value;
+    bool result = ctrl.get_halt_control(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Halt_control : [%d]", value);
 }
 void Input_effective_level(void)
 {
-    bool result = true;
+    // bool set_input_effective_level(bool low_level, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_input_effective_level(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Input_effective_level : %s", flag ? "T:low_level" : "F:hight_level");
 }
-void Input_terminal_X0_terminal_function_selection(void)
+void Input_terminal_function_selection(void)
 {
-    bool result = true;
+    // bool set_input_terminal_terminal_function_selection(TERMINAL_FUNCTION x0, TERMINAL_FUNCTION x1, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::TERMINAL_FUNCTION x0;
+    ZLAC8015DCtrl::TERMINAL_FUNCTION x1;
+    bool result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-}
-void Input_terminal_X1_terminal_function_selection(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    log_d("* Input_terminal_function_selection : x0[%d]x1[%d]", x0, x1);
 }
 void Output_effective_level(void)
 {
-    bool result = true;
+    // bool set_output_effective_low_level(bool y0, bool y1, bool b0, bool b1, bool check = false)
 
+    // TODO
+    bool b0;
+    bool b1;
+    bool y0;
+    bool y1;
+    bool result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
     TEST_ASSERT_TRUE(result);
+    log_d("* Output_effective_level : b0[%s]b1[%s]y0[%s]y1[%s]", //
+          b0 ? "T" : "F",
+          b1 ? "T" : "F",
+          y0 ? "T" : "F",
+          y1 ? "T" : "F");
 }
-void Output_terminal_B0_terminal_function_selection(void)
+void Output_terminal_function_selection(void)
 {
-    bool result = true;
+    // bool set_output_terminal_function_selection( ZLAC_TERMINAL_FUNCTION b0, ZLAC_TERMINAL_FUNCTION b1, ZLAC_TERMINAL_FUNCTION y0, ZLAC_TERMINAL_FUNCTION y1, bool check = false)
 
+    // TODO
+    ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION b0;
+    ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION b1;
+    ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION y0;
+    ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION y1;
+    bool result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
     TEST_ASSERT_TRUE(result);
-}
-void Output_terminal_B1_terminal_function_selection(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
-}
-void Output_terminal_Y0_terminal_function_selection(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
-}
-void Output_terminal_Y1_terminal_function_selection(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    log_d("* Halt_control : b0[%d]b1[%d]y0[%d]y1[%d]", b0, b1, y0, y1);
 }
 void Driver_temperature_protection_threshold(void)
 {
-    bool result = true;
+    // bool set_driver_temperature_protection_threshold(double value, bool check = false)
 
+    // TODO
+    double value = false;
+    bool result  = ctrl.get_driver_temperature_protection_threshold(&value);
     TEST_ASSERT_TRUE(result);
+    log_d("* Driver_temperature_protection_threshold : %8.3f", value);
 }
 void Alarm_PWM_processing_method(void)
 {
-    bool result = true;
+    // bool set_alarm_pwm_processing_method(bool open, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_alarm_pwm_processing_method(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Alarm_PWM_processing_method : %s", flag ? "T:Open" : "F:Close");
 }
 void Overload_processing_method(void)
 {
-    bool result = true;
+    // bool set_overload_processing_method(bool open, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_overload_processing_method(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* Overload_processing_method : %s", flag ? "T:Open" : "F:Close");
 }
 void IO_emergency_stop_processing_mode(void)
 {
-    bool result = true;
+    // bool set_io_emergency_stop_processing_mode(bool lock_shaft, bool check = false)
 
+    // TODO
+    bool flag   = false;
+    bool result = ctrl.get_io_emergency_stop_processing_mode(&flag);
     TEST_ASSERT_TRUE(result);
+    log_d("* IO_emergency_stop_processing_mode : %s", flag ? "T:Lock" : "F:Free");
 }
+#endif
+#if MOTOR_PARAMETER
 /////////////////////////////////////////////////
 // Motor parameter
 /////////////////////////////////////////////////
 void Encoder_line(void)
 {
-    bool result = true;
+    // bool set_encoder_line_left(int value, bool check = false)
+    // bool set_encoder_line_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_encoder_line_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Encoder_line : Left :");
+    result = ctrl.get_encoder_line_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Encoder_line : Right :");
+    log_d("* Encoder_line : L[%d]R[%d]", left, right);
 }
 void Hall_offset_angle(void)
 {
-    bool result = true;
+    // bool set_hall_offset_angle_left(int value, bool check = false)
+    // bool set_hall_offset_angle_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_hall_offset_angle_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Hall_offset_angle : Left :");
+    result = ctrl.get_hall_offset_angle_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Hall_offset_angle : Right :");
+    log_d("* Hall_offset_angle : L[%d]R[%d]", left, right);
 }
 void Overload_factor(void)
 {
-    bool result = true;
+    // bool set_overload_factor_left(int value, bool check = false)
+    // bool set_overload_factor_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_overload_factor_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Overload_factor : Left :");
+    result = ctrl.get_overload_factor_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Overload_factor : Right :");
+    log_d("* Overload_factor : L[%d]R[%d]", left, right);
 }
 void Rated_current(void)
 {
-    bool result = true;
+    // bool set_rated_current_left(double value, bool check = false)
+    // bool set_rated_current_right(double value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    double rated_left    = 0;
+    double maximum_left  = 0;
+    double rated_right   = 0;
+    double maximum_right = 0;
+    bool result          = ctrl.get_current_left(&rated_left, &maximum_left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Rated_current : Left :");
+    log_d("* Rated_current : Left : rated[%8.3f]/maximum[%8.3f]", rated_left, maximum_left);
+    result = ctrl.get_current_right(&rated_right, &maximum_right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Rated_current : Right :");
+    log_d("* Rated_current : Right : rated[%8.3f]/maximum[%8.3f]", rated_right, maximum_right);
 }
 void Maximum_current(void)
 {
-    bool result = true;
+    // bool set_maximum_current_left(double value, bool check = false)
+    // bool set_maximum_current_right(double value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    double rated_left    = 0;
+    double maximum_left  = 0;
+    double rated_right   = 0;
+    double maximum_right = 0;
+    bool result          = ctrl.get_current_left(&rated_left, &maximum_left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Maximum_current : Left :");
+    log_d("* Maximum_current : Left : rated[%8.3f]/maximum[%8.3f]", rated_left, maximum_left);
+    result = ctrl.get_current_right(&rated_right, &maximum_right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Maximum_current : Right :");
+    log_d("* Maximum_current : Right : rated[%8.3f]/maximum[%8.3f]", rated_right, maximum_right);
 }
 void Overload_protection_time(void)
 {
-    bool result = true;
+    // bool set_overload_protection_time_left(int value, bool check = false)
+    // bool set_overload_protection_time_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_overload_protection_time_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Overload_protection_time : Left :");
+    result = ctrl.get_overload_protection_time_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Overload_protection_time : Right :");
+    log_d("* Overload_protection_time : L[%d]R[%d]", left, right);
 }
 void Position_following_error_threshold(void)
 {
-    bool result = true;
+    // bool set_position_following_error_threshold_left(double value, bool check = false)
+    // bool set_position_following_error_threshold_right(double value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_position_following_error_threshold_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_following_error_threshold : Left :");
+    result = ctrl.get_position_following_error_threshold_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_following_error_threshold : Right :");
+    log_d("* Position_following_error_threshold : L[%d]R[%d]", left, right);
 }
 void Velocity_smoothing_factor(void)
 {
-    bool result = true;
+    // bool set_velocity_smoothing_factor_left(int value, bool check = false)
+    // bool set_velocity_smoothing_factor_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_velocity_smoothing_factor_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Velocity_smoothing_factor : Left :");
+    result = ctrl.get_velocity_smoothing_factor_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Velocity_smoothing_factor : Right :");
+    log_d("* Velocity_smoothing_factor : L[%d]R[%d]", left, right);
 }
-void Cl_Kp(void)
+void Current_loop(void)
 {
-    bool result = true;
+    // bool set_current_loop_left(int kp, int ki, bool check = false)
+    // bool set_current_loop_right(int kp, int ki, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
-}
-void Cl_Ki(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left_kp  = 0;
+    int left_ki  = 0;
+    int right_kp = 0;
+    int right_ki = 0;
+    bool result  = ctrl.get_current_loop_left(&left_kp, &left_ki);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Current_loop : Left :");
+    result = ctrl.get_current_loop_right(&right_kp, &right_ki);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Current_loop : Right :");
+    log_d("* Current_loop : Left : kp[%d]ki[%d]", left_kp, left_ki);
+    log_d("* Current_loop : Right : kp[%d]ki[%d]", right_kp, right_ki);
 }
 void Feedforward_output_smoothing_factor(void)
 {
-    bool result = true;
+    // bool set_feedforward_output_smoothing_factor_left(int value, bool check = false)
+    // bool set_feedforward_output_smoothing_factor_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_feedforward_output_smoothing_factor_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Feedforward_output_smoothing_factor : Left :");
+    result = ctrl.get_feedforward_output_smoothing_factor_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Feedforward_output_smoothing_factor : Right :");
+    log_d("* Feedforward_output_smoothing_factor : L[%d]R[%d]", left, right);
 }
 void Torque_output_smoothing_factor(void)
 {
-    bool result = true;
+    // bool set_torque_output_smoothing_factor_left(int value, bool check = false)
+    // bool set_torque_output_smoothing_factor_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_torque_output_smoothing_factor_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Torque_output_smoothing_factor : Left :");
+    result = ctrl.get_torque_output_smoothing_factor_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Torque_output_smoothing_factor : Right :");
+    log_d("* Torque_output_smoothing_factor : L[%d]R[%d]", left, right);
 }
-void Velocity_Loop_Kp(void)
+void Velocity_Loop(void)
 {
-    bool result = true;
+    // bool set_velocity_loop_left(int kp, int ki, int kf, bool check = false)
+    // bool set_velocity_loop_right(int kp, int ki, int kf, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left_kp  = 0;
+    int left_ki  = 0;
+    int left_kf  = 0;
+    int right_kp = 0;
+    int right_ki = 0;
+    int right_kf = 0;
+    bool result  = ctrl.get_velocity_loop_left(&left_kp, &left_ki, &left_kf);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_Loop : Left :");
+    result = ctrl.get_velocity_loop_right(&right_kp, &right_ki, &right_kf);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_Loop : Right :");
+    log_d("* Position_Loop : Left : kp[%d]ki[%d]kf[%d]", left_kp, left_ki, left_kf);
+    log_d("* Position_Loop : Right : kp[%d]ki[%d]kf[%d]", right_kp, right_ki, right_kf);
 }
-void Velocity_Loop_Ki(void)
+void Position_Loop(void)
 {
-    bool result = true;
+    // bool set_position_loop_left(int kp, int kf, bool check = false)
+    // bool set_position_loop_right(int kp, int kf, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
-}
-void Velocity_Loop_Kf(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
-}
-void Position_Loop_Kp(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
-}
-void Position_Loop_Kf(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left_kp  = 0;
+    int left_kf  = 0;
+    int right_kp = 0;
+    int right_kf = 0;
+    bool result  = ctrl.get_position_loop_left(&left_kp, &left_kf);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_Loop : Left :");
+    result = ctrl.get_position_loop_right(&right_kp, &right_kf);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Position_Loop : Right :");
+    log_d("* Position_Loop : Left : kp[%d]kf[%d]", left_kp, left_kf);
+    log_d("* Position_Loop : Right : kp[%d]kf[%d]", right_kp, right_kf);
 }
 void Initial_velocity(void)
 {
-    bool result = true;
+    // bool set_initial_velocity_left(int value, bool check = false)
+    // bool set_initial_velocity_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_initial_velocity_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Initial_velocity : Left :");
+    result = ctrl.get_initial_velocity_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Initial_velocity : Right :");
+    log_d("* Initial_velocity : L[%d]R[%d]", left, right);
 }
 void Motor_poles(void)
 {
-    bool result = true;
+    // bool set_motor_poles_left(int value, bool check = false)
+    // bool set_motor_poles_right(int value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_motor_poles_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Motor_poles : Left :");
+    result = ctrl.get_motor_poles_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Motor_poles : Right :");
+    log_d("* Motor_poles : L[%d]R[%d]", left, right);
 }
 void Over_temperature_threshold(void)
 {
-    bool result = true;
+    // bool set_over_temperature_threshold_left(double value, bool check = false)
+    // bool set_over_temperature_threshold_right(double value, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
+    // TODO
+    double left  = 0;
+    double right = 0;
+    bool result  = ctrl.get_over_temperature_threshold_left(&left);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Over_temperature_threshold : Left :");
+    result = ctrl.get_over_temperature_threshold_right(&right);
+    TEST_ASSERT_TRUE_MESSAGE(result, "* Over_temperature_threshold : Right :");
+    log_d("* Over_temperature_threshold : L[%8.3f]R[%8.3f]", left, right);
 }
-void Velocity_observer_coefficient_1(void)
+void Velocity_observer_coefficient(void)
 {
-    bool result = true;
+    // bool set_velocity_observer_coefficient_left(int index1, int index2, int index3, int index4, bool check = false)
+    // bool set_velocity_observer_coefficient_right(int index1, int index2, int index3, int index4, bool check = false)
 
-    TEST_ASSERT_TRUE(result);
-}
-void Velocity_observer_coefficient_2(void)
-{
-    bool result = true;
+    // TODO
+    int index1 = 0;
+    int index2 = 0;
+    int index3 = 0;
+    int index4 = 0;
 
+    bool result = ctrl.get_velocity_observer_coefficient_left(&index1, &index2, &index3, &index4);
     TEST_ASSERT_TRUE(result);
-}
-void Velocity_observer_coefficient_3(void)
-{
-    bool result = true;
+    log_d("* Velocity_observer_coefficient : Left : L[%d]R[%d]", index1, index2, index3, index4);
 
+    result = ctrl.get_velocity_observer_coefficient_right(&index1, &index2, &index3, &index4);
     TEST_ASSERT_TRUE(result);
+    log_d("* Velocity_observer_coefficient : Right : L[%d]R[%d]", index1, index2, index3, index4);
 }
-void Velocity_observer_coefficient_4(void)
-{
-    bool result = true;
-
-    TEST_ASSERT_TRUE(result);
-}
+#endif
+#if CONTROL_PARAMETER
 /////////////////////////////////////////////////
 // Control parameter
 /////////////////////////////////////////////////
 void S_shape_acceleration_time(void)
 {
-    bool result = true;
+    // bool set_s_shape_acceleration_time(int left, int right, bool check = false)
 
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_s_shape_acceleration_time(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* S_shape_acceleration_time : L[%d]R[%d]", left, right);
 }
 void S_shape_deceleration_time(void)
 {
-    bool result = true;
+    // bool set_s_shape_deceleration_time(int left, int right, bool check = false)
 
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_s_shape_deceleration_time(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* S_shape_deceleration_time : L[%d]R[%d]", left, right);
 }
 void Deceleration_time_of_quick_stop(void)
 {
-    bool result = true;
+    // bool set_deceleration_time_of_quick_stop(int left, int right, bool check = false)
 
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_deceleration_time_of_quick_stop(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Deceleration_time_of_quick_stop : L[%d]R[%d]", left, right);
 }
 void Torque_slope(void)
 {
-    bool result = true;
+    // bool set_torque_slope(int left, int right, bool check = false)
 
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_torque_slope(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Torque_slope : L[%d]R[%d]", left, right);
 }
 void Target_velocity(void)
 {
-    bool result = true;
+    // bool set_target_velocity(int left, int right, bool check = false)
 
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_target_velocity(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Target_velocity : L[%d]R[%d]", left, right);
 }
 void Target_position(void)
 {
-    bool result = true;
+    // bool set_target_position(long left, long right, bool check = false)
 
+    // TODO
+    long left   = 0;
+    long right  = 0;
+    bool result = ctrl.get_target_position(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Target_position : L[%d]R[%d]", left, right);
 }
 void Max_speed(void)
 {
-    bool result = true;
-
+    // bool set_max_speed(int left, int right, bool check = false)
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_max_speed(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Max_speed : L[%d]R[%d]", left, right);
 }
 void Target_torque(void)
 {
-    bool result = true;
-
+    // bool set_target_torque(int left, int right, bool check = false)
+    // TODO
+    int left    = 0;
+    int right   = 0;
+    bool result = ctrl.get_target_torque(&left, &right);
     TEST_ASSERT_TRUE(result);
+    log_d("* Target_torque : L[%d]R[%d]", left, right);
 }
+#endif
+#if READ_ONLY_PARAMETER
 /////////////////////////////////////////////////
 // Read only parameter
 /////////////////////////////////////////////////
@@ -665,6 +913,7 @@ void Driver_temperature(void)
         TEST_ASSERT_TRUE_MESSAGE(false, "NOT updated this value");
     }
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////
 
@@ -685,24 +934,19 @@ void RUN_UNITY_TESTS()
     RUN_TEST(Shaft_state_after_power_on);
     RUN_TEST(Maximum_motor_speed);
     RUN_TEST(Register_parameter_settings);
-    RUN_TEST(CAN_Node_ID);
-    RUN_TEST(CAN_Baud_rate);
+    RUN_TEST(CAN_Node_info);
     RUN_TEST(Control_mode);
     RUN_TEST(Control_word);
     RUN_TEST(Synchronous_control_status);
-    RUN_TEST(Whether_store_RW_register_to_EEPROM);
+    RUN_TEST(Store_RW_register_to_EEPROM);
     RUN_TEST(Quick_stop_control);
     RUN_TEST(Close_operation_control);
     RUN_TEST(Disable_control);
     RUN_TEST(Halt_control);
     RUN_TEST(Input_effective_level);
-    RUN_TEST(Input_terminal_X0_terminal_function_selection);
-    RUN_TEST(Input_terminal_X1_terminal_function_selection);
+    RUN_TEST(Input_terminal_function_selection);
     RUN_TEST(Output_effective_level);
-    RUN_TEST(Output_terminal_B0_terminal_function_selection);
-    RUN_TEST(Output_terminal_B1_terminal_function_selection);
-    RUN_TEST(Output_terminal_Y0_terminal_function_selection);
-    RUN_TEST(Output_terminal_Y1_terminal_function_selection);
+    RUN_TEST(Output_terminal_function_selection);
     RUN_TEST(Driver_temperature_protection_threshold);
     RUN_TEST(Alarm_PWM_processing_method);
     RUN_TEST(Overload_processing_method);
@@ -718,22 +962,14 @@ void RUN_UNITY_TESTS()
     RUN_TEST(Overload_protection_time);
     RUN_TEST(Position_following_error_threshold);
     RUN_TEST(Velocity_smoothing_factor);
-    RUN_TEST(Cl_Kp);
-    RUN_TEST(Cl_Ki);
+    RUN_TEST(Current_loop);
     RUN_TEST(Feedforward_output_smoothing_factor);
     RUN_TEST(Torque_output_smoothing_factor);
-    RUN_TEST(Velocity_Loop_Kp);
-    RUN_TEST(Velocity_Loop_Ki);
-    RUN_TEST(Velocity_Loop_Kf);
-    RUN_TEST(Position_Loop_Kp);
-    RUN_TEST(Position_Loop_Kf);
+    RUN_TEST(Velocity_Loop);
     RUN_TEST(Initial_velocity);
     RUN_TEST(Motor_poles);
     RUN_TEST(Over_temperature_threshold);
-    RUN_TEST(Velocity_observer_coefficient_1);
-    RUN_TEST(Velocity_observer_coefficient_2);
-    RUN_TEST(Velocity_observer_coefficient_3);
-    RUN_TEST(Velocity_observer_coefficient_4);
+    RUN_TEST(Velocity_observer_coefficient);
 #endif
 #if CONTROL_PARAMETER
     // Control parameter
@@ -780,46 +1016,5 @@ int main(int argc, char **argv)
 {
     RUN_UNITY_TESTS();
     return 0;
-}
-#endif
-
-#if 0
-#include "driver_zlac/config_zlac.hpp"
-#include "driver_zlac/zlac8015d_modbus.hpp"
-
-ZLAC8015DCtrl ctrl;
-
-void setup()
-{
-    (void)setup_m5();
-    log_d("========================================");
-    log_d("M5Atom initialized.");
-    log_d("  - Start Modbus. Address[%d]", MODBUS_ADDRESS);
-    bool flag = ctrl.begin(&Serial1, MODBUS_ADDRESS, MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU);
-    log_d("========================================");
-    if (false == flag) {
-        Serial.println("Failed to initialize RS485.");
-        m5_led(CRGB::Red);
-        while (1) {
-            delay(1000);
-        }
-    }
-}
-void loop()
-{
-    static bool flag = false;
-    (void)M5.update();
-    if (M5.Btn.wasPressed()) {
-        if (true == flag) {
-            m5_led(CRGB::Green);
-        } else {
-            m5_led(CRGB::Blue);
-        }
-        flag = !flag;
-
-        int value = ctrl.get_rs485_node_id();
-        Serial.printf("RS485_Node_ID: %d\n", value);
-        m5_led(CRGB::Green);
-    }
 }
 #endif

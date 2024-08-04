@@ -206,10 +206,10 @@ private:
                 MessageFrame::FUNCTION_READ_HOLDING_REGISTERS,
                 arr.data(),
                 arr.size());
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Reg[%02X%02X] Data[%02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
-              this->_frame.data_length,
+              this->_frame.data_length - 2,
               this->_frame.footer,
               this->_frame.data[0],
               this->_frame.data[1],
@@ -485,20 +485,22 @@ public:
         }
         return result;
     }
-    bool get_input_signal_status(int &x0, int &x1)
+    bool get_input_signal_status(int *x0, int *x1)
     {
         bool result         = true;
+        *x0                 = 0;
+        *x1                 = 0;
         MessageFrame _frame = this->_modbus_send_0x03(0x2003u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            x0                 = (value >> 0) & 0x01;
-            x1                 = (value >> 1) & 0x01;
+            *x0                = (value >> 0) & 0x01;
+            *x1                = (value >> 1) & 0x01;
         }
         return result;
     }
-    bool get_out_signal_status(int &x0, int &x1)
+    bool get_out_signal_status(int *x0, int *x1)
     {
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x2004u, 1);
@@ -506,8 +508,8 @@ public:
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            x0                 = (value >> 0) & 0x01;
-            x1                 = (value >> 1) & 0x01;
+            *x0                = (value >> 0) & 0x01;
+            *x1                = (value >> 1) & 0x01;
         }
         return result;
     }
@@ -580,7 +582,6 @@ public:
                     break;
                 case 0:
                 default:
-                    result = false;
                     *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
                     break;
             }
@@ -1774,7 +1775,7 @@ public:
         }
         return result;
     }
-    int get_overload_factor_left(int *value)
+    bool get_overload_factor_left(int *value)
     {
         bool result         = true;
         *value              = 0;
@@ -1821,8 +1822,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 0.1;
-            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) / 0.1;
+            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) * 0.1;
         }
         return result;
     }
@@ -1933,7 +1934,7 @@ public:
         }
         return result;
     }
-    bool set_position_following_error_threshold_left(double value, bool check = false)
+    bool set_position_following_error_threshold_left(int value, bool check = false)
     {
         bool result = false;
         int input   = value / 10;
@@ -1960,7 +1961,7 @@ public:
         }
         return result;
     }
-    int get_velocity_smoothing_factor_left(int *value)
+    bool get_velocity_smoothing_factor_left(int *value)
     {
         bool result         = true;
         *value              = 0;
@@ -2126,7 +2127,7 @@ public:
         }
         return result;
     }
-    int get_velocity_loop_left(int *kp, int *ki, int *kf)
+    bool get_velocity_loop_left(int *kp, int *ki, int *kf)
     {
         bool result         = true;
         *kp                 = 0;
@@ -2190,7 +2191,7 @@ public:
         }
         return result;
     }
-    int get_position_loop_left(int *kp, int *kf)
+    bool get_position_loop_left(int *kp, int *kf)
     {
         bool result         = true;
         *kp                 = 0;
@@ -2540,7 +2541,7 @@ public:
         }
         return result;
     }
-    int get_overload_factor_right(int *value)
+    bool get_overload_factor_right(int *value)
     {
         bool result         = true;
         *value              = 0;
@@ -2587,8 +2588,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 0.1;
-            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) / 0.1;
+            *rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+            *maximum = (double)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)) * 0.1;
         }
         return result;
     }
@@ -2699,7 +2700,7 @@ public:
         }
         return result;
     }
-    bool set_position_following_error_threshold_right(double value, bool check = false)
+    bool set_position_following_error_threshold_right(int value, bool check = false)
     {
         bool result = false;
         int input   = value / 10;
@@ -2726,7 +2727,7 @@ public:
         }
         return result;
     }
-    int get_velocity_smoothing_factor_right(int *value)
+    bool get_velocity_smoothing_factor_right(int *value)
     {
         bool result         = true;
         *value              = 0;
@@ -2892,7 +2893,7 @@ public:
         }
         return result;
     }
-    int get_velocity_loop_right(int *kp, int *ki, int *kf)
+    bool get_velocity_loop_right(int *kp, int *ki, int *kf)
     {
         bool result         = true;
         *kp                 = 0;
@@ -2956,7 +2957,7 @@ public:
         }
         return result;
     }
-    int get_position_loop_right(int *kp, int *kf)
+    bool get_position_loop_right(int *kp, int *kf)
     {
         bool result         = true;
         *kp                 = 0;
@@ -3422,6 +3423,7 @@ public:
                 }
             }
         }
+        return result;
     }
 
     bool get_target_velocity(int *left, int *right)
