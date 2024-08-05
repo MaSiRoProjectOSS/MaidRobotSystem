@@ -505,6 +505,24 @@ void WebViewerCustom::handle_js_top(AsyncWebServerRequest *request)
     response->addHeader("X-Content-Type-Options", "nosniff");
     request->send(response);
 }
+void WebViewerCustom::handle_js_ajax(AsyncWebServerRequest *request)
+{
+    String css = this->file_readString("/web/public/ajax.js");
+
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/javascript; charset=utf-8", css.c_str());
+    response->addHeader("Cache-Control", WEB_HEADER_CACHE_CONTROL_LONGTIME);
+    response->addHeader("X-Content-Type-Options", "nosniff");
+    request->send(response);
+}
+void WebViewerCustom::handle_css_general(AsyncWebServerRequest *request)
+{
+    String css = this->file_readString("/web/public/general.css");
+
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/css; charset=utf-8", css.c_str());
+    response->addHeader("Cache-Control", WEB_HEADER_CACHE_CONTROL_LONGTIME);
+    response->addHeader("X-Content-Type-Options", "nosniff");
+    request->send(response);
+}
 void WebViewerCustom::handle_css_custom(AsyncWebServerRequest *request)
 {
     String css = this->file_readString("/web/public/custom.css");
@@ -590,7 +608,7 @@ void WebViewerCustom::handle_set_save(AsyncWebServerRequest *request)
 }
 void WebViewerCustom::handle_favicon_ico(AsyncWebServerRequest *request)
 {
-    AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", WEB_IMAGE_FAVICON_ICO, WEB_IMAGE_FAVICON_ICO_LEN);
+    AsyncWebServerResponse *response = request->beginResponse(200, "image/x-icon", WEB_IMAGE_FAVICON_ICO, WEB_IMAGE_FAVICON_ICO_LEN);
     response->addHeader("Cache-Control", WEB_HEADER_CACHE_CONTROL_LONGTIME);
     response->addHeader("X-Content-Type-Options", "nosniff");
     request->send(response);
@@ -598,16 +616,25 @@ void WebViewerCustom::handle_favicon_ico(AsyncWebServerRequest *request)
 ///////////////////////////////////////////////////////////////////////////////////////////
 bool WebViewerCustom::setup_server(AsyncWebServer *server)
 {
+    // page : html
     server->on("/", std::bind(&WebViewerCustom::handle_root_html, this, std::placeholders::_1));
-    server->on("/get/motor", std::bind(&WebViewerCustom::handle_get_motor, this, std::placeholders::_1));
+    // page : js
     server->on("/top.js", std::bind(&WebViewerCustom::handle_js_top, this, std::placeholders::_1));
+    server->on("/ajax.js", std::bind(&WebViewerCustom::handle_js_ajax, this, std::placeholders::_1));
+    // page : css
     server->on("/custom.css", std::bind(&WebViewerCustom::handle_css_custom, this, std::placeholders::_1));
+    server->on("/general.css", std::bind(&WebViewerCustom::handle_css_general, this, std::placeholders::_1));
+
+    // getter
+    server->on("/get/motor", std::bind(&WebViewerCustom::handle_get_motor, this, std::placeholders::_1));
+
+    // setter
     server->on("/set/stop", std::bind(&WebViewerCustom::handle_set_emergency, this, std::placeholders::_1));
     server->on("/set/free_motor", std::bind(&WebViewerCustom::handle_set_free_motor, this, std::placeholders::_1));
     server->on("/set/emergency", std::bind(&WebViewerCustom::handle_set_emergency, this, std::placeholders::_1));
-
     server->on("/set/setting", std::bind(&WebViewerCustom::handle_set_setting, this, std::placeholders::_1));
     server->on("/set/save", std::bind(&WebViewerCustom::handle_set_save, this, std::placeholders::_1));
+
     return true;
 }
 

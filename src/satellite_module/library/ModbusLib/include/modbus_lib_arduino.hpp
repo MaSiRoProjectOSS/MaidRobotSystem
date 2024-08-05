@@ -324,16 +324,22 @@ protected:
                             step++;
                             break;
                         case 2:
-                            count_length = 0;
-                            // if (MessageFrame::MODBUS_TYPE::MODBUS_TYPE_RTU_EX == this->_type) {
-                            // } else {
-                            // frame.data[count_length] = buf;
-                            //     count_length++;
-                            // }
-                            frame.data_length = buf;
-                            step++;
+                            if (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER) {
+                                frame.start_reg   = (buf << 8) & 0xFFu;
+                                frame.data_length = 2;
+                                step++;
+                            } else {
+                                frame.data_length = buf;
+                                step              = 4;
+                            }
                             break;
                         case 3:
+                            if (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER) {
+                                frame.start_reg = (frame.address & 0xFF00u) | buf;
+                            }
+                            step++;
+                            break;
+                        case 4:
                             if (255 <= count_length) {
                                 timeout = 0;
                                 flag    = false;

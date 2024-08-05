@@ -3,6 +3,8 @@
 これは[roboclaw_ros](https://github.com/sonyccd/roboclaw_ros)で**ZLAC8015D**等を制御するためのプロジェクト。
 roboclawを繋ぐかわりにM5ATOMを接続し、その先にZLACのドライバを制御する。
 
+WiFiの接続情報はSPIFFSに保存され起動時に読み込まれます。情報をクリアしたい場合はSPIFFSのフォーマットを行ってください。
+
 ```plantuml
 @startuml
 title Connect roboclaw\n(RoboClawを使った場合)

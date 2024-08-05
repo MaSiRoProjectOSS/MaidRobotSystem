@@ -73,7 +73,23 @@ void setup_m5()
 }
 
 ///////////////////////////////////////////////////////////////////
+String text_drive_mode(ZLAC::DRIVER_MODE mode)
+{
+    switch (mode) {
+        case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
+            return "POSITION_RELATIVE";
+        case ZLAC::DRIVER_MODE::POSITION_ABSOLUTE:
+            return "POSITION_ABSOLUTE";
+        case ZLAC::DRIVER_MODE::VELOCITY:
+            return "VELOCITY";
+        case ZLAC::DRIVER_MODE::TORQUE:
+            return "TORQUE";
+        default:
+            return "UNKNOWN";
+    }
+}
 
+///////////////////////////////////////////////////////////////////
 void setUp(void)
 {
 }
@@ -122,20 +138,20 @@ void RS485_Baud_Rate(void)
 void Input_signal_status(void)
 {
     // TODO
-    int x0      = 0;
-    int x1      = 0;
+    bool x0     = false;
+    bool x1     = false;
     bool result = ctrl.get_input_signal_status(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    log_d("* Input_signal_status : x0[%d]x1[%d]", x0, x1);
+    log_d("* Input_signal_status : x0[%s]x1[%s]", x0 ? "T" : "F", x1 ? "T" : "F");
 }
 void Out_signal_status(void)
 {
     // TODO
-    int x0      = 0;
-    int x1      = 0;
+    bool x0     = false;
+    bool x1     = false;
     bool result = ctrl.get_out_signal_status(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    log_d("* Out_signal_status : x0[%d]x1[%d]", x0, x1);
+    log_d("* Out_signal_status : x0[%d]x1[%d]", x0 ? "T" : "F", x1 ? "T" : "F");
 }
 void Clear_feedback_position(void)
 {
@@ -200,13 +216,32 @@ void CAN_Node_info(void)
 }
 void Control_mode(void)
 {
-    // bool set_control_mode(ZLAC::DRIVER_MODE mode, bool check = false)
-
-    // TODO
-    ZLAC::DRIVER_MODE value;
-    bool result = ctrl.get_control_mode(&value);
+    bool result;
+    ZLAC::DRIVER_MODE backup_mode;
+    ZLAC::DRIVER_MODE mode;
+    result = ctrl.get_control_mode(&backup_mode);
     TEST_ASSERT_TRUE(result);
-    log_d("* Control_mode : [%d]", value);
+    log_d("* Control_mode : NO.1 [%s]", text_drive_mode(backup_mode).c_str());
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE, true);
+    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : POSITION_RELATIVE");
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::POSITION_RELATIVE, mode, "get_control_mode : POSITION_RELATIVE");
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, true);
+    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : POSITION_ABSOLUTE");
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, mode, "get_control_mode : POSITION_ABSOLUTE");
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::VELOCITY, true);
+    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : VELOCITY");
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::VELOCITY, mode, "get_control_mode : VELOCITY");
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE, true);
+    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : TORQUE");
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::TORQUE, mode, "get_control_mode : TORQUE");
+
+    result = ctrl.set_control_mode(backup_mode);
+    TEST_ASSERT_TRUE(result);
 }
 void Control_word(void)
 {

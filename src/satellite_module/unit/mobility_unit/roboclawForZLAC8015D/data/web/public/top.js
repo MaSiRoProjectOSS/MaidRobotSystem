@@ -286,8 +286,3 @@ window.onload = function () {
     JS_Ctrl.timerId =
         setInterval(JS_Ctrl.interval, JS_Ctrl.timerInterval);
 };
-window.onunload = function () {
-    if (null != JS_Ctrl.timerId) {
-        clearInterval(JS_Ctrl.timerId);
-    }
-};

@@ -96,7 +96,9 @@ public:
 
 public:
     //int start;
-    unsigned int address   = 0;                                               ///< The address of the Modbus device
+    unsigned int address   = 0; ///< The address of the Modbus device
+    unsigned int start_reg = 0;
+    unsigned int end_reg   = 0;
     unsigned int function  = (unsigned int)MODBUS_FUNCTION::FUNCTION_UNKNOWN; ///< The function code of the message frame
     unsigned int data[255] = { 0 };                                           ///< The data of the message frame
     unsigned int footer    = 0;                                               ///< The CRC or LRC of the message frame

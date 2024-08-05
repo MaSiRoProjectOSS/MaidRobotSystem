@@ -54,13 +54,21 @@ private:
     char *_make_row_text(FourDimensionalChart::FourDimensionalChartData csd, int assy, int cast_id = CAST_ID);
 
 private:
+    // page : html
     void handle_root_html(AsyncWebServerRequest *request);
-    void handle_get_motor(AsyncWebServerRequest *request);
+    // page : js
     void handle_js_top(AsyncWebServerRequest *request);
+    void handle_js_ajax(AsyncWebServerRequest *request);
+    // page : css
+    void handle_css_general(AsyncWebServerRequest *request);
     void handle_css_custom(AsyncWebServerRequest *request);
+
+    // getter
+    void handle_get_motor(AsyncWebServerRequest *request);
+
+    // setter
     void handle_set_emergency(AsyncWebServerRequest *request);
     void handle_set_free_motor(AsyncWebServerRequest *request);
-
     void handle_set_setting(AsyncWebServerRequest *request);
     void handle_set_save(AsyncWebServerRequest *request);
 

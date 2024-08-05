@@ -31,7 +31,7 @@ public:
     }
     bool _reception(MessageFrame &frame) override
     {
-        log_v("Address[%d] Func[%d] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("              ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               frame.address,
               frame.function,
               frame.data_length,
@@ -206,7 +206,7 @@ private:
                 MessageFrame::FUNCTION_READ_HOLDING_REGISTERS,
                 arr.data(),
                 arr.size());
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Reg[%02X%02X] Data[%02X %02X %02X %02X %02X %02X]",
+        log_v("      ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Reg[0x%02X%02X] Data[%02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length - 2,
@@ -236,7 +236,7 @@ private:
                 MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
                 arr.data(),
                 arr.size());
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("  ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length,
@@ -260,7 +260,7 @@ private:
                 MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
                 data,
                 len);
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length,
@@ -296,7 +296,7 @@ private:
                 MessageFrame::FUNCTION_WRITE_SINGLE_REGISTER,
                 arr.data(),
                 arr.size());
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length,
@@ -321,7 +321,7 @@ private:
                 MessageFrame::FUNCTION_WRITE_MULTIPLE_REGISTERS,
                 data,
                 len);
-        log_v("ADR[0x%0X] Fun[0x%0X] Len[%d] CRC[%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length,
@@ -349,7 +349,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -366,9 +366,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_communication_offline_time(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value_ms) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_communication_offline_time(&buf);
                     if (true == result) {
                         if (buf != value_ms) {
                             result = false;
@@ -387,7 +389,7 @@ public:
             *value = -1;
             result = false;
         } else {
-            *value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -404,9 +406,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_rs485_node_id(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != id) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_rs485_node_id(&buf);
                     if (true == result) {
                         if (buf != id) {
                             result = false;
@@ -473,43 +477,82 @@ public:
 
         if (true == result) {
             MessageFrame _frame = this->_modbus_writer_single(0x2002u, input);
-            if (true == check) {
+            if (0x80 <= _frame.function) {
+                result = false;
+            } else {
                 RS485_BAUD_RATE buf = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
-                result              = this->get_rs485_baud_rate(&buf);
-                if (true == result) {
-                    if (buf != baud) {
-                        result = false;
+                unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                switch (buffer) {
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+                        break;
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_115200:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+                        break;
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_57600:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+                        break;
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_38400:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+                        break;
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_19200:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+                        break;
+                    case RS485_BAUD_RATE::RS485_BAUD_RATE_9600:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+                        break;
+                    default:
+                        buf = RS485_BAUD_RATE::RS485_BAUD_RATE_INVALID;
+                }
+                if (buf != baud) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_rs485_baud_rate(&buf);
+                    if (true == result) {
+                        if (buf != baud) {
+                            result = false;
+                        }
                     }
                 }
             }
         }
         return result;
     }
-    bool get_input_signal_status(int *x0, int *x1)
+    bool get_input_signal_status(bool *x0, bool *x1)
     {
         bool result         = true;
-        *x0                 = 0;
-        *x1                 = 0;
+        *x0                 = false;
+        *x1                 = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2003u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *x0                = (value >> 0) & 0x01;
-            *x1                = (value >> 1) & 0x01;
+            if (0 < ((value >> 0) & 0x01)) {
+                *x0 = true;
+            }
+            if (0 < ((value >> 1) & 0x01)) {
+                *x1 = true;
+            }
         }
         return result;
     }
-    bool get_out_signal_status(int *x0, int *x1)
+    bool get_out_signal_status(bool *x0, bool *x1)
     {
         bool result         = true;
+        *x0                 = false;
+        *x1                 = false;
         MessageFrame _frame = this->_modbus_send_0x03(0x2004u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *x0                = (value >> 0) & 0x01;
-            *x1                = (value >> 1) & 0x01;
+            if (0 < ((value >> 0) & 0x01)) {
+                *x0 = true;
+            }
+            if (0 < ((value >> 1) & 0x01)) {
+                *x1 = true;
+            }
         }
         return result;
     }
@@ -522,7 +565,7 @@ public:
             result = false;
             *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int buf = _frame.data[0];
+            int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             switch (buf) {
                 case 1:
                     *value = ZLAC::target_motor::TARGET_MOTOR_LEFT;
@@ -548,9 +591,27 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
-                result                 = this->get_clear_feedback_position(&buf);
+            ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+            unsigned int buffer    = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            switch (buffer) {
+                case 1:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    break;
+                case 2:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    break;
+                case 3:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    break;
+                case 0:
+                default:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                    break;
+            }
+            if (buf != target) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_clear_feedback_position(&buf);
                 if (true == result) {
                     if (buf != target) {
                         result = false;
@@ -569,7 +630,7 @@ public:
             result = false;
             *value = ZLAC::target_motor::TARGET_MOTOR_INVALID;
         } else {
-            int buf = _frame.data[0];
+            int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             switch (buf) {
                 case 1:
                     *value = ZLAC::target_motor::TARGET_MOTOR_LEFT;
@@ -596,9 +657,27 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
-                result                 = this->get_reset_the_zero_point_in_absolute_position_control(&buf);
+            ZLAC::target_motor buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+            unsigned int buffer    = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            switch (buffer) {
+                case 1:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_LEFT;
+                    break;
+                case 2:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_RIGHT;
+                    break;
+                case 3:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_ALL;
+                    break;
+                case 0:
+                default:
+                    buf = ZLAC::target_motor::TARGET_MOTOR_INVALID;
+                    break;
+            }
+            if (buf != target) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_reset_the_zero_point_in_absolute_position_control(&buf);
                 if (true == result) {
                     if (buf != target) {
                         result = false;
@@ -630,9 +709,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_shaft_state_after_power_on(&buf);
+            int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf   = (0x01 == buffer) ? true : false;
+            if (buf != lock_shaft) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_shaft_state_after_power_on(&buf);
                 if (true == result) {
                     if (buf != lock_shaft) {
                         result = false;
@@ -667,9 +749,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_maximum_motor_speed(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != r_min) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_maximum_motor_speed(&buf);
                     if (true == result) {
                         if (buf != r_min) {
                             result = false;
@@ -702,9 +786,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_register_parameter_settings(&buf);
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != restore_factory_settings) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_register_parameter_settings(&buf);
                 if (true == result) {
                     if (buf != restore_factory_settings) {
                         result = false;
@@ -721,8 +808,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *id                = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            unsigned int value = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *id                = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            unsigned int value = (unsigned int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
             switch (value) {
                 case 0:
                     *baud = CAN_BAUD_RATE::CAN_BAUD_RATE_1000K;
@@ -798,10 +885,46 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_id             = 0;
+                CAN_BAUD_RATE buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_INVALID;
+#else
+                int buf_id          = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                unsigned int buffer = (unsigned int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                switch (buffer) {
+                    case 0:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_1000K;
+                        break;
+                    case 1:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_500K;
+                        break;
+                    case 2:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_250K;
+                        break;
+                    case 3:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_125K;
+                        break;
+                    case 4:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_100K;
+                        break;
+                    case 5:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_50K;
+                        break;
+                    case 6:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_25K;
+                        break;
+                    default:
+                        buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_INVALID;
+                        break;
+                }
+                if (buf_id != id) {
+                    result = false;
+                } else if (buf_baud != baud) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_id             = 0;
-                    CAN_BAUD_RATE buf_baud = CAN_BAUD_RATE::CAN_BAUD_RATE_INVALID;
-                    result                 = this->get_can_node_info(&buf_id, &buf_baud);
+                    result = this->get_can_node_info(&buf_id, &buf_baud);
                     if (true == result) {
                         if (buf_id != id) {
                             result = false;
@@ -816,34 +939,34 @@ public:
         return result;
     }
 
-    bool get_control_mode(ZLAC::DRIVER_MODE *value)
+    bool get_control_mode(ZLAC::DRIVER_MODE *mode)
     {
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_0x03(0x200Du, 1);
         if (0x80 <= _frame.function) {
             result = false;
-            *value = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+            *mode  = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
         } else {
-            int buf = _frame.data[0];
+            int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             switch (buf) {
                 case 1:
-                    *value = ZLAC::DRIVER_MODE::POSITION_RELATIVE;
+                    *mode = ZLAC::DRIVER_MODE::POSITION_RELATIVE;
                     break;
                 case 2:
-                    *value = ZLAC::DRIVER_MODE::POSITION_ABSOLUTE;
+                    *mode = ZLAC::DRIVER_MODE::POSITION_ABSOLUTE;
                     break;
                 case 3:
-                    *value = ZLAC::DRIVER_MODE::VELOCITY;
+                    *mode = ZLAC::DRIVER_MODE::VELOCITY;
                     break;
                 case 4:
-                    *value = ZLAC::DRIVER_MODE::TORQUE;
+                    *mode = ZLAC::DRIVER_MODE::TORQUE;
                     break;
                 case 0:
                 default:
-                    *value = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+                    *mode = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
                     break;
             }
-            this->_mode = *value;
+            this->_mode = *mode;
         }
         return result;
     }
@@ -875,9 +998,30 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    ZLAC::DRIVER_MODE buf = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
-                    result                = this->get_control_mode(&buf);
+                ZLAC::DRIVER_MODE buf = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+                unsigned int buffer   = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                switch (buffer) {
+                    case 1:
+                        buf = ZLAC::DRIVER_MODE::POSITION_RELATIVE;
+                        break;
+                    case 2:
+                        buf = ZLAC::DRIVER_MODE::POSITION_ABSOLUTE;
+                        break;
+                    case 3:
+                        buf = ZLAC::DRIVER_MODE::VELOCITY;
+                        break;
+                    case 4:
+                        buf = ZLAC::DRIVER_MODE::TORQUE;
+                        break;
+                    case 0:
+                    default:
+                        buf = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
+                        break;
+                }
+                if (buf != mode) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_control_mode(&buf);
                     if (true == result) {
                         if (buf != mode) {
                             result = false;
@@ -896,7 +1040,7 @@ public:
             result = false;
             *value = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
         } else {
-            int buf = _frame.data[0];
+            int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             switch (buf) {
                 case 0x05:
                     *value = ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP;
@@ -978,9 +1122,39 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    ZLAC_CONTROL_WORD buf = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
-                    result                = this->get_control_word(&buf);
+                ZLAC_CONTROL_WORD buf = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
+                unsigned int buffer   = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                switch (buffer) {
+                    case 0x05:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP;
+                        break;
+                    case 0x06:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT;
+                        break;
+                    case 0x07:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_STOP;
+                        break;
+                    case 0x08:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE;
+                        break;
+                    case 0x10:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START;
+                        break;
+                    case 0x11:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT;
+                        break;
+                    case 0x12:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT;
+                        break;
+                    case 0x00:
+                    default:
+                        buf = ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED;
+                        break;
+                }
+                if (buf != word) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_control_word(&buf);
                     if (true == result) {
                         if (buf != word) {
                             result = false;
@@ -1013,9 +1187,15 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_synchronous_control_status(&buf);
+            bool buf            = false;
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0x00 == buf) {
+                buf = true;
+            }
+            if (buf != synchronous) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_synchronous_control_status(&buf);
                 if (true == result) {
                     if (buf != synchronous) {
                         result = false;
@@ -1047,7 +1227,7 @@ public:
             result = false;
             *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int buf = _frame.data[0];
+            int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             switch (buf) {
                 case 0x05:
                     *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
@@ -1091,9 +1271,27 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
-                    result                = this->get_quick_stop_control(&buf);
+                ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                unsigned int buffer   = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                switch (buffer) {
+                    case 0x05:
+                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                        break;
+                    case 0x06:
+                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                        break;
+                    case 0x07:
+                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                        break;
+                    case 0x00:
+                    default:
+                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                        break;
+                }
+                if (buf != ctrl) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_quick_stop_control(&buf);
                     if (true == result) {
                         if (buf != ctrl) {
                             result = false;
@@ -1126,7 +1324,11 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != stop_normally) {
+                result = false;
+            } else if (true == check) {
                 bool buf = false;
                 result   = this->get_close_operation_control(&buf);
                 if (true == result) {
@@ -1160,9 +1362,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_disable_control(&buf);
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != stop) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_disable_control(&buf);
                 if (true == result) {
                     if (buf != stop) {
                         result = false;
@@ -1180,7 +1385,7 @@ public:
             result = false;
             *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
         } else {
-            int buf = _frame.data[0];
+            int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
             switch (buf) {
                 case 0x05:
                     *value = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
@@ -1224,9 +1429,27 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
-                    result                = this->get_halt_control(&buf);
+                ZLAC_STOP_CONTROL buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                unsigned int buffer   = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                switch (buffer) {
+                    case 0x05:
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                        break;
+                    case 0x06:
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                        break;
+                    case 0x07:
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                        break;
+                    case 0x00:
+                    default:
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                        break;
+                }
+                if (buf != ctrl) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_halt_control(&buf);
                     if (true == result) {
                         if (buf != ctrl) {
                             result = false;
@@ -1259,9 +1482,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_input_effective_level(&buf);
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != low_level) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_input_effective_level(&buf);
                 if (true == result) {
                     if (buf != low_level) {
                         result = false;
@@ -1327,10 +1553,29 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+                TERMINAL_FUNCTION buf_x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+                TERMINAL_FUNCTION buf_x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
+#if 0
+                unsigned int value0      = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                unsigned int value1      = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (0 == value0) {
+                    buf_x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE;
+                } else if (9 == value0) {
+                    buf_x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP;
+                }
+                if (0 == value1) {
+                    buf_x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE;
+                } else if (9 == value1) {
+                    buf_x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP;
+                }
+                if (buf_x0 != x0) {
+                    result = false;
+                } else if (buf_x1 != x1) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    TERMINAL_FUNCTION buf_x0 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
-                    TERMINAL_FUNCTION buf_x1 = TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC;
-                    result                   = this->get_input_terminal_terminal_function_selection(&buf_x0, &buf_x1);
+                    result = this->get_input_terminal_terminal_function_selection(&buf_x0, &buf_x1);
                     if (true == result) {
                         if (buf_x0 != x0) {
                             result = false;
@@ -1383,12 +1628,33 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf_y0 = false;
-                bool buf_y1 = false;
-                bool buf_b0 = false;
-                bool buf_b1 = false;
-                result      = this->get_output_effective_low_level(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
+            bool buf_y0         = false;
+            bool buf_y1         = false;
+            bool buf_b0         = false;
+            bool buf_b1         = false;
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            if (0 < (0x01 & buffer)) {
+                buf_y0 = true;
+            }
+            if (0 < (0x02 & buffer)) {
+                buf_y1 = true;
+            }
+            if (0 < (0x04 & buffer)) {
+                buf_b0 = true;
+            }
+            if (0 < (0x08 & buffer)) {
+                buf_b1 = true;
+            }
+            if (buf_y0 != y0) {
+                result = false;
+            } else if (buf_y1 != y1) {
+                result = false;
+            } else if (buf_b0 != b0) {
+                result = false;
+            } else if (buf_b1 != b1) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_output_effective_low_level(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
                 if (true == result) {
                     if (buf_y0 != y0) {
                         result = false;
@@ -1528,12 +1794,55 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+                ZLAC_TERMINAL_FUNCTION buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                ZLAC_TERMINAL_FUNCTION buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                ZLAC_TERMINAL_FUNCTION buf_b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                ZLAC_TERMINAL_FUNCTION buf_b1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+#if 0
+                unsigned int value0 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                unsigned int value1 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                unsigned int value2 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+                unsigned int value3 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
+                if (0 == value0) {
+                    buf_b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE;
+                } else if (1 == value0) {
+                    buf_b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE;
+                }
+                if (0 == value1) {
+                    buf_b1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE;
+                } else if (1 == value1) {
+                    buf_b1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE;
+                }
+                if (0 == value2) {
+                    buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                } else if (1 == value2) {
+                    buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL;
+                } else if (2 == value2) {
+                    buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL;
+                } else if (3 == value2) {
+                    buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL;
+                }
+                if (0 == value3) {
+                    buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
+                } else if (1 == value3) {
+                    buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL;
+                } else if (2 == value3) {
+                    buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL;
+                } else if (3 == value3) {
+                    buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL;
+                }
+                if (buf_y0 != y0) {
+                    result = false;
+                } else if (buf_y1 != y1) {
+                    result = false;
+                } else if (buf_b0 != b0) {
+                    result = false;
+                } else if (buf_b1 != b1) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    ZLAC_TERMINAL_FUNCTION buf_y0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
-                    ZLAC_TERMINAL_FUNCTION buf_y1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
-                    ZLAC_TERMINAL_FUNCTION buf_b0 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
-                    ZLAC_TERMINAL_FUNCTION buf_b1 = ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED;
-                    result                        = this->get_output_terminal_function_selection(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
+                    result = this->get_output_terminal_function_selection(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
                     if (true == result) {
                         if (buf_y0 != y0) {
                             result = false;
@@ -1580,9 +1889,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    bool buf = false;
-                    result   = this->get_alarm_pwm_processing_method(&buf);
+                double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
+                if (0.1 > std::abs(buf - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_driver_temperature_protection_threshold(&buf);
                     if (true == result) {
                         if (0.1 > std::abs(buf - value)) {
                             result = false;
@@ -1601,7 +1912,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int buf = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             if (0x01 == buf) {
                 *open = true;
             }
@@ -1615,9 +1926,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_alarm_pwm_processing_method(&buf);
+            unsigned int buffer = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != open) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_alarm_pwm_processing_method(&buf);
                 if (true == result) {
                     if (buf != open) {
                         result = false;
@@ -1635,7 +1949,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int buf = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             if (0x01 == buf) {
                 *open = true;
             }
@@ -1649,9 +1963,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = this->get_overload_processing_method(&buf);
+            unsigned int buffer = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != open) {
+                result = false;
+            } else if (true == check) {
+                result = this->get_overload_processing_method(&buf);
                 if (true == result) {
                     if (buf != open) {
                         result = false;
@@ -1669,7 +1986,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            unsigned int buf = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             if (0x00 == buf) {
                 *lock_shaft = false;
             }
@@ -1683,9 +2000,12 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            if (true == check) {
-                bool buf = false;
-                result   = set_overload_processing_method(&buf);
+            unsigned int buffer = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != lock_shaft) {
+                result = false;
+            } else if (true == check) {
+                result = set_overload_processing_method(&buf);
                 if (true == result) {
                     if (buf != lock_shaft) {
                         result = false;
@@ -1707,7 +2027,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1724,9 +2044,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_encoder_line_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_encoder_line_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -1745,7 +2067,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1762,9 +2084,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_hall_offset_angle_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_hall_offset_angle_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -1783,7 +2107,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1800,9 +2124,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_overload_factor_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_overload_factor_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -1841,10 +2167,12 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf_rated   = 0;
-                    double buf_maximum = 0;
-                    result             = this->get_current_left(&buf_rated, &buf_maximum);
+                double buf_rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+                double buf_maximum = 0;
+                if (0.1 > std::abs(buf_rated - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_current_left(&buf_rated, &buf_maximum);
                     if (true == result) {
                         if (0.1 > std::abs(buf_rated - value)) {
                             result = false;
@@ -1869,10 +2197,12 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf_rated   = 0;
-                    double buf_maximum = 0;
-                    result             = this->get_current_left(&buf_rated, &buf_maximum);
+                double buf_rated   = 0;
+                double buf_maximum = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+                if (0.1 > std::abs(buf_maximum - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_current_left(&buf_rated, &buf_maximum);
                     if (true == result) {
                         if (0.1 > std::abs(buf_maximum - value)) {
                             result = false;
@@ -1891,7 +2221,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
@@ -1909,9 +2239,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_overload_protection_time_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_overload_protection_time_left(&buf);
                     if (true == result) {
                         if ((buf / 10) == input) {
                             result = false;
@@ -1930,7 +2262,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1948,9 +2280,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_position_following_error_threshold_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_position_following_error_threshold_left(&buf);
                     if (true == result) {
                         if ((buf / 10) == input) {
                             result = false;
@@ -1969,7 +2303,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -1986,9 +2320,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_velocity_smoothing_factor_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_velocity_smoothing_factor_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2008,8 +2344,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
         return result;
     }
@@ -2034,10 +2370,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_ki = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_ki != ki) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_ki = 0;
-                    result     = this->get_current_loop_left(&buf_kp, &buf_ki);
+                    result = this->get_current_loop_left(&buf_kp, &buf_ki);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -2059,7 +2405,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2076,9 +2422,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_feedforward_output_smoothing_factor_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_feedforward_output_smoothing_factor_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2097,7 +2445,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2114,9 +2462,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_torque_output_smoothing_factor_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_torque_output_smoothing_factor_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2137,9 +2487,9 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            *kf = (int)(_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+            *kf = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
         }
         return result;
     }
@@ -2170,11 +2520,24 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_ki = 0;
+                int buf_kf = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                int buf_kf = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_ki != ki) {
+                    result = false;
+                } else if (buf_kf != kf) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_ki = 0;
-                    int buf_kf = 0;
-                    result     = this->get_velocity_loop_left(&buf_kp, &buf_ki, &buf_kf);
+                    result = this->get_velocity_loop_left(&buf_kp, &buf_ki, &buf_kf);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -2200,8 +2563,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *kf = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *kf = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
         return result;
     }
@@ -2226,10 +2589,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_kf = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_kf = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_kf != kf) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_kf = 0;
-                    result     = this->get_position_loop_left(&buf_kp, &buf_kf);
+                    result = this->get_position_loop_left(&buf_kp, &buf_kf);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -2265,7 +2638,7 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             }
         }
         return result;
@@ -2297,9 +2670,11 @@ public:
                 if (0x80 <= _frame.function) {
                     result = false;
                 } else {
-                    if (true == check) {
-                        int buf = 0;
-                        result  = this->get_initial_velocity_left(&buf);
+                    int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                    if (buf != value) {
+                        result = false;
+                    } else if (true == check) {
+                        result = this->get_initial_velocity_left(&buf);
                         if (true == result) {
                             if (buf != value) {
                                 result = false;
@@ -2320,7 +2695,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2337,9 +2712,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_motor_poles_left(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_motor_poles_left(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2376,9 +2753,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf = 0;
-                    result     = this->get_over_temperature_threshold_left(&buf);
+                double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
+                if (0.1 > std::abs(buf - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_over_temperature_threshold_left(&buf);
                     if (true == result) {
                         if (0.1 > std::abs(buf - value)) {
                             result = false;
@@ -2396,10 +2775,10 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            *index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
-            *index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
+            *index1 = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *index2 = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+            *index3 = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
+            *index4 = (int)((_frame.data[6] << 8) | (_frame.data[7] & 0xFF));
         }
         return result;
     }
@@ -2436,12 +2815,28 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_index1 = 0;
+                int buf_index2 = 0;
+                int buf_index3 = 0;
+                int buf_index4 = 0;
+#else
+                int buf_index1 = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_index2 = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                int buf_index3 = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
+                int buf_index4 = (int)((_frame.data[6] << 8) | (_frame.data[7] & 0xFF));
+                if (buf_index1 != index1) {
+                    result = false;
+                } else if (buf_index2 != index2) {
+                    result = false;
+                } else if (buf_index3 != index3) {
+                    result = false;
+                } else if (buf_index4 != index4) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_index1 = 0;
-                    int buf_index2 = 0;
-                    int buf_index3 = 0;
-                    int buf_index4 = 0;
-                    result         = this->get_velocity_observer_coefficient_left(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
+                    result = this->get_velocity_observer_coefficient_left(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
                     if (true == result) {
                         if (buf_index1 != index1) {
                             result = false;
@@ -2473,7 +2868,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2490,9 +2885,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_encoder_line_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_encoder_line_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2511,7 +2908,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2528,9 +2925,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_hall_offset_angle_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_hall_offset_angle_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2549,7 +2948,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2566,9 +2965,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_overload_factor_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_overload_factor_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2607,10 +3008,12 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf_rated   = 0;
-                    double buf_maximum = 0;
-                    result             = this->get_current_right(&buf_rated, &buf_maximum);
+                double buf_rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+                double buf_maximum = 0;
+                if (0.1 > std::abs(buf_rated - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_current_right(&buf_rated, &buf_maximum);
                     if (true == result) {
                         if (0.1 > std::abs(buf_rated - value)) {
                             result = false;
@@ -2635,10 +3038,12 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf_rated   = 0;
-                    double buf_maximum = 0;
-                    result             = this->get_current_right(&buf_rated, &buf_maximum);
+                double buf_rated   = 0;
+                double buf_maximum = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
+                if (0.1 > std::abs(buf_maximum - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_current_right(&buf_rated, &buf_maximum);
                     if (true == result) {
                         if (0.1 > std::abs(buf_maximum - value)) {
                             result = false;
@@ -2657,7 +3062,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
@@ -2675,9 +3080,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_overload_protection_time_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_overload_protection_time_right(&buf);
                     if (true == result) {
                         if ((buf / 10) == input) {
                             result = false;
@@ -2696,7 +3103,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = ((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
@@ -2714,9 +3121,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_position_following_error_threshold_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_position_following_error_threshold_right(&buf);
                     if (true == result) {
                         if ((buf / 10) == input) {
                             result = false;
@@ -2735,7 +3144,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2752,9 +3161,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_velocity_smoothing_factor_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_velocity_smoothing_factor_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2774,8 +3185,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
         return result;
     }
@@ -2800,10 +3211,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_ki = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_ki != ki) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_ki = 0;
-                    result     = this->get_current_loop_right(&buf_kp, &buf_ki);
+                    result = this->get_current_loop_right(&buf_kp, &buf_ki);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -2825,7 +3246,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2842,9 +3263,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_feedforward_output_smoothing_factor_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_feedforward_output_smoothing_factor_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2863,7 +3286,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -2880,9 +3303,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_torque_output_smoothing_factor_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_torque_output_smoothing_factor_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -2903,9 +3328,9 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *ki = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
-            *kf = (int)(_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+            *kf = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
         }
         return result;
     }
@@ -2936,11 +3361,24 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_ki = 0;
+                int buf_kf = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_ki = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                int buf_kf = (int)((_frame.data[4] << 8) | (_frame.data[5] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_ki != ki) {
+                    result = false;
+                } else if (buf_kf != kf) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_ki = 0;
-                    int buf_kf = 0;
-                    result     = this->get_velocity_loop_right(&buf_kp, &buf_ki, &buf_kf);
+                    result = this->get_velocity_loop_right(&buf_kp, &buf_ki, &buf_kf);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -2966,8 +3404,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *kp = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            *kf = (int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            *kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *kf = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
         }
         return result;
     }
@@ -2992,10 +3430,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_kp = 0;
+                int buf_kf = 0;
+#else
+                int buf_kp = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf_kf = (int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+                if (buf_kp != kp) {
+                    result = false;
+                } else if (buf_kf != kf) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_kp = 0;
-                    int buf_kf = 0;
-                    result     = this->get_position_loop_right(&buf_kp, &buf_kf);
+                    result = this->get_position_loop_right(&buf_kp, &buf_kf);
                     if (true == result) {
                         if (buf_kp != kp) {
                             result = false;
@@ -3031,7 +3479,7 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
             }
         }
         return result;
@@ -3063,9 +3511,11 @@ public:
                 if (0x80 <= _frame.function) {
                     result = false;
                 } else {
-                    if (true == check) {
-                        int buf = 0;
-                        result  = this->get_initial_velocity_right(&buf);
+                    int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                    if (buf != value) {
+                        result = false;
+                    } else if (true == check) {
+                        result = this->get_initial_velocity_right(&buf);
                         if (true == result) {
                             if (buf != value) {
                                 result = false;
@@ -3086,7 +3536,7 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
         }
         return result;
     }
@@ -3103,9 +3553,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    int buf = 0;
-                    result  = this->get_motor_poles_right(&buf);
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != value) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_motor_poles_right(&buf);
                     if (true == result) {
                         if (buf != value) {
                             result = false;
@@ -3142,9 +3594,11 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                if (true == check) {
-                    double buf = 0;
-                    result     = this->get_over_temperature_threshold_right(&buf);
+                double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
+                if (0.1 > std::abs(buf - value)) {
+                    result = false;
+                } else if (true == check) {
+                    result = this->get_over_temperature_threshold_right(&buf);
                     if (true == result) {
                         if (0.1 > std::abs(buf - value)) {
                             result = false;
@@ -3202,12 +3656,28 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_index1 = 0;
+                int buf_index2 = 0;
+                int buf_index3 = 0;
+                int buf_index4 = 0;
+#else
+                int buf_index1 = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_index2 = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                int buf_index3 = (_frame.data[4] << 8) | (_frame.data[5] & 0xFF);
+                int buf_index4 = (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
+                if (buf_index1 != index1) {
+                    result = false;
+                } else if (buf_index2 != index2) {
+                    result = false;
+                } else if (buf_index3 != index3) {
+                    result = false;
+                } else if (buf_index4 != index4) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_index1 = 0;
-                    int buf_index2 = 0;
-                    int buf_index3 = 0;
-                    int buf_index4 = 0;
-                    result         = this->get_velocity_observer_coefficient_right(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
+                    result = this->get_velocity_observer_coefficient_right(&buf_index1, &buf_index2, &buf_index3, &buf_index4);
                     if (true == result) {
                         if (buf_index1 != index1) {
                             result = false;
@@ -3265,10 +3735,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    result = this->get_s_shape_acceleration_time(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3317,10 +3797,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    result = this->get_s_shape_deceleration_time(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3370,10 +3860,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    result = this->get_deceleration_time_of_quick_stop(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3409,10 +3909,20 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
+#if 1
+            int buf_left  = 0;
+            int buf_right = 0;
+#else
+            int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+            if (buf_left != left) {
+                result = false;
+            } else if (buf_right != right) {
+                result = false;
+            } else
+#endif
             if (true == check) {
-                int buf_left  = -30001;
-                int buf_right = -30001;
-                result        = this->get_max_speed(&buf_left, &buf_right);
+                result = this->get_torque_slope(&buf_left, &buf_right);
                 if (true == result) {
                     if (buf_left != left) {
                         result = false;
@@ -3460,10 +3970,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    result = this->get_target_velocity(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3517,10 +4037,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                long buf_left  = 0;
+                long buf_right = 0;
+#else
+                long buf_left  = (_frame.data[0] << 24) | (_frame.data[1] << 16) | (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                long buf_right = (_frame.data[4] << 24) | (_frame.data[5] << 16) | (_frame.data[6] << 8) | (_frame.data[7] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    long buf_left  = -30001;
-                    long buf_right = -30001;
-                    result         = this->get_target_position(&buf_left, &buf_right);
+                    result = this->get_target_position(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3569,10 +4099,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_max_speed(&buf_left, &buf_right);
+                    result = this->get_max_speed(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3621,10 +4161,20 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
+#if 1
+                int buf_left  = 0;
+                int buf_right = 0;
+#else
+                int buf_left  = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                int buf_right = (_frame.data[2] << 8) | (_frame.data[3] & 0xFF);
+                if (buf_left != left) {
+                    result = false;
+                } else if (buf_right != right) {
+                    result = false;
+                } else
+#endif
                 if (true == check) {
-                    int buf_left  = -30001;
-                    int buf_right = -30001;
-                    result        = this->get_target_torque(&buf_left, &buf_right);
+                    result = this->get_target_torque(&buf_left, &buf_right);
                     if (true == result) {
                         if (buf_left != left) {
                             result = false;
@@ -3774,8 +4324,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            left->check((int)(_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            left->check((int)(_frame.data[2] << 8) | (_frame.data[3] & 0xFF));
+            left->check((int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)));
+            left->check((int)((_frame.data[2] << 8) | (_frame.data[3] & 0xFF)));
         }
         return result;
     }
