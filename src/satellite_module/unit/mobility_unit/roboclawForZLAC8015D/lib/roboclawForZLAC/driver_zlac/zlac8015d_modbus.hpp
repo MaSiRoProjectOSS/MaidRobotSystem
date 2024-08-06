@@ -697,36 +697,36 @@ public:
         }
         return result;
     }
-    bool get_shaft_state_after_power_on(bool *value)
+    bool get_lock_shaft_state_after_power_on(bool *flag)
     {
         bool result         = true;
-        *value              = false;
+        *flag               = true;
         MessageFrame _frame = this->_modbus_send_read(0x2007u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == buf) {
-                *value = true;
+            if (0x00 == buf) {
+                *flag = false;
             }
         }
         return result;
     }
-    bool set_shaft_state_after_power_on(bool lock_shaft, bool check = false)
+    bool set_lock_shaft_state_after_power_on(bool flag, bool check = false)
     {
         bool result         = true;
-        MessageFrame _frame = this->_modbus_writer_single(0x2007u, lock_shaft ? 1 : 0);
+        MessageFrame _frame = this->_modbus_writer_single(0x2007u, flag ? 1 : 0);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            bool buf   = (0x01 == buffer) ? true : false;
-            if (buf != lock_shaft) {
+            bool buf   = (0x00 == buffer) ? false : true;
+            if (buf != flag) {
                 result = false;
             } else if (true == check) {
-                result = this->get_shaft_state_after_power_on(&buf);
+                result = this->get_lock_shaft_state_after_power_on(&buf);
                 if (true == result) {
-                    if (buf != lock_shaft) {
+                    if (buf != flag) {
                         result = false;
                     }
                 }
@@ -2122,7 +2122,10 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                if ((_frame.data[0] & 0x80u) > 0) {
+                    buf |= 0xFFFF0000u;
+                }
                 if (buf != value) {
                     result = false;
                 } else if (true == check) {
@@ -2195,7 +2198,7 @@ public:
     {
         bool result = false;
         int input   = value * 10;
-        if (0 <= input && input <= 15.0) {
+        if (0 <= input && input <= 150) {
             result = true;
         } else {
             log_w("Out of range");
@@ -2225,7 +2228,7 @@ public:
     {
         bool result = false;
         int input   = value * 10;
-        if (0 <= input && input <= 30.0) {
+        if (0 <= input && input <= 300) {
             result = true;
         } else {
             log_w("Out of range");
@@ -2265,7 +2268,7 @@ public:
     }
     bool set_overload_protection_time_left(int value, bool check = false)
     {
-        bool result = false;
+        bool result = true;
         int input   = value / 10;
         if (0 <= input && input <= 6553) {
             result = true;
@@ -2277,13 +2280,13 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
-                if (buf != value) {
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != input) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_overload_protection_time_left(&buf);
                     if (true == result) {
-                        if ((buf / 10) == input) {
+                        if (buf != (input * 10)) {
                             result = false;
                         }
                     }
@@ -2300,13 +2303,13 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+            *value = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
         }
         return result;
     }
     bool set_position_following_error_threshold_left(int value, bool check = false)
     {
-        bool result = false;
+        bool result = true;
         int input   = value / 10;
         if (1 <= input && input <= 6553) {
             result = true;
@@ -2319,12 +2322,12 @@ public:
                 result = false;
             } else {
                 int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-                if (buf != value) {
+                if (buf != input) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_position_following_error_threshold_left(&buf);
                     if (true == result) {
-                        if ((buf / 10) == input) {
+                        if (buf != (input * 10)) {
                             result = false;
                         }
                     }
@@ -2966,7 +2969,10 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+                if ((_frame.data[0] & 0x80u) > 0) {
+                    buf |= 0xFFFF0000u;
+                }
                 if (buf != value) {
                     result = false;
                 } else if (true == check) {
@@ -3039,7 +3045,7 @@ public:
     {
         bool result = false;
         int input   = value * 10;
-        if (0 <= input && input <= 15.0) {
+        if (0 <= input && input <= 150) {
             result = true;
         } else {
             log_w("Out of range");
@@ -3069,7 +3075,7 @@ public:
     {
         bool result = false;
         int input   = value * 10;
-        if (0 <= input && input <= 30.0) {
+        if (0 <= input && input <= 300) {
             result = true;
         } else {
             log_w("Out of range");
@@ -3109,7 +3115,7 @@ public:
     }
     bool set_overload_protection_time_right(int value, bool check = false)
     {
-        bool result = false;
+        bool result = true;
         int input   = value / 10;
         if (0 <= input && input <= 6553) {
             result = true;
@@ -3121,13 +3127,13 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
-                if (buf != value) {
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != input) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_overload_protection_time_right(&buf);
                     if (true == result) {
-                        if ((buf / 10) == input) {
+                        if (buf != (input * 10)) {
                             result = false;
                         }
                     }
@@ -3150,7 +3156,7 @@ public:
     }
     bool set_position_following_error_threshold_right(int value, bool check = false)
     {
-        bool result = false;
+        bool result = true;
         int input   = value / 10;
         if (1 <= input && input <= 6553) {
             result = true;
@@ -3162,13 +3168,13 @@ public:
             if (0x80 <= _frame.function) {
                 result = false;
             } else {
-                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 10;
-                if (buf != value) {
+                int buf = (int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
+                if (buf != input) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_position_following_error_threshold_right(&buf);
                     if (true == result) {
-                        if ((buf / 10) == input) {
+                        if (buf != (input * 10)) {
                             result = false;
                         }
                     }
