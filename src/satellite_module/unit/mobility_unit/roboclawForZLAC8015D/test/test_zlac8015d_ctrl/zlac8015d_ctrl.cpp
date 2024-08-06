@@ -84,6 +84,8 @@ String text_drive_mode(ZLAC::DRIVER_MODE mode)
             return "VELOCITY";
         case ZLAC::DRIVER_MODE::TORQUE:
             return "TORQUE";
+        case ZLAC::DRIVER_MODE::UNDEFINED:
+            return "UNDEFINED";
         default:
             return "UNKNOWN";
     }
@@ -109,6 +111,95 @@ String text_can_baud_rate(ZLAC8015DCtrl::CAN_BAUD_RATE baud)
             return "INVALID";
     }
 }
+String text_rs485_baud_rate(ZLAC8015DCtrl::RS485_BAUD_RATE baud)
+{
+    switch (baud) {
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
+            return "128000";
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_115200:
+            return "115200";
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_57600:
+            return " 57600";
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_38400:
+            return " 38400";
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_19200:
+            return " 19200";
+        case ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_9600:
+            return " 9600";
+        default:
+            return "INVALID";
+    }
+}
+String text_zlac_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD word)
+{
+    switch (word) {
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP:
+            return "EMERGENCY_STOP";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT:
+            return "CLEAR_FAULT";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP:
+            return "STOP";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE:
+            return "ENABLE";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START:
+            return "SYNCHRONOUS_START";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT:
+            return "START_LEFT";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT:
+            return "START_RIGHT";
+        case ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED:
+            return "UNDEFINED";
+        default:
+            return "INVALID";
+    }
+}
+String text_zlac_stop_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL ctrl)
+{
+    switch (ctrl) {
+        case ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION:
+            return "QUICK_WITH_DECELERATION";
+        case ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION:
+            return "_QUICK_WITHOUT_DECELERATION";
+        case ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP:
+            return "STOP";
+        case ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED:
+            return "UNDEFINED";
+        default:
+            return "INVALID";
+    }
+}
+String text_terminal_function(ZLAC8015DCtrl::TERMINAL_FUNCTION func)
+{
+    switch (func) {
+        case ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE:
+            return "NONE";
+        case ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP:
+            return "EMERGENCY_STOP";
+        case ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC:
+            return "NC";
+        default:
+            return "INVALID";
+    }
+}
+String text_zlac_terminal_function(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION func)
+{
+    switch (func) {
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE:
+            return "OPEN_BRAKE";
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE:
+            return "CLOSE_BRAKE";
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL:
+            return "ALARM_SIGNAL";
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL:
+            return "DRIVE_STATUS_SIGNAL";
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL:
+            return "TARGET_POSITION_REACHED_SIGNAL";
+        case ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED:
+            return "UNDEFINED";
+        default:
+            return "INVALID";
+    }
+}
 
 ///////////////////////////////////////////////////////////////////
 void setUp(void)
@@ -127,38 +218,123 @@ void tearDown(void)
 #if COMMON_CONSTANT
 void Communication_offline_time(void)
 {
-    // bool set_communication_offline_time(int value_ms, bool check = false)
-    // TODO
-    int value   = 0;
-    bool result = ctrl.get_communication_offline_time(&value);
+    ////////////
+    bool result;
+    int value = 0;
+    // Test Setter
+    result = ctrl.set_communication_offline_time(789, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Communication_offline_time : %d", value);
+    result = ctrl.get_communication_offline_time(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(789, value);
+    // Restore
+    result = ctrl.set_communication_offline_time(1000);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_communication_offline_time(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Communication_offline_time [%d]", value);
 }
 void RS485_Node_ID(void)
 {
-    // bool set_rs485_node_id(int id, bool check = false)
-    // TODO
+    ////////////
+    bool result;
+    int value = 0;
+#if 0
+    // Test Setter
+    //////////////////////////////////////////////
+    // NOTE: Communication settings such as address/baud rate are not dynamically supported
+    //////////////////////////////////////////////
 
-    int value   = 0;
-    bool result = ctrl.get_rs485_node_id(&value);
+    result = ctrl.set_rs485_node_id(23, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* RS485_Node_ID : %d", value);
-
-    TEST_ASSERT_EQUAL_INT(1, value);
+    result = ctrl.get_rs485_node_id(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(23, value);
+    // Restore
+    result = ctrl.set_rs485_node_id(1);
+    TEST_ASSERT_TRUE(result);
+#endif
+    result = ctrl.get_rs485_node_id(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* RS485_Node_ID [%d]", value);
 }
 void RS485_Baud_Rate(void)
 {
-    // bool set_rs485_baud_rate(RS485_BAUD_RATE baud, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::RS485_BAUD_RATE value;
-    bool result = ctrl.get_rs485_baud_rate(&value);
+#if 0
+    // Test Setter
+    //////////////////////////////////////////////
+    // NOTE: Communication settings such as address/baud rate are not dynamically supported
+    //////////////////////////////////////////////
+    ZLAC8015DCtrl::RS485_BAUD_RATE input_value;
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* RS485_Baud_Rate : [%d]", value);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+    input_value = ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+    result      = ctrl.set_rs485_baud_rate(input_value, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(input_value, value);
+    // [Change baud]
+
+    // Restore
+    result = ctrl.set_rs485_baud_rate(ZLAC8015DCtrl::RS485_BAUD_RATE::RS485_BAUD_RATE_128000);
+    TEST_ASSERT_TRUE(result);
+#endif
+    result = ctrl.get_rs485_baud_rate(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* RS485_Baud_Rate [%s]", text_rs485_baud_rate(value));
 }
 void Input_signal_status(void)
 {
     // TODO
+    // [NOT TEST] If you want to test it, enter the pin.
     bool x0     = false;
     bool x1     = false;
     bool result = ctrl.get_input_signal_status(&x0, &x1);
@@ -168,17 +344,18 @@ void Input_signal_status(void)
 void Out_signal_status(void)
 {
     // TODO
+    // [NOT TEST] If you test it, you need to set it so that the out signal changes.
     bool x0     = false;
     bool x1     = false;
     bool result = ctrl.get_out_signal_status(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    log_d("* Out_signal_status : x0[%d]x1[%d]", x0 ? "T" : "F", x1 ? "T" : "F");
+    log_d("* Out_signal_status : x0[%s]x1[%s]", x0 ? "T" : "F", x1 ? "T" : "F");
 }
 void Clear_feedback_position(void)
 {
+    // TODO
     // bool set_clear_feedback_position(ZLAC::target_motor target, bool check = false)
 
-    // TODO
     ZLAC::target_motor value;
     bool result = ctrl.get_clear_feedback_position(&value);
     TEST_ASSERT_TRUE(result);
@@ -186,9 +363,9 @@ void Clear_feedback_position(void)
 }
 void In_absolute_position_control_reset_the_zero_point(void)
 {
+    // TODO
     // bool set_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor target, bool check = false)
 
-    // TODO
     ZLAC::target_motor value;
     bool result = ctrl.get_reset_the_zero_point_in_absolute_position_control(&value);
     TEST_ASSERT_TRUE(result);
@@ -196,163 +373,410 @@ void In_absolute_position_control_reset_the_zero_point(void)
 }
 void Shaft_state_after_power_on(void)
 {
-    // bool set_shaft_state_after_power_on(bool lock_shaft, bool check = false)
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_shaft_state_after_power_on(false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_shaft_state_after_power_on(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
 
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_shaft_state_after_power_on(&flag);
+    result = ctrl.set_shaft_state_after_power_on(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_shaft_state_after_power_on(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_shaft_state_after_power_on(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_shaft_state_after_power_on(&flag);
     TEST_ASSERT_TRUE(result);
     log_d("* Shaft_state_after_power_on : %s", flag ? "T:lock" : "F:unlock");
 }
 void Maximum_motor_speed(void)
 {
-    // bool set_maximum_motor_speed(int r_min, bool check = false)
-
-    // TODO
-    int value   = 0;
-    bool result = ctrl.get_maximum_motor_speed(&value);
+    ////////////
+    bool result;
+    int value = 0;
+    // Test Setter
+    result = ctrl.set_maximum_motor_speed(987, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Maximum_motor_speed : %d", value);
+    result = ctrl.get_maximum_motor_speed(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(987, value);
+    // Restore
+    result = ctrl.set_maximum_motor_speed(1000);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_maximum_motor_speed(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Maximum_motor_speed [%d]", value);
 }
 void Register_parameter_settings(void)
 {
-    // bool set_register_parameter_settings(bool restore_factory_settings, bool check = false)
-
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_register_parameter_settings(&flag);
-    TEST_ASSERT_TRUE(result);
-    log_d("* Register_parameter_settings : %s", flag ? "T" : "F");
+    bool result = true;
+#if 0
+    // [NOT TEST]
+    result = ctrl.restore_factory_settings();
+#endif
+    log_d("* Restore_factory_settings : %s", result ? "T" : "F");
+    TEST_ASSERT_TRUE_MESSAGE(result, "NOT TEST");
 }
 void CAN_Node_info(void)
 {
-    // bool set_can_node_info(int id, CAN_BAUD_RATE baud, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     int id = 0;
     ZLAC8015DCtrl::CAN_BAUD_RATE baud;
-    bool result = ctrl.get_can_node_info(&id, &baud);
+    // Test Setter
+    result = ctrl.set_can_node_info(2, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* CAN_Node_info : id[%d]baud[%d]", id, baud);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(2, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, baud);
 
-    bool result;
-    int backup_id = 0;
-    ZLAC8015DCtrl::CAN_BAUD_RATE backup_baud;
-    //
-    result = ctrl.get_can_node_info(&backup_id, &backup_baud);
+    result = ctrl.set_can_node_info(3, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* CAN_Node_info : id[%d]baud[%s]", backup_id, text_can_baud_rate(backup_baud));
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(3, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, baud);
 
-    result = ctrl.set_can_node_info(backup_id, backup_baud);
+    result = ctrl.set_can_node_info(4, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(4, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, baud);
+
+    result = ctrl.set_can_node_info(5, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(5, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, baud);
+
+    result = ctrl.set_can_node_info(6, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(6, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, baud);
+
+    result = ctrl.set_can_node_info(7, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(7, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, baud);
+
+    result = ctrl.set_can_node_info(8, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(8, id);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, baud);
+
+    // Restore
+    result = ctrl.set_can_node_info(1, ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_500K);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_can_node_info(&id, &baud);
+    TEST_ASSERT_TRUE(result);
+    log_d("* CAN_Node_info : id[%d]baud[%s]", id, text_can_baud_rate(baud));
 }
 void Control_mode(void)
 {
+    ////////////
     bool result;
-    ZLAC::DRIVER_MODE backup_mode;
     ZLAC::DRIVER_MODE mode;
-    result = ctrl.get_control_mode(&backup_mode);
-    TEST_ASSERT_TRUE(result);
-    log_d("* Control_mode : NO.1 [%s]", text_drive_mode(backup_mode).c_str());
-
+    // Test Setter
     result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE, true);
-    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : POSITION_RELATIVE");
-    result = ctrl.get_control_mode(&mode);
-    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::POSITION_RELATIVE, mode, "get_control_mode : POSITION_RELATIVE");
-    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, true);
-    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : POSITION_ABSOLUTE");
-    result = ctrl.get_control_mode(&mode);
-    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, mode, "get_control_mode : POSITION_ABSOLUTE");
-    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::VELOCITY, true);
-    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : VELOCITY");
-    result = ctrl.get_control_mode(&mode);
-    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::VELOCITY, mode, "get_control_mode : VELOCITY");
-    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE, true);
-    TEST_ASSERT_TRUE_MESSAGE(result, "set_control_mode : TORQUE");
-    result = ctrl.get_control_mode(&mode);
-    TEST_ASSERT_EQUAL_MESSAGE(ZLAC::DRIVER_MODE::TORQUE, mode, "get_control_mode : TORQUE");
-
-    result = ctrl.set_control_mode(backup_mode);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC::DRIVER_MODE::POSITION_RELATIVE, mode);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE, mode);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::VELOCITY, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC::DRIVER_MODE::VELOCITY, mode);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC::DRIVER_MODE::TORQUE, mode);
+
+    // Restore
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::UNDEFINED, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_mode(&mode);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Control_mode : %s", text_drive_mode(mode));
 }
 void Control_word(void)
 {
-    // bool set_control_word(ZLAC_CONTROL_WORD word, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::ZLAC_CONTROL_WORD value;
-    bool result = ctrl.get_control_word(&value);
+    // Test Setter
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Control_word : [%d]", value);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, value);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, value);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, value);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, value);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, value);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    TEST_ASSERT_FALSE(result);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::VELOCITY);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    TEST_ASSERT_FALSE(result);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, value);
+
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, value);
+
+    // Restore
+    result = ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_control_word(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Control_word : %s", text_zlac_control_word(value));
 }
 void Synchronous_control_status(void)
 {
-    // bool set_synchronous_control_status(bool synchronous, bool check = false)
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_synchronous_control_status(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_synchronous_control_status(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
 
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_synchronous_control_status(&flag);
+    result = ctrl.set_synchronous_control_status(false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_synchronous_control_status(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    // Restore
+    result = ctrl.set_synchronous_control_status(true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_synchronous_control_status(&flag);
     TEST_ASSERT_TRUE(result);
     log_d("* Synchronous_control_status : %s", flag ? "T:synchronous" : "F:ansynchronous");
 }
 void Store_RW_register_to_EEPROM(void)
 {
     // [CATION] This function is not implemented.
-    // bool store_rw_register_to_eperm()
-
-    // TODO
+    ////////////
     bool result = true;
+    bool flag   = false;
+    // Test Setter
+    // result = ctrl.store_rw_register_to_eperm();
+    // TEST_ASSERT_TRUE(result);
 
+    // Restore
     TEST_ASSERT_TRUE_MESSAGE(result, "NOT TEST");
 }
 void Quick_stop_control(void)
 {
-    // bool set_quick_stop_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::ZLAC_STOP_CONTROL value;
-    bool result = ctrl.get_quick_stop_control(&value);
+    // Test Setter
+    result = ctrl.set_quick_stop_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Quick_stop_control : [%d]", value);
+    result = ctrl.get_quick_stop_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
+
+    result = ctrl.set_quick_stop_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_quick_stop_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
+
+    result = ctrl.set_quick_stop_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_quick_stop_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
+
+    // Restore
+    result = ctrl.set_quick_stop_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_quick_stop_control(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Quick_stop_control : %s", text_zlac_stop_control(value));
 }
 void Close_operation_control(void)
 {
-    // bool set_close_operation_control(bool stop_normally, bool check = false)
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_close_operation_control(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_close_operation_control(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
 
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_close_operation_control(&flag);
+    result = ctrl.set_close_operation_control(false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_close_operation_control(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    // Restore
+    result = ctrl.set_close_operation_control(true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_close_operation_control(&flag);
     TEST_ASSERT_TRUE(result);
     log_d("* Close_operation_control : %s", flag ? "T:stop_normally" : "F:--");
 }
 void Disable_control(void)
 {
-    // bool set_disable_control(bool stop, bool check = false)
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_disable_control(false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_disable_control(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
 
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_disable_control(&flag);
+    result = ctrl.set_disable_control(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_disable_control(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_disable_control(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_disable_control(&flag);
     TEST_ASSERT_TRUE(result);
     log_d("* Disable_control : %s", flag ? "T:stop" : "F:--");
 }
 void Halt_control(void)
 {
-    // bool set_halt_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::ZLAC_STOP_CONTROL value;
-    bool result = ctrl.get_halt_control(&value);
+    // Test Setter
+    result = ctrl.set_halt_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Halt_control : [%d]", value);
+    result = ctrl.get_halt_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
+
+    result = ctrl.set_halt_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_halt_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
+
+    result = ctrl.set_halt_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_halt_control(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
+
+    // Restore
+    result = ctrl.set_halt_control(ZLAC8015DCtrl::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_halt_control(&value);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Halt_control : %s", text_zlac_stop_control(value));
 }
 void Input_effective_level(void)
 {
-    // bool set_input_effective_level(bool low_level, bool check = false)
-
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_input_effective_level(&flag);
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_input_effective_level(false, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_input_effective_level(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    result = ctrl.set_input_effective_level(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_input_effective_level(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_input_effective_level(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_input_effective_level(&flag);
     log_d("* Input_effective_level : %s", flag ? "T:low_level" : "F:hight_level");
 }
 void Input_terminal_function_selection(void)
@@ -360,23 +784,178 @@ void Input_terminal_function_selection(void)
     // bool set_input_terminal_terminal_function_selection(TERMINAL_FUNCTION x0, TERMINAL_FUNCTION x1, bool check = false)
 
     // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::TERMINAL_FUNCTION x0;
     ZLAC8015DCtrl::TERMINAL_FUNCTION x1;
-    bool result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
+    // Test Setter
+    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, //
+                                                                 ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
     TEST_ASSERT_TRUE(result);
-    log_d("* Input_terminal_function_selection : x0[%d]x1[%d]", x0, x1);
+    result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x1);
+
+    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
+                                                                 ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x1);
+
+    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC, //
+                                                                 ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
+    TEST_ASSERT_FALSE(result);
+
+    // Restore
+    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
+                                                                 ZLAC8015DCtrl::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Input_terminal_function_selection : x0[%s]x1[%s]", text_terminal_function(x0), text_terminal_function(x1));
 }
 void Output_effective_level(void)
 {
-    // bool set_output_effective_low_level(bool y0, bool y1, bool b0, bool b1, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     bool b0;
     bool b1;
     bool y0;
     bool y1;
-    bool result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    // Test Setter
+    result = ctrl.set_output_effective_low_level(true, false, false, false, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, true, false, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, false, true, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, false, false, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, true, false, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, false, true, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, false, false, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, true, true, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, true, false, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, false, true, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(false, true, true, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, false, true, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_FALSE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, true, false, true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_FALSE(y0);
+    TEST_ASSERT_TRUE(y1);
+
+    result = ctrl.set_output_effective_low_level(true, true, true, false, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(b0);
+    TEST_ASSERT_TRUE(b1);
+    TEST_ASSERT_TRUE(y0);
+    TEST_ASSERT_FALSE(y1);
+
+    // Restore
+    result = ctrl.set_output_effective_low_level(false, false, false, false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_effective_low_level(&b0, &b1, &y0, &y1);
     log_d("* Output_effective_level : b0[%s]b1[%s]y0[%s]y1[%s]", //
           b0 ? "T" : "F",
           b1 ? "T" : "F",
@@ -385,55 +964,155 @@ void Output_effective_level(void)
 }
 void Output_terminal_function_selection(void)
 {
-    // bool set_output_terminal_function_selection( ZLAC_TERMINAL_FUNCTION b0, ZLAC_TERMINAL_FUNCTION b1, ZLAC_TERMINAL_FUNCTION y0, ZLAC_TERMINAL_FUNCTION y1, bool check = false)
-
-    // TODO
+    ////////////
+    bool result;
     ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION b0;
     ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION b1;
     ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION y0;
     ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION y1;
-    bool result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
+    // Test Setter
+    result = ctrl.set_output_terminal_function_selection(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
+                                                         true);
     TEST_ASSERT_TRUE(result);
-    log_d("* Halt_control : b0[%d]b1[%d]y0[%d]y1[%d]", b0, b1, y0, y1);
+    result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b1);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y1);
+
+    result = ctrl.set_output_terminal_function_selection(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
+                                                         true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y1);
+
+    result = ctrl.set_output_terminal_function_selection(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
+                                                         true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y1);
+
+    // Restore
+    result = ctrl.set_output_terminal_function_selection(ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
+                                                         ZLAC8015DCtrl::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
+                                                         true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
+    log_d("* Output_terminal_function_selection : b0[%s]b1[%s]y0[%s]y1[%s]", //
+          text_zlac_terminal_function(b0),
+          text_zlac_terminal_function(b1),
+          text_zlac_terminal_function(y0),
+          text_zlac_terminal_function(y1));
 }
 void Driver_temperature_protection_threshold(void)
 {
-    // bool set_driver_temperature_protection_threshold(double value, bool check = false)
+    ////////////
+    bool result;
+    double value = 0;
+    // Test Setter
+    result = ctrl.set_driver_temperature_protection_threshold(98.71, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_driver_temperature_protection_threshold(&value);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FLOAT_WITHIN(0.1, 98.71, value);
 
-    // TODO
-    double value = false;
-    bool result  = ctrl.get_driver_temperature_protection_threshold(&value);
+    // Restore
+    result = ctrl.set_driver_temperature_protection_threshold(80.0);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_driver_temperature_protection_threshold(&value);
     TEST_ASSERT_TRUE(result);
     log_d("* Driver_temperature_protection_threshold : %8.3f", value);
 }
 void Alarm_PWM_processing_method(void)
 {
-    // bool set_alarm_pwm_processing_method(bool open, bool check = false)
-
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_alarm_pwm_processing_method(&flag);
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_alarm_pwm_processing_method(false, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_alarm_pwm_processing_method(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    result = ctrl.set_alarm_pwm_processing_method(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_alarm_pwm_processing_method(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_alarm_pwm_processing_method(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_alarm_pwm_processing_method(&flag);
     log_d("* Alarm_PWM_processing_method : %s", flag ? "T:Open" : "F:Close");
 }
 void Overload_processing_method(void)
 {
-    // bool set_overload_processing_method(bool open, bool check = false)
-
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_overload_processing_method(&flag);
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_overload_processing_method(false, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_overload_processing_method(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    result = ctrl.set_overload_processing_method(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_overload_processing_method(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_overload_processing_method(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_overload_processing_method(&flag);
     log_d("* Overload_processing_method : %s", flag ? "T:Open" : "F:Close");
 }
 void IO_emergency_stop_processing_mode(void)
 {
-    // bool set_io_emergency_stop_processing_mode(bool lock_shaft, bool check = false)
-
-    // TODO
-    bool flag   = false;
-    bool result = ctrl.get_io_emergency_stop_processing_mode(&flag);
+    ////////////
+    bool result;
+    bool flag = false;
+    // Test Setter
+    result = ctrl.set_io_emergency_stop_processing_mode(false, true);
     TEST_ASSERT_TRUE(result);
+    result = ctrl.get_io_emergency_stop_processing_mode(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_FALSE(flag);
+
+    result = ctrl.set_io_emergency_stop_processing_mode(true, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_io_emergency_stop_processing_mode(&flag);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_TRUE(flag);
+
+    // Restore
+    result = ctrl.set_io_emergency_stop_processing_mode(false);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_io_emergency_stop_processing_mode(&flag);
     log_d("* IO_emergency_stop_processing_mode : %s", flag ? "T:Lock" : "F:Free");
 }
 #endif
@@ -1093,11 +1772,6 @@ void NOT_CONNECTED_DEVICE(void)
 void TEST_ONCE(void)
 {
     log_d("=== TEST_ONCE ===");
-    long left;
-    long right;
-    bool result = ctrl.get_actual_motor_position(&left, &right);
-    TEST_ASSERT_TRUE(result);
-    log_d("* Actual_motor_position : L[%d]R[%d]", left, right);
 }
 
 ///////////////////////////////////////////////////////////////////

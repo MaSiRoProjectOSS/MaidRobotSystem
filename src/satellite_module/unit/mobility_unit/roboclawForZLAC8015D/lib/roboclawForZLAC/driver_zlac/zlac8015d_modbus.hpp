@@ -241,7 +241,7 @@ private:
         log_v("  ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Reg[0x%02X%02X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
-              this->_frame.data_length,
+              this->_frame.data_length - 2,
               this->_frame.footer,
               this->_frame.data[0],
               this->_frame.data[1],
@@ -301,7 +301,7 @@ private:
                 MessageFrame::FUNCTION_WRITE_MULTIPLE_REGISTERS,
                 arr.data(),
                 arr.size());
-        log_v("ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Reg[0x%02X%02X] Size[0x%02X%02X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
+        log_v("ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Reg[0x%02X%02X] Size[0x%02X%02X / %d] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
               this->_frame.address,
               this->_frame.function,
               this->_frame.data_length,
@@ -317,7 +317,8 @@ private:
               this->_frame.data[8],
               this->_frame.data[9],
               this->_frame.data[10],
-              this->_frame.data[11]);
+              this->_frame.data[11],
+              this->_frame.data[12]);
         return this->send_frame(this->_frame);
     }
 #else
@@ -773,6 +774,7 @@ public:
         }
         return result;
     }
+#if 0
     bool get_register_parameter_settings(bool *value)
     {
         bool result         = true;
@@ -810,6 +812,24 @@ public:
         }
         return result;
     }
+#else
+    bool restore_factory_settings()
+    {
+        bool result         = true;
+        MessageFrame _frame = this->_modbus_writer_single(0x2009u, 1);
+        if (0x80 <= _frame.function) {
+            result = false;
+        } else {
+            unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
+            bool buf            = (0x01 == buffer) ? true : false;
+            if (buf != true) {
+                result = false;
+            }
+        }
+        return result;
+    }
+
+#endif
     bool get_can_node_info(int *id, CAN_BAUD_RATE *baud)
     {
         bool result         = false;
@@ -1028,6 +1048,8 @@ public:
                         buf = ZLAC::DRIVER_MODE::TORQUE;
                         break;
                     case 0:
+                        buf = ZLAC::DRIVER_MODE::UNDEFINED;
+                        break;
                     default:
                         buf = ZLAC::DRIVER_MODE::NOT_INITIALIZED;
                         break;
@@ -1041,6 +1063,8 @@ public:
                             result = false;
                         }
                     }
+                } else {
+                    this->_mode = mode;
                 }
             }
         }
@@ -1182,14 +1206,14 @@ public:
     bool get_synchronous_control_status(bool *synchronous)
     {
         bool result         = true;
-        *synchronous        = false;
+        *synchronous        = true;
         MessageFrame _frame = this->_modbus_send_read(0x200Fu, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x00 == buf) {
-                *synchronous = true;
+            if (0x01 == buf) {
+                *synchronous = false;
             }
         }
         return result;
@@ -1201,11 +1225,8 @@ public:
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            bool buf            = false;
             unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x00 == buf) {
-                buf = true;
-            }
+            bool buf            = (0x01 == buf) ? false : true;
             if (buf != synchronous) {
                 result = false;
             } else if (true == check) {
@@ -1289,17 +1310,17 @@ public:
                 unsigned int buffer   = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
                 switch (buffer) {
                     case 0x05:
-                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP;
                         break;
                     case 0x06:
-                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION;
                         break;
                     case 0x07:
-                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION;
                         break;
                     case 0x00:
                     default:
-                        buffer = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
+                        buf = ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED;
                         break;
                 }
                 if (buf != ctrl) {
@@ -1637,7 +1658,7 @@ public:
         int input   = (y0 ? 0x01 : 0x00) | //
                     (y1 ? 0x02 : 0x00) |   //
                     (b0 ? 0x04 : 0x00) |   //
-                    (b1 ? 0x09 : 0x00);
+                    (b1 ? 0x08 : 0x00);
         MessageFrame _frame = this->_modbus_writer_single(0x2019u, input);
         if (0x80 <= _frame.function) {
             result = false;
@@ -1856,18 +1877,18 @@ public:
                 } else
 #endif
                 if (true == check) {
-                    result = this->get_output_terminal_function_selection(&buf_y0, &buf_y1, &buf_b0, &buf_b1);
+                    result = this->get_output_terminal_function_selection(&buf_b0, &buf_b1, &buf_y0, &buf_y1);
                     if (true == result) {
-                        if (buf_y0 != y0) {
-                            result = false;
-                        }
-                        if (buf_y1 != y1) {
-                            result = false;
-                        }
                         if (buf_b0 != b0) {
                             result = false;
                         }
                         if (buf_b1 != b1) {
+                            result = false;
+                        }
+                        if (buf_y0 != y0) {
+                            result = false;
+                        }
+                        if (buf_y1 != y1) {
                             result = false;
                         }
                     }
@@ -1895,7 +1916,7 @@ public:
         if (0 <= value && value <= 120.0) {
             result = true;
         } else {
-            log_w("Out of range");
+            log_w("Out of range [%f]", value);
         }
         if (true == result) {
             int input           = value * 10;
@@ -1904,12 +1925,12 @@ public:
                 result = false;
             } else {
                 double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
-                if (0.1 > std::abs(buf - value)) {
+                if (0.1 < std::abs(buf - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_driver_temperature_protection_threshold(&buf);
                     if (true == result) {
-                        if (0.1 > std::abs(buf - value)) {
+                        if (0.1 < std::abs(buf - value)) {
                             result = false;
                         }
                     }
@@ -2001,7 +2022,7 @@ public:
             result = false;
         } else {
             unsigned int buf = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            if (0x00 == buf) {
+            if (0x01 == buf) {
                 *lock_shaft = false;
             }
         }
@@ -2015,7 +2036,7 @@ public:
             result = false;
         } else {
             unsigned int buffer = (unsigned int)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF));
-            bool buf            = (0x01 == buffer) ? true : false;
+            bool buf            = (0x01 == buffer) ? false : true;
             if (buf != lock_shaft) {
                 result = false;
             } else if (true == check) {
@@ -2186,12 +2207,12 @@ public:
             } else {
                 double buf_rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
                 double buf_maximum = 0;
-                if (0.1 > std::abs(buf_rated - value)) {
+                if (0.1 < std::abs(buf_rated - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_current_left(&buf_rated, &buf_maximum);
                     if (true == result) {
-                        if (0.1 > std::abs(buf_rated - value)) {
+                        if (0.1 < std::abs(buf_rated - value)) {
                             result = false;
                         }
                     }
@@ -2216,12 +2237,12 @@ public:
             } else {
                 double buf_rated   = 0;
                 double buf_maximum = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
-                if (0.1 > std::abs(buf_maximum - value)) {
+                if (0.1 < std::abs(buf_maximum - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_current_left(&buf_rated, &buf_maximum);
                     if (true == result) {
-                        if (0.1 > std::abs(buf_maximum - value)) {
+                        if (0.1 < std::abs(buf_maximum - value)) {
                             result = false;
                         }
                     }
@@ -2771,12 +2792,12 @@ public:
                 result = false;
             } else {
                 double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
-                if (0.1 > std::abs(buf - value)) {
+                if (0.1 < std::abs(buf - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_over_temperature_threshold_left(&buf);
                     if (true == result) {
-                        if (0.1 > std::abs(buf - value)) {
+                        if (0.1 < std::abs(buf - value)) {
                             result = false;
                         }
                     }
@@ -3030,12 +3051,12 @@ public:
             } else {
                 double buf_rated   = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
                 double buf_maximum = 0;
-                if (0.1 > std::abs(buf_rated - value)) {
+                if (0.1 < std::abs(buf_rated - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_current_right(&buf_rated, &buf_maximum);
                     if (true == result) {
-                        if (0.1 > std::abs(buf_rated - value)) {
+                        if (0.1 < std::abs(buf_rated - value)) {
                             result = false;
                         }
                     }
@@ -3060,12 +3081,12 @@ public:
             } else {
                 double buf_rated   = 0;
                 double buf_maximum = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) * 0.1;
-                if (0.1 > std::abs(buf_maximum - value)) {
+                if (0.1 < std::abs(buf_maximum - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_current_right(&buf_rated, &buf_maximum);
                     if (true == result) {
-                        if (0.1 > std::abs(buf_maximum - value)) {
+                        if (0.1 < std::abs(buf_maximum - value)) {
                             result = false;
                         }
                     }
@@ -3615,12 +3636,12 @@ public:
                 result = false;
             } else {
                 double buf = (double)((_frame.data[0] << 8) | (_frame.data[1] & 0xFF)) / 10.0;
-                if (0.1 > std::abs(buf - value)) {
+                if (0.1 < std::abs(buf - value)) {
                     result = false;
                 } else if (true == check) {
                     result = this->get_over_temperature_threshold_right(&buf);
                     if (true == result) {
-                        if (0.1 > std::abs(buf - value)) {
+                        if (0.1 < std::abs(buf - value)) {
                             result = false;
                         }
                     }
