@@ -321,10 +321,11 @@ protected:
                     switch (step) {
                         case 1:
                             frame.function = buf;
-                            step++;
+                            step           = 2;
                             break;
                         case 2:
-                            if (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER) {
+                            if ((frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER)
+                                || (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS)) {
                                 frame.start_reg   = (buf << 8) & 0xFFu;
                                 frame.data_length = 2;
                                 step++;
@@ -334,10 +335,11 @@ protected:
                             }
                             break;
                         case 3:
-                            if (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER) {
+                            if ((frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_SINGLE_REGISTER)
+                                || (frame.function == MessageFrame::MODBUS_FUNCTION::FUNCTION_WRITE_MULTIPLE_REGISTERS)) {
                                 frame.start_reg = (frame.address & 0xFF00u) | buf;
                             }
-                            step++;
+                            step = 4;
                             break;
                         case 4:
                             if (255 <= count_length) {

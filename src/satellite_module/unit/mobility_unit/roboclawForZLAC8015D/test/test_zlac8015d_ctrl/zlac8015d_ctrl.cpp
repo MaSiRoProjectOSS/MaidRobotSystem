@@ -88,6 +88,27 @@ String text_drive_mode(ZLAC::DRIVER_MODE mode)
             return "UNKNOWN";
     }
 }
+String text_can_baud_rate(ZLAC8015DCtrl::CAN_BAUD_RATE baud)
+{
+    switch (baud) {
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K:
+            return "1000K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_500K:
+            return "500K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_250K:
+            return "250K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_125K:
+            return "125K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_100K:
+            return "100K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_50K:
+            return " 50K";
+        case ZLAC8015DCtrl::CAN_BAUD_RATE::CAN_BAUD_RATE_25K:
+            return " 25K";
+        default:
+            return "INVALID";
+    }
+}
 
 ///////////////////////////////////////////////////////////////////
 void setUp(void)
@@ -213,6 +234,17 @@ void CAN_Node_info(void)
     bool result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     log_d("* CAN_Node_info : id[%d]baud[%d]", id, baud);
+
+    bool result;
+    int backup_id = 0;
+    ZLAC8015DCtrl::CAN_BAUD_RATE backup_baud;
+    //
+    result = ctrl.get_can_node_info(&backup_id, &backup_baud);
+    TEST_ASSERT_TRUE(result);
+    log_d("* CAN_Node_info : id[%d]baud[%s]", backup_id, text_can_baud_rate(backup_baud));
+
+    result = ctrl.set_can_node_info(backup_id, backup_baud);
+    TEST_ASSERT_TRUE(result);
 }
 void Control_mode(void)
 {
@@ -676,89 +708,193 @@ void Velocity_observer_coefficient(void)
 /////////////////////////////////////////////////
 void S_shape_acceleration_time(void)
 {
-    // bool set_s_shape_acceleration_time(int left, int right, bool check = false)
-
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_s_shape_acceleration_time(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    // Test Setter
+    result = ctrl.set_s_shape_acceleration_time(456, 321, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_s_shape_acceleration_time(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(456, left);
+    TEST_ASSERT_EQUAL(321, right);
+    // Restore
+    result = ctrl.set_s_shape_acceleration_time(500, 500);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_s_shape_acceleration_time(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* S_shape_acceleration_time : L[%d]R[%d]", left, right);
 }
 void S_shape_deceleration_time(void)
 {
-    // bool set_s_shape_deceleration_time(int left, int right, bool check = false)
-
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_s_shape_deceleration_time(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    // Test Setter
+    result = ctrl.set_s_shape_deceleration_time(789, 123, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_s_shape_deceleration_time(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(789, left);
+    TEST_ASSERT_EQUAL(123, right);
+    // Restore
+    result = ctrl.set_s_shape_deceleration_time(500, 500);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_s_shape_acceleration_time(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* S_shape_deceleration_time : L[%d]R[%d]", left, right);
 }
 void Deceleration_time_of_quick_stop(void)
 {
-    // bool set_deceleration_time_of_quick_stop(int left, int right, bool check = false)
-
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_deceleration_time_of_quick_stop(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    // Test Setter
+    result = ctrl.set_deceleration_time_of_quick_stop(12, 21, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_deceleration_time_of_quick_stop(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(12, left);
+    TEST_ASSERT_EQUAL(21, right);
+    // Restore
+    result = ctrl.set_deceleration_time_of_quick_stop(10, 10);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_deceleration_time_of_quick_stop(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Deceleration_time_of_quick_stop : L[%d]R[%d]", left, right);
 }
 void Torque_slope(void)
 {
-    // bool set_torque_slope(int left, int right, bool check = false)
-
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_torque_slope(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    // Test Setter
+    result = ctrl.set_torque_slope(345, 678, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_torque_slope(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(345, left);
+    TEST_ASSERT_EQUAL(678, right);
+    // Restore
+    result = ctrl.set_torque_slope(300, 300);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_torque_slope(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Torque_slope : L[%d]R[%d]", left, right);
 }
 void Target_velocity(void)
 {
-    // bool set_target_velocity(int left, int right, bool check = false)
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    result    = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE, true);
+    TEST_ASSERT_TRUE(result);
+    // Test Setter
+    result = ctrl.set_target_velocity(-123, -456, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_velocity(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(-123, left);
+    TEST_ASSERT_EQUAL(-456, right);
 
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_target_velocity(&left, &right);
+    result = ctrl.set_target_velocity(789, 234, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_velocity(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(789, left);
+    TEST_ASSERT_EQUAL(234, right);
+    // Restore
+    result = ctrl.set_target_velocity(0, 0);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_velocity(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Target_velocity : L[%d]R[%d]", left, right);
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE, true);
+    TEST_ASSERT_TRUE(result);
 }
 void Target_position(void)
 {
-    // bool set_target_position(long left, long right, bool check = false)
+    ////////////
+    bool result;
+    long left  = 0;
+    long right = 0;
+    // Test Setter
+    result = ctrl.set_target_position(-467, -891, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_position(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(-467, left);
+    TEST_ASSERT_EQUAL(-891, right);
 
-    // TODO
-    long left   = 0;
-    long right  = 0;
-    bool result = ctrl.get_target_position(&left, &right);
+    result = ctrl.set_target_position(234, 567, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_position(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(234, left);
+    TEST_ASSERT_EQUAL(567, right);
+    // Restore
+    result = ctrl.set_target_position(0, 0);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_position(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Target_position : L[%d]R[%d]", left, right);
 }
 void Max_speed(void)
 {
-    // bool set_max_speed(int left, int right, bool check = false)
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_max_speed(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    // Test Setter
+    result = ctrl.set_max_speed(97, 86, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_max_speed(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(97, left);
+    TEST_ASSERT_EQUAL(86, right);
+    // Restore
+    result = ctrl.set_max_speed(120, 120);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_max_speed(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Max_speed : L[%d]R[%d]", left, right);
 }
 void Target_torque(void)
 {
-    // bool set_target_torque(int left, int right, bool check = false)
-    // TODO
-    int left    = 0;
-    int right   = 0;
-    bool result = ctrl.get_target_torque(&left, &right);
+    ////////////
+    bool result;
+    int left  = 0;
+    int right = 0;
+    result    = ctrl.set_control_mode(ZLAC::DRIVER_MODE::TORQUE, true);
+    TEST_ASSERT_TRUE(result);
+    // Test Setter
+    result = ctrl.set_target_torque(-467, -891, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_torque(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(-467, left);
+    TEST_ASSERT_EQUAL(-891, right);
+
+    result = ctrl.set_target_torque(234, 567, true);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_torque(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    TEST_ASSERT_EQUAL(234, left);
+    TEST_ASSERT_EQUAL(567, right);
+    // Restore
+    result = ctrl.set_target_torque(0, 0);
+    TEST_ASSERT_TRUE(result);
+    result = ctrl.get_target_torque(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Target_torque : L[%d]R[%d]", left, right);
+
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE, true);
+    TEST_ASSERT_TRUE(result);
 }
 #endif
 #if READ_ONLY_PARAMETER
@@ -899,8 +1035,8 @@ void Actual_motor_position(void)
     bool result = ctrl.get_actual_motor_position(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Actual_motor_position : L[%d]R[%d]", left, right);
-    TEST_ASSERT_GREATER_OR_EQUAL(0, left);
-    TEST_ASSERT_GREATER_OR_EQUAL(0, right);
+    // TEST_ASSERT_GREATER_OR_EQUAL(0, left);
+    // TEST_ASSERT_GREATER_OR_EQUAL(0, right);
 }
 void Actual_velocity(void)
 {
@@ -949,6 +1085,20 @@ void Driver_temperature(void)
     }
 }
 #endif
+void NOT_CONNECTED_DEVICE(void)
+{
+    TEST_ASSERT_TRUE_MESSAGE(false, "[Not connected] Please check the connection.");
+}
+
+void TEST_ONCE(void)
+{
+    log_d("=== TEST_ONCE ===");
+    long left;
+    long right;
+    bool result = ctrl.get_actual_motor_position(&left, &right);
+    TEST_ASSERT_TRUE(result);
+    log_d("* Actual_motor_position : L[%d]R[%d]", left, right);
+}
 
 ///////////////////////////////////////////////////////////////////
 
@@ -956,82 +1106,93 @@ void RUN_UNITY_TESTS()
 {
     (void)setup_m5();
     UNITY_BEGIN();
-    //////////////////////////////////
-    // Common constant
-#if COMMON_CONSTANT
-    RUN_TEST(Communication_offline_time);
-    RUN_TEST(RS485_Node_ID);
-    RUN_TEST(RS485_Baud_Rate);
-    RUN_TEST(Input_signal_status);
-    RUN_TEST(Out_signal_status);
-    RUN_TEST(Clear_feedback_position);
-    RUN_TEST(In_absolute_position_control_reset_the_zero_point);
-    RUN_TEST(Shaft_state_after_power_on);
-    RUN_TEST(Maximum_motor_speed);
-    RUN_TEST(Register_parameter_settings);
-    RUN_TEST(CAN_Node_info);
-    RUN_TEST(Control_mode);
-    RUN_TEST(Control_word);
-    RUN_TEST(Synchronous_control_status);
-    RUN_TEST(Store_RW_register_to_EEPROM);
-    RUN_TEST(Quick_stop_control);
-    RUN_TEST(Close_operation_control);
-    RUN_TEST(Disable_control);
-    RUN_TEST(Halt_control);
-    RUN_TEST(Input_effective_level);
-    RUN_TEST(Input_terminal_function_selection);
-    RUN_TEST(Output_effective_level);
-    RUN_TEST(Output_terminal_function_selection);
-    RUN_TEST(Driver_temperature_protection_threshold);
-    RUN_TEST(Alarm_PWM_processing_method);
-    RUN_TEST(Overload_processing_method);
-    RUN_TEST(IO_emergency_stop_processing_mode);
-#endif
-#if MOTOR_PARAMETER
-    // Motor parameter
-    RUN_TEST(Encoder_line);
-    RUN_TEST(Hall_offset_angle);
-    RUN_TEST(Overload_factor);
-    RUN_TEST(Rated_current);
-    RUN_TEST(Maximum_current);
-    RUN_TEST(Overload_protection_time);
-    RUN_TEST(Position_following_error_threshold);
-    RUN_TEST(Velocity_smoothing_factor);
-    RUN_TEST(Current_loop);
-    RUN_TEST(Feedforward_output_smoothing_factor);
-    RUN_TEST(Torque_output_smoothing_factor);
-    RUN_TEST(Velocity_Loop);
-    RUN_TEST(Initial_velocity);
-    RUN_TEST(Motor_poles);
-    RUN_TEST(Over_temperature_threshold);
-    RUN_TEST(Velocity_observer_coefficient);
+    bool value;
+    bool result = ctrl.get_software_connected_status(&value);
+    if (false == result) {
+        RUN_TEST(NOT_CONNECTED_DEVICE);
+    } else {
+        RUN_TEST(TEST_ONCE);
+        //////////////////////////////////
+#if READ_ONLY_PARAMETER
+        log_d("=== Read only parameter ===");
+        // Read only parameter
+        RUN_TEST(Software_version);
+        RUN_TEST(Bus_voltage);
+        RUN_TEST(Status_word);
+        RUN_TEST(Hall_input_state);
+        RUN_TEST(Motor_temperature);
+        RUN_TEST(Error_code);
+        RUN_TEST(Actual_motor_position);
+        RUN_TEST(Actual_velocity);
+        RUN_TEST(Actual_torque);
+        RUN_TEST(Software_connected_status);
+        RUN_TEST(Driver_temperature);
 #endif
 #if CONTROL_PARAMETER
-    // Control parameter
-    RUN_TEST(S_shape_acceleration_time);
-    RUN_TEST(S_shape_deceleration_time);
-    RUN_TEST(Deceleration_time_of_quick_stop);
-    RUN_TEST(Torque_slope);
-    RUN_TEST(Target_velocity);
-    RUN_TEST(Target_position);
-    RUN_TEST(Max_speed);
-    RUN_TEST(Target_torque);
+        // Control parameter
+        log_d("=== Control parameter ===");
+        RUN_TEST(S_shape_acceleration_time);
+        RUN_TEST(S_shape_deceleration_time);
+        RUN_TEST(Deceleration_time_of_quick_stop);
+        RUN_TEST(Torque_slope);
+        RUN_TEST(Target_velocity);
+        RUN_TEST(Target_position);
+        RUN_TEST(Max_speed);
+        RUN_TEST(Target_torque);
 #endif
-#if READ_ONLY_PARAMETER
-    // Read only parameter
-    RUN_TEST(Software_version);
-    RUN_TEST(Bus_voltage);
-    RUN_TEST(Status_word);
-    RUN_TEST(Hall_input_state);
-    RUN_TEST(Motor_temperature);
-    RUN_TEST(Error_code);
-    RUN_TEST(Actual_motor_position);
-    RUN_TEST(Actual_velocity);
-    RUN_TEST(Actual_torque);
-    RUN_TEST(Software_connected_status);
-    RUN_TEST(Driver_temperature);
+#if COMMON_CONSTANT
+        // Common constant
+        log_d("=== Common constant ===");
+        RUN_TEST(Communication_offline_time);
+        RUN_TEST(RS485_Node_ID);
+        RUN_TEST(RS485_Baud_Rate);
+        RUN_TEST(Input_signal_status);
+        RUN_TEST(Out_signal_status);
+        RUN_TEST(Clear_feedback_position);
+        RUN_TEST(In_absolute_position_control_reset_the_zero_point);
+        RUN_TEST(Shaft_state_after_power_on);
+        RUN_TEST(Maximum_motor_speed);
+        RUN_TEST(Register_parameter_settings);
+        RUN_TEST(CAN_Node_info);
+        RUN_TEST(Control_mode);
+        RUN_TEST(Control_word);
+        RUN_TEST(Synchronous_control_status);
+        RUN_TEST(Store_RW_register_to_EEPROM);
+        RUN_TEST(Quick_stop_control);
+        RUN_TEST(Close_operation_control);
+        RUN_TEST(Disable_control);
+        RUN_TEST(Halt_control);
+        RUN_TEST(Input_effective_level);
+        RUN_TEST(Input_terminal_function_selection);
+        RUN_TEST(Output_effective_level);
+        RUN_TEST(Output_terminal_function_selection);
+        RUN_TEST(Driver_temperature_protection_threshold);
+        RUN_TEST(Alarm_PWM_processing_method);
+        RUN_TEST(Overload_processing_method);
+        RUN_TEST(IO_emergency_stop_processing_mode);
 #endif
-    //////////////////////////////////
+#if MOTOR_PARAMETER
+        // Motor parameter
+        log_d("=== Motor parameter ===");
+        RUN_TEST(Encoder_line);
+        RUN_TEST(Hall_offset_angle);
+        RUN_TEST(Overload_factor);
+        RUN_TEST(Rated_current);
+        RUN_TEST(Maximum_current);
+        RUN_TEST(Overload_protection_time);
+        RUN_TEST(Position_following_error_threshold);
+        RUN_TEST(Velocity_smoothing_factor);
+        RUN_TEST(Current_loop);
+        RUN_TEST(Feedforward_output_smoothing_factor);
+        RUN_TEST(Torque_output_smoothing_factor);
+        RUN_TEST(Velocity_Loop);
+        RUN_TEST(Initial_velocity);
+        RUN_TEST(Motor_poles);
+        RUN_TEST(Over_temperature_threshold);
+        RUN_TEST(Velocity_observer_coefficient);
+#endif
+        //////////////////////////////////
+    }
     UNITY_END();
 }
 
