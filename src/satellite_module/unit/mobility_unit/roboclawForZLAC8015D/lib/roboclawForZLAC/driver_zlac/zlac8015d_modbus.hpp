@@ -157,9 +157,13 @@ public:
             if (0x00 < (value & 0x400)) {
                 this->motor_temperature_over_temperature = true;
             }
+            if (0x00 < value) {
+                this->no_error = true;
+            }
         }
         void clear()
         {
+            this->no_error                           = false;
             this->over_voltage                       = false;
             this->under_voltage                      = false;
             this->over_current                       = false;
@@ -172,6 +176,7 @@ public:
             this->hall_error                         = false;
             this->motor_temperature_over_temperature = false;
         }
+        bool no_error                           = false;
         bool over_voltage                       = false;
         bool under_voltage                      = false;
         bool over_current                       = false;
@@ -352,6 +357,9 @@ public:
     ////////////////
     // Common constant for Left and Right motors
     ////////////////
+    /**
+     * @brief Get the communication offline time object (0x2000h)
+     */
     bool get_communication_offline_time(int *value)
     {
         bool result         = true;
@@ -363,6 +371,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the communication offline time object (0x2000h)
+     */
     bool set_communication_offline_time(int value_ms, bool check = false)
     {
         bool result = false;
@@ -391,6 +402,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the rs485 node id object (0x2001h)
+     */
     bool get_rs485_node_id(int *value)
     {
         bool result         = true;
@@ -403,6 +417,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the rs485 node id object (0x2001h)
+     */
     bool set_rs485_node_id(int id, bool check = false)
     {
         bool result = false;
@@ -431,6 +448,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the rs485 baud rate object (0x2002h)
+     */
     bool get_rs485_baud_rate(RS485_BAUD_RATE *value)
     {
         bool result         = true;
@@ -466,6 +486,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the rs485 baud rate object (0x2002h)
+     */
     bool set_rs485_baud_rate(RS485_BAUD_RATE baud, bool check = false)
     {
         bool result = true;
@@ -528,6 +551,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the input signal status object (0x2003h)
+     */
     bool get_input_signal_status(bool *x0, bool *x1)
     {
         bool result         = true;
@@ -547,6 +573,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the out signal status object (0x2004h)
+     */
     bool get_out_signal_status(bool *x0, bool *x1)
     {
         bool result         = true;
@@ -566,7 +595,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the clear feedback position object (0x2005h)
+     */
     bool get_clear_feedback_position(ZLAC::target_motor *value)
     {
         bool result         = true;
@@ -594,6 +625,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the clear feedback position object (0x2005h)
+     */
     bool set_clear_feedback_position(ZLAC::target_motor target, bool check = false)
     {
         bool result         = true;
@@ -631,7 +665,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the reset the zero point in absolute position control object (0x2006h)
+     */
     bool get_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor *value)
     {
         bool result         = true;
@@ -659,6 +695,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the reset the zero point in absolute position control object (0x2006h)
+     */
     bool set_reset_the_zero_point_in_absolute_position_control(ZLAC::target_motor target, bool check = false)
     {
         bool result         = true;
@@ -697,6 +736,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the lock shaft state after power on object (0x2007h)
+     */
     bool get_lock_shaft_state_after_power_on(bool *flag)
     {
         bool result         = true;
@@ -712,6 +754,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the lock shaft state after power on object (0x2007h)
+     */
     bool set_lock_shaft_state_after_power_on(bool flag, bool check = false)
     {
         bool result         = true;
@@ -734,6 +779,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the maximum motor speed object (0x2008h)
+     */
     bool get_maximum_motor_speed(int *value)
     {
         bool result         = true;
@@ -746,6 +794,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the maximum motor speed object (0x2008h)
+     */
     bool set_maximum_motor_speed(int r_min, bool check = false)
     {
         bool result = false;
@@ -830,6 +881,9 @@ public:
     }
 
 #endif
+    /**
+     * @brief Get the can node info object (0x200Ah -0x200Bh)
+     */
     bool get_can_node_info(int *id, CAN_BAUD_RATE *baud)
     {
         bool result         = false;
@@ -869,7 +923,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Set the can node info object (0x200Ah -0x200Bh)
+     */
     bool set_can_node_info(int id, CAN_BAUD_RATE baud, bool check = false)
     {
         bool result = true;
@@ -967,7 +1023,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the control mode object (0x200Dh)
+     */
     bool get_control_mode(ZLAC::DRIVER_MODE *mode)
     {
         bool result         = true;
@@ -1001,6 +1059,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the control mode object (0x200Dh)
+     */
     bool set_control_mode(ZLAC::DRIVER_MODE mode, bool check = false)
     {
         bool result = true;
@@ -1070,6 +1131,16 @@ public:
         }
         return result;
     }
+    /**
+     * @brief clear fault (0x200Eh)
+     */
+    bool clear_fault()
+    {
+        return this->set_control_word(ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT);
+    }
+    /**
+     * @brief Get the control word object (0x200Eh)
+     */
     bool get_control_word(ZLAC_CONTROL_WORD *value)
     {
         bool result         = true;
@@ -1109,6 +1180,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the control word object (0x200Eh)
+     */
     bool set_control_word(ZLAC_CONTROL_WORD word, bool check = false)
     {
         bool result = true;
@@ -1203,6 +1277,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the synchronous control status object (0x200Fh)
+     */
     bool get_synchronous_control_status(bool *synchronous)
     {
         bool result         = true;
@@ -1218,6 +1295,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the synchronous control status object (0x200Fh)
+     */
     bool set_synchronous_control_status(bool synchronous, bool check = false)
     {
         bool result         = true;
@@ -1226,7 +1306,7 @@ public:
             result = false;
         } else {
             unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            bool buf            = (0x01 == buf) ? false : true;
+            bool buf            = (0x01 == buffer) ? false : true;
             if (buf != synchronous) {
                 result = false;
             } else if (true == check) {
@@ -1240,6 +1320,10 @@ public:
         }
         return result;
     }
+
+    /**
+     * @brief store rw register to eperm (0x2010h)
+     */
     bool store_rw_register_to_eperm()
     {
         bool result         = false;
@@ -1254,6 +1338,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the quick stop control object (0x2011h)
+     */
     bool get_quick_stop_control(ZLAC_STOP_CONTROL *value)
     {
         bool result         = true;
@@ -1281,6 +1368,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the quick stop control object (0x2011h)
+     */
     bool set_quick_stop_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
     {
         bool result = true;
@@ -1337,6 +1427,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the close operation control object (0x2012h)
+     */
     bool get_close_operation_control(bool *stop_normally)
     {
         bool result         = true;
@@ -1352,6 +1445,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the close operation control object (0x2012h)
+     */
     bool set_close_operation_control(bool stop_normally, bool check = false)
     {
         bool result         = true;
@@ -1375,6 +1471,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the disable control object (0x2013h)
+     */
     bool get_disable_control(bool *stop)
     {
         bool result         = true;
@@ -1390,6 +1489,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the disable control object (0x2013h)
+     */
     bool set_disable_control(bool stop, bool check = false)
     {
         bool result         = true;
@@ -1412,6 +1514,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the halt control object (0x2014h)
+     */
     bool get_halt_control(ZLAC_STOP_CONTROL *value)
     {
         bool result         = true;
@@ -1439,6 +1544,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the halt control object (0x2014h)
+     */
     bool set_halt_control(ZLAC_STOP_CONTROL ctrl, bool check = false)
     {
         bool result = true;
@@ -1495,6 +1603,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the input effective level object (0x2016h)
+     */
     bool get_input_effective_level(bool *low_level)
     {
         bool result         = true;
@@ -1510,6 +1621,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the input effective level object (0x2016h)
+     */
     bool set_input_effective_level(bool low_level, bool check = false)
     {
         bool result         = true;
@@ -1532,6 +1646,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the input terminal terminal function selection object (0x2017h -0x2018h)
+     */
     bool get_input_terminal_terminal_function_selection(TERMINAL_FUNCTION *x0, TERMINAL_FUNCTION *x1)
     {
         bool result         = true;
@@ -1556,6 +1673,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the input terminal terminal function selection object (0x2017h -0x2018h)
+     */
     bool set_input_terminal_terminal_function_selection(TERMINAL_FUNCTION x0, TERMINAL_FUNCTION x1, bool check = false)
     {
         bool result = true;
@@ -1624,7 +1744,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the output effective low level object (0x2019h -0x2020h)
+     */
     bool get_output_effective_low_level(bool *y0, bool *y1, bool *b0, bool *b1)
     {
         bool result         = true;
@@ -1652,6 +1774,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the output effective low level object (0x2019h -0x2020h)
+     */
     bool set_output_effective_low_level(bool y0, bool y1, bool b0, bool b1, bool check = false)
     {
         bool result = true;
@@ -1708,6 +1833,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the output terminal function selection object (0x201Ah - 0x201Dh)
+     */
     bool get_output_terminal_function_selection( //
             ZLAC_TERMINAL_FUNCTION *b0,
             ZLAC_TERMINAL_FUNCTION *b1,
@@ -1758,6 +1886,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the output terminal function selection object (0x201Ah - 0x201Dh)
+     */
     bool set_output_terminal_function_selection( //
             ZLAC_TERMINAL_FUNCTION b0,
             ZLAC_TERMINAL_FUNCTION b1,
@@ -1897,7 +2028,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the driver temperature protection threshold object (0x201Eh)
+     */
     bool get_driver_temperature_protection_threshold(double *value)
     {
         bool result         = true;
@@ -1910,6 +2043,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the driver temperature protection threshold object (0x201Eh)
+     */
     bool set_driver_temperature_protection_threshold(double value, bool check = false)
     {
         bool result = false;
@@ -1939,6 +2075,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the alarm pwm processing method object (0x201Fh)
+     */
     bool get_alarm_pwm_processing_method(bool *open)
     {
         bool result         = true;
@@ -1954,6 +2093,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the alarm pwm processing method object (0x201Fh)
+     */
     bool set_alarm_pwm_processing_method(bool open, bool check = false)
     {
         bool result         = true;
@@ -1976,6 +2118,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the overload processing method object (0x2020h)
+     */
     bool get_overload_processing_method(bool *open)
     {
         bool result         = true;
@@ -1991,6 +2136,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the overload processing method object (0x2020h)
+     */
     bool set_overload_processing_method(bool open, bool check = false)
     {
         bool result         = true;
@@ -2013,6 +2161,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the io emergency stop processing mode object (0x2021h)
+     */
     bool get_io_emergency_stop_processing_mode(bool *lock_shaft)
     {
         bool result         = true;
@@ -2028,6 +2179,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the io emergency stop processing mode object (0x2021h)
+     */
     bool set_io_emergency_stop_processing_mode(bool lock_shaft, bool check = false)
     {
         bool result         = true;
@@ -2054,6 +2208,9 @@ public:
     ////////////////
     // Left motor parameter
     ////////////////
+    /**
+     * @brief Get the encoder line left object (0x2030h)
+     */
     bool get_encoder_line_left(int *value)
     {
         bool result         = true;
@@ -2066,6 +2223,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the encoder line left object (0x2030h)
+     */
     bool set_encoder_line_left(int value, bool check = false)
     {
         bool result = false;
@@ -2094,6 +2254,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the hall offset angle left object (0x2031h)
+     */
     bool get_hall_offset_angle_left(int *value)
     {
         bool result         = true;
@@ -2109,6 +2272,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the hall offset angle left object (0x2031h)
+     */
     bool set_hall_offset_angle_left(int value, bool check = false)
     {
         bool result = false;
@@ -2140,6 +2306,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the overload factor left object (0x2032h)
+     */
     bool get_overload_factor_left(int *value)
     {
         bool result         = true;
@@ -2152,6 +2321,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the overload factor left object (0x2032h)
+     */
     bool set_overload_factor_left(int value, bool check = false)
     {
         bool result = false;
@@ -2180,6 +2352,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the current left object (0x2033h)
+     */
     bool get_current_left(double *rated, double *maximum)
     {
         bool result         = true;
@@ -2194,6 +2369,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the rated current left object (0x2033h)
+     */
     bool set_rated_current_left(double value, bool check = false)
     {
         bool result = false;
@@ -2224,6 +2402,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the maximum current left object (0x2034h)
+     */
     bool set_maximum_current_left(double value, bool check = false)
     {
         bool result = false;
@@ -2254,6 +2435,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the overload protection time left object (0x2035h)
+     */
     bool get_overload_protection_time_left(int *value)
     {
         bool result         = true;
@@ -2266,6 +2450,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the overload protection time left object (0x2035h)
+     */
     bool set_overload_protection_time_left(int value, bool check = false)
     {
         bool result = true;
@@ -2295,6 +2482,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the position following error threshold left object (0x2036h)
+     */
     bool get_position_following_error_threshold_left(int *value)
     {
         bool result         = true;
@@ -2307,6 +2497,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the position following error threshold left object (0x2036h)
+     */
     bool set_position_following_error_threshold_left(int value, bool check = false)
     {
         bool result = true;
@@ -2336,6 +2529,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity smoothing factor left object (0x2037h)
+     */
     bool get_velocity_smoothing_factor_left(int *value)
     {
         bool result         = true;
@@ -2348,6 +2544,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity smoothing factor left object (0x2037h)
+     */
     bool set_velocity_smoothing_factor_left(int value, bool check = false)
     {
         bool result = false;
@@ -2376,6 +2575,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the current loop left object (0x2038h)
+     */
     bool get_current_loop_left(int *kp, int *ki)
     {
         bool result         = true;
@@ -2390,6 +2592,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the current loop left object (0x2038h - 0x2039h)
+     */
     bool set_current_loop_left(int kp, int ki, bool check = false)
     {
         bool result = true;
@@ -2438,6 +2643,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the feedforward output smoothing factor left object (0x203Ah)
+     */
     bool get_feedforward_output_smoothing_factor_left(int *value)
     {
         bool result         = true;
@@ -2450,6 +2658,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the feedforward output smoothing factor left object (0x203Ah)
+     */
     bool set_feedforward_output_smoothing_factor_left(int value, bool check = false)
     {
         bool result = false;
@@ -2478,6 +2689,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the torque output smoothing factor left object (0x203Bh)
+     */
     bool get_torque_output_smoothing_factor_left(int *value)
     {
         bool result         = true;
@@ -2490,6 +2704,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the torque output smoothing factor left object (0x203Bh)
+     */
     bool set_torque_output_smoothing_factor_left(int value, bool check = false)
     {
         bool result = false;
@@ -2518,6 +2735,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity loop left object (0x203Ch -0x203Eh)
+     */
     bool get_velocity_loop_left(int *kp, int *ki, int *kf)
     {
         bool result         = true;
@@ -2534,6 +2754,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity loop left object (0x203Ch -0x203Eh)
+     */
     bool set_velocity_loop_left(int kp, int ki, int kf, bool check = false)
     {
         bool result = true;
@@ -2595,6 +2818,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the position loop left object (0x203Fh - 0x2040h)
+     */
     bool get_position_loop_left(int *kp, int *kf)
     {
         bool result         = true;
@@ -2609,6 +2835,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the position loop left object (0x203Fh - 0x2040h)
+     */
     bool set_position_loop_left(int kp, int kf, bool check = false)
     {
         bool result = true;
@@ -2657,7 +2886,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the initial velocity left object (VELOCITY:0x2043h / POSITION:0x2044h)
+     */
     bool get_initial_velocity_left(int *value)
     {
         bool result = true;
@@ -2684,6 +2915,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the initial velocity left object (VELOCITY:0x2043h / POSITION:0x2044h)
+     */
     bool set_initial_velocity_left(int value, bool check = false)
     {
         bool result = false;
@@ -2727,7 +2961,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the motor poles left object (0x2045h)
+     */
     bool get_motor_poles_left(int *value)
     {
         bool result         = true;
@@ -2740,6 +2976,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the motor poles left object (0x2045h)
+     */
     bool set_motor_poles_left(int value, bool check = false)
     {
         bool result = false;
@@ -2768,6 +3007,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the over temperature threshold left object (0x2046h)
+     */
     bool get_over_temperature_threshold_left(double *value)
     {
         bool result         = true;
@@ -2780,6 +3022,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the over temperature threshold left object (0x2046h)
+     */
     bool set_over_temperature_threshold_left(double value, bool check = false)
     {
         bool result = false;
@@ -2809,6 +3054,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity observer coefficient left object (0x2047h - 0x204Ah)
+     */
     bool get_velocity_observer_coefficient_left(int *index1, int *index2, int *index3, int *index4)
     {
         bool result         = true;
@@ -2823,6 +3071,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity observer coefficient left object (0x2047h - 0x204Ah)
+     */
     bool set_velocity_observer_coefficient_left(int index1, int index2, int index3, int index4, bool check = false)
     {
         bool result = true;
@@ -2901,6 +3152,9 @@ public:
     ////////////////
     // Right motor parameter
     ////////////////
+    /**
+     * @brief Get the encoder line right object (0x2060h)
+     */
     bool get_encoder_line_right(int *value)
     {
         bool result         = true;
@@ -2913,6 +3167,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the encoder line right object (0x2060h)
+     */
     bool set_encoder_line_right(int value, bool check = false)
     {
         bool result = false;
@@ -2941,6 +3198,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the hall offset angle right object (0x2061h)
+     */
     bool get_hall_offset_angle_right(int *value)
     {
         bool result         = true;
@@ -2956,6 +3216,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the hall offset angle right object (0x2061h)
+     */
     bool set_hall_offset_angle_right(int value, bool check = false)
     {
         bool result = false;
@@ -2987,6 +3250,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the overload factor right object (0x2062h)
+     */
     bool get_overload_factor_right(int *value)
     {
         bool result         = true;
@@ -2999,6 +3265,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the overload factor right object (0x2062h)
+     */
     bool set_overload_factor_right(int value, bool check = false)
     {
         bool result = false;
@@ -3027,6 +3296,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the current right object (0x2063h - 0x2064h)
+     */
     bool get_current_right(double *rated, double *maximum)
     {
         bool result         = true;
@@ -3041,6 +3313,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the rated current right object (0x2063h - 0x2064h)
+     */
     bool set_rated_current_right(double value, bool check = false)
     {
         bool result = false;
@@ -3071,6 +3346,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the maximum current right object (0x2064)
+     */
     bool set_maximum_current_right(double value, bool check = false)
     {
         bool result = false;
@@ -3101,6 +3379,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the overload protection time right object (0x2065h)
+     */
     bool get_overload_protection_time_right(int *value)
     {
         bool result         = true;
@@ -3113,6 +3394,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the overload protection time right object (0x2065h)
+     */
     bool set_overload_protection_time_right(int value, bool check = false)
     {
         bool result = true;
@@ -3142,6 +3426,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the position following error threshold right object (0x2066h)
+     */
     bool get_position_following_error_threshold_right(int *value)
     {
         bool result         = true;
@@ -3154,6 +3441,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the position following error threshold right object (0x2066h)
+     */
     bool set_position_following_error_threshold_right(int value, bool check = false)
     {
         bool result = true;
@@ -3183,6 +3473,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity smoothing factor right object (0x2067h)
+     */
     bool get_velocity_smoothing_factor_right(int *value)
     {
         bool result         = true;
@@ -3195,6 +3488,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity smoothing factor right object (0x2067h)
+     */
     bool set_velocity_smoothing_factor_right(int value, bool check = false)
     {
         bool result = false;
@@ -3223,6 +3519,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the current loop right object (0x2068h - 0x2069h)
+     */
     bool get_current_loop_right(int *kp, int *ki)
     {
         bool result         = true;
@@ -3237,6 +3536,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the current loop right object (0x2068h - 0x2069h)
+     */
     bool set_current_loop_right(int kp, int ki, bool check = false)
     {
         bool result = true;
@@ -3285,6 +3587,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the feedforward output smoothing factor right object (0x206Ah)
+     */
     bool get_feedforward_output_smoothing_factor_right(int *value)
     {
         bool result         = true;
@@ -3297,6 +3602,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the feedforward output smoothing factor right object (0x206Ah)
+     */
     bool set_feedforward_output_smoothing_factor_right(int value, bool check = false)
     {
         bool result = false;
@@ -3325,6 +3633,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the torque output smoothing factor right object (0x206Bh)
+     */
     bool get_torque_output_smoothing_factor_right(int *value)
     {
         bool result         = true;
@@ -3337,6 +3648,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the torque output smoothing factor right object (0x206Bh)
+     */
     bool set_torque_output_smoothing_factor_right(int value, bool check = false)
     {
         bool result = false;
@@ -3365,6 +3679,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity loop right object (0x206Ch - 0x206Eh)
+     */
     bool get_velocity_loop_right(int *kp, int *ki, int *kf)
     {
         bool result         = true;
@@ -3381,6 +3698,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity loop right object (0x206Ch - 0x206Eh)
+     */
     bool set_velocity_loop_right(int kp, int ki, int kf, bool check = false)
     {
         bool result = true;
@@ -3442,6 +3762,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the position loop right object (0x206Fh)
+     */
     bool get_position_loop_right(int *kp, int *kf)
     {
         bool result         = true;
@@ -3456,6 +3779,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the position loop right object (0x206Fh)
+     */
     bool set_position_loop_right(int kp, int kf, bool check = false)
     {
         bool result = true;
@@ -3504,7 +3830,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the initial velocity right object (VELOCITY:0x2043h / POSITION:0x2044)
+     */
     bool get_initial_velocity_right(int *value)
     {
         bool result = true;
@@ -3531,6 +3859,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the initial velocity right object (VELOCITY:0x2043h / POSITION:0x2044)
+     */
     bool set_initial_velocity_right(int value, bool check = false)
     {
         bool result = false;
@@ -3574,7 +3905,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the motor poles right object (0x2075h)
+     */
     bool get_motor_poles_right(int *value)
     {
         bool result         = true;
@@ -3587,6 +3920,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the motor poles right object (0x2075h)
+     */
     bool set_motor_poles_right(int value, bool check = false)
     {
         bool result = false;
@@ -3615,6 +3951,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the over temperature threshold right object (0x2076h)
+     */
     bool get_over_temperature_threshold_right(double *value)
     {
         bool result         = true;
@@ -3627,6 +3966,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the over temperature threshold right object (0x2076h)
+     */
     bool set_over_temperature_threshold_right(double value, bool check = false)
     {
         bool result = false;
@@ -3656,6 +3998,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the velocity observer coefficient right object (0x2077h - 0x207Ah)
+     */
     bool get_velocity_observer_coefficient_right(int *index1, int *index2, int *index3, int *index4)
     {
         bool result         = true;
@@ -3670,6 +4015,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the velocity observer coefficient right object (0x2077h - 0x207Ah)
+     */
     bool set_velocity_observer_coefficient_right(int index1, int index2, int index3, int index4, bool check = false)
     {
         bool result = true;
@@ -3748,6 +4096,9 @@ public:
     ////////////////
     // Control parameter
     ////////////////
+    /**
+     * @brief Get the s-shape acceleration time object (0x2080h)
+     */
     bool get_s_shape_acceleration_time(int *left, int *right)
     {
         bool result         = true;
@@ -3760,6 +4111,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the s-shape acceleration time object (0x2080h)
+     */
     bool set_s_shape_acceleration_time(int left, int right, bool check = false)
     {
         bool result = true;
@@ -3809,7 +4163,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the s-shape deceleration time object (0x2082h - 0x2083h)
+     */
     bool get_s_shape_deceleration_time(int *left, int *right)
     {
         bool result         = true;
@@ -3822,6 +4178,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the s-shape deceleration time object (0x2082h - 0x2083h)
+     */
     bool set_s_shape_deceleration_time(int left, int right, bool check = false)
     {
         bool result = true;
@@ -3871,7 +4230,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the deceleration time of quick stop object (0x2084h - 0x2085h)
+     */
     bool get_deceleration_time_of_quick_stop(int *left, int *right)
     {
         bool result         = true;
@@ -3885,6 +4246,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the deceleration time of quick stop object (0x2084h - 0x2085h)
+     */
     bool set_deceleration_time_of_quick_stop(int left, int right, bool check = false)
     {
         bool result = true;
@@ -3934,7 +4298,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the torque slope object (0x2086h - 0x2087h)
+     */
     bool get_torque_slope(int *left, int *right)
     {
         bool result         = true;
@@ -3948,6 +4314,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the torque slope object (0x2086h - 0x2087h)
+     */
     bool set_torque_slope(int left, int right, bool check = false)
     {
         bool result           = true;
@@ -3982,7 +4351,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the target velocity object (0x2088h - 0x2089h)
+     */
     bool get_target_velocity(int *left, int *right)
     {
         bool result         = true;
@@ -4001,6 +4372,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the target velocity object (0x2088h - 0x2089h)
+     */
     bool set_target_velocity(int left, int right, bool check = false)
     {
         bool result = true;
@@ -4050,7 +4424,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the target position object (0x208Ah - 0x208Dh)
+     */
     bool get_target_position(long *left, long *right)
     {
         bool result         = true;
@@ -4063,6 +4439,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the target position object (0x208Ah - 0x208Dh)
+     */
     bool set_target_position(long left, long right, bool check = false)
     {
         bool result = true;
@@ -4117,7 +4496,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the max speed object (0x208Eh - 0x208Fh)
+     */
     bool get_max_speed(int *left, int *right)
     {
         bool result         = true;
@@ -4130,6 +4511,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the max speed object (0x208Eh - 0x208Fh)
+     */
     bool set_max_speed(int left, int right, bool check = false)
     {
         bool result = true;
@@ -4179,7 +4563,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the target torque object (0x2090h - 0x2091h)
+     */
     bool get_target_torque(int *left, int *right)
     {
         bool result         = true;
@@ -4198,6 +4584,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Set the target torque object (0x2090h - 0x2091h)
+     */
     bool set_target_torque(int left, int right, bool check = false)
     {
         bool result = true;
@@ -4250,6 +4639,9 @@ public:
     ////////////////
     // Read only parameter
     ////////////////
+    /**
+     * @brief Get the software version (0x20A0h)
+     */
     bool get_software_version(int *version)
     {
         bool result         = true;
@@ -4262,6 +4654,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the bus voltage object (0x20A1h)
+     */
     bool get_bus_voltage(double *value)
     {
         bool result         = true;
@@ -4274,6 +4669,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the status word object (0x20A2h)
+     */
     bool get_status_word(bool *left_shaft_lock,
                          bool *left_emergency_stop,
                          bool *left_alarm,
@@ -4332,6 +4730,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the hall input state object (0x20A3h)
+     */
     bool get_hall_input_state(bool *left_hall_err, bool *right_hall_err)
     {
         bool result         = true;
@@ -4352,6 +4753,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the motor temperature object (0x20A4h)
+     */
     bool get_motor_temperature(int *left, int *right)
     {
         bool result         = true;
@@ -4372,6 +4776,9 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the error code object (0x20A5h -0x20A6h)
+     */
     bool get_error_code(zlac_error *left, zlac_error *right)
     {
         bool result = true;
@@ -4386,14 +4793,14 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the actual motor position object (0x20A7h -0x20AAh)
+     */
     bool get_actual_motor_position(long *left, long *right)
     {
         bool result         = true;
         MessageFrame _frame = this->_modbus_send_read(0x20A7u, 4);
         if (0x80 <= _frame.function) {
-            *left  = -1;
-            *right = -1;
             result = false;
         } else {
             *left = (_frame.data[0] << 24)   //
@@ -4407,7 +4814,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the actual velocity object (0x20ABh - 0x20ACh)
+     */
     bool get_actual_velocity(double *left, double *right)
     {
         bool result         = true;
@@ -4434,6 +4843,9 @@ public:
         return result;
     }
 
+    /**
+     * @brief Get the actual torque object (0x20AD - 0x20AEh)
+     */
     bool get_actual_torque(double *left, double *right)
     {
         bool result         = true;
@@ -4456,7 +4868,9 @@ public:
         }
         return result;
     }
-
+    /**
+     * @brief Get the software connected status object (0x20AFh)
+    */
     bool get_software_connected_status(bool *value)
     {
         bool result         = true;
@@ -4476,10 +4890,13 @@ public:
         }
         return result;
     }
+    /**
+     * @brief Get the driver temperature object (0x20B0h)
+     */
     bool get_driver_temperature(double *value)
     {
         double result       = true;
-        MessageFrame _frame = this->_modbus_send_read(0x20B0u, 2);
+        MessageFrame _frame = this->_modbus_send_read(0x20B0u, 1);
         if (0x80 <= _frame.function) {
             *value = NAN;
             result = false;
