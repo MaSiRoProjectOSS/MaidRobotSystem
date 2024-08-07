@@ -564,10 +564,10 @@ public:
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0 < ((value >> 0) & 0x01)) {
+            if (0 < (value & 0x01)) {
                 *x0 = true;
             }
-            if (0 < ((value >> 1) & 0x01)) {
+            if (0 < (value & 0x02)) {
                 *x1 = true;
             }
         }
@@ -586,10 +586,10 @@ public:
             result = false;
         } else {
             unsigned int value = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0 < ((value >> 0) & 0x01)) {
+            if (0 < (value & 0x01)) {
                 *x0 = true;
             }
-            if (0 < ((value >> 1) & 0x01)) {
+            if (0 < (value & 0x01)) {
                 *x1 = true;
             }
         }
@@ -1606,17 +1606,21 @@ public:
     /**
      * @brief Get the input effective level object (0x2016h)
      */
-    bool get_input_effective_level(bool *low_level)
+    bool get_input_effective_low_level(bool *x0, bool *x1)
     {
         bool result         = true;
-        *low_level          = false;
+        *x0                 = false;
+        *x1                 = false;
         MessageFrame _frame = this->_modbus_send_read(0x2016u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buf = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            if (0x01 == buf) {
-                *low_level = true;
+            if (0 < (0x01 & buf)) {
+                *x0 = true;
+            }
+            if (0 < (0x02 & buf)) {
+                *x1 = true;
             }
         }
         return result;
@@ -1624,21 +1628,28 @@ public:
     /**
      * @brief Set the input effective level object (0x2016h)
      */
-    bool set_input_effective_level(bool low_level, bool check = false)
+    bool set_input_effective_low_level(bool x0, bool x1, bool check = false)
     {
         bool result         = true;
-        MessageFrame _frame = this->_modbus_writer_single(0x2016u, low_level ? 1 : 0);
+        int input           = (x0 ? 0x01 : 0x00) | (x1 ? 0x02 : 0x00);
+        MessageFrame _frame = this->_modbus_writer_single(0x2016u, input);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
             unsigned int buffer = (_frame.data[0] << 8) | (_frame.data[1] & 0xFF);
-            bool buf            = (0x01 == buffer) ? true : false;
-            if (buf != low_level) {
+            bool buf_x0         = (0 < (0x01 & buffer)) ? true : false;
+            bool buf_x1         = (0 < (0x02 & buffer)) ? true : false;
+            if (buf_x0 != x0) {
+                result = false;
+            } else if (buf_x1 != x1) {
                 result = false;
             } else if (true == check) {
-                result = this->get_input_effective_level(&buf);
+                result = this->get_input_effective_low_level(&buf_x0, &buf_x1);
                 if (true == result) {
-                    if (buf != low_level) {
+                    if (buf_x0 != x0) {
+                        result = false;
+                    }
+                    if (buf_x1 != x1) {
                         result = false;
                     }
                 }

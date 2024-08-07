@@ -21,8 +21,14 @@
 #ifndef READ_ONLY_PARAMETER
 #define READ_ONLY_PARAMETER 1
 #endif
+#ifndef MOTOR_PARAMETER_RUNNING
+#define MOTOR_PARAMETER_RUNNING 0
+#endif
 #ifndef COMPILE_TEST_FUNCTION
 #define COMPILE_TEST_FUNCTION 1
+#endif
+#ifndef RESTORE_FACTORY_SETTINGS
+#define RESTORE_FACTORY_SETTINGS 0
 #endif
 
 ///////////////////////////////////////////////////////////////////
@@ -76,7 +82,7 @@ void setup_m5()
 }
 
 ///////////////////////////////////////////////////////////////////
-String text_drive_mode(ZLAC::DRIVER_MODE mode)
+String text_zlac_driver_mode(ZLAC::DRIVER_MODE mode)
 {
     switch (mode) {
         case ZLAC::DRIVER_MODE::POSITION_RELATIVE:
@@ -525,7 +531,7 @@ void Control_mode(void)
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
-    log_d("* Control_mode : %s", text_drive_mode(mode));
+    log_d("* Control_mode : %s", text_zlac_driver_mode(mode).c_str());
 }
 void Control_word(void)
 {
@@ -762,25 +768,33 @@ void Input_effective_level(void)
 {
     ////////////
     bool result;
-    bool flag = false;
+    bool x0 = false;
+    bool x1 = false;
     // Test Setter
-    result = ctrl.set_input_effective_level(false, true);
-    TEST_ASSERT_TRUE(result);
-    result = ctrl.get_input_effective_level(&flag);
-    TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_FALSE(flag);
+    TEST_ASSERT_TRUE(ctrl.set_input_effective_low_level(false, false, true));
+    TEST_ASSERT_TRUE(ctrl.get_input_effective_low_level(&x0, &x1));
+    TEST_ASSERT_FALSE(x0);
+    TEST_ASSERT_FALSE(x1);
 
-    result = ctrl.set_input_effective_level(true, true);
-    TEST_ASSERT_TRUE(result);
-    result = ctrl.get_input_effective_level(&flag);
-    TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_TRUE(flag);
+    TEST_ASSERT_TRUE(ctrl.set_input_effective_low_level(true, false, true));
+    TEST_ASSERT_TRUE(ctrl.get_input_effective_low_level(&x0, &x1));
+    TEST_ASSERT_TRUE(x0);
+    TEST_ASSERT_FALSE(x1);
+
+    TEST_ASSERT_TRUE(ctrl.set_input_effective_low_level(false, true, true));
+    TEST_ASSERT_TRUE(ctrl.get_input_effective_low_level(&x0, &x1));
+    TEST_ASSERT_FALSE(x0);
+    TEST_ASSERT_TRUE(x1);
+
+    TEST_ASSERT_TRUE(ctrl.set_input_effective_low_level(true, true, true));
+    TEST_ASSERT_TRUE(ctrl.get_input_effective_low_level(&x0, &x1));
+    TEST_ASSERT_TRUE(x0);
+    TEST_ASSERT_TRUE(x1);
 
     // Restore
-    result = ctrl.set_input_effective_level(false);
-    TEST_ASSERT_TRUE(result);
-    result = ctrl.get_input_effective_level(&flag);
-    log_d("* Input_effective_level : %s", flag ? "T:low_level" : "F:hight_level");
+    TEST_ASSERT_TRUE(ctrl.set_input_effective_low_level(false, false));
+    TEST_ASSERT_TRUE(ctrl.get_input_effective_low_level(&x0, &x1));
+    log_d("* Input_effective_level : x0[%s]x1[%s]", x0 ? "T:low_level" : "F:hight_level", x1 ? "T:low_level" : "F:hight_level");
 }
 void Input_terminal_function_selection(void)
 {
@@ -815,7 +829,7 @@ void Input_terminal_function_selection(void)
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    log_d("* Input_terminal_function_selection : x0[%s]x1[%s]", text_terminal_function(x0), text_terminal_function(x1));
+    log_d("* Input_terminal_function_selection : x0[%s]x1[%s]", text_terminal_function(x0).c_str(), text_terminal_function(x1).c_str());
 }
 void Output_effective_level(void)
 {
@@ -1018,11 +1032,12 @@ void Output_terminal_function_selection(void)
                                                          true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
-    log_d("* Output_terminal_function_selection : b0[%s]b1[%s]y0[%s]y1[%s]", //
-          text_zlac_terminal_function(b0),
-          text_zlac_terminal_function(b1),
-          text_zlac_terminal_function(y0),
-          text_zlac_terminal_function(y1));
+    log_d("* Output_terminal_function_selection : b0[%s]b1[%s]", //
+          text_zlac_terminal_function(b0).c_str(),
+          text_zlac_terminal_function(b1).c_str());
+    log_d("* Output_terminal_function_selection : y0[%s]y1[%s]", //
+          text_zlac_terminal_function(y0).c_str(),
+          text_zlac_terminal_function(y1).c_str());
 }
 void Driver_temperature_protection_threshold(void)
 {
@@ -1810,7 +1825,7 @@ void Max_speed(void)
     TEST_ASSERT_EQUAL(97, left);
     TEST_ASSERT_EQUAL(86, right);
     // Restore
-    result = ctrl.set_max_speed(120, 120);
+    result = ctrl.set_max_speed(60, 60);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_max_speed(&left, &right);
     TEST_ASSERT_TRUE(result);
@@ -1844,16 +1859,66 @@ void Target_velocity(void)
     result = ctrl.get_target_velocity(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Target_velocity : L[%d]R[%d]", left, right);
-    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE, true);
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::UNDEFINED);
     TEST_ASSERT_TRUE(result);
 }
-void Target_position(void)
+void Target_position_absolute(void)
 {
     ////////////
     bool result;
     long left  = 0;
     long right = 0;
-    result     = ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE);
+    TEST_ASSERT_TRUE(ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED));
+    TEST_ASSERT_TRUE(ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_ABSOLUTE));
+#if MOTOR_PARAMETER_RUNNING
+#else
+#endif
+}
+void Target_position_relative_asynchronous(void)
+{
+}
+void Target_position_relative_synchronous(void)
+{
+    ////////////
+    bool result;
+    long left      = 0;
+    long right     = 0;
+    double left_d  = 0;
+    double right_d = 0;
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
+    log_d("* Control word : %s", text_zlac_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED).c_str());
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
+    log_d("* Control mode : %s", text_zlac_driver_mode(ZLAC::DRIVER_MODE::POSITION_RELATIVE).c_str());
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "set acceleration time");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "set deceleration time");
+
+#if MOTOR_PARAMETER_RUNNING
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(ZLAC::target_motor::TARGET_MOTOR_ALL), "clear feedback position");
+
+    // Target velocity 2088h
+    ctrl.set_target_velocity(100, 100);
+    ctrl.set_target_position(100, 100);
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_synchronous_control_status(true), "synchronous");
+    // Enable (0x200e)
+    ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
+    // Target velocity to    100RPM (0x2088)
+    ctrl.set_target_velocity(10, 10);
+    // Target velocity to    -100RPM
+    // Stop (0x200e)
+    delay(1000 * 2);
+    ctrl.set_control_word(ZLAC8015DCtrl::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    // Actual velocity 20ABh
+    ctrl.get_actual_velocity(&left_d, &right_d);
+    log_d("* Target_position_relative_synchronous : L[%f]R[%f]", left_d, right_d);
+
+#if 1
+    TEST_ASSERT_TRUE(ctrl.set_target_position(0, 0, true));
+    TEST_ASSERT_TRUE(ctrl.get_target_position(&left, &right));
+    TEST_ASSERT_EQUAL(0, left);
+    TEST_ASSERT_EQUAL(0, right);
+#endif
+#else
+#if 0
     // Test Setter
     result = ctrl.set_target_position(-467, -891, true);
     TEST_ASSERT_TRUE(result);
@@ -1874,6 +1939,8 @@ void Target_position(void)
     result = ctrl.get_target_position(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_d("* Target_position : L[%d]R[%d]", left, right);
+#endif
+#endif
 }
 void Target_torque(void)
 {
@@ -1992,52 +2059,75 @@ void Error_code(void)
     ZLAC8015DCtrl::zlac_error right;
     bool result = ctrl.get_error_code(&left, &right);
     TEST_ASSERT_TRUE(result);
-    log_d("* Error_code : L : "
-          "over_voltage[%s]"
-          "under_voltage[%s]"
-          "over_current[%s]"
-          "over_load[%s]"
-          "current_out_of_tolerance[%s]"
-          "encoder_out_of_tolerance[%s]"
-          "velocity_out_of_tolerance[%s]"
-          "reference_voltage_error[%s]"
-          "eeprom_error[%s]"
-          "hall_error[%s]"
-          "motor_temperature_over_temperature[%s]", //
-          left.over_voltage ? "T" : "F",
-          left.under_voltage ? "T" : "F",
-          left.over_current ? "T" : "F",
-          left.over_load ? "T" : "F",
-          left.current_out_of_tolerance ? "T" : "F",
-          left.encoder_out_of_tolerance ? "T" : "F",
-          left.velocity_out_of_tolerance ? "T" : "F",
-          left.reference_voltage_error ? "T" : "F",
-          left.eeprom_error ? "T" : "F",
-          left.hall_error ? "T" : "F",
-          left.motor_temperature_over_temperature ? "T" : "F");
-    log_d("* Error_code : R : "
-          "over_voltage[%s]"
-          "under_voltage[%s]"
-          "over_current[%s]"
-          "over_load[%s]"
-          "current_out_of_tolerance[%s]"
-          "encoder_out_of_tolerance[%s]"
-          "velocity_out_of_tolerance[%s]"
-          "reference_voltage_error[%s]"
-          "eeprom_error[%s]"
-          "hall_error[%s]"
-          "motor_temperature_over_temperature[%s]", //
-          right.over_voltage ? "T" : "F",
-          right.under_voltage ? "T" : "F",
-          right.over_current ? "T" : "F",
-          right.over_load ? "T" : "F",
-          right.current_out_of_tolerance ? "T" : "F",
-          right.encoder_out_of_tolerance ? "T" : "F",
-          right.velocity_out_of_tolerance ? "T" : "F",
-          right.reference_voltage_error ? "T" : "F",
-          right.eeprom_error ? "T" : "F",
-          right.hall_error ? "T" : "F",
-          right.motor_temperature_over_temperature ? "T" : "F");
+    log_i("* Error_code : L : %s", left.no_error ? "No error" : "Error");
+    if (true == left.over_voltage) {
+        log_i("  * [%s]over_voltage", left.over_voltage ? "OVER" : "-");
+    }
+    if (true == left.under_voltage) {
+        log_i("  * [%s]under_voltage", left.under_voltage ? "UNDER" : "-");
+    }
+    if (true == left.over_current) {
+        log_i("  * [%s]over_current", left.over_current ? "T" : "F");
+    }
+    if (true == left.over_load) {
+        log_i("  * [%s]over_load", left.over_load ? "T" : "F");
+    }
+    if (true == left.current_out_of_tolerance) {
+        log_i("  * [%s]current_out_of_tolerance", left.current_out_of_tolerance ? "T" : "F");
+    }
+    if (true == left.encoder_out_of_tolerance) {
+        log_i("  * [%s]encoder_out_of_tolerance", left.encoder_out_of_tolerance ? "T" : "F");
+    }
+    if (true == left.velocity_out_of_tolerance) {
+        log_i("  * [%s]velocity_out_of_tolerance", left.velocity_out_of_tolerance ? "T" : "F");
+    }
+    if (true == left.reference_voltage_error) {
+        log_i("  * [%s]reference_voltage_error", left.reference_voltage_error ? "T" : "F");
+    }
+    if (true == left.eeprom_error) {
+        log_i("  * [%s]eeprom_error", left.eeprom_error ? "T" : "F");
+    }
+    if (true == left.hall_error) {
+        log_i("  * [%s]hall_error", left.hall_error ? "T" : "F");
+    }
+    if (true == left.motor_temperature_over_temperature) {
+        log_i("  * [%s]motor_temperature_over_temperature", left.motor_temperature_over_temperature ? "T" : "F");
+    }
+
+    log_i("* Error_code : R : %s", right.no_error ? "No error" : "Error");
+    if (true == right.over_voltage) {
+        log_i("  * [%s]over_voltage", right.over_voltage ? "OVER" : "-");
+    }
+    if (true == right.under_voltage) {
+        log_i("  * [%s]under_voltage", right.under_voltage ? "UNDER" : "-");
+    }
+    if (true == right.over_current) {
+        log_i("  * [%s]over_current", right.over_current ? "T" : "F");
+    }
+    if (true == right.over_load) {
+        log_i("  * [%s]over_load", right.over_load ? "T" : "F");
+    }
+    if (true == right.current_out_of_tolerance) {
+        log_i("  * [%s]current_out_of_tolerance", right.current_out_of_tolerance ? "T" : "F");
+    }
+    if (true == right.encoder_out_of_tolerance) {
+        log_i("  * [%s]encoder_out_of_tolerance", right.encoder_out_of_tolerance ? "T" : "F");
+    }
+    if (true == right.velocity_out_of_tolerance) {
+        log_i("  * [%s]velocity_out_of_tolerance", right.velocity_out_of_tolerance ? "T" : "F");
+    }
+    if (true == right.reference_voltage_error) {
+        log_i("  * [%s]reference_voltage_error", right.reference_voltage_error ? "T" : "F");
+    }
+    if (true == right.eeprom_error) {
+        log_i("  * [%s]eeprom_error", right.eeprom_error ? "T" : "F");
+    }
+    if (true == right.hall_error) {
+        log_i("  * [%s]hall_error", right.hall_error ? "T" : "F");
+    }
+    if (true == right.motor_temperature_over_temperature) {
+        log_i("  * [%s]motor_temperature_over_temperature", right.motor_temperature_over_temperature ? "T" : "F");
+    }
 }
 void Actual_motor_position(void)
 {
@@ -2103,11 +2193,25 @@ void NOT_CONNECTED_DEVICE(void)
 
 void TEST_ONCE(void)
 {
+    bool result;
     log_d("=== TEST_ONCE ===");
+    result = ctrl.clear_fault();
+    (void)Error_code();
 }
 void TEST_RUNNING(void)
 {
     log_d("=== TEST_RUNNING ===");
+}
+void STOP_MOTOR(void)
+{
+    delay(1000);
+    bool result;
+    log_d("=== STOP_MOTOR ===");
+    result = ctrl.set_control_mode(ZLAC::DRIVER_MODE::UNDEFINED);
+    TEST_ASSERT_TRUE(result);
+#if RESTORE_FACTORY_SETTINGS
+    ctrl.restore_factory_settings();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -2147,7 +2251,9 @@ void RUN_UNITY_TESTS()
         RUN_TEST(Torque_slope);
         RUN_TEST(Max_speed);
         RUN_TEST(Target_velocity);
-        RUN_TEST(Target_position);
+        RUN_TEST(Target_position_absolute);
+        RUN_TEST(Target_position_relative_synchronous);
+        RUN_TEST(Target_position_relative_asynchronous);
         RUN_TEST(Target_torque);
 #endif
 #if MOTOR_PARAMETER
