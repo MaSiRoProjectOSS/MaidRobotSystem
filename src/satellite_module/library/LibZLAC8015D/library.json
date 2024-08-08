@@ -1,0 +1,44 @@
+{
+    "name": "LibZLAC8015D",
+    "version": "0.24.06",
+    "description": "Provide API for ZLAC8015D",
+    "keywords": "ZLAC8015D",
+    "homepage": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem",
+    "authors": {
+        "name": "MaSiRo Project.",
+        "email": "developer@masiro-project.com",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MaSiRoProjectOSS/MaidRobotSystem.git"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "ModbusLibrary": "^0.23.12"
+    },
+    "examples": [
+        {
+            "name": "basic",
+            "base": "examples/basic",
+            "files": [
+                "basic.cpp"
+            ]
+        }
+    ],
+    "build": {
+        "flags": []
+    },
+    "export": {
+        "exclude": [
+            ".vscode/*",
+            "data/*",
+            "examples/*",
+            "test/*",
+            ".clang-format",
+            "Doxyfile",
+            "doxygen",
+            "platformio.ini"
+        ]
+    }
+}

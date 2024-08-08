@@ -1,0 +1,51 @@
+{
+	"folders": [
+		{
+			"name": "LibZLAC8015D",
+			"path": "."
+		}
+	],
+	"settings": {
+		"doxdocgen.file.versionTag": "@version 0.24.06",
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.file.copyrightTag": [
+			"@copyright Copyright (c) MaSiRo Project. {year}-."
+		],
+		"cSpell.words": [
+			"CRGB",
+			"eeprom",
+			"Feedforward",
+			"fillpix",
+			"ZLAC"
+		],
+		"files.exclude": {
+			"**/.git": true,
+			"**/.pio": false,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/doxygen": true
+		},
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/node_modules/*/**": true,
+			"**/.hg/store/**": true,
+			"**/doxygen": true,
+			"**/.pio": true,
+			"**/Doxyfile": true
+		},
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/*.code-search": true,
+			"**/.clang-format": true,
+			"**/Doxyfile": true,
+			"**/doxygen": true,
+			"*.code-workspace": true
+		}
+	}
+}
