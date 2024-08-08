@@ -33,6 +33,7 @@
         "exclude": [
             ".vscode/*",
             "data/*",
+            ".pio/*",
             "examples/*",
             "test/*",
             ".clang-format",

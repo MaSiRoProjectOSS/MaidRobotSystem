@@ -39,9 +39,9 @@
 #include <M5Atom.h>
 #include <unity.h>
 ////
-#include "zlac8015d_modbus.hpp"
+#include "lib_zlac8015d_modbus.hpp"
 
-class ImplZLAC8015DModbus : public ZLAC8015DModbus {
+class ImplZLAC8015DModbus : public LibZLAC8015DModbus {
     bool _reception(MessageFrame &frame) override
     {
         log_v("              ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
@@ -100,128 +100,128 @@ void setup_m5()
 }
 
 ///////////////////////////////////////////////////////////////////
-String text_zlac_driver_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE mode)
+String text_zlac_driver_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE mode)
 {
     switch (mode) {
-        case ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE:
+        case LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE:
             return "POSITION_RELATIVE";
-        case ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE:
+        case LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE:
             return "POSITION_ABSOLUTE";
-        case ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY:
+        case LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY:
             return "VELOCITY";
-        case ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE:
+        case LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE:
             return "TORQUE";
-        case ZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED:
+        case LibZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED:
             return "UNDEFINED";
         default:
             return "UNKNOWN";
     }
 }
-String text_can_baud_rate(ZLAC8015DModbus::CAN_BAUD_RATE baud)
+String text_can_baud_rate(LibZLAC8015DModbus::CAN_BAUD_RATE baud)
 {
     switch (baud) {
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K:
             return "1000K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K:
             return "500K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K:
             return "250K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K:
             return "125K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K:
             return "100K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K:
             return " 50K";
-        case ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K:
+        case LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K:
             return " 25K";
         default:
             return "INVALID";
     }
 }
-String text_rs485_baud_rate(ZLAC8015DModbus::RS485_BAUD_RATE baud)
+String text_rs485_baud_rate(LibZLAC8015DModbus::RS485_BAUD_RATE baud)
 {
     switch (baud) {
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000:
             return "128000";
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200:
             return "115200";
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600:
             return " 57600";
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400:
             return " 38400";
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200:
             return " 19200";
-        case ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600:
+        case LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600:
             return " 9600";
         default:
             return "INVALID";
     }
 }
-String text_zlac_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD word)
+String text_zlac_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD word)
 {
     switch (word) {
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP:
             return "EMERGENCY_STOP";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT:
             return "CLEAR_FAULT";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP:
             return "STOP";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE:
             return "ENABLE";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START:
             return "SYNCHRONOUS_START";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT:
             return "START_LEFT";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT:
             return "START_RIGHT";
-        case ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED:
+        case LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED:
             return "UNDEFINED";
         default:
             return "INVALID";
     }
 }
-String text_zlac_stop_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL ctrl)
+String text_zlac_stop_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL ctrl)
 {
     switch (ctrl) {
-        case ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION:
+        case LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION:
             return "QUICK_WITH_DECELERATION";
-        case ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION:
+        case LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION:
             return "_QUICK_WITHOUT_DECELERATION";
-        case ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP:
+        case LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP:
             return "STOP";
-        case ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED:
+        case LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_UNDEFINED:
             return "UNDEFINED";
         default:
             return "INVALID";
     }
 }
-String text_terminal_function(ZLAC8015DModbus::TERMINAL_FUNCTION func)
+String text_terminal_function(LibZLAC8015DModbus::TERMINAL_FUNCTION func)
 {
     switch (func) {
-        case ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE:
+        case LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE:
             return "NONE";
-        case ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP:
+        case LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP:
             return "EMERGENCY_STOP";
-        case ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC:
+        case LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC:
             return "NC";
         default:
             return "INVALID";
     }
 }
-String text_zlac_terminal_function(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION func)
+String text_zlac_terminal_function(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION func)
 {
     switch (func) {
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE:
             return "OPEN_BRAKE";
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE:
             return "CLOSE_BRAKE";
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL:
             return "ALARM_SIGNAL";
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL:
             return "DRIVE_STATUS_SIGNAL";
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL:
             return "TARGET_POSITION_REACHED_SIGNAL";
-        case ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED:
+        case LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED:
             return "UNDEFINED";
         default:
             return "INVALID";
@@ -259,8 +259,8 @@ bool Wait_zero_velocity(int span_ms = 1000, int timeout_ms = (10 * 1000))
 bool Check_no_error(void)
 {
     bool result = false;
-    ZLAC8015DModbus::zlac_error left;
-    ZLAC8015DModbus::zlac_error right;
+    LibZLAC8015DModbus::zlac_error left;
+    LibZLAC8015DModbus::zlac_error right;
     if (true == ctrl.get_error_code(&left, &right)) {
         if (true == left.no_error) {
             if (true == right.no_error) {
@@ -340,15 +340,15 @@ void RS485_Baud_Rate(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::RS485_BAUD_RATE value;
+    LibZLAC8015DModbus::RS485_BAUD_RATE value;
 #if 0
     // Test Setter
     //////////////////////////////////////////////
     // NOTE: Communication settings such as address/baud rate are not dynamically supported
     //////////////////////////////////////////////
-    ZLAC8015DModbus::RS485_BAUD_RATE input_value;
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+    LibZLAC8015DModbus::RS485_BAUD_RATE input_value;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -356,8 +356,8 @@ void RS485_Baud_Rate(void)
     TEST_ASSERT_EQUAL(input_value, value);
     // [Change baud]
 
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_115200;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -365,8 +365,8 @@ void RS485_Baud_Rate(void)
     TEST_ASSERT_EQUAL(input_value, value);
     // [Change baud]
 
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_57600;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -374,8 +374,8 @@ void RS485_Baud_Rate(void)
     TEST_ASSERT_EQUAL(input_value, value);
     // [Change baud]
 
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_38400;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -383,8 +383,8 @@ void RS485_Baud_Rate(void)
     TEST_ASSERT_EQUAL(input_value, value);
     // [Change baud]
 
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_19200;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -392,8 +392,8 @@ void RS485_Baud_Rate(void)
     TEST_ASSERT_EQUAL(input_value, value);
     // [Change baud]
 
-    // ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
-    input_value = ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+    // LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
+    input_value = LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_9600;
     result      = ctrl.set_rs485_baud_rate(input_value, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_rs485_baud_rate(&value);
@@ -402,7 +402,7 @@ void RS485_Baud_Rate(void)
     // [Change baud]
 
     // Restore
-    result = ctrl.set_rs485_baud_rate(ZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000);
+    result = ctrl.set_rs485_baud_rate(LibZLAC8015DModbus::RS485_BAUD_RATE::RS485_BAUD_RATE_128000);
     TEST_ASSERT_TRUE(result);
 #endif
     result = ctrl.get_rs485_baud_rate(&value);
@@ -432,9 +432,9 @@ void Out_signal_status(void)
 void Clear_feedback_position(void)
 {
     // TODO
-    // bool set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR target, bool check = false)
+    // bool set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR target, bool check = false)
 
-    ZLAC8015DModbus::MODBUS_TARGET_MOTOR value;
+    LibZLAC8015DModbus::MODBUS_TARGET_MOTOR value;
     bool result = ctrl.get_clear_feedback_position(&value);
     TEST_ASSERT_TRUE(result);
     log_d("* Clear_feedback_position : [%d]", value);
@@ -443,13 +443,13 @@ void In_absolute_position_control_reset_the_zero_point(void)
 {
     ////////////
 
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
-    TEST_ASSERT_FALSE(ctrl.reset_the_zero_point_in_absolute_position_control(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL, true));
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
-    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL, true));
-    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_LEFT, true));
-    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_RIGHT, true));
-    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_INVALID, true));
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
+    TEST_ASSERT_FALSE(ctrl.reset_the_zero_point_in_absolute_position_control(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL, true));
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
+    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL, true));
+    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_LEFT, true));
+    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_RIGHT, true));
+    TEST_ASSERT_TRUE(ctrl.reset_the_zero_point_in_absolute_position_control(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_INVALID, true));
 
     log_d("* In_absolute_position_control_reset_the_zero_point");
 }
@@ -511,59 +511,59 @@ void CAN_Node_info(void)
     ////////////
     bool result;
     int id = 0;
-    ZLAC8015DModbus::CAN_BAUD_RATE baud;
+    LibZLAC8015DModbus::CAN_BAUD_RATE baud;
     // Test Setter
-    result = ctrl.set_can_node_info(2, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, true);
+    result = ctrl.set_can_node_info(2, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(2, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_1000K, baud);
 
-    result = ctrl.set_can_node_info(3, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, true);
+    result = ctrl.set_can_node_info(3, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(3, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K, baud);
 
-    result = ctrl.set_can_node_info(4, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, true);
+    result = ctrl.set_can_node_info(4, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(4, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_250K, baud);
 
-    result = ctrl.set_can_node_info(5, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, true);
+    result = ctrl.set_can_node_info(5, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(5, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_125K, baud);
 
-    result = ctrl.set_can_node_info(6, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, true);
+    result = ctrl.set_can_node_info(6, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(6, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_100K, baud);
 
-    result = ctrl.set_can_node_info(7, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, true);
+    result = ctrl.set_can_node_info(7, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(7, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_50K, baud);
 
-    result = ctrl.set_can_node_info(8, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, true);
+    result = ctrl.set_can_node_info(8, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
     TEST_ASSERT_EQUAL(8, id);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, baud);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_25K, baud);
 
     // Restore
-    result = ctrl.set_can_node_info(1, ZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K);
+    result = ctrl.set_can_node_info(1, LibZLAC8015DModbus::CAN_BAUD_RATE::CAN_BAUD_RATE_500K);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_can_node_info(&id, &baud);
     TEST_ASSERT_TRUE(result);
@@ -573,34 +573,34 @@ void Control_mode(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::MODBUS_DRIVER_MODE mode;
+    LibZLAC8015DModbus::MODBUS_DRIVER_MODE mode;
     // Test Setter
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE, true);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE, mode);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE, mode);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE, true);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE, mode);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE, mode);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY, true);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY, mode);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY, mode);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE, true);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE, mode);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE, mode);
 
     // Restore
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED, true);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_mode(&mode);
     TEST_ASSERT_TRUE(result);
@@ -610,78 +610,78 @@ void Control_word(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::ZLAC_CONTROL_WORD value;
+    LibZLAC8015DModbus::ZLAC_CONTROL_WORD value;
     // Test Setter
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_EMERGENCY_STOP, value);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, value);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_CLEAR_FAULT, value);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP, value);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE, value);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
     TEST_ASSERT_TRUE(result);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
     TEST_ASSERT_TRUE(result);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, value);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
     TEST_ASSERT_TRUE(result);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
     TEST_ASSERT_FALSE(result);
 
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
     TEST_ASSERT_TRUE(result);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_SYNCHRONOUS_START, true);
     TEST_ASSERT_FALSE(result);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_LEFT, value);
 
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_START_RIGHT, value);
 
     // Restore
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_control_word(&value);
     TEST_ASSERT_TRUE(result);
@@ -729,28 +729,28 @@ void Quick_stop_control(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::ZLAC_STOP_CONTROL value;
+    LibZLAC8015DModbus::ZLAC_STOP_CONTROL value;
     // Test Setter
-    result = ctrl.set_quick_stop_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
+    result = ctrl.set_quick_stop_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_quick_stop_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
 
-    result = ctrl.set_quick_stop_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
+    result = ctrl.set_quick_stop_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_quick_stop_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
 
-    result = ctrl.set_quick_stop_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
+    result = ctrl.set_quick_stop_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_quick_stop_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
 
     // Restore
-    result = ctrl.set_quick_stop_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
+    result = ctrl.set_quick_stop_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_quick_stop_control(&value);
     TEST_ASSERT_TRUE(result);
@@ -810,28 +810,28 @@ void Halt_control(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::ZLAC_STOP_CONTROL value;
+    LibZLAC8015DModbus::ZLAC_STOP_CONTROL value;
     // Test Setter
-    result = ctrl.set_halt_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
+    result = ctrl.set_halt_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_halt_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITH_DECELERATION, value);
 
-    result = ctrl.set_halt_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
+    result = ctrl.set_halt_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_halt_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP, value);
 
-    result = ctrl.set_halt_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
+    result = ctrl.set_halt_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_halt_control(&value);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_QUICK_WITHOUT_DECELERATION, value);
 
     // Restore
-    result = ctrl.set_halt_control(ZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
+    result = ctrl.set_halt_control(LibZLAC8015DModbus::ZLAC_STOP_CONTROL::ZLAC_STOP_CONTROL_STOP);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_halt_control(&value);
     TEST_ASSERT_TRUE(result);
@@ -873,32 +873,32 @@ void Input_terminal_function_selection(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::TERMINAL_FUNCTION x0;
-    ZLAC8015DModbus::TERMINAL_FUNCTION x1;
+    LibZLAC8015DModbus::TERMINAL_FUNCTION x0;
+    LibZLAC8015DModbus::TERMINAL_FUNCTION x1;
     // Test Setter
-    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, //
-                                                                 ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
+    result = ctrl.set_input_terminal_terminal_function_selection(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, //
+                                                                 LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x1);
 
-    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
-                                                                 ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
+    result = ctrl.set_input_terminal_terminal_function_selection(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
+                                                                 LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, x0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE, x1);
 
-    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC, //
-                                                                 ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
+    result = ctrl.set_input_terminal_terminal_function_selection(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NC, //
+                                                                 LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP);
     TEST_ASSERT_FALSE(result);
 
     // Restore
-    result = ctrl.set_input_terminal_terminal_function_selection(ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
-                                                                 ZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
+    result = ctrl.set_input_terminal_terminal_function_selection(LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_EMERGENCY_STOP, //
+                                                                 LibZLAC8015DModbus::TERMINAL_FUNCTION::TERMINAL_FUNCTION_NONE);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_input_terminal_terminal_function_selection(&x0, &x1);
     TEST_ASSERT_TRUE(result);
@@ -1053,55 +1053,55 @@ void Output_terminal_function_selection(void)
 {
     ////////////
     bool result;
-    ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION b0;
-    ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION b1;
-    ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION y0;
-    ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION y1;
+    LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION b0;
+    LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION b1;
+    LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION y0;
+    LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION y1;
     // Test Setter
-    result = ctrl.set_output_terminal_function_selection(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
+    result = ctrl.set_output_terminal_function_selection(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
                                                          true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b1);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y1);
 
-    result = ctrl.set_output_terminal_function_selection(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
+    result = ctrl.set_output_terminal_function_selection(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
                                                          true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, b0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_DRIVE_STATUS_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y1);
 
-    result = ctrl.set_output_terminal_function_selection(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
+    result = ctrl.set_output_terminal_function_selection(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, //
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL,
                                                          true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
     TEST_ASSERT_TRUE(result);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y0);
-    TEST_ASSERT_EQUAL(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_CLOSE_BRAKE, b1);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_TARGET_POSITION_REACHED_SIGNAL, y0);
+    TEST_ASSERT_EQUAL(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_ALARM_SIGNAL, y1);
 
     // Restore
-    result = ctrl.set_output_terminal_function_selection(ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
-                                                         ZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
+    result = ctrl.set_output_terminal_function_selection(LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE, //
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_OPEN_BRAKE,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
+                                                         LibZLAC8015DModbus::ZLAC_TERMINAL_FUNCTION::ZLAC_TERMINAL_FUNCTION_UNDEFINED,
                                                          true);
     TEST_ASSERT_TRUE(result);
     result = ctrl.get_output_terminal_function_selection(&b0, &b1, &y0, &y1);
@@ -1654,7 +1654,7 @@ void Initial_velocity(void)
     int right = 0;
     // Test Setter
     // TORQUE
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
     TEST_ASSERT_TRUE(result);
     result = ctrl.set_initial_velocity_left(11, true);
     TEST_ASSERT_FALSE(result);
@@ -1662,7 +1662,7 @@ void Initial_velocity(void)
     TEST_ASSERT_FALSE(result);
 
     // VELOCITY
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
     TEST_ASSERT_TRUE(result);
     result = ctrl.set_initial_velocity_left(32, true);
     TEST_ASSERT_TRUE(result);
@@ -1677,7 +1677,7 @@ void Initial_velocity(void)
     TEST_ASSERT_EQUAL(35, right);
 
     // POSITION_RELATIVE
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
     TEST_ASSERT_TRUE(result);
     result = ctrl.set_initial_velocity_left(46, true);
     TEST_ASSERT_TRUE(result);
@@ -1692,7 +1692,7 @@ void Initial_velocity(void)
     TEST_ASSERT_EQUAL(47, right);
 
     // POSITION_ABSOLUTE
-    result = ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
+    result = ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
     TEST_ASSERT_TRUE(result);
     result = ctrl.set_initial_velocity_left(52, true);
     TEST_ASSERT_TRUE(result);
@@ -1914,14 +1914,14 @@ void Target_velocity(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY), "MODE[VELOCITY]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY), "MODE[VELOCITY]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "Set acceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "Set deceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_velocity(0, 0), "Reset velocity : L[0]R[0]");
     TEST_ASSERT_TRUE(ctrl.get_actual_velocity(&left_d, &right_d));
     log_d("* Target_velocity : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
 #if MOTOR_PARAMETER_RUNNING
     delay(1000);
     result_step += ctrl.set_target_velocity(60, 0) ? 1 : 0;
@@ -1937,7 +1937,7 @@ void Target_velocity(void)
 #endif
     result_step += ctrl.set_target_velocity(0, 0) ? 1 : 0;
     delay(1000);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
     TEST_ASSERT_EQUAL(6, result_step);
     TEST_ASSERT_TRUE_MESSAGE(result, "Control word : STOP");
 }
@@ -1953,16 +1953,16 @@ void Target_position_absolute_asynchronous(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_synchronous_control_status(false), "asynchronous");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "set acceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "set deceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_position(0, 0), "Reset position : L[0]R[0]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_max_speed(60, 60), "Set MAX-speed : L[60]R[60]");
     TEST_ASSERT_TRUE(ctrl.get_actual_velocity(&left_d, &right_d));
     log_d("* Target_position_absolute_asynchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
     ctrl.control_word_enable();
 #if MOTOR_PARAMETER_RUNNING
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
@@ -2039,14 +2039,14 @@ void Target_position_absolute_synchronous(void)
 
     TEST_ASSERT_TRUE_MESSAGE(ctrl.control_word_none(), "Control word");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_synchronous_control_status(true), "synchronous");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE), "MODE[POSITION_ABSOLUTE]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "set acceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "set deceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_position(0, 0), "Reset position : L[0]R[0]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_max_speed(60, 60), "Set MAX-speed : L[60]R[60]");
     TEST_ASSERT_TRUE(ctrl.get_actual_velocity(&left_d, &right_d));
     log_d("* Target_position_absolute_synchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
     ctrl.control_word_enable();
 #if MOTOR_PARAMETER_RUNNING
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
@@ -2111,16 +2111,16 @@ void Target_position_relative_asynchronous(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_synchronous_control_status(false), "asynchronous");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "set acceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "set deceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_position(0, 0), "Reset position : L[0]R[0]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_max_speed(60, 60), "Set MAX-speed : L[60]R[60]");
     TEST_ASSERT_TRUE(ctrl.get_actual_velocity(&left_d, &right_d));
     log_d("* Target_position_relative_asynchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
     ctrl.control_word_enable();
 #if MOTOR_PARAMETER_RUNNING
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
@@ -2168,14 +2168,14 @@ void Target_position_relative_synchronous(void)
 
     TEST_ASSERT_TRUE_MESSAGE(ctrl.control_word_none(), "Control word");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_synchronous_control_status(true), "synchronous");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE), "MODE[POSITION_RELATIVE]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_acceleration_time(500, 500), "set acceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_s_shape_deceleration_time(500, 500), "set deceleration time");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_position(0, 0), "Reset position : L[0]R[0]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_max_speed(60, 60), "Set MAX-speed : L[60]R[60]");
     TEST_ASSERT_TRUE(ctrl.get_actual_velocity(&left_d, &right_d));
     log_d("* Target_position_relative_synchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL), "clear feedback position");
     ctrl.control_word_enable();
 #if MOTOR_PARAMETER_RUNNING
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
@@ -2213,13 +2213,13 @@ void Target_torque(void)
     long right      = 0;
     double left_d   = 0;
     double right_d  = 0;
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
-    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE), "MODE[TORQUE]");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED), "Control word");
+    TEST_ASSERT_TRUE_MESSAGE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE), "MODE[TORQUE]");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_torque_slope(300, 300), "Torque slope");
     TEST_ASSERT_TRUE_MESSAGE(ctrl.set_target_torque(0, 0), "Reset torque : L[0]R[0]");
     TEST_ASSERT_TRUE(ctrl.get_actual_torque(&left_d, &right_d));
     log_d("* Target_torque : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
 #if MOTOR_PARAMETER_RUNNING
     delay(1000);
     result_step += ctrl.set_target_torque(1000, 0) ? 1 : 0;
@@ -2237,7 +2237,7 @@ void Target_torque(void)
 #endif
     result_step += ctrl.set_target_torque(0, 0) ? 1 : 0;
     delay(1000);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
     TEST_ASSERT_EQUAL(7, result_step);
     TEST_ASSERT_TRUE_MESSAGE(result, "Control word : STOP");
 }
@@ -2322,8 +2322,8 @@ void Motor_temperature(void)
 }
 void Error_code(void)
 {
-    ZLAC8015DModbus::zlac_error left;
-    ZLAC8015DModbus::zlac_error right;
+    LibZLAC8015DModbus::zlac_error left;
+    LibZLAC8015DModbus::zlac_error right;
     bool result = ctrl.get_error_code(&left, &right);
     TEST_ASSERT_TRUE(result);
     log_i("* Error_code : L : %s[%d]", left.no_error ? "No error" : "Error", left.err_value);
@@ -2476,8 +2476,8 @@ void STOP_MOTOR(void)
     log_d("=== STOP_MOTOR ===");
     ctrl.set_target_torque(0, 0);
     ctrl.set_target_velocity(0, 0);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
-    TEST_ASSERT_TRUE(ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED));
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    TEST_ASSERT_TRUE(ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::UNDEFINED));
     TEST_ASSERT_TRUE_MESSAGE(result, "Control word : STOP");
     (void)Error_code();
     ctrl.clear_fault();

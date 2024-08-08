@@ -8,11 +8,11 @@
  *
  */
 #ifndef PIO_UNIT_TESTING
-#include "zlac8015d_modbus.hpp"
+#include "lib_zlac8015d_modbus.hpp"
 
 #include <M5Atom.h>
 
-class ImplZLAC8015DModbus : public ZLAC8015DModbus {
+class ImplZLAC8015DModbus : public LibZLAC8015DModbus {
     bool _reception(MessageFrame &frame) override
     {
         log_v("              ADR[0x%02X] Fun[0x%02X] Len[%d] CRC[0x%04X] Data[%02X %02X %02X %02X %02X %02X %02X %02X]",
@@ -36,8 +36,8 @@ ImplZLAC8015DModbus ctrl;
 bool Check_no_error(void)
 {
     bool result = false;
-    ZLAC8015DModbus::zlac_error left;
-    ZLAC8015DModbus::zlac_error right;
+    LibZLAC8015DModbus::zlac_error left;
+    LibZLAC8015DModbus::zlac_error right;
     if (true == ctrl.get_error_code(&left, &right)) {
         if (true == left.no_error) {
             if (true == right.no_error) {
@@ -57,8 +57,8 @@ bool Check_no_error(void)
 }
 void Error_code(void)
 {
-    ZLAC8015DModbus::zlac_error left;
-    ZLAC8015DModbus::zlac_error right;
+    LibZLAC8015DModbus::zlac_error left;
+    LibZLAC8015DModbus::zlac_error right;
     bool result = ctrl.get_error_code(&left, &right);
     log_i("* Error_code : L : %s[%d]", left.no_error ? "No error" : "Error", left.err_value);
     if (true == left.over_voltage) {
@@ -160,14 +160,14 @@ void Target_velocity(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::VELOCITY);
     ctrl.set_s_shape_acceleration_time(500, 500);
     ctrl.set_s_shape_deceleration_time(500, 500);
     ctrl.set_target_velocity(0, 0);
     ctrl.get_actual_velocity(&left_d, &right_d);
     log_d("* Target_velocity : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
     delay(1000);
     result_step += ctrl.set_target_velocity(60, 0) ? 1 : 0;
     delay(1000);
@@ -181,7 +181,7 @@ void Target_velocity(void)
     delay(1000);
     result_step += ctrl.set_target_velocity(0, 0) ? 1 : 0;
     delay(1000);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
 }
 void Target_position_absolute_asynchronous(void)
 {
@@ -195,16 +195,16 @@ void Target_position_absolute_asynchronous(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
     ctrl.set_synchronous_control_status(false);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
     ctrl.set_s_shape_acceleration_time(500, 500);
     ctrl.set_s_shape_deceleration_time(500, 500);
     ctrl.set_target_position(0, 0);
     ctrl.set_max_speed(60, 60);
     ctrl.get_actual_velocity(&left_d, &right_d);
     log_d("* Target_position_absolute_asynchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
+    ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
     ctrl.control_word_enable();
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
     result_step += ctrl.control_word_start_left() ? 1 : 0;
@@ -274,14 +274,14 @@ void Target_position_absolute_synchronous(void)
 
     ctrl.control_word_none();
     ctrl.set_synchronous_control_status(true);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_ABSOLUTE);
     ctrl.set_s_shape_acceleration_time(500, 500);
     ctrl.set_s_shape_deceleration_time(500, 500);
     ctrl.set_target_position(0, 0);
     ctrl.set_max_speed(60, 60);
     ctrl.get_actual_velocity(&left_d, &right_d);
     log_d("* Target_position_absolute_synchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
+    ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
     ctrl.control_word_enable();
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
     result_step += ctrl.control_word_synchronous_start() ? 1 : 0;
@@ -342,16 +342,16 @@ void Target_position_relative_asynchronous(void)
     double left_d   = 0;
     double right_d  = 0;
 
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
     ctrl.set_synchronous_control_status(false);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
     ctrl.set_s_shape_acceleration_time(500, 500);
     ctrl.set_s_shape_deceleration_time(500, 500);
     ctrl.set_target_position(0, 0);
     ctrl.set_max_speed(60, 60);
     ctrl.get_actual_velocity(&left_d, &right_d);
     log_d("* Target_position_relative_asynchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
+    ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
     ctrl.control_word_enable();
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
     result_step += ctrl.control_word_start_left() ? 1 : 0;
@@ -395,14 +395,14 @@ void Target_position_relative_synchronous(void)
 
     ctrl.control_word_none();
     ctrl.set_synchronous_control_status(true);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::POSITION_RELATIVE);
     ctrl.set_s_shape_acceleration_time(500, 500);
     ctrl.set_s_shape_deceleration_time(500, 500);
     ctrl.set_target_position(0, 0);
     ctrl.set_max_speed(60, 60);
     ctrl.get_actual_velocity(&left_d, &right_d);
     log_d("* Target_position_relative_synchronous : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_clear_feedback_position(ZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
+    ctrl.set_clear_feedback_position(LibZLAC8015DModbus::MODBUS_TARGET_MOTOR::TARGET_MOTOR_ALL);
     ctrl.control_word_enable();
     result_step += ctrl.set_target_position(10000, 10000) ? 1 : 0;
     result_step += ctrl.control_word_synchronous_start() ? 1 : 0;
@@ -436,13 +436,13 @@ void Target_torque(void)
     long right      = 0;
     double left_d   = 0;
     double right_d  = 0;
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
-    ctrl.set_control_mode(ZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_UNDEFINED);
+    ctrl.set_control_mode(LibZLAC8015DModbus::MODBUS_DRIVER_MODE::TORQUE);
     ctrl.set_torque_slope(300, 300);
     ctrl.set_target_torque(0, 0);
     ctrl.get_actual_torque(&left_d, &right_d);
     log_d("* Target_torque : Get actual : L[%f]R[%f]", left_d, right_d);
-    ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
+    ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_ENABLE);
     delay(1000);
     result_step += ctrl.set_target_torque(1000, 0) ? 1 : 0;
     delay(1000);
@@ -458,7 +458,7 @@ void Target_torque(void)
     delay(1000);
     result_step += ctrl.set_target_torque(0, 0) ? 1 : 0;
     delay(1000);
-    result = ctrl.set_control_word(ZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
+    result = ctrl.set_control_word(LibZLAC8015DModbus::ZLAC_CONTROL_WORD::CONTROL_WORD_STOP);
 }
 ///////////////
 void setup()

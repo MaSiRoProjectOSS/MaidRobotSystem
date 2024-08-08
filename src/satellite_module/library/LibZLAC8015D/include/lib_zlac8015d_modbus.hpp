@@ -1,5 +1,5 @@
 /**
- * @file zlac8015d_modbus.hpp
+ * @file lib_zlac8015d_modbus.hpp
  * @author Akari (masiro.to.akari@gmail.com)
  * @brief
  * @version 0.23.1
@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023 / MaSiRo Project.
  *
  */
-#ifndef ZLAC8015D_MODBUS_HPP
-#define ZLAC8015D_MODBUS_HPP
+#ifndef LIB_ZLAC8015D_MODBUS_HPP
+#define LIB_ZLAC8015D_MODBUS_HPP
 
 #include "modbus_lib_arduino.hpp"
 
@@ -23,7 +23,7 @@
 #define MODBUS_TARGET_ADDRESS 0x01
 #endif
 
-class ZLAC8015DModbus : public ModbusLibArduino {
+class LibZLAC8015DModbus : public ModbusLibArduino {
 public:
     typedef enum zlac_terminal_function
     {
@@ -187,13 +187,13 @@ public:
     };
 
 public:
-    ZLAC8015DModbus()
+    LibZLAC8015DModbus()
     {
     }
-    ~ZLAC8015DModbus()
+    ~LibZLAC8015DModbus()
     {
     }
-    void set_address(unsigned int address)
+    void set_send_address(unsigned int address)
     {
         this->_address = address;
     }
