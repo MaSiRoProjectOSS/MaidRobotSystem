@@ -297,37 +297,17 @@ public:
         return this->_send_target(__func__, target, 0x2D, (value_mW >> 8) & 0xFF, (value_mW >> 0) & 0xFF, true);
     }
 
+#if 0
     bool cmd_looking_for_z_signal(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
     {
         log_v("%s", __func__);
         return this->_send_target(__func__, target, 0x53, 0x00, 0x00, true);
     }
+#endif
     bool cmd_clear_fault(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
     {
         log_v("%s", __func__);
         return this->_send_target(__func__, target, 0x4A, 0x00, 0x00, true);
-    }
-
-    void cmd_get_all_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
-    {
-        static int cnt = 0;
-        this->cmd_get_alarm_status();
-        cnt++;
-        delay(this->INTERVAL_DRIVER_MS * 3);
-        switch (cnt) {
-            case 1:
-                this->cmd_get_bus_voltage(target);
-                this->cmd_get_output_current(target);
-                break;
-            case 2:
-                this->cmd_get_position_given(target);
-                this->cmd_get_position_feedback(target);
-                break;
-            default:
-                this->cmd_get_motor_speed(target);
-                cnt = 0;
-                break;
-        }
     }
 
     bool cmd_get_alarm_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
@@ -546,52 +526,6 @@ public:
         return result_01 && result_02;
     }
 
-    //////////////////////////////////////
-    bool cmd_mode_selection(DRIVER_MODE mode)
-    {
-        log_v("%s", __func__);
-        bool result      = false;
-        char buffer[100] = { 0 };
-        switch (mode) {
-            case DRIVER_MODE::POSITION_FROM_PULSE:
-                result = this->cmd_position_mode_pulse();
-                break;
-            case DRIVER_MODE::POSITION_FROM_DIGITAL:
-                result = this->cmd_position_mode();
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::POSITION_FROM_ANALOG:
-                this->info.mode = mode;
-                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::SPEED_FROM_DIGITAL:
-                result = this->cmd_speed_mode();
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::SPEED_FROM_ANALOG:
-                this->info.mode = mode;
-                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::TORQUE_FROM_DIGITAL:
-                result = this->cmd_torque_mode();
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::TORQUE_FROM_ANALOG:
-                this->info.mode = mode;
-                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
-                break;
-                ///////////////////////////////////////////
-            case DRIVER_MODE::NOT_INITIALIZED:
-            default:
-                this->info.mode = mode;
-                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
-                result = this->cmd_motor_stop(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
-                break;
-        }
-        return result;
-    }
     //////////////////////////////////////
 
     bool cmd_motor_start(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
@@ -1158,10 +1092,8 @@ private:
     bool _flag_monitoring_speed = false;
 
 private:
-    const unsigned long TIMEOUT_DRIVER_MS  = 50;
-    const unsigned long INTERVAL_DRIVER_MS = 1;
-    const size_t RX_BUFFER_SIZE            = 512;
-    const size_t TX_BUFFER_SIZE            = 512;
+    const size_t RX_BUFFER_SIZE = 512;
+    const size_t TX_BUFFER_SIZE = 512;
 };
 
 #endif

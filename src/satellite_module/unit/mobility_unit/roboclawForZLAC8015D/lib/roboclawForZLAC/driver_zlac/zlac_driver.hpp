@@ -232,18 +232,42 @@ public:
     virtual bool cmd_setting_integral_gain(ZLAC::TARGET_MOTOR target, int value)     = 0;
     virtual bool cmd_setting_differential_gain(ZLAC::TARGET_MOTOR target, int value) = 0;
     virtual bool cmd_setting_feed_forward_gain(ZLAC::TARGET_MOTOR target, int value) = 0;
+#if 0
     virtual bool cmd_setting_inverted(ZLAC::TARGET_MOTOR target, bool value)         = 0;
     virtual bool cmd_setting_acc(ZLAC::TARGET_MOTOR target, int value)               = 0;
     virtual bool cmd_setting_dcc(ZLAC::TARGET_MOTOR target, int value)               = 0;
     virtual bool cmd_setting_limit(ZLAC::TARGET_MOTOR target, int value)             = 0;
+#endif
 
 public:
     virtual bool cmd_modify_the_rated_current(int value_mW, ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
 
+#if 0
     virtual bool cmd_looking_for_z_signal(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
-    virtual bool cmd_clear_fault(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)          = 0;
+#endif
+    virtual bool cmd_clear_fault(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
 
-    virtual void cmd_get_all_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)   = 0;
+    void cmd_get_all_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
+    {
+        static int cnt = 0;
+        this->cmd_get_alarm_status();
+        cnt++;
+        delay(this->INTERVAL_DRIVER_MS * 3);
+        switch (cnt) {
+            case 1:
+                this->cmd_get_bus_voltage(target);
+                this->cmd_get_output_current(target);
+                break;
+            case 2:
+                this->cmd_get_position_given(target);
+                this->cmd_get_position_feedback(target);
+                break;
+            default:
+                this->cmd_get_motor_speed(target);
+                cnt = 0;
+                break;
+        }
+    }
     virtual bool cmd_get_alarm_status(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
     virtual bool cmd_get_bus_voltage(ZLAC::TARGET_MOTOR target)                                         = 0;
     virtual bool cmd_get_output_current(ZLAC::TARGET_MOTOR target)                                      = 0;
@@ -252,7 +276,51 @@ public:
     virtual bool cmd_get_position_feedback(ZLAC::TARGET_MOTOR target)                                   = 0;
 
     //////////////////////////////////////
-    virtual bool cmd_mode_selection(DRIVER_MODE mode) = 0;
+    bool cmd_mode_selection(DRIVER_MODE mode)
+    {
+        log_v("%s", __func__);
+        bool result      = false;
+        char buffer[100] = { 0 };
+        switch (mode) {
+            case DRIVER_MODE::POSITION_FROM_PULSE:
+                result = this->cmd_position_mode_pulse();
+                break;
+            case DRIVER_MODE::POSITION_FROM_DIGITAL:
+                result = this->cmd_position_mode();
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::POSITION_FROM_ANALOG:
+                this->info.mode = mode;
+                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::SPEED_FROM_DIGITAL:
+                result = this->cmd_speed_mode();
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::SPEED_FROM_ANALOG:
+                this->info.mode = mode;
+                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::TORQUE_FROM_DIGITAL:
+                result = this->cmd_torque_mode();
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::TORQUE_FROM_ANALOG:
+                this->info.mode = mode;
+                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
+                break;
+                ///////////////////////////////////////////
+            case DRIVER_MODE::NOT_INITIALIZED:
+            default:
+                this->info.mode = mode;
+                this->info.system.set(LOG_MODE, 0, 0, this->info.mode);
+                result = this->cmd_motor_stop(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
+                break;
+        }
+        return result;
+    }
     //////////////////////////////////////
     virtual bool cmd_motor_start(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL) = 0;
     virtual bool cmd_motor_stop(ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)  = 0;
@@ -544,6 +612,44 @@ public:
         return result;
     }
 
+    bool cmd_setting_inverted(ZLAC::TARGET_MOTOR target, bool value)
+    {
+        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
+            this->info.left.interval = value;
+        }
+        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
+            this->info.right.interval = value;
+        }
+        return true;
+    }
+    bool cmd_setting_acc(ZLAC::TARGET_MOTOR target, int value)
+    {
+        if (0 > value) {
+            value = 0;
+        }
+        this->info.acceleration_ms = value;
+        this->cmd_speed_set_acc_and_dec(this->info.acceleration_ms, this->info.deceleration_ms, target);
+
+        return true;
+    }
+    bool cmd_setting_dcc(ZLAC::TARGET_MOTOR target, int value)
+    {
+        if (0 > value) {
+            value = 0;
+        }
+        this->info.deceleration_ms = value;
+        this->cmd_speed_set_acc_and_dec(this->info.acceleration_ms, this->info.deceleration_ms, target);
+        return true;
+    }
+    bool cmd_setting_limit(ZLAC::TARGET_MOTOR target, int value)
+    {
+        if (0 > value) {
+            value = 0;
+        }
+        this->info.SPEED_LIMIT = value;
+        return true;
+    }
+
 protected:
     int _to_int(String data, int default_value)
     {
@@ -554,8 +660,10 @@ protected:
         return value;
     }
 
-private:
-    bool _flag_error = false;
+protected:
+    const unsigned long TIMEOUT_DRIVER_MS  = 50;
+    const unsigned long INTERVAL_DRIVER_MS = 1;
+    bool _flag_error                       = false;
 };
 
 #endif

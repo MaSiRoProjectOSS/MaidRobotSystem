@@ -81,7 +81,7 @@ private:
     HardwareSerial *_input_serial;
 
 #if ZLAC_DRIVER == ZLAC8015D_MODBUS
-    ZLAC8015DModbus *_zlac;
+    ZLAC8015DCtrl *_zlac;
 #elif ZLAC_DRIVER == ZLAC706_SERIAL
     ZLAC706Serial *_zlac;
 #endif

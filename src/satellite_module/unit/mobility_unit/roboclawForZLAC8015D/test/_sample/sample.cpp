@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023 / MaSiRo Project.
  *
  */
-
+#include <M5Atom.h>
 #include <unity.h>
 
 void setUp(void)
@@ -41,6 +41,9 @@ void test_loop(void)
 
 void RUN_UNITY_TESTS()
 {
+    log_d("========================================");
+    log_d("M5Atom initialized.");
+    log_d("========================================");
     UNITY_BEGIN();
     //////////////////////////////////
     RUN_TEST(test_setup);
@@ -55,14 +58,25 @@ void RUN_UNITY_TESTS()
 #include <Arduino.h>
 void setup()
 {
-    // NOTE!!! Wait for >2 secs
-    // if board doesn't support software reset via Serial.DTR/RTS
-    delay(2000);
+    bool enable_serial  = true;
+    bool enable_i2c     = false;
+    bool enable_display = true;
+    (void)M5.begin(enable_serial, enable_i2c, enable_display);
+    (void)M5.dis.begin();
+    (void)M5.dis.fillpix(CRGB::White);
+    delay(200);
+    (void)M5.dis.fillpix(CRGB::Black);
+    delay(200);
+    (void)M5.dis.fillpix(CRGB::White);
 
     RUN_UNITY_TESTS();
 }
 void loop()
 {
+    (void)M5.update();
+    if (M5.Btn.wasPressed()) {
+        RUN_UNITY_TESTS();
+    }
 }
 #else
 int main(int argc, char **argv)

@@ -186,12 +186,55 @@ public:
         int err_value                           = 0;
     };
 
+    class status_word {
+    public:
+        status_word()
+        {
+            this->clear();
+        }
+        void check(int value)
+        {
+            this->clear();
+            // is_run
+            if (0 < (value & 0x01)) {
+                this->is_run = true;
+            }
+            // shaft_lock
+            if (0 < (value & 0x40)) {
+                this->shaft_lock = true;
+            }
+            // emergency_stop
+            if (0 < (value & 0x80)) {
+                this->emergency_stop = true;
+            }
+            // emergency_stop
+            if (0 < (value & 0xC0)) {
+                this->alarm = true;
+            }
+        }
+        void clear()
+        {
+            this->shaft_lock     = false;
+            this->emergency_stop = false;
+            this->alarm          = false;
+            this->is_run         = false;
+        }
+        bool shaft_lock     = false;
+        bool emergency_stop = false;
+        bool alarm          = false;
+        bool is_run         = false;
+    };
+
 public:
     LibZLAC8015DModbus()
     {
     }
     ~LibZLAC8015DModbus()
     {
+    }
+    unsigned int get_send_address()
+    {
+        return this->_address;
     }
     void set_send_address(unsigned int address)
     {
@@ -1001,6 +1044,10 @@ public:
             }
         }
         return result;
+    }
+    MODBUS_DRIVER_MODE current_mode()
+    {
+        return this->_mode;
     }
     /**
      * @brief Get the control mode object (0x200Dh)
@@ -4714,61 +4761,18 @@ public:
     /**
      * @brief Get the status word object (0x20A2h)
      */
-    bool get_status_word(bool *left_shaft_lock,
-                         bool *left_emergency_stop,
-                         bool *left_alarm,
-                         bool *left_is_run,
-                         bool *right_shaft_lock,
-                         bool *right_emergency_stop,
-                         bool *right_alarm,
-                         bool *right_is_run)
+    bool get_status_word(status_word *left, status_word *right)
     {
-        bool result           = true;
-        *left_shaft_lock      = false;
-        *left_emergency_stop  = false;
-        *left_alarm           = false;
-        *left_is_run          = false;
-        *right_shaft_lock     = false;
-        *right_emergency_stop = false;
-        *right_alarm          = false;
-        *right_is_run         = false;
+        bool result = true;
+        left->clear();
+        right->clear();
 
-        int result_left     = 0;
-        int result_right    = 0;
         MessageFrame _frame = this->_modbus_send_read(0x20A2u, 1);
         if (0x80 <= _frame.function) {
             result = false;
         } else {
-            result_left  = _frame.data[0];
-            result_right = _frame.data[1];
-            // is_run
-            if (0 < (result_left & 0x01)) {
-                *left_is_run = true;
-            }
-            if (0 < (result_right & 0x01)) {
-                *right_is_run = true;
-            }
-            // shaft_lock
-            if (0 < (result_left & 0x40)) {
-                *left_shaft_lock = true;
-            }
-            if (0 < (result_right & 0x40)) {
-                *right_shaft_lock = true;
-            }
-            // emergency_stop
-            if (0 < (result_left & 0x80)) {
-                *left_emergency_stop = true;
-            }
-            if (0 < (result_right & 0x80)) {
-                *right_emergency_stop = true;
-            }
-            // emergency_stop
-            if (0 < (result_left & 0xC0)) {
-                *left_alarm = true;
-            }
-            if (0 < (result_right & 0xC0)) {
-                *right_alarm = true;
-            }
+            left->check(_frame.data[0]);
+            left->check(_frame.data[1]);
         }
         return result;
     }

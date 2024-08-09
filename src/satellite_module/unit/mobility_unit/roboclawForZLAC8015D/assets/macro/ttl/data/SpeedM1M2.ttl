@@ -1,0 +1,8 @@
+setdebug 2
+
+send 128 37
+send 0 0 0 0
+send 0 0 0 0
+send 0 165
+
+setdebug 0

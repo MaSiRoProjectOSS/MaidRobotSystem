@@ -212,9 +212,11 @@ void RoboClawForZlac::_receive()
             case 'c':
                 this->_zlac->cmd_clear_fault(ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL);
                 break;
+#if 0
             case 'm':
                 this->_zlac->cmd_looking_for_z_signal();
                 break;
+#endif
             case '0':
                 id           = 0x80;
                 command      = 0x5A;
@@ -657,7 +659,7 @@ bool RoboClawForZlac::reset()
 #endif
 
         this->_zlac->cmd_speed_set_acc_and_dec(this->_zlac->info.acceleration_ms, this->_zlac->info.deceleration_ms);
-        this->_zlac->cmd_looking_for_z_signal();
+        //this->_zlac->cmd_looking_for_z_signal();
         this->_set_speed(0, 0);
         result = true;
     }
@@ -1363,7 +1365,7 @@ void RoboClawForZlac::_read_error(unsigned int crc, uint8_t command)
 RoboClawForZlac::RoboClawForZlac()
 {
 #if ZLAC_DRIVER == ZLAC8015D_MODBUS
-    this->_zlac = new ZLAC8015DModbus();
+    this->_zlac = new ZLAC8015DCtrl();
 #elif ZLAC_DRIVER == ZLAC706_SERIAL
     this->_zlac = new ZLAC706Serial();
 #endif

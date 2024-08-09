@@ -458,6 +458,12 @@ protected:
      */
     void _send_rtu(MessageFrame frame)
     {
+        static char buffer[255] = { 0 };
+        size_t received_size    = this->_serial->available();
+        if (0 < received_size) {
+            this->_serial->readBytes(buffer, received_size);
+        }
+
         // address
         this->_serial->write(frame.address);
         // function
