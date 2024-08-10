@@ -251,44 +251,6 @@ public:
         return result;
     }
 
-    bool cmd_setting_inverted(ZLAC::TARGET_MOTOR target, bool value)
-    {
-        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_LEFT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
-            this->info.left.interval = value;
-        }
-        if ((ZLAC::TARGET_MOTOR::TARGET_MOTOR_RIGHT == target) || (ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL == target)) {
-            this->info.right.interval = value;
-        }
-        return true;
-    }
-    bool cmd_setting_acc(ZLAC::TARGET_MOTOR target, int value)
-    {
-        if (0 > value) {
-            value = 0;
-        }
-        this->info.acceleration_ms = value;
-        this->cmd_speed_set_acc_and_dec(this->info.acceleration_ms, this->info.deceleration_ms, target);
-
-        return true;
-    }
-    bool cmd_setting_dcc(ZLAC::TARGET_MOTOR target, int value)
-    {
-        if (0 > value) {
-            value = 0;
-        }
-        this->info.deceleration_ms = value;
-        this->cmd_speed_set_acc_and_dec(this->info.acceleration_ms, this->info.deceleration_ms, target);
-        return true;
-    }
-    bool cmd_setting_limit(ZLAC::TARGET_MOTOR target, int value)
-    {
-        if (0 > value) {
-            value = 0;
-        }
-        this->info.SPEED_LIMIT = value;
-        return true;
-    }
-
 public:
     bool cmd_modify_the_rated_current(int value_mW, ZLAC::TARGET_MOTOR target = ZLAC::TARGET_MOTOR::TARGET_MOTOR_ALL)
     {

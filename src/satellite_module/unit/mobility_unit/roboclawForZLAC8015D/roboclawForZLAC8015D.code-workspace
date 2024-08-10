@@ -79,7 +79,10 @@
 			"unordered_map": "cpp",
 			"unordered_set": "cpp",
 			"vector": "cpp",
-			"system_error": "cpp"
+			"system_error": "cpp",
+			"array": "cpp",
+			"list": "cpp",
+			"initializer_list": "cpp"
 		}
 	}
 }
